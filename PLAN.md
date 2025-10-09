@@ -405,6 +405,36 @@ fn test_dag_with_energy() {
 
 ---
 
+## Unresolved Issues
+
+**CRITICAL - Must resolve before implementation:**
+
+- [ ] **Verify token usage data availability** - Check actual Claude Code hook event payloads to confirm token metrics are included in PostToolUse events. If not, token-based metrics (lines 43, 340, 383) cannot be implemented as designed.
+
+- [ ] **Define workflow run identity** - `Event` struct includes `workflow_id: Option<String>` but Hegel doesn't currently generate or persist workflow run IDs. Need strategy: timestamp? UUID? hash of start time + workflow name?
+
+- [ ] **Specify file watching strategy for TUI** - `hegel top` needs "live updating" metrics (line 300) but polling strategy is undefined:
+  - How often to poll `.hegel/hooks.jsonl` for new events?
+  - Use file watching (notify crate) or simple polling?
+  - How to handle file being written while reading?
+
+- [ ] **Define chronological merge algorithm** - Test in Step 2 (line 116) asserts events are "chronologically ordered" when merging two JSONL files, but merge strategy unspecified (merge sort? read all + sort?). Impacts memory usage for large files.
+
+- [ ] **Add test isolation strategy** - Many tests will write to `.hegel/hooks.jsonl` and `.hegel/states.jsonl`. Need:
+  - Helper like `with_temp_hegel_dir()` for test isolation
+  - Cleanup strategy for test artifacts
+  - Prevent tests from interfering with actual development state
+
+**MINOR - Can resolve during implementation:**
+
+- [ ] **Fix Step 5 test format inconsistency** - Uses bash commands (lines 243-252) instead of Rust unit tests, breaking TDD pattern. Should be integration test or manual verification step.
+
+- [ ] **Add `colored` dependency** - Notes mention `colored` crate (line 424) but Step 5 only lists ratatui/crossterm.
+
+- [ ] **Clarify graph rendering scope** - Step 8 treats ASCII graph rendering as "Optional" (line 391). Should either commit to it in Phase 1 or explicitly move to Phase 2.
+
+---
+
 ## Implementation Order (Red-Green-Refactor)
 
 1. **State transition logging** (Step 1) - Foundational for correlation
