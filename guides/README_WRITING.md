@@ -44,15 +44,15 @@ Brief description of what it does and key technology/pattern
 - How it fits in the broader system/integration
 
 ### **3. Key API (essential methods only)**
-```python
-# 3-5 most important methods with type hints
-primary_method(param: Type) -> ReturnType
-secondary_method(param: Type) -> ReturnType
+```
+primary_operation(input) -> output
+secondary_operation(config) -> result
+utility_function(data) -> transformed
 ```
 
 ### **4. Core Concepts (bullet list)**
 - Key data structures or abstractions
-- Critical constraints or assumptions  
+- Critical constraints or assumptions
 - Integration points with other libraries
 - Important design patterns
 
@@ -63,8 +63,8 @@ secondary_method(param: Type) -> ReturnType
 - Integration pitfalls
 
 ### **6. Quick Test**
-```bash
-pytest tests/test_basic.py  # or most representative test
+```
+command to run most representative test
 ```
 
 ---
@@ -78,7 +78,7 @@ pytest tests/test_basic.py  # or most representative test
 
 ### **Be Specific**
 - Include actual method signatures, not generic descriptions
-- Mention specific constraints (e.g., "max 1000 rooms before performance degrades")
+- Mention specific constraints (e.g., "performance degrades beyond 10K items")
 - Reference specific test files for examples
 
 ### **Be Practical**
@@ -104,10 +104,10 @@ Brief description of what it does
 2–3 sentences covering the core problem solved, architectural approach, and role in broader integration.
 
 ## Key API
-```python
-most_important_method(params: Type) -> ReturnType
-second_most_important(params: Type) -> ReturnType
-utility_method(params: Type) -> ReturnType
+```
+most_important_method(params) -> return_value
+second_most_important(params) -> return_value
+utility_method(params) -> return_value
 ```
 
 ## Core Concepts
@@ -122,7 +122,7 @@ utility_method(params: Type) -> ReturnType
 - Integration pitfall with other libraries
 
 ## Quick Test
-`pytest tests/test_representative.py`
+`command to run representative test`
 ```
 
 ---

@@ -85,10 +85,11 @@ A **PLAN.md is a strategic roadmap** describing **what to build and how to build
 ### Code Patterns
 Use examples as **patterns**, not literal code:
 
-    cmdWalk(cells, direction) {
-        if (!(direction in DIRECTIONS)) throw Error(`Invalid: ${direction}`);
-        const [dx, dy] = DIRECTIONS[direction];
-        this.cursor.x += cells * dx; this.cursor.y += cells * dy;
+    operation(input, params) {
+        if (!validate(params)) throw Error(`Invalid: ${params}`);
+        let result = process(input, params);
+        update_state(result);
+        return result;
     }
 
 ### Tasks
@@ -102,10 +103,10 @@ Break implementation into minimal units:
 ### Success Criteria
 Always check with concrete, objective boxes:
 
-- [ ] Parser initializes cleanly  
-- [ ] Commands mutate state correctly  
-- [ ] Errors raised for invalid input  
-- [ ] Test suite runs with single command  
+- [ ] Module initializes cleanly
+- [ ] Operations produce expected output
+- [ ] Errors raised for invalid input
+- [ ] Test suite passes  
 
 ---
 
