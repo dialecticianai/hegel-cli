@@ -43,6 +43,9 @@ Each tool enables new workflows. Each abstraction saves future tokens. Build onc
 **Test density is infrastructure**
 Verbose tests compound as friction. Extract patterns early, compress aggressively, save context forever.
 
+**Refactor early, not late**
+Human wisdom says wait for pain. LLM coding says wait for pattern. 18x token overhead is immediate cost, not future debt. Line count thresholds are literal constraints, not suggestions. Structure for reading efficiency, not writing comfort.
+
 **Housekeeping before heroics**
 Automate the pattern before repeating it. Infrastructure investment pays immediately.
 
