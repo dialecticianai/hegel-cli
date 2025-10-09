@@ -13,8 +13,8 @@
 **Context**: Hook events are now captured in `.hegel/hooks.jsonl`. This phase processes that data into actionable metrics.
 
 **Prerequisites**
-- [ ] Cache the ratatui docs in .webcache/ratatui (https://docs.rs/ratatui/latest/ratatui/)
-- [ ] Add `ratatui` and `crossterm` to cargo toml
+- [x] Add `ratatui` and `crossterm` to cargo toml ✅
+- [x] State transition logging to states.jsonl ✅
 
 **Tasks**:
 - [ ] Build metrics parser

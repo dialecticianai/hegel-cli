@@ -1,5 +1,6 @@
 mod commands;
 mod engine;
+mod metrics;
 mod storage;
 
 #[cfg(test)]
