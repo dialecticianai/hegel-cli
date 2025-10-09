@@ -53,80 +53,6 @@ struct PhaseMetrics {
 
 ## Implementation Steps (TDD)
 
-### Step 0: Prerequisites ✅ COMPLETE
-
-**Goal**: Infrastructure needed for metrics collection
-
-**Status**: All prerequisites implemented with 70 passing tests
-
-**Prerequisite 1**: Add `--state-dir` flag and `HEGEL_STATE_DIR` env var ✅
-```rust
-#[test]
-fn test_state_dir_flag_overrides_default() {
-    // Run hegel command with --state-dir /tmp/test
-    // Assert state written to /tmp/test/.hegel/state.json
-}
-
-#[test]
-fn test_state_dir_env_var() {
-    // Set HEGEL_STATE_DIR=/tmp/test
-    // Run hegel command
-    // Assert state written to /tmp/test/state.json
-}
-
-#[test]
-fn test_state_dir_precedence() {
-    // Set HEGEL_STATE_DIR=/tmp/env
-    // Run with --state-dir /tmp/flag
-    // Assert flag takes precedence
-}
-```
-
-**Prerequisite 2**: Inject timestamp in `hegel hook` command ✅
-```rust
-#[test]
-fn test_hook_injects_timestamp() {
-    // Pipe hook event JSON to `hegel hook PostToolUse`
-    // Read hooks.jsonl
-    // Assert written event has timestamp field
-}
-```
-
-**Implementation Note**: Refactored into testable `process_hook_event()` function. Timestamps injected as RFC3339 format using `chrono::Utc::now()`.
-
-**Prerequisite 3**: Generate workflow_id in `hegel start` ✅
-```rust
-#[test]
-fn test_start_generates_workflow_id() {
-    // Run `hegel start discovery`
-    // Load state.json
-    // Assert workflow_id is ISO timestamp
-}
-```
-
-**Implementation**:
-- Modify `src/main.rs` to accept global `--state-dir` flag
-- Modify `FileStorage::new()` to check `HEGEL_STATE_DIR` env var if no flag provided
-- Update `hegel hook` to inject `timestamp` field before appending to hooks.jsonl
-- Update `hegel start` to generate workflow_id (ISO timestamp) and persist in state.json
-
-**Files to modify**:
-- `src/main.rs` - Add global `--state-dir` flag
-- `src/storage/mod.rs` - Check env var in constructor
-- `src/commands/mod.rs` - Update hook and start commands
-
-**Completed Implementation Summary**:
-- Added `workflow_id: Option<String>` to `WorkflowState` struct
-- Implemented `FileStorage::resolve_state_dir()` with correct precedence (CLI > env > default)
-- Added global `--state-dir` CLI flag to main.rs
-- Refactored `handle_hook()` to inject timestamps via `process_hook_event()`
-- Fixed bug: `handle_hook` now uses storage's state_dir instead of always using default
-- `start_workflow()` generates workflow_id as ISO 8601 timestamp
-- All 70 tests passing (1 ignored pre-existing test)
-- Test coverage: 93.01% lines
-
----
-
 ### Step 1: State Transition Logging
 
 **Goal**: Emit workflow state changes to `.hegel/states.jsonl`
@@ -481,8 +407,7 @@ fn test_dag_with_energy() {
 
 ## Success Criteria (from ROADMAP)
 
-- [x] Both event streams (hooks.jsonl, states.jsonl) feed unified metrics for rule evaluation
-- [x] **Step 0 Prerequisites complete**: --state-dir flag, timestamp injection, workflow_id generation
+- [ ] Both event streams (hooks.jsonl, states.jsonl) feed unified metrics for rule evaluation
 - [ ] `hegel top` displays correlated state and performance telemetry in real-time
 - [ ] Reports show phase metrics correlating epistemic state with energetic usage
 - [ ] Graph reconstruction visualizes branching and synthesis across workflows
@@ -491,7 +416,6 @@ fn test_dag_with_energy() {
 
 ## Implementation Order (Red-Green-Refactor)
 
-0. **Prerequisites** (Step 0) - Infrastructure setup (--state-dir flag, timestamp injection, workflow_id generation)
 1. **State transition logging** (Step 1) - Foundational for correlation
 2. **Unified event parser** (Step 2) - Required for all downstream metrics
 3. **Metrics aggregator** (Step 3) - Core business logic
@@ -509,7 +433,4 @@ fn test_dag_with_energy() {
 - **Color palette**: Use `colored` crate for terminal, ratatui themes for TUI
 - **Performance**: Stream processing for large JSONL files (avoid loading all into memory)
 - **Error handling**: Gracefully handle malformed JSONL entries (log + skip)
-- **Test isolation**: Add `--state-dir <PATH>` flag (or `HEGEL_STATE_DIR` env var) to override default `.hegel` directory
-  - Precedence: CLI flag > env var > default (`.hegel`)
-  - Tests use `tempfile` crate with `--state-dir` for automatic cleanup
-  - Users can manage multiple workflow contexts with different state directories
+- **Test isolation**: Tests use `tempfile` crate with `--state-dir` flag for automatic cleanup

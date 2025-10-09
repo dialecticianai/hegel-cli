@@ -122,6 +122,60 @@ All state is stored in `~/.hegel/state.json` with atomic writes to prevent corru
 - Current node/phase
 - Navigation history
 - Workflow mode
+- Unique workflow ID (ISO 8601 timestamp)
+
+### Configurable State Directory
+
+By default, Hegel uses `~/.hegel/` for state storage. You can override this:
+
+**Via command-line flag:**
+```bash
+hegel --state-dir /tmp/my-project start discovery
+```
+
+**Via environment variable:**
+```bash
+export HEGEL_STATE_DIR=/tmp/my-project
+hegel start discovery
+```
+
+**Precedence:** CLI flag > environment variable > default (`~/.hegel/`)
+
+**Use cases:**
+- **Testing:** Isolate test runs in temporary directories
+- **Multiple projects:** Run separate workflow contexts simultaneously
+- **CI/CD:** Configure non-default state locations in automated environments
+
+## Claude Code Integration
+
+Hegel integrates with [Claude Code](https://claude.com/claude-code) to capture development activity as you work. This enables metrics collection and workflow analysis.
+
+### Hook Events
+
+The `hegel hook` command processes Claude Code hook events:
+
+```bash
+# Typically configured in .claude/settings.json
+hegel hook PostToolUse < event.json
+```
+
+Hook events are logged to `.hegel/hooks.jsonl` with timestamps. Each workflow session is assigned a unique `workflow_id` (ISO 8601 timestamp) when you run `hegel start`, enabling correlation between workflow phases and development activity.
+
+### Metrics Commands
+
+**Coming soon:**
+- `hegel metrics` - View development activity summaries
+- `hegel top` - Interactive TUI dashboard with live metrics
+
+**What's tracked:**
+- Tool usage (Bash, Read, Edit, Write commands)
+- File modifications across phases
+- Workflow state transitions
+- Token usage and performance metrics
+
+**Configuration:**
+
+See `.claude/settings.json` in this repository for an example hook configuration. Hook events are optional—Hegel works without them, but metrics features require hook data.
 
 ## Contributing
 
