@@ -291,6 +291,63 @@ pub fn assert_state_eq(state: &State, node: &str, mode: &str, history: &[&str]) 
     assert_eq!(ws.history, history);
 }
 
+// ========== JSONL Test Helpers ==========
+
+/// Create a JSONL file for testing with given events
+///
+/// # Arguments
+/// * `events` - Array of JSON strings (one per line)
+/// * `filename` - Name of the JSONL file to create
+///
+/// # Returns
+/// A tuple of (TempDir, PathBuf) where PathBuf points to the created file
+///
+/// # Example
+/// ```ignore
+/// let events = vec![r#"{"type":"test","value":1}"#];
+/// let (_temp_dir, path) = create_jsonl_file(&events, "data.jsonl");
+/// ```
+pub fn create_jsonl_file(events: &[&str], filename: &str) -> (TempDir, PathBuf) {
+    let temp_dir = TempDir::new().unwrap();
+    let file_path = temp_dir.path().join(filename);
+    let content = events.join("\n");
+    std::fs::write(&file_path, content).unwrap();
+    (temp_dir, file_path)
+}
+
+/// Create a transcript.jsonl file for testing
+///
+/// # Example
+/// ```ignore
+/// let events = vec![r#"{"type":"assistant","usage":{"input_tokens":100}}"#];
+/// let (_temp_dir, path) = create_transcript_file(&events);
+/// ```
+pub fn create_transcript_file(events: &[&str]) -> (TempDir, PathBuf) {
+    create_jsonl_file(events, "transcript.jsonl")
+}
+
+/// Create a states.jsonl file for testing
+///
+/// # Example
+/// ```ignore
+/// let events = vec![r#"{"timestamp":"2025-01-01T00:00:00Z","from_node":"spec","to_node":"plan"}"#];
+/// let (_temp_dir, path) = create_states_file(&events);
+/// ```
+pub fn create_states_file(events: &[&str]) -> (TempDir, PathBuf) {
+    create_jsonl_file(events, "states.jsonl")
+}
+
+/// Create a hooks.jsonl file for testing
+///
+/// # Example
+/// ```ignore
+/// let events = vec![r#"{"session_id":"test","hook_event_name":"SessionStart"}"#];
+/// let (_temp_dir, path) = create_hooks_file(&events);
+/// ```
+pub fn create_hooks_file(events: &[&str]) -> (TempDir, PathBuf) {
+    create_jsonl_file(events, "hooks.jsonl")
+}
+
 // ========== Workflow Command Test Helpers ==========
 
 /// Helper to save and restore working directory

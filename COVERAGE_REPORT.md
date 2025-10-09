@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-09 19:35
+**Last Updated**: 2025-10-09 19:39
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **85.43%** lines | **85.33%** regions | **82.22%** functions
+**Overall Coverage**: **85.41%** lines | **85.19%** regions | **82.51%** functions
 
 ## Summary
 
 ```
-TOTAL                            3319               487    85.33%         180                32    82.22%        1785               260    85.43%           0                 0         -
+TOTAL                            3288               487    85.19%         183                32    82.51%        1782               260    85.41%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -20,9 +20,9 @@ TOTAL                            3319               487    85.33%         180   
 | `engine/mod.rs` | 99.67% | 99.43% | 94.74% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `metrics/mod.rs` | 83.93% | 84.62% | 81.82% | 🟡 Good |
+| `metrics/mod.rs` | 82.87% | 82.68% | 81.25% | 🟡 Good |
 | `storage/mod.rs` | 92.47% | 93.12% | 70.00% | 🟢 Excellent |
-| `test_helpers.rs` | 97.64% | 95.60% | 100.00% | 🟢 Excellent |
+| `test_helpers.rs` | 97.90% | 96.28% | 100.00% | 🟢 Excellent |
 
 ## Coverage Tiers
 
@@ -31,11 +31,11 @@ TOTAL                            3319               487    85.33%         180   
 - `engine/mod.rs` - 99.67%
 - `engine/template.rs` - 95.47%
 - `storage/mod.rs` - 92.47%
-- `test_helpers.rs` - 97.64%
+- `test_helpers.rs` - 97.90%
 
 ### 🟡 Good (70-89% lines)
 - `commands/hook.rs` - 80.52%
-- `metrics/mod.rs` - 83.93%
+- `metrics/mod.rs` - 82.87%
 
 ### 🟠 Moderate (40-69% lines)
 
@@ -47,7 +47,7 @@ TOTAL                            3319               487    85.33%         180   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 85.43% | ✅ Met |
+| Overall | ≥80% | 85.41% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

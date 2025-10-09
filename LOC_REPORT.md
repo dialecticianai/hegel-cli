@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-09 19:35
+**Last Updated**: 2025-10-09 19:39
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,242 | 2,206 | 4,448 |
-| **Comments** | 315 | - | 315 |
-| **Blank Lines** | 425 | - | 425 |
-| **Total Lines** | 2,982 | 2,206 | 5,188 |
+| **Lines** | 2,241 | 2,206 | 4,447 |
+| **Comments** | 351 | - | 351 |
+| **Blank Lines** | 411 | - | 411 |
+| **Total Lines** | 3,003 | 2,206 | 5,209 |
 | **Files** | 10 | 15 | 25 |
 
 **Documentation Ratio**: 0.98 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            10            425            315           2242
+Rust                            10            411            351           2241
 -------------------------------------------------------------------------------
-SUM:                            10            425            315           2242
+SUM:                            10            411            351           2241
 -------------------------------------------------------------------------------
 ```
 
@@ -43,9 +43,9 @@ SUM:                            10            425            315           2242
 | `engine/mod.rs` | 452 | 97 | 355 | 78.5% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
 | `main.rs` | 103 | 5 | 98 | 95.1% | ✅ |
-| `metrics/mod.rs` | 589 | 343 | 246 | 41.8% | ⚠️ Large |
+| `metrics/mod.rs` | 553 | 343 | 210 | 38.0% | ⚠️ Large |
 | `storage/mod.rs` | 461 | 173 | 288 | 62.5% | ✅ |
-| `test_helpers.rs` | 345 | 345 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers.rs` | 402 | 402 | 0 | 0.0% | ✅ (infra) |
 
 **⚠️ Warning:** 1 file(s) over 200 impl lines - consider splitting for maintainability
 

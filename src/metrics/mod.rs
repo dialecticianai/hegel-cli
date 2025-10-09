@@ -344,19 +344,11 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
-
-    fn create_test_hooks_file(events: &[&str]) -> (TempDir, std::path::PathBuf) {
-        let temp_dir = TempDir::new().unwrap();
-        let hooks_path = temp_dir.path().join("hooks.jsonl");
-        let content = events.join("\n");
-        fs::write(&hooks_path, content).unwrap();
-        (temp_dir, hooks_path)
-    }
+    use crate::test_helpers::*;
 
     #[test]
     fn test_parse_empty_file() {
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&[]);
+        let (_temp_dir, hooks_path) = create_hooks_file(&[]);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
         assert_eq!(metrics.total_events, 0);
         assert!(metrics.bash_commands.is_empty());
@@ -368,7 +360,7 @@ mod tests {
         let events = vec![
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"},"tool_response":{"stdout":"Compiling...","stderr":""}}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         assert_eq!(metrics.bash_commands.len(), 1);
@@ -385,7 +377,7 @@ mod tests {
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Edit","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/main.rs"}}"#,
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Write","timestamp":"2025-01-01T00:00:01Z","tool_input":{"file_path":"README.md"}}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         assert_eq!(metrics.file_modifications.len(), 2);
@@ -402,7 +394,7 @@ mod tests {
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo test"}}"#,
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         let freq = metrics.bash_command_frequency();
@@ -417,7 +409,7 @@ mod tests {
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Write","tool_input":{"file_path":"src/lib.rs"}}"#,
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Edit","tool_input":{"file_path":"src/main.rs"}}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         let freq = metrics.file_modification_frequency();
@@ -432,7 +424,7 @@ mod tests {
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
             r#"{"session_id":"test","hook_event_name":"Stop","timestamp":"2025-01-01T01:00:00Z"}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         assert_eq!(
@@ -451,7 +443,7 @@ mod tests {
             r#"{"session_id":"test","hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo test"}}"#,
         ];
-        let (_temp_dir, hooks_path) = create_test_hooks_file(&events);
+        let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
 
         // Only PostToolUse should be counted
@@ -463,17 +455,12 @@ mod tests {
 
     #[test]
     fn test_parse_transcript_token_usage() {
-        let temp_dir = TempDir::new().unwrap();
-        let transcript_path = temp_dir.path().join("transcript.jsonl");
-
         let events = vec![
             r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50,"cache_creation_input_tokens":200,"cache_read_input_tokens":300}}"#,
             r#"{"type":"user","content":"test message"}"#,
             r#"{"type":"assistant","usage":{"input_tokens":150,"output_tokens":75}}"#,
         ];
-
-        fs::write(&transcript_path, events.join("\n")).unwrap();
-
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
         let metrics = parse_transcript_file(&transcript_path).unwrap();
 
         assert_eq!(metrics.total_input_tokens, 250);
@@ -485,17 +472,12 @@ mod tests {
 
     #[test]
     fn test_parse_transcript_skip_non_assistant() {
-        let temp_dir = TempDir::new().unwrap();
-        let transcript_path = temp_dir.path().join("transcript.jsonl");
-
         let events = vec![
             r#"{"type":"user","content":"hello"}"#,
             r#"{"type":"system","content":"system message"}"#,
             r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
         ];
-
-        fs::write(&transcript_path, events.join("\n")).unwrap();
-
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
         let metrics = parse_transcript_file(&transcript_path).unwrap();
 
         assert_eq!(metrics.assistant_turns, 1);
@@ -504,18 +486,13 @@ mod tests {
 
     #[test]
     fn test_parse_transcript_new_format_message_usage() {
-        let temp_dir = TempDir::new().unwrap();
-        let transcript_path = temp_dir.path().join("transcript.jsonl");
-
         // New Claude Code format: token usage nested in message.usage
         let events = vec![
             r#"{"type":"assistant","message":{"usage":{"input_tokens":100,"output_tokens":50,"cache_creation_input_tokens":200,"cache_read_input_tokens":300}}}"#,
             r#"{"type":"user","content":"test message"}"#,
             r#"{"type":"assistant","message":{"usage":{"input_tokens":150,"output_tokens":75}}}"#,
         ];
-
-        fs::write(&transcript_path, events.join("\n")).unwrap();
-
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
         let metrics = parse_transcript_file(&transcript_path).unwrap();
 
         assert_eq!(metrics.total_input_tokens, 250);
@@ -527,9 +504,6 @@ mod tests {
 
     #[test]
     fn test_parse_transcript_mixed_format() {
-        let temp_dir = TempDir::new().unwrap();
-        let transcript_path = temp_dir.path().join("transcript.jsonl");
-
         // Mix of old and new formats in same file (resilience test)
         let events = vec![
             r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
@@ -537,9 +511,7 @@ mod tests {
             r#"{"type":"user","content":"test"}"#,
             r#"{"type":"assistant","usage":{"input_tokens":200,"output_tokens":100}}"#,
         ];
-
-        fs::write(&transcript_path, events.join("\n")).unwrap();
-
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
         let metrics = parse_transcript_file(&transcript_path).unwrap();
 
         assert_eq!(metrics.total_input_tokens, 450); // 100 + 150 + 200
@@ -552,16 +524,11 @@ mod tests {
 
     #[test]
     fn test_parse_states_file() {
-        let temp_dir = TempDir::new().unwrap();
-        let states_path = temp_dir.path().join("states.jsonl");
-
         let events = vec![
             r#"{"timestamp":"2025-01-01T00:00:00Z","workflow_id":"wf-001","from_node":"spec","to_node":"plan","phase":"plan","mode":"discovery"}"#,
             r#"{"timestamp":"2025-01-01T01:00:00Z","workflow_id":"wf-001","from_node":"plan","to_node":"code","phase":"code","mode":"discovery"}"#,
         ];
-
-        fs::write(&states_path, events.join("\n")).unwrap();
-
+        let (_temp_dir, states_path) = create_states_file(&events);
         let transitions = parse_states_file(&states_path).unwrap();
 
         assert_eq!(transitions.len(), 2);
@@ -574,13 +541,10 @@ mod tests {
 
     #[test]
     fn test_parse_states_with_none_workflow_id() {
-        let temp_dir = TempDir::new().unwrap();
-        let states_path = temp_dir.path().join("states.jsonl");
-
-        let event = r#"{"timestamp":"2025-01-01T00:00:00Z","workflow_id":null,"from_node":"spec","to_node":"plan","phase":"plan","mode":"discovery"}"#;
-
-        fs::write(&states_path, event).unwrap();
-
+        let events = vec![
+            r#"{"timestamp":"2025-01-01T00:00:00Z","workflow_id":null,"from_node":"spec","to_node":"plan","phase":"plan","mode":"discovery"}"#,
+        ];
+        let (_temp_dir, states_path) = create_states_file(&events);
         let transitions = parse_states_file(&states_path).unwrap();
 
         assert_eq!(transitions.len(), 1);
