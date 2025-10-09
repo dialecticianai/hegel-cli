@@ -161,17 +161,30 @@ hegel hook PostToolUse < event.json
 
 Hook events are logged to `.hegel/hooks.jsonl` with timestamps. Each workflow session is assigned a unique `workflow_id` (ISO 8601 timestamp) when you run `hegel start`, enabling correlation between workflow phases and development activity.
 
-### Metrics Commands
+### Analyzing Metrics
+
+View captured development activity and metrics:
+
+```bash
+hegel analyze
+```
+
+Shows:
+- Session ID and workflow summary
+- Token usage (input/output/cache metrics from transcripts)
+- Activity summary (bash commands, file modifications)
+- Top commands and most-edited files
+- Workflow state transitions
 
 **Coming soon:**
-- `hegel metrics` - View development activity summaries
 - `hegel top` - Interactive TUI dashboard with live metrics
+- Per-phase budget tracking and alerts
 
 **What's tracked:**
-- Tool usage (Bash, Read, Edit, Write commands)
-- File modifications across phases
-- Workflow state transitions
-- Token usage and performance metrics
+- Tool usage (Bash, Read, Edit, Write, etc.)
+- File modifications with frequency counts
+- Workflow state transitions (logged to states.jsonl)
+- Token usage from Claude Code transcripts
 
 **Configuration:**
 

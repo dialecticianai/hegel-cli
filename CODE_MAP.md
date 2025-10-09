@@ -14,7 +14,8 @@
 - **State machine**: YAML workflows define nodes + transitions, engine evaluates claims to advance state
 - **Template system**: Workflow prompts support guide injection ({{GUIDE_NAME}}) and context variables ({{var}})
 - **Atomic writes**: State updates use temp file + rename to prevent corruption
-- **Hook integration**: Captures Claude Code events to `.hegel/hooks.jsonl` for future metrics
+- **File locking**: Exclusive locks on JSONL appends prevent concurrent write corruption (fs2 crate)
+- **Hook integration**: Captures Claude Code events to `.hegel/hooks.jsonl`, parses transcripts for token metrics
 
 ---
 
@@ -34,16 +35,20 @@ hegel-cli/
 │   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers)
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
-│   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook)
+│   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
 │   │   ├── workflow.rs          # Workflow commands (start, next, status, reset)
-│   │   └── hook.rs              # Claude Code hook event capture (JSON stdin → hooks.jsonl)
+│   │   ├── hook.rs              # Claude Code hook event capture (JSON stdin → hooks.jsonl, with file locking)
+│   │   └── analyze.rs           # Metrics analysis and display (hegel analyze command)
 │   │
 │   ├── engine/                  # Layer 2: State machine and template rendering
 │   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt
 │   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
 │   │
+│   ├── metrics/                 # Metrics parsing and aggregation
+│   │   └── mod.rs               # parse_hooks_file, parse_transcript_file, parse_states_file, parse_unified_metrics
+│   │
 │   └── storage/                 # Layer 3: Atomic persistence and event logging
-│       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl)
+│       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
 │
 ├── workflows/                   # YAML workflow definitions
 │   ├── discovery.yaml           # Learning-focused workflow (SPEC → PLAN → CODE → LEARNINGS → README)
@@ -65,7 +70,11 @@ hegel-cli/
 ├── scripts/                     # Development utilities
 │   ├── generate-coverage-report.sh  # Update COVERAGE_REPORT.md
 │   ├── generate-loc-report.sh       # Update LOC_REPORT.md
-│   └── check-transcript-tokens.sh   # Validate conversation token usage
+│   ├── check-transcript-tokens.sh   # Validate conversation token usage
+│   ├── analyze-hook-schema.sh       # Explore hook event schema
+│   ├── check-hook-fields.sh         # Verify hook field availability
+│   ├── analyze-transcripts.sh       # Explore transcript structure
+│   └── summarize-findings.sh        # Summary of hook/transcript analysis
 │
 ├── .claude/                     # Claude Code configuration
 │   └── settings.json            # Hook routing to `hegel hook` command
