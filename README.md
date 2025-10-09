@@ -4,6 +4,8 @@
 
 A command-line tool for orchestrating Dialectic-Driven Development workflows. Hegel guides you through structured development cycles with state-based workflow management.
 
+**Designed for AI agents, ergonomic for humans.** Hegel is primarily an agent-facing CLI that provides deterministic workflow guardrails for AI-assisted development. It's also comfortable for direct human use.
+
 ## Installation
 
 ```bash
@@ -103,6 +105,10 @@ All state is stored in `~/.hegel/state.json` with atomic writes to prevent corru
 - Current node/phase
 - Navigation history
 - Workflow mode
+
+## Contributing
+
+For AI agents or developers working **on** Hegel (not just using it), see **`CLAUDE.md`** for project structure, development guidelines, and contribution workflow.
 
 ## License
 
