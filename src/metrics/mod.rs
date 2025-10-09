@@ -30,12 +30,13 @@ pub struct HookEvent {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cwd: Option<String>,
 
-    // TODO: Potentially unneeded fields (captured for schema exploration)
-    // - transcript_path: Only useful if we parse transcripts for token metrics
-    // - permission_mode: Probably not relevant for cycle detection
+    // CRITICAL: transcript_path is needed to parse token usage from transcript files
+    // Token data lives in message.usage (input_tokens, output_tokens, cache_*_input_tokens)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transcript_path: Option<String>,
 
+    // TODO: Potentially unneeded field (captured for schema exploration)
+    // - permission_mode: Probably not relevant for cycle detection or metrics
     #[serde(skip_serializing_if = "Option::is_none")]
     pub permission_mode: Option<String>,
 
@@ -61,6 +62,42 @@ pub struct FileModification {
     pub timestamp: Option<String>,
 }
 
+/// Token usage from transcript events
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TokenUsage {
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cache_creation_input_tokens: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cache_read_input_tokens: Option<u64>,
+}
+
+/// Transcript event (from Claude Code session transcript)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TranscriptEvent {
+    #[serde(rename = "type")]
+    pub event_type: String, // "assistant", "user", "system", "file-history-snapshot"
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub usage: Option<TokenUsage>,
+
+    // Catch-all for other fields
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
+}
+
+/// State transition event from states.jsonl
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StateTransitionEvent {
+    pub timestamp: String,
+    pub workflow_id: Option<String>,
+    pub from_node: String,
+    pub to_node: String,
+    pub phase: String,
+    pub mode: String,
+}
+
 /// Aggregated metrics from hook events
 #[derive(Debug, Default)]
 pub struct HookMetrics {
@@ -69,6 +106,16 @@ pub struct HookMetrics {
     pub file_modifications: Vec<FileModification>,
     pub session_start_time: Option<String>,
     pub session_end_time: Option<String>,
+}
+
+/// Aggregated token metrics from transcript
+#[derive(Debug, Default)]
+pub struct TokenMetrics {
+    pub total_input_tokens: u64,
+    pub total_output_tokens: u64,
+    pub total_cache_creation_tokens: u64,
+    pub total_cache_read_tokens: u64,
+    pub assistant_turns: usize,
 }
 
 impl HookMetrics {
@@ -161,6 +208,99 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
     }
 
     Ok(metrics)
+}
+
+/// Parse transcript file and extract token metrics
+pub fn parse_transcript_file<P: AsRef<Path>>(transcript_path: P) -> Result<TokenMetrics> {
+    let content = fs::read_to_string(transcript_path.as_ref()).with_context(|| {
+        format!(
+            "Failed to read transcript file: {:?}",
+            transcript_path.as_ref()
+        )
+    })?;
+
+    let mut metrics = TokenMetrics::default();
+
+    for (line_num, line) in content.lines().enumerate() {
+        let event: TranscriptEvent = serde_json::from_str(line).with_context(|| {
+            format!("Failed to parse transcript event at line {}", line_num + 1)
+        })?;
+
+        // Only assistant events have token usage
+        if event.event_type == "assistant" {
+            if let Some(usage) = event.usage {
+                metrics.total_input_tokens += usage.input_tokens;
+                metrics.total_output_tokens += usage.output_tokens;
+                metrics.total_cache_creation_tokens +=
+                    usage.cache_creation_input_tokens.unwrap_or(0);
+                metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
+                metrics.assistant_turns += 1;
+            }
+        }
+    }
+
+    Ok(metrics)
+}
+
+/// Parse states.jsonl and extract state transitions
+pub fn parse_states_file<P: AsRef<Path>>(states_path: P) -> Result<Vec<StateTransitionEvent>> {
+    let content = fs::read_to_string(states_path.as_ref())
+        .with_context(|| format!("Failed to read states file: {:?}", states_path.as_ref()))?;
+
+    let mut transitions = Vec::new();
+
+    for (line_num, line) in content.lines().enumerate() {
+        let event: StateTransitionEvent = serde_json::from_str(line).with_context(|| {
+            format!("Failed to parse state transition at line {}", line_num + 1)
+        })?;
+        transitions.push(event);
+    }
+
+    Ok(transitions)
+}
+
+/// Unified metrics combining all data sources
+#[derive(Debug, Default)]
+pub struct UnifiedMetrics {
+    pub hook_metrics: HookMetrics,
+    pub token_metrics: TokenMetrics,
+    pub state_transitions: Vec<StateTransitionEvent>,
+    pub session_id: Option<String>,
+}
+
+/// Parse all available metrics from .hegel directory
+pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetrics> {
+    let state_dir = state_dir.as_ref();
+    let hooks_path = state_dir.join("hooks.jsonl");
+    let states_path = state_dir.join("states.jsonl");
+
+    let mut unified = UnifiedMetrics::default();
+
+    // Parse hooks if available
+    if hooks_path.exists() {
+        unified.hook_metrics = parse_hooks_file(&hooks_path)?;
+
+        // Extract session_id and transcript_path from first hook event
+        let content = fs::read_to_string(&hooks_path)?;
+        if let Some(first_line) = content.lines().next() {
+            let event: HookEvent = serde_json::from_str(first_line)?;
+            unified.session_id = Some(event.session_id.clone());
+
+            // Parse transcript if we have a path
+            if let Some(transcript_path) = event.transcript_path {
+                if Path::new(&transcript_path).exists() {
+                    unified.token_metrics = parse_transcript_file(&transcript_path)?;
+                }
+            }
+        }
+    }
+
+    // Parse states if available
+    if states_path.exists() {
+        unified.state_transitions = parse_states_file(&states_path)?;
+    }
+
+    Ok(unified)
 }
 
 #[cfg(test)]
@@ -279,5 +419,87 @@ mod tests {
         // Only PostToolUse should be counted
         assert_eq!(metrics.bash_commands.len(), 1);
         assert_eq!(metrics.bash_commands[0].command, "cargo test");
+    }
+
+    // ========== Transcript Parser Tests ==========
+
+    #[test]
+    fn test_parse_transcript_token_usage() {
+        let temp_dir = TempDir::new().unwrap();
+        let transcript_path = temp_dir.path().join("transcript.jsonl");
+
+        let events = vec![
+            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50,"cache_creation_input_tokens":200,"cache_read_input_tokens":300}}"#,
+            r#"{"type":"user","content":"test message"}"#,
+            r#"{"type":"assistant","usage":{"input_tokens":150,"output_tokens":75}}"#,
+        ];
+
+        fs::write(&transcript_path, events.join("\n")).unwrap();
+
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        assert_eq!(metrics.total_input_tokens, 250);
+        assert_eq!(metrics.total_output_tokens, 125);
+        assert_eq!(metrics.total_cache_creation_tokens, 200);
+        assert_eq!(metrics.total_cache_read_tokens, 300);
+        assert_eq!(metrics.assistant_turns, 2);
+    }
+
+    #[test]
+    fn test_parse_transcript_skip_non_assistant() {
+        let temp_dir = TempDir::new().unwrap();
+        let transcript_path = temp_dir.path().join("transcript.jsonl");
+
+        let events = vec![
+            r#"{"type":"user","content":"hello"}"#,
+            r#"{"type":"system","content":"system message"}"#,
+            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
+        ];
+
+        fs::write(&transcript_path, events.join("\n")).unwrap();
+
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        assert_eq!(metrics.assistant_turns, 1);
+        assert_eq!(metrics.total_input_tokens, 100);
+    }
+
+    // ========== States Parser Tests ==========
+
+    #[test]
+    fn test_parse_states_file() {
+        let temp_dir = TempDir::new().unwrap();
+        let states_path = temp_dir.path().join("states.jsonl");
+
+        let events = vec![
+            r#"{"timestamp":"2025-01-01T00:00:00Z","workflow_id":"wf-001","from_node":"spec","to_node":"plan","phase":"plan","mode":"discovery"}"#,
+            r#"{"timestamp":"2025-01-01T01:00:00Z","workflow_id":"wf-001","from_node":"plan","to_node":"code","phase":"code","mode":"discovery"}"#,
+        ];
+
+        fs::write(&states_path, events.join("\n")).unwrap();
+
+        let transitions = parse_states_file(&states_path).unwrap();
+
+        assert_eq!(transitions.len(), 2);
+        assert_eq!(transitions[0].from_node, "spec");
+        assert_eq!(transitions[0].to_node, "plan");
+        assert_eq!(transitions[0].phase, "plan");
+        assert_eq!(transitions[1].from_node, "plan");
+        assert_eq!(transitions[1].to_node, "code");
+    }
+
+    #[test]
+    fn test_parse_states_with_none_workflow_id() {
+        let temp_dir = TempDir::new().unwrap();
+        let states_path = temp_dir.path().join("states.jsonl");
+
+        let event = r#"{"timestamp":"2025-01-01T00:00:00Z","workflow_id":null,"from_node":"spec","to_node":"plan","phase":"plan","mode":"discovery"}"#;
+
+        fs::write(&states_path, event).unwrap();
+
+        let transitions = parse_states_file(&states_path).unwrap();
+
+        assert_eq!(transitions.len(), 1);
+        assert_eq!(transitions[0].workflow_id, None);
     }
 }

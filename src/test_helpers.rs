@@ -295,20 +295,24 @@ pub fn assert_state_eq(state: &State, node: &str, mode: &str, history: &[&str]) 
 
 /// Helper to save and restore working directory
 pub struct WorkingDirGuard {
-    original_dir: PathBuf,
+    original_dir: Option<PathBuf>,
 }
 
 impl WorkingDirGuard {
     pub fn new() -> Self {
         Self {
-            original_dir: std::env::current_dir().unwrap(),
+            // Handle case where current dir doesn't exist (parallel test race condition)
+            original_dir: std::env::current_dir().ok(),
         }
     }
 }
 
 impl Drop for WorkingDirGuard {
     fn drop(&mut self) {
-        let _ = std::env::set_current_dir(&self.original_dir);
+        // Only restore if we successfully captured the original dir
+        if let Some(dir) = &self.original_dir {
+            let _ = std::env::set_current_dir(dir);
+        }
     }
 }
 

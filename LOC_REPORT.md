@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-09 19:08
+**Last Updated**: 2025-10-09 19:13
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,883 | 2,191 | 4,074 |
-| **Comments** | 268 | - | 268 |
-| **Blank Lines** | 347 | - | 347 |
-| **Total Lines** | 2,498 | 2,191 | 4,689 |
+| **Lines** | 2,045 | 2,193 | 4,238 |
+| **Comments** | 287 | - | 287 |
+| **Blank Lines** | 392 | - | 392 |
+| **Total Lines** | 2,724 | 2,193 | 4,917 |
 | **Files** | 9 | 15 | 24 |
 
-**Documentation Ratio**: 1.16 lines of docs per line of code
+**Documentation Ratio**: 1.07 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             9            347            268           1883
+Rust                             9            392            287           2045
 -------------------------------------------------------------------------------
-SUM:                             9            347            268           1883
+SUM:                             9            392            287           2045
 -------------------------------------------------------------------------------
 ```
 
@@ -42,9 +42,11 @@ SUM:                             9            347            268           1883
 | `engine/mod.rs` | 452 | 97 | 355 | 78.5% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
 | `main.rs` | 98 | 5 | 93 | 94.9% | ✅ |
-| `metrics/mod.rs` | 283 | 165 | 118 | 41.7% | ✅ |
+| `metrics/mod.rs` | 505 | 305 | 200 | 39.6% | ⚠️ Large |
 | `storage/mod.rs` | 450 | 162 | 288 | 64.0% | ✅ |
-| `test_helpers.rs` | 341 | 341 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers.rs` | 345 | 345 | 0 | 0.0% | ✅ (infra) |
+
+**⚠️ Warning:** 1 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -63,7 +65,7 @@ SUM:                             9            347            268           1883
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 81 |
-| `LOC_REPORT.md` | 91 |
+| `LOC_REPORT.md` | 93 |
 | `PLAN.md` | 436 |
 | `README.md` | 190 |
 | `ROADMAP.md` | 148 |
@@ -74,7 +76,7 @@ SUM:                             9            347            268           1883
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.16 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.07 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
