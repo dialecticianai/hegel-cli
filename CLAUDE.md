@@ -1,41 +1,34 @@
 # CLAUDE.md
 
-**Hegel**: CLI tool for Dialectic-Driven Development workflows. State-based orchestration, no external dependencies.
+**Hegel**: CLI orchestration for Dialectic-Driven Development. State-based workflow enforcement with no external dependencies.
+
+---
+
+## Architecture
+
+**Core**: `src/{main,commands,engine,storage,metrics}` - CLI → workflow state machine → file-based persistence
+**Workflows**: `workflows/*.yaml` - YAML definitions (discovery/execution modes)
+**Guides**: `guides/*.md` - Template content injected via `{{GUIDE_NAME}}` placeholders
+**State**: `.hegel/{state.json,hooks.jsonl,states.jsonl}` - Local state + event logs
+**Metrics**: Submodules `metrics/{hooks,transcript,states}.rs` - Parse JSONL, extract telemetry
 
 ---
 
 ## Philosophy (Compressed from LEXICON.md)
 
-**Context is king** - State determines what's possible. Files load tokens, line counts are physics.
+**Context is king** - Line counts are physics, not style. Token overhead is immediate cost. Refactor on pattern, not pain.
 
-**Refactor early, not late** - 18x token overhead is immediate cost, not future debt. Structure for reading efficiency, not writing comfort.
+**Artifacts disposable, clarity durable** - Code rewrites. Insights don't. Generation cheap, understanding valuable.
 
-**Infrastructure compounds** - Each abstraction saves future tokens. Test helpers, scripts, submodules all pay dividends forever.
+**Infrastructure compounds** - Helpers, submodules, test patterns save context forever. Build once, reuse infinitely.
 
-**Remember you're not human** - Comprehensive is just complete. No cost to thoroughness. Line count thresholds are literal constraints.
+**Test density is infrastructure** - Verbose patterns = compounding friction. Extract early, compress aggressively.
 
-**The human always knows best** - Execute instructions, don't editorialize. Questions are literal, not criticism.
+**Remember you're not human** - No cost to thoroughness. 18x token waste is real waste, not hypothetical debt.
 
-**Artifacts are disposable, clarity is durable** - Code can be rewritten, insights cannot. Documentation is the deliverable.
+**The human always knows best** - Execute instructions. Don't editorialize. Questions are literal, not criticism.
 
-**Housekeeping before heroics** - Automate the pattern before repeating it. Write scripts on second occurrence, not third pain.
-
-Full philosophy: See `LEXICON.md` when making architectural decisions.
-
----
-
-## Critical Files & State
-
-**State directory**: `.hegel/` (gitignored)
-- `state.json` - Current workflow state (atomic writes via temp+rename)
-- `states.jsonl` - State transition log (file-locked appends)
-- `hooks.jsonl` - Claude Code hook events (file-locked appends)
-
-**Workflows**: `workflows/*.yaml` - Phase definitions, transition logic
-**Guides**: `guides/*.md` - Template content for workflow prompts
-**Metrics**: `src/metrics/{hooks,transcript,states}.rs` - JSONL parsers (isolated by domain)
-
-**Session continuity**: `HANDOFF.md` (ephemeral, gitignored - see protocol below)
+**Refactor early, not late** - Structure for reading efficiency, not writing comfort. 200+ line files trigger immediate split.
 
 ---
 
@@ -43,68 +36,93 @@ Full philosophy: See `LEXICON.md` when making architectural decisions.
 
 **CRITICAL: Only update at END OF SESSION**
 
-**Session start:**
-1. Read `HANDOFF.md` if exists
-2. **Delete immediately**: `rm HANDOFF.md`
+**Purpose**: Session-to-session continuity. Gitignored ephemeral file.
 
-**Session end:**
-1. Write fresh `HANDOFF.md` (don't read old - already deleted)
-2. Include: status, learnings, next action, key files
-3. **NO FURTHER CODE WORK** after writing HANDOFF
-4. Only housekeeping: doc updates, commits
-5. **NEVER commit HANDOFF.md** (gitignored)
+**At session start:**
+- Read `HANDOFF.md` if exists
+- **Delete after reading**: `rm HANDOFF.md` (force explicit handoff, prevent drift)
 
----
+**At session end:**
+- Write fresh `HANDOFF.md` (old already deleted)
+- Include: Status, learnings, next action, key files
+- **NO CODE WORK AFTER WRITING** - signals session end
+- Only housekeeping: docs updates, commits
+- **NEVER commit HANDOFF.md**
 
-## Development Procedures
-
-**Commit format**: `type(scope): subject` with footer:
-```
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-**Doc updates BEFORE code commits**:
-- `README.md` - User-facing changes
-- `ROADMAP.md` - Delete completed phases (future-only policy)
-- `LEXICON.md` - New architectural principles
-- Coverage/LOC reports auto-update via pre-commit hook
-
-**Testing**: TDD discipline, ≥80% coverage target. `cargo test` runs all.
-
-**Module organization**: Split files >200 impl lines into submodules. Token efficiency over monolithic convenience.
+**When to write:**
+- User says "done for now"
+- Tokens running low
+- Natural stopping point
 
 ---
 
 ## Claude Code Hooks Integration
 
-Hegel captures Claude activity via hooks: `.claude/settings.json` routes events to `hegel hook <event>` (reads stdin JSON, appends to `.hegel/hooks.jsonl`).
+`hegel hook <event_name>` reads JSON from stdin, appends to `.hegel/hooks.jsonl`.
 
-Currently passive logging. Future: Cycle detection, budget enforcement from metrics.
-
----
-
-## Workflow Engine
-
-**Commands**: `start <workflow>` → `next '{"claim":true}'` → `status` → `reset`
-
-**State machine**: Load YAML → evaluate claims → transition nodes → save state
-
-**Templates**: `{{GUIDE_NAME}}` (required) and `{{?optional}}` in prompts, resolved from `guides/`
-
-**Atomic writes**: All `.hegel/*.json` writes use temp file + rename to prevent corruption.
+**Events**: `PostToolUse`, `PreToolUse`, `UserPromptSubmit`, `Stop`, `SessionStart`
+**Configuration**: `.claude/settings.json` routes events to Hegel
+**Schema**: `src/metrics/hooks.rs` - HookEvent struct, BashCommand, FileModification
+**Transcripts**: Token usage at `.message.usage` (new format) or `.usage` (old format)
 
 ---
 
-## Next Steps Protocol
+## Critical Patterns
 
-After completing tasks, propose next action with alternatives:
-- ✅ "Should I implement X, or refactor Y first?"
-- ❌ "Done. What's next?" (forces user to decide scope)
+**Atomic writes**: Temp file + rename (prevents corruption). See `src/storage/mod.rs`.
 
-Wait for explicit approval before proceeding.
+**File locking**: `fs2::FileExt` exclusive locks on JSONL appends (prevents concat corruption).
+
+**Test helpers**: `src/test_helpers.rs` - `create_{hooks,transcript,states}_file()` compress boilerplate.
+
+**Submodule organization**: `metrics/{hooks,transcript,states}.rs` - One parser per file. ~100-200 lines each.
+
+**Documentation ordering**: Update README/ROADMAP **BEFORE** committing code changes.
+
+**ROADMAP policy**: Future-only. Delete completed sections, don't mark them done.
 
 ---
 
-**Philosophy**: Thesis. Antithesis. Synthesis. State-based workflow orchestration with no external dependencies.
+## Session Continuity Vectors
+
+**Coverage target**: ≥80% lines (current: ~85%)
+**Commit format**: Conventional commits (`type(scope): subject`). Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`. Always include footer with Claude Code attribution.
+**Pre-commit hooks**: Auto-format, update coverage/LOC reports, auto-stage
+**Tests**: TDD discipline. `cargo test` before commits.
+
+**Key files:**
+- `LEXICON.md` - Full philosophy (reference, don't read every session)
+- `ROADMAP.md` - Future-only development plan
+- `COVERAGE_REPORT.md` - Auto-generated test metrics
+- `LOC_REPORT.md` - Auto-generated line counts
+
+---
+
+## Workflow Execution
+
+**State machine**: `src/engine/mod.rs` - Evaluate claims → transition nodes → update state
+**Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
+**Atomic state**: `.hegel/state.json` stores workflow definition + current node + history
+
+**Commands:**
+- `hegel start <workflow>` - Initialize from `workflows/<workflow>.yaml`
+- `hegel next '{"claim":true}'` - Evaluate claim, transition if matched
+- `hegel status` - Show current mode/node/history
+- `hegel reset` - Clear state
+- `hegel analyze` - Parse metrics from `.hegel/*.jsonl`
+
+---
+
+## Development Constraints
+
+**Platform**: macOS Apple Silicon (M1)
+**Language**: Rust stable
+**Dependencies**: Minimal (serde, anyhow, clap, fs2, ratatui/crossterm for future TUI)
+
+**Build**: `cargo build --release`
+**Test**: `cargo test`
+**Format**: `cargo fmt` (pre-commit auto-formats)
+
+---
+
+**Remember**: Hegel orchestrates workflows through state transitions. Keep it simple, transparent, local-first.
