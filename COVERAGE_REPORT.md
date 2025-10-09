@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-09 19:39
+**Last Updated**: 2025-10-09 19:45
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **85.41%** lines | **85.19%** regions | **82.51%** functions
 
@@ -20,7 +20,10 @@ TOTAL                            3288               487    85.19%         183   
 | `engine/mod.rs` | 99.67% | 99.43% | 94.74% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `metrics/mod.rs` | 82.87% | 82.68% | 81.25% | 🟡 Good |
+| `metrics/hooks.rs` | 92.81% | 94.40% | 94.12% | 🟢 Excellent |
+| `metrics/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `metrics/states.rs` | 84.85% | 86.30% | 60.00% | 🟡 Good |
+| `metrics/transcript.rs` | 87.01% | 88.14% | 77.78% | 🟡 Good |
 | `storage/mod.rs` | 92.47% | 93.12% | 70.00% | 🟢 Excellent |
 | `test_helpers.rs` | 97.90% | 96.28% | 100.00% | 🟢 Excellent |
 
@@ -30,18 +33,21 @@ TOTAL                            3288               487    85.19%         183   
 - `commands/workflow.rs` - 96.49%
 - `engine/mod.rs` - 99.67%
 - `engine/template.rs` - 95.47%
+- `metrics/hooks.rs` - 92.81%
 - `storage/mod.rs` - 92.47%
 - `test_helpers.rs` - 97.90%
 
 ### 🟡 Good (70-89% lines)
 - `commands/hook.rs` - 80.52%
-- `metrics/mod.rs` - 82.87%
+- `metrics/states.rs` - 84.85%
+- `metrics/transcript.rs` - 87.01%
 
 ### 🟠 Moderate (40-69% lines)
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/analyze.rs` - 0.00%
 - `main.rs` - 0.00%
+- `metrics/mod.rs` - 0.00%
 
 ## Coverage Targets
 
