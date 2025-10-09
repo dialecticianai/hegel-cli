@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use fs2::FileExt;
 use std::fs::OpenOptions;
 use std::io::{self, BufRead, Write};
 
@@ -34,16 +35,25 @@ fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
     std::fs::create_dir_all(&state_dir)
         .with_context(|| format!("Failed to create state directory: {:?}", state_dir))?;
 
-    // Append hook JSON to hooks.jsonl
+    // Append hook JSON to hooks.jsonl with exclusive file lock
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
         .open(&hooks_file)
         .with_context(|| format!("Failed to open hooks file: {:?}", hooks_file))?;
 
+    // Acquire exclusive lock to prevent race conditions from concurrent hook processes
+    file.lock_exclusive()
+        .with_context(|| format!("Failed to lock hooks file: {:?}", hooks_file))?;
+
     writeln!(file, "{}", enriched_json)
         .with_context(|| format!("Failed to write to hooks file: {:?}", hooks_file))?;
 
+    // Flush before unlocking to ensure data hits disk
+    file.flush()
+        .with_context(|| format!("Failed to flush hooks file: {:?}", hooks_file))?;
+
+    // Lock is automatically released when file goes out of scope
     Ok(())
 }
 

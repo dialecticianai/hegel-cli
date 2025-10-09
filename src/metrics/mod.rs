@@ -146,8 +146,23 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
     let mut metrics = HookMetrics::default();
 
     for (line_num, line) in content.lines().enumerate() {
-        let event: HookEvent = serde_json::from_str(line)
-            .with_context(|| format!("Failed to parse hook event at line {}", line_num + 1))?;
+        // Skip empty lines
+        if line.trim().is_empty() {
+            continue;
+        }
+
+        let event: HookEvent = match serde_json::from_str(line) {
+            Ok(event) => event,
+            Err(e) => {
+                // Skip malformed lines with warning (e.g., concatenated JSON)
+                eprintln!(
+                    "Warning: Skipping malformed hook event at line {}: {}",
+                    line_num + 1,
+                    e
+                );
+                continue;
+            }
+        };
 
         metrics.total_events += 1;
 

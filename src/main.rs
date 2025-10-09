@@ -44,6 +44,8 @@ enum Commands {
         /// Hook event name (e.g., PostToolUse, PreToolUse)
         event_name: String,
     },
+    /// Analyze captured metrics (hooks, transcripts, states)
+    Analyze,
 }
 
 fn main() -> Result<()> {
@@ -91,6 +93,9 @@ fn main() -> Result<()> {
         }
         Commands::Hook { event_name } => {
             commands::handle_hook(&event_name, &storage)?;
+        }
+        Commands::Analyze => {
+            commands::analyze_metrics(&storage)?;
         }
     }
 
