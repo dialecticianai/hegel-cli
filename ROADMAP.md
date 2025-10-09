@@ -10,15 +10,7 @@
 
 **Goal**: Parse hook data and build metrics to feed cycle detection and budget enforcement
 
-**Completed**:
-- ✅ Dependencies (`ratatui`, `crossterm`, `fs2`)
-- ✅ State transition logging (states.jsonl with file locking)
-- ✅ Metrics parser (hooks.jsonl, transcripts, states.jsonl)
-- ✅ `hegel analyze` command (session summary, token usage, activity metrics)
-- ✅ File locking for concurrent writes (prevents JSONL corruption)
-
-**Remaining Tasks**:
-- [ ] Fix transcript token parsing (currently showing "No token data found")
+**Tasks**:
 - [ ] Unified event schema documentation
   - Document common envelope for hooks.jsonl and states.jsonl
   - Formalize correlation between Claude activity and workflow state
