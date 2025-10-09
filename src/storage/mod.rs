@@ -9,6 +9,8 @@ pub struct WorkflowState {
     pub current_node: String,
     pub mode: String,
     pub history: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_id: Option<String>,
 }
 
 /// Complete state including workflow definition and current state
@@ -143,6 +145,7 @@ mod tests {
             current_node: "spec".to_string(),
             mode: "discovery".to_string(),
             history: vec!["spec".to_string()],
+            workflow_id: None,
         };
 
         let state = State {
@@ -191,6 +194,7 @@ mod tests {
                 current_node: "plan".to_string(),
                 mode: "execution".to_string(),
                 history: vec!["spec".to_string(), "plan".to_string()],
+                workflow_id: None,
             }),
         };
 
@@ -212,6 +216,7 @@ mod tests {
                 current_node: "spec".to_string(),
                 mode: "discovery".to_string(),
                 history: vec!["spec".to_string()],
+                workflow_id: None,
             }),
         };
         storage.save(&state1).unwrap();
@@ -223,6 +228,7 @@ mod tests {
                 current_node: "plan".to_string(),
                 mode: "execution".to_string(),
                 history: vec!["spec".to_string(), "plan".to_string()],
+                workflow_id: None,
             }),
         };
         storage.save(&state2).unwrap();
@@ -245,6 +251,7 @@ mod tests {
                 current_node: "spec".to_string(),
                 mode: "discovery".to_string(),
                 history: vec!["spec".to_string()],
+                workflow_id: None,
             }),
         };
 
@@ -273,6 +280,7 @@ mod tests {
                 current_node: "spec".to_string(),
                 mode: "discovery".to_string(),
                 history: vec!["spec".to_string()],
+                workflow_id: None,
             }),
         };
         storage.save(&state).unwrap();
@@ -307,6 +315,7 @@ mod tests {
                 current_node: "spec".to_string(),
                 mode: "discovery".to_string(),
                 history: vec!["spec".to_string()],
+                workflow_id: None,
             }),
         };
         storage.save(&state).unwrap();
@@ -330,6 +339,7 @@ mod tests {
                 current_node: "code".to_string(),
                 mode: "execution".to_string(),
                 history: vec!["spec".to_string(), "plan".to_string(), "code".to_string()],
+                workflow_id: None,
             }),
         };
 
@@ -371,6 +381,7 @@ mod tests {
                     current_node: node.to_string(),
                     mode: "discovery".to_string(),
                     history: history.iter().map(|s| s.to_string()).collect(),
+                    workflow_id: None,
                 }),
             };
 

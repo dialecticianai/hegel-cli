@@ -49,6 +49,7 @@ pub fn init_state(workflow: &Workflow) -> WorkflowState {
         current_node: start.clone(),
         mode: workflow.mode.clone(),
         history: vec![start],
+        workflow_id: None,
     }
 }
 
@@ -470,6 +471,7 @@ nodes:
             current_node: "code".to_string(),
             mode: "execution".to_string(),
             history: vec!["code".to_string()],
+            workflow_id: None,
         };
 
         // CODE -> REVIEW

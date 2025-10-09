@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-09 01:34
+**Last Updated**: 2025-10-09 05:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,538 | 1,561 | 3,099 |
+| **Lines** | 1,551 | 2,081 | 3,632 |
 | **Comments** | 148 | - | 148 |
 | **Blank Lines** | 318 | - | 318 |
-| **Total Lines** | 2,004 | 1,561 | 3,565 |
-| **Files** | 5 | 13 | 18 |
+| **Total Lines** | 2,017 | 2,081 | 4,098 |
+| **Files** | 5 | 14 | 19 |
 
-**Documentation Ratio**: 1.01 lines of docs per line of code
+**Documentation Ratio**: 1.34 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             5            318            148           1538
+Rust                             5            318            148           1551
 -------------------------------------------------------------------------------
-SUM:                             5            318            148           1538
+SUM:                             5            318            148           1551
 -------------------------------------------------------------------------------
 ```
 
@@ -45,10 +45,11 @@ SUM:                             5            318            148           1538
 | `guides/PLAN_WRITING.md` | 145 |
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
-| `LEXICON.md` | 91 |
-| `LOC_REPORT.md` | 74 |
-| `README.md` | 119 |
-| `ROADMAP.md` | 121 |
+| `LEXICON.md` | 66 |
+| `LOC_REPORT.md` | 75 |
+| `PLAN.md` | 500 |
+| `README.md` | 136 |
+| `ROADMAP.md` | 148 |
 
 ---
 
@@ -56,7 +57,7 @@ SUM:                             5            318            148           1538
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.01 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.34 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
