@@ -1,0 +1,14 @@
+# Minimal workflow for testing (2 nodes, 1 transition)
+mode: discovery
+start_node: spec
+
+nodes:
+  spec:
+    prompt: "Write a SPEC.md defining inputs, outputs, and invariants."
+    transitions:
+      - when: "spec_complete"
+        to: plan
+
+  plan:
+    prompt: "Write a PLAN.md with testable steps."
+    transitions: []

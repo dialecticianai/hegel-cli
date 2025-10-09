@@ -1,0 +1,126 @@
+# Execution mode workflow - optimized for production resilience
+mode: execution
+start_node: spec
+
+nodes:
+  spec:
+    prompt: |
+      You are in the SPEC phase of Document-Driven Development (Execution Mode).
+
+      {{SPEC_WRITING}}
+
+      Your task: Write a production-grade behavioral contract.
+      {{?context_note}}
+
+      Execution mode requirements:
+      - Comprehensive error handling scenarios
+      - Performance and scaling considerations
+      - Security and validation rules
+      - Complete edge case coverage
+      - Production-ready acceptance criteria
+
+      Respond with your completed SPEC.md content.
+    transitions:
+      - when: "spec_complete"
+        to: plan
+
+  plan:
+    prompt: |
+      You are in the PLAN phase of Document-Driven Development (Execution Mode).
+
+      {{PLAN_WRITING}}
+
+      Your task: Create a rigorous implementation plan.
+      {{?context_note}}
+
+      Execution mode requirements:
+      - Strict TDD with comprehensive test coverage
+      - Error handling for all failure modes
+      - Integration testing strategy
+      - Performance validation steps
+      - Security considerations at each step
+
+      Respond with your completed PLAN.md content.
+    transitions:
+      - when: "plan_complete"
+        to: code
+
+  code:
+    prompt: |
+      You are in the CODE phase of Document-Driven Development (Execution Mode).
+
+      Implement the system following the PLAN.md steps with production quality.
+      {{?context_note}}
+
+      Execution mode requirements:
+      - Full test coverage (unit + integration)
+      - Comprehensive error handling
+      - Input validation and sanitization
+      - Performance optimization where needed
+      - Clear documentation and logging
+
+      Respond when code is complete and all tests pass.
+    transitions:
+      - when: "code_complete"
+        to: review
+
+  review:
+    prompt: |
+      You are in the REVIEW phase of Document-Driven Development (Execution Mode).
+
+      Perform adversarial code review.
+      {{?context_note}}
+
+      Review checklist:
+      - Correctness: Does code match SPEC?
+      - Test coverage: Are all paths tested?
+      - Error handling: Are failures handled gracefully?
+      - Security: Any injection/traversal risks?
+      - Performance: Any obvious bottlenecks?
+      - Maintainability: Is code clear and documented?
+
+      Respond with review findings. If issues found, list them clearly.
+    transitions:
+      - when: "review_passed"
+        to: done
+      - when: "review_failed"
+        to: refactor
+
+  refactor:
+    prompt: |
+      You are in the REFACTOR phase of Document-Driven Development (Execution Mode).
+
+      Address review feedback.
+      {{?context_note}}
+
+      Refactoring requirements:
+      - Fix all issues identified in review
+      - Maintain or improve test coverage
+      - Preserve existing functionality
+      - Update tests if behavior changes
+      - Document significant changes
+
+      Respond when refactoring is complete and tests pass.
+    transitions:
+      - when: "refactor_complete"
+        to: code
+
+  done:
+    prompt: |
+      Execution workflow complete.
+
+      {{README_WRITING}}
+
+      Final task: Create production-ready README.md.
+
+      Include:
+      - System overview and purpose
+      - Installation and setup
+      - API documentation
+      - Usage examples
+      - Error handling guide
+      - Performance characteristics
+      - Integration points
+
+      Respond with your completed README.md content.
+    transitions: []

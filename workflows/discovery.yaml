@@ -1,0 +1,102 @@
+# Discovery mode workflow - optimized for learning density
+mode: discovery
+start_node: spec
+
+nodes:
+  spec:
+    prompt: |
+      You are in the SPEC phase of Dialectic-Driven Development (Discovery Mode).
+
+      {{SPEC_WRITING}}
+
+      Your task: Write a minimal behavioral contract.
+      {{?context_note}}
+
+      Focus on:
+      - Precise input/output formats
+      - Core operations with examples
+      - Test scenarios (simple, complex, error cases)
+      - Falsifiable success criteria
+
+      Respond with your completed SPEC.md content.
+    transitions:
+      - when: "spec_complete"
+        to: plan
+
+  plan:
+    prompt: |
+      You are in the PLAN phase of Dialectic-Driven Development (Discovery Mode).
+
+      {{PLAN_WRITING}}
+
+      Your task: Create a test-driven implementation plan.
+      {{?context_note}}
+
+      Focus on:
+      - TDD discipline (Red → Green → Refactor)
+      - Numbered steps with clear goals
+      - Test strategies before implementation
+      - Success criteria for each step
+
+      Respond with your completed PLAN.md content.
+    transitions:
+      - when: "plan_complete"
+        to: code
+
+  code:
+    prompt: |
+      You are in the CODE phase of Dialectic-Driven Development (Discovery Mode).
+
+      Implement the system following the PLAN.md steps.
+      {{?context_note}}
+
+      Focus on:
+      - Follow TDD: write tests first, then implementation
+      - Complete one numbered step at a time
+      - Keep functions small and focused
+      - Commit after each step completion
+
+      Respond when code is complete and all tests pass.
+    transitions:
+      - when: "code_complete"
+        to: learnings
+
+  learnings:
+    prompt: |
+      You are in the LEARNINGS phase of Dialectic-Driven Development (Discovery Mode).
+
+      {{LEARNINGS_WRITING}}
+
+      Your task: Extract insights from building the system.
+      {{?context_note}}
+
+      Focus on:
+      - What worked vs. what failed
+      - Technical constraints discovered
+      - Pivots and their rationale
+      - Key architectural decisions
+      - Recommendations for future work
+
+      Respond with your completed LEARNINGS.md content.
+    transitions:
+      - when: "learnings_complete"
+        to: done
+      - when: "restart_cycle"
+        to: spec
+
+  done:
+    prompt: |
+      Discovery workflow complete.
+
+      {{README_WRITING}}
+
+      Final task: Create a README.md summarizing the toy model for future AI context refresh.
+
+      Keep it concise (100-200 words):
+      - What the system does
+      - Key APIs/interfaces
+      - Usage examples
+      - Integration points
+
+      Respond with your completed README.md content.
+    transitions: []
