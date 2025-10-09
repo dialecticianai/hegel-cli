@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-09 19:19
+**Last Updated**: 2025-10-09 19:20
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,193 | 2,197 | 4,390 |
-| **Comments** | 299 | - | 299 |
-| **Blank Lines** | 410 | - | 410 |
-| **Total Lines** | 2,902 | 2,197 | 5,099 |
+| **Lines** | 2,198 | 2,198 | 4,396 |
+| **Comments** | 303 | - | 303 |
+| **Blank Lines** | 412 | - | 412 |
+| **Total Lines** | 2,913 | 2,198 | 5,111 |
 | **Files** | 10 | 15 | 25 |
 
 **Documentation Ratio**: 1.00 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            10            410            299           2193
+Rust                            10            412            303           2198
 -------------------------------------------------------------------------------
-SUM:                            10            410            299           2193
+SUM:                            10            412            303           2198
 -------------------------------------------------------------------------------
 ```
 
@@ -44,7 +44,7 @@ SUM:                            10            410            299           2193
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
 | `main.rs` | 103 | 5 | 98 | 95.1% | ✅ |
 | `metrics/mod.rs` | 520 | 320 | 200 | 38.5% | ⚠️ Large |
-| `storage/mod.rs` | 450 | 162 | 288 | 64.0% | ✅ |
+| `storage/mod.rs` | 461 | 173 | 288 | 62.5% | ✅ |
 | `test_helpers.rs` | 345 | 345 | 0 | 0.0% | ✅ (infra) |
 
 **⚠️ Warning:** 1 file(s) over 200 impl lines - consider splitting for maintainability
@@ -66,7 +66,7 @@ SUM:                            10            410            299           2193
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 81 |
-| `LOC_REPORT.md` | 95 |
+| `LOC_REPORT.md` | 96 |
 | `PLAN.md` | 436 |
 | `README.md` | 190 |
 | `ROADMAP.md` | 148 |

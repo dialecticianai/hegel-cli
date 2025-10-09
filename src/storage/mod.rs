@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::OpenOptions;
@@ -113,9 +114,10 @@ impl FileStorage {
         Ok(())
     }
 
-    /// Append a JSON value to a JSONL file
+    /// Append a JSON value to a JSONL file with exclusive locking
     ///
     /// Helper method for appending JSON objects to JSONL files with proper error handling
+    /// and file locking to prevent race conditions
     fn append_jsonl(&self, filename: &str, json_value: &serde_json::Value) -> Result<()> {
         let file_path = self.state_dir.join(filename);
 
@@ -123,16 +125,25 @@ impl FileStorage {
         let json_line = serde_json::to_string(json_value)
             .with_context(|| format!("Failed to serialize JSON for {}", filename))?;
 
-        // Append to file
+        // Append to file with exclusive lock
         let mut file = OpenOptions::new()
             .create(true)
             .append(true)
             .open(&file_path)
             .with_context(|| format!("Failed to open file: {:?}", file_path))?;
 
+        // Acquire exclusive lock to prevent race conditions
+        file.lock_exclusive()
+            .with_context(|| format!("Failed to lock file: {:?}", file_path))?;
+
         writeln!(file, "{}", json_line)
             .with_context(|| format!("Failed to write to file: {:?}", file_path))?;
 
+        // Flush before unlocking to ensure data hits disk
+        file.flush()
+            .with_context(|| format!("Failed to flush file: {:?}", file_path))?;
+
+        // Lock is automatically released when file goes out of scope
         Ok(())
     }
 
