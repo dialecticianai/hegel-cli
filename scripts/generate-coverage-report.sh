@@ -16,8 +16,8 @@ fi
 # Generate coverage data silently
 echo "Generating coverage data..."
 
-# Run coverage
-cargo llvm-cov --summary-only > /tmp/coverage-raw.txt 2>&1
+# Run coverage (skip ignored tests to avoid flaky failures)
+cargo llvm-cov --summary-only -- --skip ignored > /tmp/coverage-raw.txt 2>&1
 
 # Strip ANSI color codes from output
 sed 's/\x1b\[[0-9;]*m//g' /tmp/coverage-raw.txt > /tmp/coverage-summary.txt

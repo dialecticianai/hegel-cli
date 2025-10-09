@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-08 23:54
+**Last Updated**: 2025-10-09 00:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,163 | 1,569 | 2,732 |
-| **Comments** | 90 | - | 90 |
-| **Blank Lines** | 218 | - | 218 |
-| **Total Lines** | 1,471 | 1,569 | 3,040 |
+| **Lines** | 1,497 | 1,569 | 3,066 |
+| **Comments** | 139 | - | 139 |
+| **Blank Lines** | 310 | - | 310 |
+| **Total Lines** | 1,946 | 1,569 | 3,515 |
 | **Files** | 5 | 12 | 17 |
 
-**Documentation Ratio**: 1.35 lines of docs per line of code
+**Documentation Ratio**: 1.05 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             5            218             90           1163
+Rust                             5            310            139           1497
 -------------------------------------------------------------------------------
-SUM:                             5            218             90           1163
+SUM:                             5            310            139           1497
 -------------------------------------------------------------------------------
 ```
 
@@ -55,7 +55,7 @@ SUM:                             5            218             90           1163
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.35 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.05 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

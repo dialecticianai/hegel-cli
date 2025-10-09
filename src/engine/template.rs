@@ -1,8 +1,33 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+
+/// Validate guide name to prevent path traversal attacks
+fn validate_guide_name(guide_name: &str) -> Result<()> {
+    // Reject empty names
+    if guide_name.is_empty() {
+        return Err(anyhow!("Guide name cannot be empty"));
+    }
+
+    // Reject path traversal attempts
+    if guide_name.contains("..") {
+        return Err(anyhow!("Path traversal not allowed in guide names"));
+    }
+
+    // Reject absolute paths
+    if guide_name.starts_with('/') || guide_name.starts_with('\\') {
+        return Err(anyhow!("Absolute paths not allowed in guide names"));
+    }
+
+    // Reject subdirectories
+    if guide_name.contains('/') || guide_name.contains('\\') {
+        return Err(anyhow!("Subdirectories not allowed in guide names"));
+    }
+
+    Ok(())
+}
 
 /// Render a template string by replacing placeholders with guide content and context variables
 ///
@@ -18,9 +43,19 @@ pub fn render_template(
     let mut result = template.to_string();
 
     // First, handle guide placeholders ({{UPPERCASE}})
-    let guide_re = Regex::new(r"\{\{([A-Z_]+)\}\}").unwrap();
+    // Use permissive regex and validate afterwards for security
+    let guide_re = Regex::new(r"\{\{([^{}?]+)\}\}").unwrap();
     for cap in guide_re.captures_iter(template) {
         let guide_name = &cap[1];
+
+        // Skip if it's lowercase (context variable, handled later)
+        if guide_name.chars().all(|c| c.is_lowercase() || c == '_') {
+            continue;
+        }
+
+        // Validate guide name for security
+        validate_guide_name(guide_name)?;
+
         let guide_path = guides_dir.join(format!("{}.md", guide_name));
 
         let guide_content = fs::read_to_string(&guide_path)
@@ -273,5 +308,118 @@ mod tests {
 
         let result = render_template(template, &PathBuf::from("guides"), &context).unwrap();
         assert_eq!(result, "Just plain text, no variables at all.");
+    }
+
+    // ========== Security Tests ==========
+
+    #[test]
+    fn test_path_traversal_rejected() {
+        let temp_dir = create_test_guides_dir();
+        let guides_path = temp_dir.path().join("guides");
+
+        // Try to escape guides directory with ..
+        let template = "{{../../../etc/passwd}}";
+        let context = HashMap::new();
+
+        let result = render_template(template, &guides_path, &context);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(
+            err_msg.contains("Path traversal not allowed") || err_msg.contains("Failed to load")
+        );
+    }
+
+    #[test]
+    fn test_path_traversal_with_dots_rejected() {
+        let temp_dir = create_test_guides_dir();
+        let guides_path = temp_dir.path().join("guides");
+
+        let template = "{{..SPEC_WRITING}}";
+        let context = HashMap::new();
+
+        let result = render_template(template, &guides_path, &context);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(
+            err_msg.contains("Path traversal not allowed") || err_msg.contains("Failed to load")
+        );
+    }
+
+    #[test]
+    fn test_absolute_path_unix_rejected() {
+        let temp_dir = create_test_guides_dir();
+        let guides_path = temp_dir.path().join("guides");
+
+        let template = "{{/etc/passwd}}";
+        let context = HashMap::new();
+
+        let result = render_template(template, &guides_path, &context);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(
+            err_msg.contains("Absolute paths not allowed") || err_msg.contains("Failed to load")
+        );
+    }
+
+    #[test]
+    fn test_subdirectory_rejected() {
+        let temp_dir = create_test_guides_dir();
+        let guides_path = temp_dir.path().join("guides");
+
+        let template = "{{subdir/GUIDE}}";
+        let context = HashMap::new();
+
+        let result = render_template(template, &guides_path, &context);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(
+            err_msg.contains("Subdirectories not allowed") || err_msg.contains("Failed to load")
+        );
+    }
+
+    #[test]
+    fn test_validate_guide_name_empty() {
+        let result = validate_guide_name("");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("cannot be empty"));
+    }
+
+    #[test]
+    fn test_validate_guide_name_path_traversal() {
+        let result = validate_guide_name("../etc/passwd");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Path traversal not allowed"));
+    }
+
+    #[test]
+    fn test_validate_guide_name_absolute_path() {
+        let result = validate_guide_name("/etc/passwd");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Absolute paths not allowed"));
+    }
+
+    #[test]
+    fn test_validate_guide_name_subdirectory() {
+        let result = validate_guide_name("subdir/guide");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Subdirectories not allowed"));
+    }
+
+    #[test]
+    fn test_validate_guide_name_valid() {
+        let result = validate_guide_name("SPEC_WRITING");
+        assert!(result.is_ok());
+
+        let result2 = validate_guide_name("PLAN_WRITING");
+        assert!(result2.is_ok());
     }
 }
