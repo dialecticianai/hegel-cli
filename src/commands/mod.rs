@@ -9,13 +9,16 @@ use crate::engine::{get_next_prompt, init_state, load_workflow, render_template}
 use crate::storage::{FileStorage, State};
 
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
+    use chrono::Utc;
+
     // Load workflow from YAML file
     let workflow_path = format!("workflows/{}.yaml", workflow_name);
     let workflow = load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_name))?;
 
-    // Initialize workflow state
-    let workflow_state = init_state(&workflow);
+    // Initialize workflow state with workflow_id (ISO timestamp)
+    let mut workflow_state = init_state(&workflow);
+    workflow_state.workflow_id = Some(Utc::now().to_rfc3339());
 
     // Get current node and prompt
     let current_node = &workflow_state.current_node;
@@ -145,24 +148,30 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
-pub fn handle_hook(_event_name: &str, _storage: &FileStorage) -> Result<()> {
-    // Read JSON from stdin
-    let stdin = io::stdin();
-    let mut stdin_lock = stdin.lock();
-    let mut hook_json = String::new();
-    stdin_lock
-        .read_line(&mut hook_json)
-        .context("Failed to read hook JSON from stdin")?;
+/// Process a hook event JSON string and write to hooks.jsonl with timestamp
+fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
+    use chrono::Utc;
 
-    // Trim whitespace
-    let hook_json = hook_json.trim();
+    // Parse and validate JSON
+    let mut hook_value: serde_json::Value =
+        serde_json::from_str(hook_json).context("Invalid JSON received")?;
 
-    // Validate it's valid JSON
-    let _: serde_json::Value =
-        serde_json::from_str(hook_json).context("Invalid JSON received from stdin")?;
+    // Inject timestamp if not present
+    if let serde_json::Value::Object(ref mut map) = hook_value {
+        if !map.contains_key("timestamp") {
+            map.insert(
+                "timestamp".to_string(),
+                serde_json::Value::String(Utc::now().to_rfc3339()),
+            );
+        }
+    }
 
-    // Get hooks.jsonl path in ~/.hegel
-    let state_dir = FileStorage::default_state_dir()?;
+    // Serialize back to JSON
+    let enriched_json =
+        serde_json::to_string(&hook_value).context("Failed to serialize enriched hook event")?;
+
+    // Get hooks.jsonl path using the storage's state dir
+    let state_dir = storage.state_dir();
     let hooks_file = state_dir.join("hooks.jsonl");
 
     // Ensure directory exists (should already exist from storage init, but be safe)
@@ -176,11 +185,23 @@ pub fn handle_hook(_event_name: &str, _storage: &FileStorage) -> Result<()> {
         .open(&hooks_file)
         .with_context(|| format!("Failed to open hooks file: {:?}", hooks_file))?;
 
-    writeln!(file, "{}", hook_json)
+    writeln!(file, "{}", enriched_json)
         .with_context(|| format!("Failed to write to hooks file: {:?}", hooks_file))?;
 
-    // Exit 0 (success)
     Ok(())
+}
+
+pub fn handle_hook(_event_name: &str, storage: &FileStorage) -> Result<()> {
+    // Read JSON from stdin
+    let stdin = io::stdin();
+    let mut stdin_lock = stdin.lock();
+    let mut hook_json = String::new();
+    stdin_lock
+        .read_line(&mut hook_json)
+        .context("Failed to read hook JSON from stdin")?;
+
+    // Trim whitespace and process
+    process_hook_event(hook_json.trim(), storage)
 }
 
 #[cfg(test)]
@@ -277,6 +298,13 @@ nodes:
         assert_eq!(workflow_state.mode, "discovery");
         assert_eq!(workflow_state.current_node, "spec");
         assert_eq!(workflow_state.history, vec!["spec"]);
+
+        // Verify workflow_id is set to ISO timestamp
+        assert!(workflow_state.workflow_id.is_some());
+        let workflow_id = workflow_state.workflow_id.unwrap();
+        // Should be parseable as ISO timestamp
+        use chrono::DateTime;
+        assert!(DateTime::parse_from_rfc3339(&workflow_id).is_ok());
     }
 
     #[test]
@@ -481,6 +509,73 @@ nodes:
         let workflow_state = state.workflow_state.unwrap();
         assert_eq!(workflow_state.current_node, "spec");
         assert_eq!(workflow_state.history, vec!["spec"]);
+    }
+
+    // ========== handle_hook Tests ==========
+
+    #[test]
+    fn test_hook_injects_timestamp() {
+        let temp_dir = TempDir::new().unwrap();
+        let storage = FileStorage::new(temp_dir.path()).unwrap();
+
+        let hook_json =
+            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Read"}"#;
+
+        // Process the hook event
+        process_hook_event(hook_json, &storage).unwrap();
+
+        // Read the hooks.jsonl file
+        let hooks_file = temp_dir.path().join("hooks.jsonl");
+        let content = fs::read_to_string(&hooks_file).unwrap();
+        let line = content.trim();
+
+        // Parse and verify timestamp was injected
+        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        assert!(parsed.get("timestamp").is_some());
+        assert_eq!(parsed["session_id"], "test");
+        assert_eq!(parsed["hook_event_name"], "PostToolUse");
+        assert_eq!(parsed["tool_name"], "Read");
+    }
+
+    #[test]
+    fn test_hook_preserves_existing_timestamp() {
+        let temp_dir = TempDir::new().unwrap();
+        let storage = FileStorage::new(temp_dir.path()).unwrap();
+
+        let hook_json =
+            r#"{"session_id":"test","timestamp":"2025-01-01T00:00:00Z","tool_name":"Edit"}"#;
+
+        process_hook_event(hook_json, &storage).unwrap();
+
+        let hooks_file = temp_dir.path().join("hooks.jsonl");
+        let content = fs::read_to_string(&hooks_file).unwrap();
+        let line = content.trim();
+
+        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        assert_eq!(parsed["timestamp"], "2025-01-01T00:00:00Z"); // Original timestamp preserved
+    }
+
+    #[test]
+    fn test_hook_appends_multiple_events() {
+        let temp_dir = TempDir::new().unwrap();
+        let storage = FileStorage::new(temp_dir.path()).unwrap();
+
+        process_hook_event(r#"{"event":"first"}"#, &storage).unwrap();
+        process_hook_event(r#"{"event":"second"}"#, &storage).unwrap();
+
+        let hooks_file = temp_dir.path().join("hooks.jsonl");
+        let content = fs::read_to_string(&hooks_file).unwrap();
+        let lines: Vec<&str> = content.lines().collect();
+
+        assert_eq!(lines.len(), 2);
+
+        let first: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        let second: serde_json::Value = serde_json::from_str(lines[1]).unwrap();
+
+        assert_eq!(first["event"], "first");
+        assert_eq!(second["event"], "second");
+        assert!(first.get("timestamp").is_some());
+        assert!(second.get("timestamp").is_some());
     }
 
     // ========== Integration Tests ==========

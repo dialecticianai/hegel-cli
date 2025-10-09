@@ -11,6 +11,10 @@ use storage::FileStorage;
 #[command(name = "hegel")]
 #[command(about = "Dialectic-Driven Development CLI", long_about = None)]
 struct Cli {
+    /// Override state directory (default: .hegel)
+    #[arg(long, global = true, value_name = "PATH")]
+    state_dir: Option<std::path::PathBuf>,
+
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -63,8 +67,8 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    // Initialize storage
-    let state_dir = FileStorage::default_state_dir()?;
+    // Initialize storage with resolved state directory
+    let state_dir = FileStorage::resolve_state_dir(cli.state_dir)?;
     let storage = FileStorage::new(state_dir)?;
 
     // Execute command

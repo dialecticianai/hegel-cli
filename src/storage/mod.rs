@@ -36,11 +36,32 @@ impl FileStorage {
         Ok(Self { state_dir })
     }
 
+    /// Get the state directory path
+    pub fn state_dir(&self) -> &Path {
+        &self.state_dir
+    }
+
     /// Get the default state directory (.hegel in current working directory)
     pub fn default_state_dir() -> Result<PathBuf> {
         let cwd =
             std::env::current_dir().context("Could not determine current working directory")?;
         Ok(cwd.join(".hegel"))
+    }
+
+    /// Resolve state directory with precedence: CLI flag > env var > default
+    pub fn resolve_state_dir(cli_flag: Option<PathBuf>) -> Result<PathBuf> {
+        // Check CLI flag first (highest precedence)
+        if let Some(path) = cli_flag {
+            return Ok(path);
+        }
+
+        // Check HEGEL_STATE_DIR env var
+        if let Ok(env_path) = std::env::var("HEGEL_STATE_DIR") {
+            return Ok(PathBuf::from(env_path));
+        }
+
+        // Fall back to default
+        Self::default_state_dir()
     }
 
     /// Load state from file
@@ -324,6 +345,53 @@ mod tests {
         let loaded = storage.load().unwrap();
         assert!(loaded.workflow.is_none());
         assert!(loaded.workflow_state.is_none());
+    }
+
+    // ========== State Directory Resolution Tests ==========
+
+    #[test]
+    fn test_resolve_state_dir_default() {
+        // When no CLI flag or env var, should use default (.hegel in cwd)
+        let resolved = FileStorage::resolve_state_dir(None).unwrap();
+        let expected = std::env::current_dir().unwrap().join(".hegel");
+        assert_eq!(resolved, expected);
+    }
+
+    #[test]
+    fn test_resolve_state_dir_with_env_var() {
+        // When HEGEL_STATE_DIR is set, should use it
+        let temp_dir = TempDir::new().unwrap();
+        std::env::set_var("HEGEL_STATE_DIR", temp_dir.path());
+
+        let resolved = FileStorage::resolve_state_dir(None).unwrap();
+        assert_eq!(resolved, temp_dir.path());
+
+        std::env::remove_var("HEGEL_STATE_DIR");
+    }
+
+    #[test]
+    fn test_resolve_state_dir_with_cli_flag() {
+        // When CLI flag is provided, should use it
+        let temp_dir = TempDir::new().unwrap();
+        let cli_path = temp_dir.path().to_path_buf();
+
+        let resolved = FileStorage::resolve_state_dir(Some(cli_path.clone())).unwrap();
+        assert_eq!(resolved, cli_path);
+    }
+
+    #[test]
+    fn test_resolve_state_dir_precedence() {
+        // CLI flag should override env var
+        let env_dir = TempDir::new().unwrap();
+        let cli_dir = TempDir::new().unwrap();
+
+        std::env::set_var("HEGEL_STATE_DIR", env_dir.path());
+        let cli_path = cli_dir.path().to_path_buf();
+
+        let resolved = FileStorage::resolve_state_dir(Some(cli_path.clone())).unwrap();
+        assert_eq!(resolved, cli_path);
+
+        std::env::remove_var("HEGEL_STATE_DIR");
     }
 
     // ========== Round-trip Tests ==========

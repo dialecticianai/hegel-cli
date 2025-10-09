@@ -53,11 +53,13 @@ struct PhaseMetrics {
 
 ## Implementation Steps (TDD)
 
-### Step 0: Prerequisites
+### Step 0: Prerequisites ✅ COMPLETE
 
 **Goal**: Infrastructure needed for metrics collection
 
-**Prerequisite 1**: Add `--state-dir` flag and `HEGEL_STATE_DIR` env var
+**Status**: All prerequisites implemented with 70 passing tests
+
+**Prerequisite 1**: Add `--state-dir` flag and `HEGEL_STATE_DIR` env var ✅
 ```rust
 #[test]
 fn test_state_dir_flag_overrides_default() {
@@ -80,7 +82,7 @@ fn test_state_dir_precedence() {
 }
 ```
 
-**Prerequisite 2**: Inject timestamp in `hegel hook` command
+**Prerequisite 2**: Inject timestamp in `hegel hook` command ✅
 ```rust
 #[test]
 fn test_hook_injects_timestamp() {
@@ -90,7 +92,9 @@ fn test_hook_injects_timestamp() {
 }
 ```
 
-**Prerequisite 3**: Generate workflow_id in `hegel start`
+**Implementation Note**: Refactored into testable `process_hook_event()` function. Timestamps injected as RFC3339 format using `chrono::Utc::now()`.
+
+**Prerequisite 3**: Generate workflow_id in `hegel start` ✅
 ```rust
 #[test]
 fn test_start_generates_workflow_id() {
@@ -110,6 +114,16 @@ fn test_start_generates_workflow_id() {
 - `src/main.rs` - Add global `--state-dir` flag
 - `src/storage/mod.rs` - Check env var in constructor
 - `src/commands/mod.rs` - Update hook and start commands
+
+**Completed Implementation Summary**:
+- Added `workflow_id: Option<String>` to `WorkflowState` struct
+- Implemented `FileStorage::resolve_state_dir()` with correct precedence (CLI > env > default)
+- Added global `--state-dir` CLI flag to main.rs
+- Refactored `handle_hook()` to inject timestamps via `process_hook_event()`
+- Fixed bug: `handle_hook` now uses storage's state_dir instead of always using default
+- `start_workflow()` generates workflow_id as ISO 8601 timestamp
+- All 70 tests passing (1 ignored pre-existing test)
+- Test coverage: 93.01% lines
 
 ---
 
@@ -468,6 +482,7 @@ fn test_dag_with_energy() {
 ## Success Criteria (from ROADMAP)
 
 - [x] Both event streams (hooks.jsonl, states.jsonl) feed unified metrics for rule evaluation
+- [x] **Step 0 Prerequisites complete**: --state-dir flag, timestamp injection, workflow_id generation
 - [ ] `hegel top` displays correlated state and performance telemetry in real-time
 - [ ] Reports show phase metrics correlating epistemic state with energetic usage
 - [ ] Graph reconstruction visualizes branching and synthesis across workflows
