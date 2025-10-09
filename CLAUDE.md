@@ -18,7 +18,7 @@ This file provides guidance to Claude Code when working with the Hegel CLI proje
 - **`commands/mod.rs`** - Command implementations (start, next, status, reset)
 - **`engine/mod.rs`** - Workflow state machine, transition logic
 - **`engine/template.rs`** - Template rendering ({{GUIDE_NAME}} placeholders)
-- **`storage/mod.rs`** - File-based state persistence (~/.hegel/state.json)
+- **`storage/mod.rs`** - File-based state persistence (.hegel/state.json)
 
 ### Workflows (`workflows/`)
 
@@ -144,7 +144,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Claude Code Hooks Integration
 
-Hegel integrates with Claude Code's hook system to capture development activity. All hook events are logged to `~/.hegel/hooks.jsonl` for future analysis.
+Hegel integrates with Claude Code's hook system to capture development activity. All hook events are logged to `.hegel/hooks.jsonl` for future analysis.
 
 **Hook command**: `hegel hook <event_name>` reads JSON from stdin and appends to JSONL log.
 
@@ -158,7 +158,7 @@ Hegel integrates with Claude Code's hook system to capture development activity.
 
 ### State Storage
 
-All state lives in `~/.hegel/state.json`:
+All state lives in `.hegel/state.json`:
 - Current workflow definition (YAML serialized)
 - Current node/phase
 - Navigation history
@@ -171,11 +171,11 @@ All state lives in `~/.hegel/state.json`:
 1. **`hegel start <workflow>`**
    - Load YAML from `workflows/<workflow>.yaml`
    - Initialize state at start_node
-   - Save to `~/.hegel/state.json`
+   - Save to `.hegel/state.json`
    - Display first prompt
 
 2. **`hegel next '{"claim": true}'`**
-   - Load state from `~/.hegel/state.json`
+   - Load state from `.hegel/state.json`
    - Evaluate claims against current node's transitions
    - Transition to next node (or stay if no match)
    - Save updated state
@@ -185,7 +185,7 @@ All state lives in `~/.hegel/state.json`:
    - Display current mode, node, history
 
 4. **`hegel reset`**
-   - Clear `~/.hegel/state.json`
+   - Clear `.hegel/state.json`
 
 ---
 

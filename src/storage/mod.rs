@@ -34,11 +34,11 @@ impl FileStorage {
         Ok(Self { state_dir })
     }
 
-    /// Get the default state directory (~/.hegel)
+    /// Get the default state directory (.hegel in current working directory)
     pub fn default_state_dir() -> Result<PathBuf> {
-        dirs::home_dir()
-            .map(|home| home.join(".hegel"))
-            .context("Could not determine home directory")
+        let cwd =
+            std::env::current_dir().context("Could not determine current working directory")?;
+        Ok(cwd.join(".hegel"))
     }
 
     /// Load state from file

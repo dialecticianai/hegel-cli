@@ -10,7 +10,11 @@
 
 **Goal**: Parse hook data and build metrics to feed cycle detection and budget enforcement
 
-**Context**: Hook events are now captured in `~/.hegel/hooks.jsonl`. This phase processes that data into actionable metrics.
+**Context**: Hook events are now captured in `.hegel/hooks.jsonl`. This phase processes that data into actionable metrics.
+
+**Prerequisites**
+- [ ] Cache the ratatui docs in .webcache/ratatui (https://docs.rs/ratatui/latest/ratatui/)
+- [ ] Add `ratatui` and `crossterm` to cargo toml
 
 **Tasks**:
 - [ ] Build metrics parser
@@ -20,15 +24,38 @@
   - Track time elapsed per workflow phase
   - Store metrics in state file or separate metrics.json
 - [ ] Implement metrics display
-  - `hegel metrics` command
-  - Show current counts, time elapsed
-  - Display file edit patterns
-  - Show command history
+  - `hegel metrics` command tracking hooks.jsonl metrics (i.e. count/hook/min)
+  - `ratatui/crossterm` live gauges
+- [ ] Implement state transition logging
+  - Log all workflow transitions to .hegel/states.jsonl
+  - Capture: timestamp, workflow_id, from_node, to_node, phase, mode
+  - Write atomically on every state change in engine
+- [ ] Unified event schema
+  - Define common envelope for both streams (hooks.jsonl from Claude Code, states.jsonl from Hegel)
+  - Implement parser to read and normalize both JSONL files concurrently
+  - Correlate Claude activity (hooks) with Hegel state transitions (states)
+  - Aggregate metrics per workflow and per phase
+- [ ] Telemetry aggregator
+  - Track phase durations, mode transitions, recursion depth
+  - Track token usage, cost, latency, retries
+  - Correlate epistemic (phase) and energetic (token/time) metrics
+  - Store live aggregates in memory and persist summaries
+- [ ] TUI “Dialectic Dashboard”
+  - Build `hegel top` interactive dashboard using `ratatui/crossterm`
+  - Show current workflows, active phases, recent events, and resource usage
+  - Display per-phase gauges for token/time budgets
+  - Color-coded differentiation for Hegel vs Claude events
+- [ ] Historical graph reconstruction
+  - Rebuild recursive workflow DAG (mode invocations and merges)
+  - Annotate branches with energy expenditure (token density, cost)
+  - Support playback or time-slider navigation
 
 **Success Criteria**:
-- Parse hooks.jsonl into structured metrics
-- `hegel metrics` displays file edits, commands, timing
-- Metrics feed into state for future rule evaluation
+- Both event streams (hooks.jsonl, states.jsonl) feed unified metrics for rule evaluation
+- `hegel top` displays correlated state and performance telemetry in real-time
+- Reports show phase metrics correlating epistemic state with energetic usage (tokens, duration, recursion)
+- Graph reconstruction visualizes branching and synthesis across workflows
+- Everything is beautifully colorful enough for any MUD enthusiast
 
 ---
 
