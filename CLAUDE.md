@@ -69,13 +69,9 @@
 
 ## Critical Patterns
 
-**Atomic writes**: Temp file + rename (prevents corruption). See `src/storage/mod.rs`.
-
-**File locking**: `fs2::FileExt` exclusive locks on JSONL appends (prevents concat corruption).
-
 **Test helpers**: `src/test_helpers.rs` - `create_{hooks,transcript,states}_file()` compress boilerplate.
 
-**Submodule organization**: `metrics/{hooks,transcript,states}.rs` - One parser per file. ~100-200 lines each.
+**Submodule organization**: Split files >200 impl lines. One parser per file (~100-200 lines each).
 
 **Documentation ordering**: Update README/ROADMAP **BEFORE** committing code changes.
 
@@ -100,16 +96,11 @@
 
 ## Workflow Execution
 
-**State machine**: `src/engine/mod.rs` - Evaluate claims → transition nodes → update state
-**Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
-**Atomic state**: `.hegel/state.json` stores workflow definition + current node + history
+**Commands**: `start <workflow>` → `next '{"claim":true}'` → `status` → `reset` → `analyze`
 
-**Commands:**
-- `hegel start <workflow>` - Initialize from `workflows/<workflow>.yaml`
-- `hegel next '{"claim":true}'` - Evaluate claim, transition if matched
-- `hegel status` - Show current mode/node/history
-- `hegel reset` - Clear state
-- `hegel analyze` - Parse metrics from `.hegel/*.jsonl`
+**Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
+
+**State**: `.hegel/state.json` (workflow + current node + history)
 
 ---
 
@@ -118,10 +109,6 @@
 **Platform**: macOS Apple Silicon (M1)
 **Language**: Rust stable
 **Dependencies**: Minimal (serde, anyhow, clap, fs2, ratatui/crossterm for future TUI)
-
-**Build**: `cargo build --release`
-**Test**: `cargo test`
-**Format**: `cargo fmt` (pre-commit auto-formats)
 
 ---
 
