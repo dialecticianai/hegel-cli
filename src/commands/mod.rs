@@ -1,8 +1,9 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::collections::HashMap;
+use std::path::Path;
 
-use crate::engine::{get_next_prompt, init_state, load_workflow};
+use crate::engine::{get_next_prompt, init_state, load_workflow, render_template};
 use crate::storage::{FileStorage, State};
 
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
@@ -21,6 +22,12 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
         .get(current_node)
         .with_context(|| format!("Node not found: {}", current_node))?;
 
+    // Render prompt with guides
+    let guides_dir = Path::new("guides");
+    let context = HashMap::new(); // Empty context for now
+    let rendered_prompt = render_template(&node.prompt, guides_dir, &context)
+        .with_context(|| "Failed to render prompt template")?;
+
     // Store state
     let state = State {
         workflow: Some(serde_yaml::to_value(&workflow)?),
@@ -35,7 +42,7 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     println!("{}: {}", "Current node".bold(), current_node);
     println!();
     println!("{}", "Prompt:".bold().cyan());
-    println!("{}", node.prompt);
+    println!("{}", rendered_prompt);
 
     Ok(())
 }
@@ -55,8 +62,8 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
         .context("No workflow state found")?;
 
     // Parse workflow from stored YAML value
-    let workflow = serde_yaml::from_value(workflow_yaml.clone())
-        .context("Failed to parse stored workflow")?;
+    let workflow =
+        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
 
     // Parse claims from JSON string
     let claims: HashMap<String, bool> = serde_json::from_str(claims_str)
@@ -65,6 +72,12 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     // Get next prompt
     let previous_node = workflow_state.current_node.clone();
     let (prompt_text, new_state) = get_next_prompt(&workflow, workflow_state, &claims)?;
+
+    // Render prompt with guides
+    let guides_dir = Path::new("guides");
+    let context = HashMap::new(); // Empty context for now
+    let rendered_prompt = render_template(&prompt_text, guides_dir, &context)
+        .with_context(|| "Failed to render prompt template")?;
 
     // Save updated state
     let updated_state = State {
@@ -90,7 +103,7 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     println!("{}: {}", "Current node".bold(), new_state.current_node);
     println!();
     println!("{}", "Prompt:".bold().cyan());
-    println!("{}", prompt_text);
+    println!("{}", rendered_prompt);
 
     Ok(())
 }

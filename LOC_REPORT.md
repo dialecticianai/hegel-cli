@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-08 23:48
+**Last Updated**: 2025-10-08 23:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 358 | 1,568 | 1,926 |
-| **Comments** | 48 | - | 48 |
-| **Blank Lines** | 76 | - | 76 |
-| **Total Lines** | 482 | 1,568 | 2,050 |
+| **Lines** | 1,163 | 1,569 | 2,732 |
+| **Comments** | 90 | - | 90 |
+| **Blank Lines** | 218 | - | 218 |
+| **Total Lines** | 1,471 | 1,569 | 3,040 |
 | **Files** | 5 | 12 | 17 |
 
-**Documentation Ratio**: 4.38 lines of docs per line of code
+**Documentation Ratio**: 1.35 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             5             76             48            358
+Rust                             5            218             90           1163
 -------------------------------------------------------------------------------
-SUM:                             5             76             48            358
+SUM:                             5            218             90           1163
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                             5             76             48            358
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 91 |
-| `LOC_REPORT.md` | 73 |
+| `LOC_REPORT.md` | 74 |
 | `README.md` | 113 |
 | `ROADMAP.md` | 135 |
 
@@ -55,7 +55,7 @@ SUM:                             5             76             48            358
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 4.38 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.35 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
