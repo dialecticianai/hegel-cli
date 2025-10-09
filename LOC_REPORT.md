@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-09 00:03
+**Last Updated**: 2025-10-09 01:34
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,497 | 1,569 | 3,066 |
-| **Comments** | 139 | - | 139 |
-| **Blank Lines** | 310 | - | 310 |
-| **Total Lines** | 1,946 | 1,569 | 3,515 |
-| **Files** | 5 | 12 | 17 |
+| **Lines** | 1,538 | 1,561 | 3,099 |
+| **Comments** | 148 | - | 148 |
+| **Blank Lines** | 318 | - | 318 |
+| **Total Lines** | 2,004 | 1,561 | 3,565 |
+| **Files** | 5 | 13 | 18 |
 
-**Documentation Ratio**: 1.05 lines of docs per line of code
+**Documentation Ratio**: 1.01 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             5            310            139           1497
+Rust                             5            318            148           1538
 -------------------------------------------------------------------------------
-SUM:                             5            310            139           1497
+SUM:                             5            318            148           1538
 -------------------------------------------------------------------------------
 ```
 
@@ -36,18 +36,19 @@ SUM:                             5            310            139           1497
 
 | File | Lines |
 |------|-------|
+| `CLAUDE.md` | 275 |
 | `COVERAGE_REPORT.md` | 66 |
-| `guides/CODE_MAP_WRITING.md` | 254 |
+| `guides/CODE_MAP_WRITING.md` | 95 |
+| `guides/HANDOFF_WRITING.md` | 142 |
 | `guides/KICKOFF_WRITING.md` | 92 |
 | `guides/LEARNINGS_WRITING.md` | 92 |
-| `guides/ORIENTATION_WRITING.md` | 259 |
-| `guides/PLAN_WRITING.md` | 144 |
+| `guides/PLAN_WRITING.md` | 145 |
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 91 |
 | `LOC_REPORT.md` | 74 |
-| `README.md` | 113 |
-| `ROADMAP.md` | 135 |
+| `README.md` | 119 |
+| `ROADMAP.md` | 121 |
 
 ---
 
@@ -55,7 +56,7 @@ SUM:                             5            310            139           1497
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.05 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.01 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

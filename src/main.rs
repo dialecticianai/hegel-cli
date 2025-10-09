@@ -31,6 +31,11 @@ enum Commands {
     Status,
     /// Reset workflow state
     Reset,
+    /// Handle Claude Code hook events
+    Hook {
+        /// Hook event name (e.g., PostToolUse, PreToolUse)
+        event_name: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -38,13 +43,23 @@ fn main() -> Result<()> {
 
     // If no command provided, show the coming soon message
     if cli.command.is_none() {
-        println!("{}", "Hegel - Dialectic-Driven Development CLI".bold().cyan());
+        println!(
+            "{}",
+            "Hegel - Dialectic-Driven Development CLI".bold().cyan()
+        );
         println!();
-        println!("{}", "Thesis. Antithesis. Synthesis.".italic().bright_white());
+        println!(
+            "{}",
+            "Thesis. Antithesis. Synthesis.".italic().bright_white()
+        );
         println!();
         println!("{}", "Coming soon...".yellow());
         println!();
-        println!("{} {}", "Learn more at:".white(), "https://dialectician.ai".bright_blue().underline());
+        println!(
+            "{} {}",
+            "Learn more at:".white(),
+            "https://dialectician.ai".bright_blue().underline()
+        );
         return Ok(());
     }
 
@@ -65,6 +80,9 @@ fn main() -> Result<()> {
         }
         Commands::Reset => {
             commands::reset_workflow(&storage)?;
+        }
+        Commands::Hook { event_name } => {
+            commands::handle_hook(&event_name, &storage)?;
         }
     }
 

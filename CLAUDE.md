@@ -29,14 +29,7 @@ YAML workflow definitions:
 
 ### Guides (`guides/`)
 
-Writing guides for DDD artifacts (project-agnostic, reusable):
-- **`SPEC_WRITING.md`** - How to write specifications
-- **`PLAN_WRITING.md`** - How to write implementation plans
-- **`LEARNINGS_WRITING.md`** - How to write retrospectives
-- **`README_WRITING.md`** - How to write library READMEs
-- **`CODE_MAP_WRITING.md`** - How to write code maps
-- **`KICKOFF_WRITING.md`** - How to write feature kickoffs
-- **`HANDOFF_WRITING.md`** - How to write session handoffs
+Template content injected into workflow prompts via {{GUIDE_NAME}} placeholders. These are part of Hegel's workflow system, not instructions for working on Hegel itself.
 
 ### Documentation
 
@@ -45,6 +38,11 @@ Writing guides for DDD artifacts (project-agnostic, reusable):
 - **`LEXICON.md`** - Core philosophy and guidance vectors
 - **`COVERAGE_REPORT.md`** - Test coverage metrics (auto-generated)
 - **`LOC_REPORT.md`** - Lines of code metrics (auto-generated)
+
+### Session Artifacts (Project Root)
+
+**Gitignored ephemeral files**:
+- **`HANDOFF.md`** - Session handoff document for context between Claude sessions (see protocol below)
 
 ---
 
@@ -119,14 +117,44 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **CRITICAL**: Update documentation BEFORE committing code changes
 
-- Update `guides/` when adding new artifact types
 - Update `README.md` when changing user-facing behavior
 - Update `ROADMAP.md` when completing phases (delete completed sections)
+- Update `HANDOFF.md` per protocol below (end of session only)
 - Coverage/LOC reports update automatically via pre-commit hook
+
+### HANDOFF.md Protocol
+
+**CRITICAL: Only update at END OF SESSION**
+
+- `HANDOFF.md` is ephemeral (gitignored, session-to-session handoff only)
+- **ONLY write when session is ending** (user says "done for now", tokens running low, etc.)
+- **DO NOT write after completing a task** if continuing work in same session
+
+**At start of session:**
+- Read HANDOFF.md for context (if it exists)
+- **Delete after reading**: `rm HANDOFF.md` (keep context clean, force explicit handoff)
+
+**When updating for next session:**
+- Write fresh content (file already deleted at session start)
+- **DO NOT** read old content first (already consumed and deleted)
+- Include: Current status, what was learned/completed, what to do next, key files to review
+- Make it clear where we left off and what's the immediate next action
 
 ---
 
-## Workflow Lifecycle
+## Claude Code Hooks Integration
+
+Hegel integrates with Claude Code's hook system to capture development activity. All hook events are logged to `~/.hegel/hooks.jsonl` for future analysis.
+
+**Hook command**: `hegel hook <event_name>` reads JSON from stdin and appends to JSONL log.
+
+**Configuration**: `.claude/settings.json` routes Claude Code events (PostToolUse, PreToolUse, UserPromptSubmit, Stop, SessionStart) to Hegel.
+
+**Note**: Currently just captures events. Metrics processing and workflow enforcement are future work.
+
+---
+
+## Engine & State Management
 
 ### State Storage
 
@@ -225,31 +253,22 @@ From `LEXICON.md`:
 
 ---
 
-## Project-Agnostic Guides
-
-**CRITICAL**: All guides in `guides/` MUST be project and language-agnostic
-
-- NO specific tech stacks (FastMCP, PyYAML, pytest, etc.)
-- NO specific languages (Python, JavaScript, Rust examples)
-- NO project-specific references (ddd-nes, hegel-cli internals)
-
-**Why**: These guides are reusable across all DDD projects
-
-**When updating**: Strip out specific examples, use generic patterns
-
----
-
 ## Next Steps Protocol
 
-**After completing any task, propose specific next action**
+**Never just report what you did - always suggest what to do next:**
+- After completing any task, propose the next logical action
+- Don't say "done" or "ready for next step" - suggest a specific next move
+- **Wait for explicit approval before proceeding**
 
-Format: "Should I [specific action], or [alternative]?"
+**Format**: "Should I [specific action], or [alternative]?"
+- ✅ Good: "Should I start implementing the hook subcommand, or design the metrics schema first?"
+- ❌ Bad: "Continue, or wrap up?" (too vague - forces user to clarify what "continue" means)
+- ❌ Bad: "Ready for next session." (declares stopping instead of proposing)
 
-Examples:
+**Examples**:
 - "Should I start implementing Phase 1 (Claude Code hooks), or review the roadmap?"
 - "Should I add tests for the new command, or update the README first?"
-
-**Wait for explicit approval before proceeding**
+- "Built the hook parser. Should I add metrics storage next, or test the JSON parsing first?"
 
 ---
 

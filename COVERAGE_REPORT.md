@@ -1,20 +1,20 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-09 00:03
+**Last Updated**: 2025-10-09 01:34
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **95.41%** lines | **93.33%** regions | **88.00%** functions
+**Overall Coverage**: **92.88%** lines | **91.51%** regions | **84.62%** functions
 
 ## Summary
 
 ```
-TOTAL                            2505               167    93.33%         100                12    88.00%        1285                59    95.41%           0                 0         -
+TOTAL                            2555               217    91.51%         104                16    84.62%        1320                94    92.88%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `commands/mod.rs` | 95.58% | 92.84% | 91.30% | 🟢 Excellent |
+| `commands/mod.rs` | 87.81% | 87.21% | 77.78% | 🟡 Good |
 | `engine/mod.rs` | 99.77% | 99.52% | 94.74% | 🟢 Excellent |
 | `engine/template.rs` | 96.01% | 93.90% | 96.88% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -23,12 +23,12 @@ TOTAL                            2505               167    93.33%         100   
 ## Coverage Tiers
 
 ### 🟢 Excellent (≥90% lines)
-- `commands/mod.rs` - 95.58%
 - `engine/mod.rs` - 99.77%
 - `engine/template.rs` - 96.01%
 - `storage/mod.rs` - 95.58%
 
 ### 🟡 Good (70-89% lines)
+- `commands/mod.rs` - 87.81%
 
 ### 🟠 Moderate (40-69% lines)
 
@@ -39,7 +39,7 @@ TOTAL                            2505               167    93.33%         100   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 95.41% | ✅ Met |
+| Overall | ≥80% | 92.88% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

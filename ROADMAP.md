@@ -6,39 +6,29 @@
 
 ---
 
-## Phase 1: Claude Code Hooks Integration
+## Phase 1: Metrics Collection & Analysis
 
-**Goal**: Route Claude Code's hook system through Hegel for workflow orchestration
+**Goal**: Parse hook data and build metrics to feed cycle detection and budget enforcement
 
-**Context**: Claude Code supports hooks that trigger on various events (file edits, command runs, task completion). We intercept these to track state and enforce DDD methodology.
+**Context**: Hook events are now captured in `~/.hegel/hooks.jsonl`. This phase processes that data into actionable metrics.
 
 **Tasks**:
-- [ ] Research Claude Code hook system
-  - Read Claude Code hooks documentation
-  - Identify available hook types
-  - Understand hook invocation format
-- [ ] Implement hook command
-  - Add `hegel --claude-code-hook <hook_type> [args]` command
-  - Parse hook type and extract metadata
-  - Map hooks to state updates
-- [ ] Build metrics collection
-  - Track file modifications (which files, how many times)
-  - Track bash commands (command, frequency, recency)
-  - Track token usage (if available from hooks)
+- [ ] Build metrics parser
+  - Parse hooks.jsonl into structured data
+  - Extract file modifications (which files, how many times)
+  - Extract bash commands (command, frequency, recency)
   - Track time elapsed per workflow phase
-  - Store metrics in state file
-- [ ] Auto-state updates via hooks
-  - On file write → update modified files list
-  - On command run → increment command counter
-  - On task complete → consider auto-transition?
-- [ ] Hook configuration
-  - Allow users to enable/disable specific hooks
-  - Configurable hook → action mappings
+  - Store metrics in state file or separate metrics.json
+- [ ] Implement metrics display
+  - `hegel metrics` command
+  - Show current counts, time elapsed
+  - Display file edit patterns
+  - Show command history
 
 **Success Criteria**:
-- Claude Code can invoke `hegel --claude-code-hook post-edit file.rs`
-- Metrics accumulate in state file
-- State reflects actual development activity
+- Parse hooks.jsonl into structured metrics
+- `hegel metrics` displays file edits, commands, timing
+- Metrics feed into state for future rule evaluation
 
 ---
 
@@ -46,7 +36,7 @@
 
 **Goal**: Deterministic guardrails that interrupt workflow when stuck or over-budget
 
-**Philosophy**: No LLM calls for enforcement - pure state-based rule evaluation. Transparent, configurable, debuggable.
+**Philosophy**: No LLM calls for enforcement - pure state-based rule evaluation using metrics from Phase 1.
 
 **Tasks**:
 - [ ] Implement cycle detection rules
@@ -69,10 +59,6 @@
   - Per-workflow rules (discovery vs execution)
   - User-customizable thresholds
   - Ability to add custom rules
-- [ ] Metrics dashboard (CLI)
-  - `hegel metrics` command
-  - Show current counts, budgets, time elapsed
-  - Highlight which rules are close to triggering
 
 **Example Rules**:
 ```yaml
@@ -94,10 +80,10 @@ rules:
 ```
 
 **Success Criteria**:
-- Rules trigger based on state, not LLM judgment
+- Rules trigger based on metrics from Phase 1
 - Interrupt prompts appear when thresholds crossed
-- Users can inspect metrics and understand why rules triggered
 - Configuration is transparent and modifiable
+- Guardrails prevent common anti-patterns (build loops, file thrashing)
 
 ---
 

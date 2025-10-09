@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::collections::HashMap;
+use std::fs::OpenOptions;
+use std::io::{self, BufRead, Write};
 use std::path::Path;
 
 use crate::engine::{get_next_prompt, init_state, load_workflow, render_template};
@@ -140,6 +142,44 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
 pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     storage.clear()?;
     println!("{}", "Workflow state cleared".green());
+    Ok(())
+}
+
+pub fn handle_hook(_event_name: &str, _storage: &FileStorage) -> Result<()> {
+    // Read JSON from stdin
+    let stdin = io::stdin();
+    let mut stdin_lock = stdin.lock();
+    let mut hook_json = String::new();
+    stdin_lock
+        .read_line(&mut hook_json)
+        .context("Failed to read hook JSON from stdin")?;
+
+    // Trim whitespace
+    let hook_json = hook_json.trim();
+
+    // Validate it's valid JSON
+    let _: serde_json::Value =
+        serde_json::from_str(hook_json).context("Invalid JSON received from stdin")?;
+
+    // Get hooks.jsonl path in ~/.hegel
+    let state_dir = FileStorage::default_state_dir()?;
+    let hooks_file = state_dir.join("hooks.jsonl");
+
+    // Ensure directory exists (should already exist from storage init, but be safe)
+    std::fs::create_dir_all(&state_dir)
+        .with_context(|| format!("Failed to create state directory: {:?}", state_dir))?;
+
+    // Append hook JSON to hooks.jsonl
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&hooks_file)
+        .with_context(|| format!("Failed to open hooks file: {:?}", hooks_file))?;
+
+    writeln!(file, "{}", hook_json)
+        .with_context(|| format!("Failed to write to hooks file: {:?}", hooks_file))?;
+
+    // Exit 0 (success)
     Ok(())
 }
 
@@ -450,7 +490,7 @@ nodes:
         let (temp_dir, storage, _workflows, _guides, _guard) = setup_test_env();
         std::env::set_current_dir(temp_dir.path()).unwrap();
 
-        // Complete workflow: start -> spec -> plan -> done
+        // Complete workflow: start -> spec -> plan -> done (using test workflow)
         start_workflow("discovery", &storage).unwrap();
 
         let state1 = storage.load().unwrap();
