@@ -75,7 +75,7 @@ Write NEXT_SESSION.md when:
 ## Writing Guidelines
 
 **Be specific about next action**:
-- ✅ "Continue Step 3: Implement FileStorage class"
+- ✅ "Continue Step 3: Implement core module"
 - ❌ "Keep working on the feature"
 
 **Include essential context**:
@@ -111,27 +111,27 @@ Write NEXT_SESSION.md when:
 
 ## Where We Left Off
 
-Implemented Steps 1-2 of multi-user auth (StaticTokenVerifier + UserIdentityMiddleware). Currently on Step 3: FileStorage with per-user state isolation.
+Implemented Steps 1-2 of feature implementation. Currently on Step 3: Core module with state management.
 
 ## What We Learned
 
-- FastMCP Context API works as expected for user_id extraction
-- Atomic writes pattern: temp file + os.rename (no flock needed)
-- alice/bob dev tokens validated in integration tests
+- API integration works as expected
+- State persistence pattern validated
+- Initial tests passing, edge cases identified
 
 ## What's Next
 
-**Immediate action**: Complete Step 3.b - Implement FileStorage class with atomic writes
+**Immediate action**: Complete Step 3 - Implement core module functionality
 
 **Context needed**:
 - Review PLAN.md Step 3 for acceptance criteria
-- Check `.state/` directory structure once FileStorage is working
-- Add `.state/` to `.gitignore` after validation
+- Verify integration points after implementation
+- Update documentation once feature is working
 
 ## Key Files
 
-- `src/storage.py` - FileStorage implementation in progress (Step 3.b)
-- `tests/test_storage.py` - Tests passing for Steps 1-2, Step 3 tests written but failing
+- `src/module` - Implementation in progress (Step 3)
+- `tests/module_test` - Tests passing for Steps 1-2, Step 3 tests written but failing
 - `PLAN.md` - Step 3 acceptance criteria
 ```
 
