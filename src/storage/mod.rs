@@ -155,6 +155,7 @@ impl FileStorage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::*;
     use tempfile::TempDir;
 
     // ========== FileStorage::new Tests ==========
@@ -188,8 +189,7 @@ mod tests {
 
     #[test]
     fn test_load_returns_empty_state_when_no_file_exists() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         let state = storage.load().unwrap();
         assert!(state.workflow.is_none());
@@ -198,16 +198,10 @@ mod tests {
 
     #[test]
     fn test_load_returns_saved_state() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         // Save a state
-        let workflow_state = WorkflowState {
-            current_node: "spec".to_string(),
-            mode: "discovery".to_string(),
-            history: vec!["spec".to_string()],
-            workflow_id: None,
-        };
+        let workflow_state = test_workflow_state("spec", "discovery", &["spec"]);
 
         let state = State {
             workflow: None,
@@ -227,8 +221,7 @@ mod tests {
 
     #[test]
     fn test_load_invalid_json_returns_error() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         // Write invalid JSON
         let state_file = temp_dir.path().join("state.json");
@@ -246,17 +239,11 @@ mod tests {
 
     #[test]
     fn test_save_creates_state_file() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         let state = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "plan".to_string(),
-                mode: "execution".to_string(),
-                history: vec!["spec".to_string(), "plan".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("plan", "execution", &["spec", "plan"])),
         };
 
         storage.save(&state).unwrap();
@@ -267,30 +254,19 @@ mod tests {
 
     #[test]
     fn test_save_overwrites_existing_state() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         // Save first state
         let state1 = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "spec".to_string(),
-                mode: "discovery".to_string(),
-                history: vec!["spec".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("spec", "discovery", &["spec"])),
         };
         storage.save(&state1).unwrap();
 
         // Save second state (should overwrite)
         let state2 = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "plan".to_string(),
-                mode: "execution".to_string(),
-                history: vec!["spec".to_string(), "plan".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("plan", "execution", &["spec", "plan"])),
         };
         storage.save(&state2).unwrap();
 
@@ -303,17 +279,11 @@ mod tests {
 
     #[test]
     fn test_save_is_atomic() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         let state = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "spec".to_string(),
-                mode: "discovery".to_string(),
-                history: vec!["spec".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("spec", "discovery", &["spec"])),
         };
 
         storage.save(&state).unwrap();
@@ -331,18 +301,12 @@ mod tests {
 
     #[test]
     fn test_clear_removes_state_file() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         // Save a state
         let state = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "spec".to_string(),
-                mode: "discovery".to_string(),
-                history: vec!["spec".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("spec", "discovery", &["spec"])),
         };
         storage.save(&state).unwrap();
 
@@ -356,8 +320,7 @@ mod tests {
 
     #[test]
     fn test_clear_when_no_state_file_exists() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         // Should not error when clearing non-existent state
         let result = storage.clear();
@@ -366,18 +329,12 @@ mod tests {
 
     #[test]
     fn test_clear_then_load_returns_empty_state() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         // Save, clear, then load
         let state = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "spec".to_string(),
-                mode: "discovery".to_string(),
-                history: vec!["spec".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state("spec", "discovery", &["spec"])),
         };
         storage.save(&state).unwrap();
         storage.clear().unwrap();
@@ -439,17 +396,15 @@ mod tests {
 
     #[test]
     fn test_save_load_roundtrip_preserves_state() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         let original_state = State {
             workflow: None,
-            workflow_state: Some(WorkflowState {
-                current_node: "code".to_string(),
-                mode: "execution".to_string(),
-                history: vec!["spec".to_string(), "plan".to_string(), "code".to_string()],
-                workflow_id: None,
-            }),
+            workflow_state: Some(test_workflow_state(
+                "code",
+                "execution",
+                &["spec", "plan", "code"],
+            )),
         };
 
         storage.save(&original_state).unwrap();
@@ -472,8 +427,7 @@ mod tests {
 
     #[test]
     fn test_multiple_save_load_cycles() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (_temp_dir, storage) = test_storage();
 
         // Simulate workflow progression
         let states = vec![
@@ -486,12 +440,7 @@ mod tests {
         for (node, history) in states {
             let state = State {
                 workflow: None,
-                workflow_state: Some(WorkflowState {
-                    current_node: node.to_string(),
-                    mode: "discovery".to_string(),
-                    history: history.iter().map(|s| s.to_string()).collect(),
-                    workflow_id: None,
-                }),
+                workflow_state: Some(test_workflow_state(node, "discovery", &history)),
             };
 
             storage.save(&state).unwrap();
@@ -508,8 +457,7 @@ mod tests {
 
     #[test]
     fn test_log_state_transition_creates_file() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         storage
             .log_state_transition("spec", "plan", "discovery", Some("2025-10-09T04:15:23Z"))
@@ -521,19 +469,16 @@ mod tests {
 
     #[test]
     fn test_log_state_transition_event_schema() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         storage
             .log_state_transition("spec", "plan", "discovery", Some("2025-10-09T04:15:23Z"))
             .unwrap();
 
         let states_file = temp_dir.path().join("states.jsonl");
-        let content = fs::read_to_string(&states_file).unwrap();
-        let line = content.trim();
 
         // Parse and verify schema
-        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        let parsed = read_jsonl_line(&states_file, 0);
         assert!(parsed.get("timestamp").is_some());
         assert!(parsed.get("workflow_id").is_some());
         assert!(parsed.get("from_node").is_some());
@@ -556,8 +501,7 @@ mod tests {
 
     #[test]
     fn test_log_state_transition_appends_multiple() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         storage
             .log_state_transition("spec", "plan", "discovery", Some("wf-001"))
@@ -570,14 +514,13 @@ mod tests {
             .unwrap();
 
         let states_file = temp_dir.path().join("states.jsonl");
-        let content = fs::read_to_string(&states_file).unwrap();
-        let lines: Vec<&str> = content.lines().collect();
+        let events = read_jsonl_all(&states_file);
 
-        assert_eq!(lines.len(), 3);
+        assert_eq!(events.len(), 3);
 
-        let first: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
-        let second: serde_json::Value = serde_json::from_str(lines[1]).unwrap();
-        let third: serde_json::Value = serde_json::from_str(lines[2]).unwrap();
+        let first = &events[0];
+        let second = &events[1];
+        let third = &events[2];
 
         assert_eq!(first["from_node"], "spec");
         assert_eq!(first["to_node"], "plan");
@@ -591,18 +534,14 @@ mod tests {
 
     #[test]
     fn test_log_state_transition_with_none_workflow_id() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         storage
             .log_state_transition("spec", "plan", "discovery", None)
             .unwrap();
 
         let states_file = temp_dir.path().join("states.jsonl");
-        let content = fs::read_to_string(&states_file).unwrap();
-        let line = content.trim();
-
-        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        let parsed = read_jsonl_line(&states_file, 0);
         assert!(parsed["workflow_id"].is_null());
     }
 }

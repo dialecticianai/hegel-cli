@@ -217,6 +217,7 @@ pub fn handle_hook(_event_name: &str, storage: &FileStorage) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::*;
     use std::fs;
     use tempfile::TempDir;
 
@@ -247,7 +248,7 @@ mod tests {
         std::path::PathBuf,
         WorkingDirGuard,
     ) {
-        let _guard = WorkingDirGuard::new();
+        let guard = WorkingDirGuard::new();
         let temp_dir = TempDir::new().unwrap();
 
         // Create workflows directory
@@ -258,32 +259,13 @@ mod tests {
         let guides_dir = temp_dir.path().join("guides");
         fs::create_dir(&guides_dir).unwrap();
 
-        // Create test workflow
-        let workflow_yaml = r#"
-mode: discovery
-start_node: spec
-nodes:
-  spec:
-    prompt: "Write SPEC.md"
-    transitions:
-      - when: spec_complete
-        to: plan
-  plan:
-    prompt: "Write PLAN.md"
-    transitions:
-      - when: plan_complete
-        to: done
-  done:
-    prompt: "Complete!"
-    transitions: []
-"#;
-        fs::write(workflows_dir.join("discovery.yaml"), workflow_yaml).unwrap();
+        // Create test workflow using shared constant
+        fs::write(workflows_dir.join("discovery.yaml"), TEST_WORKFLOW_YAML).unwrap();
 
         // Create storage
         let storage_dir = temp_dir.path().join("state");
         let storage = FileStorage::new(&storage_dir).unwrap();
 
-        let guard = WorkingDirGuard::new();
         (temp_dir, storage, workflows_dir, guides_dir, guard)
     }
 
@@ -525,8 +507,7 @@ nodes:
 
     #[test]
     fn test_hook_injects_timestamp() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         let hook_json =
             r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Read"}"#;
@@ -534,13 +515,9 @@ nodes:
         // Process the hook event
         process_hook_event(hook_json, &storage).unwrap();
 
-        // Read the hooks.jsonl file
+        // Read and parse the hooks.jsonl file
         let hooks_file = temp_dir.path().join("hooks.jsonl");
-        let content = fs::read_to_string(&hooks_file).unwrap();
-        let line = content.trim();
-
-        // Parse and verify timestamp was injected
-        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        let parsed = read_jsonl_line(&hooks_file, 0);
         assert!(parsed.get("timestamp").is_some());
         assert_eq!(parsed["session_id"], "test");
         assert_eq!(parsed["hook_event_name"], "PostToolUse");
@@ -549,8 +526,7 @@ nodes:
 
     #[test]
     fn test_hook_preserves_existing_timestamp() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         let hook_json =
             r#"{"session_id":"test","timestamp":"2025-01-01T00:00:00Z","tool_name":"Edit"}"#;
@@ -558,34 +534,25 @@ nodes:
         process_hook_event(hook_json, &storage).unwrap();
 
         let hooks_file = temp_dir.path().join("hooks.jsonl");
-        let content = fs::read_to_string(&hooks_file).unwrap();
-        let line = content.trim();
-
-        let parsed: serde_json::Value = serde_json::from_str(line).unwrap();
+        let parsed = read_jsonl_line(&hooks_file, 0);
         assert_eq!(parsed["timestamp"], "2025-01-01T00:00:00Z"); // Original timestamp preserved
     }
 
     #[test]
     fn test_hook_appends_multiple_events() {
-        let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let (temp_dir, storage) = test_storage();
 
         process_hook_event(r#"{"event":"first"}"#, &storage).unwrap();
         process_hook_event(r#"{"event":"second"}"#, &storage).unwrap();
 
         let hooks_file = temp_dir.path().join("hooks.jsonl");
-        let content = fs::read_to_string(&hooks_file).unwrap();
-        let lines: Vec<&str> = content.lines().collect();
+        let events = read_jsonl_all(&hooks_file);
 
-        assert_eq!(lines.len(), 2);
-
-        let first: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
-        let second: serde_json::Value = serde_json::from_str(lines[1]).unwrap();
-
-        assert_eq!(first["event"], "first");
-        assert_eq!(second["event"], "second");
-        assert!(first.get("timestamp").is_some());
-        assert!(second.get("timestamp").is_some());
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0]["event"], "first");
+        assert_eq!(events[1]["event"], "second");
+        assert!(events[0].get("timestamp").is_some());
+        assert!(events[1].get("timestamp").is_some());
     }
 
     // ========== Integration Tests ==========
@@ -631,11 +598,7 @@ nodes:
         let states_file = storage.state_dir().join("states.jsonl");
         assert!(states_file.exists());
 
-        let content = fs::read_to_string(&states_file).unwrap();
-        let lines: Vec<&str> = content.lines().collect();
-        assert_eq!(lines.len(), 1);
-
-        let event: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        let event = read_jsonl_line(&states_file, 0);
         assert_eq!(event["from_node"], "spec");
         assert_eq!(event["to_node"], "plan");
         assert_eq!(event["phase"], "plan");
@@ -656,17 +619,14 @@ nodes:
 
         // Verify all transitions were logged
         let states_file = storage.state_dir().join("states.jsonl");
-        let content = fs::read_to_string(&states_file).unwrap();
-        let lines: Vec<&str> = content.lines().collect();
-        assert_eq!(lines.len(), 2);
+        let events = read_jsonl_all(&states_file);
+        assert_eq!(events.len(), 2);
 
-        let event1: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
-        assert_eq!(event1["from_node"], "spec");
-        assert_eq!(event1["to_node"], "plan");
+        assert_eq!(events[0]["from_node"], "spec");
+        assert_eq!(events[0]["to_node"], "plan");
 
-        let event2: serde_json::Value = serde_json::from_str(lines[1]).unwrap();
-        assert_eq!(event2["from_node"], "plan");
-        assert_eq!(event2["to_node"], "done");
+        assert_eq!(events[1]["from_node"], "plan");
+        assert_eq!(events[1]["to_node"], "done");
     }
 
     #[test]
@@ -682,11 +642,7 @@ nodes:
 
         // Verify no transition was logged
         let states_file = storage.state_dir().join("states.jsonl");
-        if states_file.exists() {
-            let content = fs::read_to_string(&states_file).unwrap();
-            let lines: Vec<&str> = content.lines().collect();
-            assert_eq!(lines.len(), 0);
-        }
+        assert_eq!(count_jsonl_lines(&states_file), 0);
     }
 
     #[test]
@@ -711,10 +667,7 @@ nodes:
 
         // Verify workflow_id is in logged event
         let states_file = storage.state_dir().join("states.jsonl");
-        let content = fs::read_to_string(&states_file).unwrap();
-        let line = content.lines().next().unwrap();
-
-        let event: serde_json::Value = serde_json::from_str(line).unwrap();
+        let event = read_jsonl_line(&states_file, 0);
         assert_eq!(event["workflow_id"], workflow_id.as_str());
     }
 }

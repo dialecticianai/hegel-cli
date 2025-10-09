@@ -86,6 +86,41 @@ $(cloc src 2>/dev/null | tail -n +3)
 
 ---
 
+## Rust File Details
+
+| File | Total Lines | Impl Lines | Test Lines | Test % |
+|------|-------------|------------|------------|--------|
+EOF
+
+# Generate per-file breakdown
+find src -name "*.rs" -type f | sort | while IFS= read -r file; do
+    TOTAL=$(wc -l < "$file" | tr -d ' ')
+
+    # Find line where tests start
+    TEST_START=$(grep -n "^#\[cfg(test)\]" "$file" 2>/dev/null | head -1 | cut -d: -f1)
+
+    if [ -n "$TEST_START" ]; then
+        IMPL=$((TEST_START - 1))
+        TEST=$((TOTAL - TEST_START + 1))
+    else
+        IMPL=$TOTAL
+        TEST=0
+    fi
+
+    if [ "$TOTAL" -gt 0 ]; then
+        TEST_PCT=$(awk "BEGIN {printf \"%.1f\", ($TEST / $TOTAL) * 100}")
+    else
+        TEST_PCT="0.0"
+    fi
+
+    DISPLAY_PATH=$(echo "$file" | sed 's|^src/||')
+    echo "| \`$DISPLAY_PATH\` | $(format_number $TOTAL) | $(format_number $IMPL) | $(format_number $TEST) | ${TEST_PCT}% |" >> "$TEMP_FILE"
+done
+
+cat >> "$TEMP_FILE" <<'EOF'
+
+---
+
 ## Documentation Files
 
 EOF

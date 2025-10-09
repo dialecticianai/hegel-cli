@@ -2,6 +2,9 @@ mod commands;
 mod engine;
 mod storage;
 
+#[cfg(test)]
+mod test_helpers;
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
