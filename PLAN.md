@@ -13,15 +13,18 @@
 **Input Streams**:
 1. `.hegel/hooks.jsonl` - Claude Code tool use events (already implemented)
 2. `.hegel/states.jsonl` - Hegel workflow state transitions (to be implemented)
+3. Claude transcript files - Token usage data via `transcript_path` field in hook events
+   - Location: `.claude/projects/**/*.jsonl`
+   - Token data at: `message.usage.{input_tokens, output_tokens, cache_*_input_tokens}`
 
 **Processing Layer**:
 - Unified event schema for both streams
 - Metrics aggregator (in-memory + persistent)
-- Real-time event parser
+- Real-time event parser with stream-based merge-sort (constant memory)
 
 **Output Layer**:
 1. `hegel metrics` - Text-based metrics summary
-2. `hegel top` - Interactive TUI dashboard (ratatui/crossterm)
+2. `hegel top` - Interactive TUI dashboard (ratatui/crossterm with notify file watching)
 
 ### Core Data Structures
 
@@ -29,9 +32,9 @@
 // Unified event envelope
 struct Event {
     timestamp: DateTime<Utc>,
-    source: EventSource,      // Hegel | Claude
-    workflow_id: Option<String>,
-    phase: Option<String>,
+    source: EventSource,           // Hegel | Claude
+    workflow_id: Option<String>,   // ISO timestamp of `hegel start` (e.g., "2025-10-09T04:15:23Z")
+    phase: Option<String>,         // Current node (spec, plan, code, etc.)
     event_type: EventType,
     payload: serde_json::Value,
 }
@@ -40,7 +43,7 @@ struct Event {
 struct PhaseMetrics {
     phase_name: String,
     duration_secs: u64,
-    token_usage: TokenMetrics,
+    token_usage: TokenMetrics,     // From transcript message.usage
     file_edits: Vec<FileEdit>,
     bash_commands: Vec<BashCommand>,
 }
@@ -49,6 +52,66 @@ struct PhaseMetrics {
 ---
 
 ## Implementation Steps (TDD)
+
+### Step 0: Prerequisites
+
+**Goal**: Infrastructure needed for metrics collection
+
+**Prerequisite 1**: Add `--state-dir` flag and `HEGEL_STATE_DIR` env var
+```rust
+#[test]
+fn test_state_dir_flag_overrides_default() {
+    // Run hegel command with --state-dir /tmp/test
+    // Assert state written to /tmp/test/.hegel/state.json
+}
+
+#[test]
+fn test_state_dir_env_var() {
+    // Set HEGEL_STATE_DIR=/tmp/test
+    // Run hegel command
+    // Assert state written to /tmp/test/state.json
+}
+
+#[test]
+fn test_state_dir_precedence() {
+    // Set HEGEL_STATE_DIR=/tmp/env
+    // Run with --state-dir /tmp/flag
+    // Assert flag takes precedence
+}
+```
+
+**Prerequisite 2**: Inject timestamp in `hegel hook` command
+```rust
+#[test]
+fn test_hook_injects_timestamp() {
+    // Pipe hook event JSON to `hegel hook PostToolUse`
+    // Read hooks.jsonl
+    // Assert written event has timestamp field
+}
+```
+
+**Prerequisite 3**: Generate workflow_id in `hegel start`
+```rust
+#[test]
+fn test_start_generates_workflow_id() {
+    // Run `hegel start discovery`
+    // Load state.json
+    // Assert workflow_id is ISO timestamp
+}
+```
+
+**Implementation**:
+- Modify `src/main.rs` to accept global `--state-dir` flag
+- Modify `FileStorage::new()` to check `HEGEL_STATE_DIR` env var if no flag provided
+- Update `hegel hook` to inject `timestamp` field before appending to hooks.jsonl
+- Update `hegel start` to generate workflow_id (ISO timestamp) and persist in state.json
+
+**Files to modify**:
+- `src/main.rs` - Add global `--state-dir` flag
+- `src/storage/mod.rs` - Check env var in constructor
+- `src/commands/mod.rs` - Update hook and start commands
+
+---
 
 ### Step 1: State Transition Logging
 
@@ -107,13 +170,14 @@ fn test_parse_hegel_state_event() {
 }
 ```
 
-**Test 3**: Read both JSONL files concurrently
+**Test 3**: Read both JSONL files with stream-based merge
 ```rust
 #[test]
 fn test_read_mixed_event_stream() {
     // Create test hooks.jsonl and states.jsonl
-    // Parse both into unified event stream
+    // Parse both into unified event stream using merge-sort
     // Assert events are chronologically ordered
+    // Assert constant memory usage (no full file load)
 }
 ```
 
@@ -121,6 +185,8 @@ fn test_read_mixed_event_stream() {
 - Create `src/metrics/parser.rs`
 - Implement `Event`, `EventSource`, `EventType` enums
 - Implement `parse_event()` and `read_event_stream()`
+- Stream-based merge: maintain two file readers, compare timestamps, emit in order
+- Handle edge cases: exhausted streams, malformed lines (skip + log), missing timestamps
 
 **Files to create**:
 - `src/metrics/mod.rs`
@@ -236,30 +302,15 @@ Bash Commands (top 5):
 
 ---
 
-### Step 5: Prerequisites Setup
-
-**Goal**: Cache ratatui docs and add dependencies
-
-**Test 1**: Verify ratatui docs cached
-```bash
-test -f ~/Code/ddd-mcp/.webcache/ratatui/index.html
-```
-
-**Test 2**: Verify dependencies added
-```bash
-grep "ratatui" Cargo.toml
-grep "crossterm" Cargo.toml
-```
-
-**Implementation**:
-- Fetch and cache ratatui docs
-- Add dependencies to Cargo.toml
-
----
-
-### Step 6: TUI Framework Setup
+### Step 5: TUI Framework Setup
 
 **Goal**: Basic TUI scaffold with ratatui/crossterm
+
+**Dependencies** (add to Cargo.toml):
+- `ratatui = "0.28"`
+- `crossterm = "0.28"`
+- `notify = "6.0"` (for file watching)
+- `colored = "2.0"` (for terminal output)
 
 **Test 1**: TUI renders without error
 ```rust
@@ -292,7 +343,7 @@ fn test_tui_quit_on_q() {
 
 ---
 
-### Step 7: `hegel top` Command
+### Step 6: `hegel top` Command
 
 **Goal**: Interactive dashboard showing live metrics
 
@@ -319,11 +370,13 @@ fn test_top_shows_phase_gauges() {
 **Implementation**:
 - Add `top` subcommand to `src/main.rs`
 - Implement dashboard with:
-  - Event counts (live updating)
+  - Event counts (live updating via `notify` file watching)
   - Tool usage breakdown
   - Phase gauges (token/time budgets)
   - Recent activity log
   - Color-coded Hegel vs Claude events
+- File watching: use `notify` crate to watch `.hegel/hooks.jsonl` and `.hegel/states.jsonl` for modifications
+- Near-instant updates on new events (event-driven, not polling)
 
 **Layout**:
 ```
@@ -355,7 +408,7 @@ fn test_top_shows_phase_gauges() {
 
 ---
 
-### Step 8: Historical Graph Reconstruction
+### Step 7: Historical Graph Reconstruction
 
 **Goal**: Visualize recursive workflow DAG with energy expenditure
 
@@ -388,10 +441,27 @@ fn test_dag_with_energy() {
 - Create `src/metrics/graph.rs`
 - Implement DAG construction
 - Annotate nodes with: token usage, duration, file edits
-- Optional: Render ASCII graph or export DOT format
+- Render ASCII graph visualization
+- Support DOT format export for external visualization tools
 
 **Files to create**:
 - `src/metrics/graph.rs`
+
+---
+
+## Unresolved Questions
+
+**To resolve before/during Step 2 implementation:**
+
+- [ ] **Token metrics correlation strategy** - How to attach transcript `message.usage` data to events?
+  - **Leading approach**: Attach to `Stop` hook events (when assistant response completes)
+  - **Unknowns**:
+    - Verify actual ratio of message.usage entries to Stop hooks (script reported 1,430 vs 8 - seems high)
+    - Should we aggregate ALL usage between Stop hooks or just most recent?
+    - How to handle missing Stop hooks (if hooks weren't enabled for part of session)?
+    - Transcript I/O strategy: open on-demand per Stop, or cache file handle?
+    - Timestamp alignment tolerance when looking backward from Stop hook
+  - **Decision needed**: Investigate actual transcript structure before implementing
 
 ---
 
@@ -403,55 +473,17 @@ fn test_dag_with_energy() {
 - [ ] Graph reconstruction visualizes branching and synthesis across workflows
 - [ ] Everything is beautifully colorful enough for any MUD enthusiast 🎨
 
----
-
-## Unresolved Issues
-
-**RESOLVED:**
-
-- [x] **Token usage data availability** - ✓ AVAILABLE in transcript files at `message.usage` path.
-  - **SOURCE**: Claude transcript JSONL files (`.claude/projects/**/*.jsonl`)
-  - **PATH**: `transcript_path` field in hook events points to transcript file
-  - **FIELDS**: `message.usage.{input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens}`
-  - **REFERENCE**: See `claude-code-leaderboard` npm package for working implementation
-  - **ACTION**: Parse transcript files in addition to hook events to correlate tool usage with token consumption
-
-**CRITICAL - Must resolve before implementation:**
-
-- [ ] **Define workflow run identity** - `Event` struct includes `workflow_id: Option<String>` but Hegel doesn't currently generate or persist workflow run IDs. Need strategy: timestamp? UUID? hash of start time + workflow name?
-
-- [ ] **Specify file watching strategy for TUI** - `hegel top` needs "live updating" metrics (line 300) but polling strategy is undefined:
-  - How often to poll `.hegel/hooks.jsonl` for new events?
-  - Use file watching (notify crate) or simple polling?
-  - How to handle file being written while reading?
-
-- [ ] **Define chronological merge algorithm** - Test in Step 2 (line 116) asserts events are "chronologically ordered" when merging two JSONL files, but merge strategy unspecified (merge sort? read all + sort?). Impacts memory usage for large files.
-
-- [ ] **Add test isolation strategy** - Many tests will write to `.hegel/hooks.jsonl` and `.hegel/states.jsonl`. Need:
-  - Helper like `with_temp_hegel_dir()` for test isolation
-  - Cleanup strategy for test artifacts
-  - Prevent tests from interfering with actual development state
-
-**MINOR - Can resolve during implementation:**
-
-- [ ] **Fix Step 5 test format inconsistency** - Uses bash commands (lines 243-252) instead of Rust unit tests, breaking TDD pattern. Should be integration test or manual verification step.
-
-- [ ] **Add `colored` dependency** - Notes mention `colored` crate (line 424) but Step 5 only lists ratatui/crossterm.
-
-- [ ] **Clarify graph rendering scope** - Step 8 treats ASCII graph rendering as "Optional" (line 391). Should either commit to it in Phase 1 or explicitly move to Phase 2.
-
----
 
 ## Implementation Order (Red-Green-Refactor)
 
+0. **Prerequisites** (Step 0) - Infrastructure setup (--state-dir flag, timestamp injection, workflow_id generation)
 1. **State transition logging** (Step 1) - Foundational for correlation
 2. **Unified event parser** (Step 2) - Required for all downstream metrics
 3. **Metrics aggregator** (Step 3) - Core business logic
 4. **Text metrics command** (Step 4) - Early validation of metrics logic
-5. **Prerequisites setup** (Step 5) - Enable TUI development
-6. **TUI framework** (Step 6) - Scaffold for dashboard
-7. **Dashboard command** (Step 7) - Primary deliverable
-8. **Graph reconstruction** (Step 8) - Advanced visualization
+5. **TUI framework** (Step 5) - Scaffold for dashboard (add deps: ratatui, crossterm, notify, colored)
+6. **Dashboard command** (Step 6) - Primary deliverable
+7. **Graph reconstruction** (Step 7) - Advanced visualization
 
 ---
 
@@ -462,3 +494,7 @@ fn test_dag_with_energy() {
 - **Color palette**: Use `colored` crate for terminal, ratatui themes for TUI
 - **Performance**: Stream processing for large JSONL files (avoid loading all into memory)
 - **Error handling**: Gracefully handle malformed JSONL entries (log + skip)
+- **Test isolation**: Add `--state-dir <PATH>` flag (or `HEGEL_STATE_DIR` env var) to override default `.hegel` directory
+  - Precedence: CLI flag > env var > default (`.hegel`)
+  - Tests use `tempfile` crate with `--state-dir` for automatic cleanup
+  - Users can manage multiple workflow contexts with different state directories
