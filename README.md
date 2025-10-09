@@ -85,6 +85,23 @@ Hegel implements the Dialectic-Driven Development methodology:
 
 This methodology treats artifacts as disposable fuel while preserving clarity and constraints as durable value.
 
+### When to Use DDD Workflows
+
+**Hegel is a general workflow orchestration tool.** The DDD-opinionated guides included in this project (SPEC_WRITING, PLAN_WRITING, etc.) are defaults, not requirements.
+
+**Use full DDD workflows for:**
+- Hard problems requiring novel solutions
+- Projects needing extremely rigorous documentation
+- Complex domains where mistakes are expensive
+- Learning-dense exploration (discovery mode)
+
+**Skip DDD overhead for:**
+- Straightforward implementations agents can handle autonomously
+- Simple CRUD applications or routine features
+- Projects where the agent doesn't need structured guidance
+
+The workflow steps and accompanying token usage are designed for problems that **need** that rigor. Many projects don't.
+
 ## Project Structure
 
 ```
