@@ -253,30 +253,15 @@ nodes:
 
     #[test]
     fn test_get_next_prompt_successful_transition() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "spec".to_string(),
-            Node {
-                prompt: "Write SPEC.md".to_string(),
-                transitions: vec![Transition {
-                    when: "spec_complete".to_string(),
-                    to: "plan".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "plan".to_string(),
-            Node {
-                prompt: "Write PLAN.md".to_string(),
-                transitions: vec![],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "discovery".to_string(),
-            start_node: "spec".to_string(),
-            nodes,
-        };
+        let workflow = workflow("discovery", "spec")
+            .with_node(
+                "spec",
+                node("Write SPEC.md", vec![transition("spec_complete", "plan")]),
+            )
+            .with_node("plan", node("Write PLAN.md", vec![]))
+            .build();
 
         let state = init_state(&workflow);
         let mut claims = HashMap::new();
@@ -290,30 +275,20 @@ nodes:
 
     #[test]
     fn test_get_next_prompt_no_matching_transition() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "spec".to_string(),
-            Node {
-                prompt: "Write SPEC.md".to_string(),
-                transitions: vec![Transition {
-                    when: "spec_complete".to_string(),
-                    to: "plan".to_string(),
-                }],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "discovery".to_string(),
-            start_node: "spec".to_string(),
-            nodes,
-        };
+        let workflow = workflow("discovery", "spec")
+            .with_node(
+                "spec",
+                node("Write SPEC.md", vec![transition("spec_complete", "plan")]),
+            )
+            .build();
 
         let state = init_state(&workflow);
         let mut claims = HashMap::new();
         claims.insert("wrong_claim".to_string(), true);
 
         let (prompt, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        // Should stay at current node
         assert_eq!(new_state.current_node, "spec");
         assert_eq!(new_state.history, vec!["spec"]);
         assert_eq!(prompt, "Write SPEC.md");
@@ -321,93 +296,48 @@ nodes:
 
     #[test]
     fn test_get_next_prompt_full_workflow_cycle() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "spec".to_string(),
-            Node {
-                prompt: "Write SPEC.md".to_string(),
-                transitions: vec![Transition {
-                    when: "spec_complete".to_string(),
-                    to: "plan".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "plan".to_string(),
-            Node {
-                prompt: "Write PLAN.md".to_string(),
-                transitions: vec![Transition {
-                    when: "plan_complete".to_string(),
-                    to: "code".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "code".to_string(),
-            Node {
-                prompt: "Write code".to_string(),
-                transitions: vec![Transition {
-                    when: "code_complete".to_string(),
-                    to: "learnings".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "learnings".to_string(),
-            Node {
-                prompt: "Write LEARNINGS.md".to_string(),
-                transitions: vec![Transition {
-                    when: "learnings_complete".to_string(),
-                    to: "done".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "done".to_string(),
-            Node {
-                prompt: "Complete!".to_string(),
-                transitions: vec![],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "discovery".to_string(),
-            start_node: "spec".to_string(),
-            nodes,
-        };
+        let workflow = workflow("discovery", "spec")
+            .with_node(
+                "spec",
+                node("Write SPEC.md", vec![transition("spec_complete", "plan")]),
+            )
+            .with_node(
+                "plan",
+                node("Write PLAN.md", vec![transition("plan_complete", "code")]),
+            )
+            .with_node(
+                "code",
+                node("Write code", vec![transition("code_complete", "learnings")]),
+            )
+            .with_node(
+                "learnings",
+                node(
+                    "Write LEARNINGS.md",
+                    vec![transition("learnings_complete", "done")],
+                ),
+            )
+            .with_node("done", node("Complete!", vec![]))
+            .build();
 
         let mut state = init_state(&workflow);
-        assert_eq!(state.current_node, "spec");
-
-        // SPEC -> PLAN
         let mut claims = HashMap::new();
-        claims.insert("spec_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "plan");
 
-        // PLAN -> CODE
-        claims.clear();
-        claims.insert("plan_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "code");
+        // SPEC -> PLAN -> CODE -> LEARNINGS -> DONE
+        for (claim, expected_node) in [
+            ("spec_complete", "plan"),
+            ("plan_complete", "code"),
+            ("code_complete", "learnings"),
+            ("learnings_complete", "done"),
+        ] {
+            claims.clear();
+            claims.insert(claim.to_string(), true);
+            let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
+            state = new_state;
+            assert_eq!(state.current_node, expected_node);
+        }
 
-        // CODE -> LEARNINGS
-        claims.clear();
-        claims.insert("code_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "learnings");
-
-        // LEARNINGS -> DONE
-        claims.clear();
-        claims.insert("learnings_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "done");
-
-        // Verify full history
         assert_eq!(
             state.history,
             vec!["spec", "plan", "code", "learnings", "done"]
@@ -416,56 +346,32 @@ nodes:
 
     #[test]
     fn test_get_next_prompt_review_loop() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "code".to_string(),
-            Node {
-                prompt: "Write code".to_string(),
-                transitions: vec![Transition {
-                    when: "code_complete".to_string(),
-                    to: "review".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "review".to_string(),
-            Node {
-                prompt: "Review code".to_string(),
-                transitions: vec![
-                    Transition {
-                        when: "review_passed".to_string(),
-                        to: "done".to_string(),
-                    },
-                    Transition {
-                        when: "review_failed".to_string(),
-                        to: "refactor".to_string(),
-                    },
-                ],
-            },
-        );
-        nodes.insert(
-            "refactor".to_string(),
-            Node {
-                prompt: "Refactor code".to_string(),
-                transitions: vec![Transition {
-                    when: "refactor_complete".to_string(),
-                    to: "code".to_string(),
-                }],
-            },
-        );
-        nodes.insert(
-            "done".to_string(),
-            Node {
-                prompt: "Complete!".to_string(),
-                transitions: vec![],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "execution".to_string(),
-            start_node: "code".to_string(),
-            nodes,
-        };
+        let workflow = workflow("execution", "code")
+            .with_node(
+                "code",
+                node("Write code", vec![transition("code_complete", "review")]),
+            )
+            .with_node(
+                "review",
+                node(
+                    "Review code",
+                    vec![
+                        transition("review_passed", "done"),
+                        transition("review_failed", "refactor"),
+                    ],
+                ),
+            )
+            .with_node(
+                "refactor",
+                node(
+                    "Refactor code",
+                    vec![transition("refactor_complete", "code")],
+                ),
+            )
+            .with_node("done", node("Complete!", vec![]))
+            .build();
 
         let mut state = WorkflowState {
             current_node: "code".to_string(),
@@ -474,112 +380,64 @@ nodes:
             workflow_id: None,
         };
 
-        // CODE -> REVIEW
         let mut claims = HashMap::new();
-        claims.insert("code_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "review");
 
-        // REVIEW -> REFACTOR (fail)
-        claims.clear();
-        claims.insert("review_failed".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "refactor");
+        // CODE -> REVIEW -> REFACTOR -> CODE (loop)
+        for (claim, expected_node) in [
+            ("code_complete", "review"),
+            ("review_failed", "refactor"),
+            ("refactor_complete", "code"),
+        ] {
+            claims.clear();
+            claims.insert(claim.to_string(), true);
+            let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
+            state = new_state;
+            assert_eq!(state.current_node, expected_node);
+        }
 
-        // REFACTOR -> CODE (loop back)
-        claims.clear();
-        claims.insert("refactor_complete".to_string(), true);
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        state = new_state;
-        assert_eq!(state.current_node, "code");
-
-        // Verify loop in history
         assert_eq!(state.history, vec!["code", "review", "refactor", "code"]);
     }
 
     #[test]
     fn test_get_next_prompt_multiple_transitions_first_match_wins() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "start".to_string(),
-            Node {
-                prompt: "Start".to_string(),
-                transitions: vec![
-                    Transition {
-                        when: "option_a".to_string(),
-                        to: "path_a".to_string(),
-                    },
-                    Transition {
-                        when: "option_b".to_string(),
-                        to: "path_b".to_string(),
-                    },
-                    Transition {
-                        when: "option_c".to_string(),
-                        to: "path_c".to_string(),
-                    },
-                ],
-            },
-        );
-        nodes.insert(
-            "path_a".to_string(),
-            Node {
-                prompt: "Path A".to_string(),
-                transitions: vec![],
-            },
-        );
-        nodes.insert(
-            "path_b".to_string(),
-            Node {
-                prompt: "Path B".to_string(),
-                transitions: vec![],
-            },
-        );
-        nodes.insert(
-            "path_c".to_string(),
-            Node {
-                prompt: "Path C".to_string(),
-                transitions: vec![],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "test".to_string(),
-            start_node: "start".to_string(),
-            nodes,
-        };
+        let workflow = workflow("test", "start")
+            .with_node(
+                "start",
+                node(
+                    "Start",
+                    vec![
+                        transition("option_a", "path_a"),
+                        transition("option_b", "path_b"),
+                        transition("option_c", "path_c"),
+                    ],
+                ),
+            )
+            .with_node("path_a", node("Path A", vec![]))
+            .with_node("path_b", node("Path B", vec![]))
+            .with_node("path_c", node("Path C", vec![]))
+            .build();
 
         let state = init_state(&workflow);
-
-        // If multiple claims are true, first transition should win
         let mut claims = HashMap::new();
         claims.insert("option_b".to_string(), true);
         claims.insert("option_c".to_string(), true);
 
         let (_, new_state) = get_next_prompt(&workflow, &state, &claims).unwrap();
-        assert_eq!(new_state.current_node, "path_b"); // option_b comes first in transitions list
+        assert_eq!(new_state.current_node, "path_b");
     }
 
     #[test]
     fn test_get_next_prompt_invalid_next_node() {
-        let mut nodes = HashMap::new();
-        nodes.insert(
-            "start".to_string(),
-            Node {
-                prompt: "Start".to_string(),
-                transitions: vec![Transition {
-                    when: "go".to_string(),
-                    to: "nonexistent".to_string(),
-                }],
-            },
-        );
+        use crate::test_helpers::*;
 
-        let workflow = Workflow {
-            mode: "test".to_string(),
-            start_node: "start".to_string(),
-            nodes,
-        };
+        let workflow = workflow("test", "start")
+            .with_node(
+                "start",
+                node("Start", vec![transition("go", "nonexistent")]),
+            )
+            .build();
 
         let state = init_state(&workflow);
         let mut claims = HashMap::new();

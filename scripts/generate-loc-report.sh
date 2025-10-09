@@ -7,6 +7,11 @@ set -e
 OUTPUT_FILE="LOC_REPORT.md"
 TEMP_FILE="${OUTPUT_FILE}.tmp"
 
+# Files allowed to exceed 200 impl lines (infrastructure, shared utilities, etc.)
+ALLOWED_LARGE_FILES=(
+    "test_helpers.rs"
+)
+
 # Check if cloc is available
 if ! command -v cloc &> /dev/null; then
     echo "Error: cloc not found. Install with: brew install cloc"
@@ -55,6 +60,17 @@ format_number() {
     printf "%'d" "$1" 2>/dev/null || echo "$1"
 }
 
+# Helper function to check if a file is in the allowed large files list
+is_allowed_large_file() {
+    local filename="$1"
+    for allowed in "${ALLOWED_LARGE_FILES[@]}"; do
+        if [[ "$filename" == "$allowed" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Start generating report
 cat > "$TEMP_FILE" <<EOF
 # Lines of Code Report
@@ -88,12 +104,13 @@ $(cloc src 2>/dev/null | tail -n +3)
 
 ## Rust File Details
 
-| File | Total Lines | Impl Lines | Test Lines | Test % |
-|------|-------------|------------|------------|--------|
+| File | Total Lines | Impl Lines | Test Lines | Test % | Status |
+|------|-------------|------------|------------|--------|--------|
 EOF
 
-# Generate per-file breakdown
-find src -name "*.rs" -type f | sort | while IFS= read -r file; do
+# Generate per-file breakdown and track large files
+LARGE_COUNT=0
+while IFS= read -r file; do
     TOTAL=$(wc -l < "$file" | tr -d ' ')
 
     # Find line where tests start
@@ -114,8 +131,27 @@ find src -name "*.rs" -type f | sort | while IFS= read -r file; do
     fi
 
     DISPLAY_PATH=$(echo "$file" | sed 's|^src/||')
-    echo "| \`$DISPLAY_PATH\` | $(format_number $TOTAL) | $(format_number $IMPL) | $(format_number $TEST) | ${TEST_PCT}% |" >> "$TEMP_FILE"
-done
+
+    # Flag files with >200 impl lines (unless whitelisted)
+    if [ "$IMPL" -gt 200 ]; then
+        if is_allowed_large_file "$DISPLAY_PATH"; then
+            STATUS="✅ (infra)"
+        else
+            STATUS="⚠️ Large"
+            LARGE_COUNT=$((LARGE_COUNT + 1))
+        fi
+    else
+        STATUS="✅"
+    fi
+
+    echo "| \`$DISPLAY_PATH\` | $(format_number $TOTAL) | $(format_number $IMPL) | $(format_number $TEST) | ${TEST_PCT}% | $STATUS |" >> "$TEMP_FILE"
+done < <(find src -name "*.rs" -type f | sort)
+
+# Add warning section if there are large files
+if [ "$LARGE_COUNT" -gt 0 ]; then
+    echo "" >> "$TEMP_FILE"
+    echo "**⚠️ Warning:** $LARGE_COUNT file(s) over 200 impl lines - consider splitting for maintainability" >> "$TEMP_FILE"
+fi
 
 cat >> "$TEMP_FILE" <<'EOF'
 
