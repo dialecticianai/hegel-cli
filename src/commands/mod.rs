@@ -91,8 +91,18 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     };
     storage.save(&updated_state)?;
 
-    // Display transition
+    // Log state transition if a transition occurred
     let transitioned = previous_node != new_state.current_node;
+    if transitioned {
+        storage.log_state_transition(
+            &previous_node,
+            &new_state.current_node,
+            &new_state.mode,
+            new_state.workflow_id.as_deref(),
+        )?;
+    }
+
+    // Display transition
     if transitioned {
         println!(
             "{} {} {} {}",
@@ -602,5 +612,109 @@ nodes:
             state3.workflow_state.as_ref().unwrap().history,
             vec!["spec", "plan", "done"]
         );
+    }
+
+    // ========== State Transition Logging Tests ==========
+
+    #[test]
+    fn test_next_prompt_logs_state_transition() {
+        let (temp_dir, storage, _workflows, _guides, _guard) = setup_test_env();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        // Start workflow
+        start_workflow("discovery", &storage).unwrap();
+
+        // Transition from spec to plan
+        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+
+        // Verify transition was logged to states.jsonl
+        let states_file = storage.state_dir().join("states.jsonl");
+        assert!(states_file.exists());
+
+        let content = fs::read_to_string(&states_file).unwrap();
+        let lines: Vec<&str> = content.lines().collect();
+        assert_eq!(lines.len(), 1);
+
+        let event: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        assert_eq!(event["from_node"], "spec");
+        assert_eq!(event["to_node"], "plan");
+        assert_eq!(event["phase"], "plan");
+        assert_eq!(event["mode"], "discovery");
+    }
+
+    #[test]
+    fn test_next_prompt_logs_multiple_transitions() {
+        let (temp_dir, storage, _workflows, _guides, _guard) = setup_test_env();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        // Start workflow
+        start_workflow("discovery", &storage).unwrap();
+
+        // Make multiple transitions
+        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(r#"{"plan_complete": true}"#, &storage).unwrap();
+
+        // Verify all transitions were logged
+        let states_file = storage.state_dir().join("states.jsonl");
+        let content = fs::read_to_string(&states_file).unwrap();
+        let lines: Vec<&str> = content.lines().collect();
+        assert_eq!(lines.len(), 2);
+
+        let event1: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        assert_eq!(event1["from_node"], "spec");
+        assert_eq!(event1["to_node"], "plan");
+
+        let event2: serde_json::Value = serde_json::from_str(lines[1]).unwrap();
+        assert_eq!(event2["from_node"], "plan");
+        assert_eq!(event2["to_node"], "done");
+    }
+
+    #[test]
+    fn test_next_prompt_no_log_when_no_transition() {
+        let (temp_dir, storage, _workflows, _guides, _guard) = setup_test_env();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        // Start workflow
+        start_workflow("discovery", &storage).unwrap();
+
+        // Try to transition with wrong claim (should stay at spec)
+        next_prompt(r#"{"wrong_claim": true}"#, &storage).unwrap();
+
+        // Verify no transition was logged
+        let states_file = storage.state_dir().join("states.jsonl");
+        if states_file.exists() {
+            let content = fs::read_to_string(&states_file).unwrap();
+            let lines: Vec<&str> = content.lines().collect();
+            assert_eq!(lines.len(), 0);
+        }
+    }
+
+    #[test]
+    fn test_state_transition_includes_workflow_id() {
+        let (temp_dir, storage, _workflows, _guides, _guard) = setup_test_env();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        // Start workflow (which generates workflow_id)
+        start_workflow("discovery", &storage).unwrap();
+
+        let state = storage.load().unwrap();
+        let workflow_id = state
+            .workflow_state
+            .as_ref()
+            .unwrap()
+            .workflow_id
+            .as_ref()
+            .unwrap();
+
+        // Transition
+        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+
+        // Verify workflow_id is in logged event
+        let states_file = storage.state_dir().join("states.jsonl");
+        let content = fs::read_to_string(&states_file).unwrap();
+        let line = content.lines().next().unwrap();
+
+        let event: serde_json::Value = serde_json::from_str(line).unwrap();
+        assert_eq!(event["workflow_id"], workflow_id.as_str());
     }
 }
