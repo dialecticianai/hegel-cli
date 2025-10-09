@@ -1,4 +1,4 @@
-# NEXT_SESSION_WRITING.md — Guide for Writing NEXT_SESSION.md Files
+# HANDOFF_WRITING.md — Guide for Writing HANDOFF.md Files
 
 This guide explains how to create session handoff documents for AI assistant continuity.
 
@@ -6,7 +6,7 @@ This guide explains how to create session handoff documents for AI assistant con
 
 ## Purpose
 
-**NEXT_SESSION.md** is an ephemeral handoff document for AI assistants working across multiple sessions. It captures where you left off so the next session can pick up seamlessly.
+**HANDOFF.md** is an ephemeral handoff document for AI assistants working across multiple sessions. It captures where you left off so the next session can pick up seamlessly.
 
 **Key Properties**:
 - Ephemeral (gitignored, deleted after reading)
@@ -19,7 +19,7 @@ This guide explains how to create session handoff documents for AI assistant con
 
 **CRITICAL: Only at END OF SESSION, not end of task**
 
-Write NEXT_SESSION.md when:
+Write HANDOFF.md when:
 - User signals session is ending ("done for now", "let's stop")
 - Token budget running low
 - Natural stopping point after significant progress
@@ -34,12 +34,12 @@ Write NEXT_SESSION.md when:
 ## Session Lifecycle
 
 ### At Session Start
-1. Read NEXT_SESSION.md (if exists)
-2. Delete immediately after reading: `rm NEXT_SESSION.md`
+1. Read HANDOFF.md (if exists)
+2. Delete immediately after reading: `rm HANDOFF.md`
 3. Use context to resume work
 
 ### At Session End
-1. Write fresh NEXT_SESSION.md
+1. Write fresh HANDOFF.md
 2. DO NOT read old content (already deleted at start)
 3. Include current status and immediate next action
 
@@ -48,7 +48,7 @@ Write NEXT_SESSION.md when:
 ## Structure
 
 ```markdown
-# Next Session
+# Handoff
 
 ## Where We Left Off
 
@@ -107,7 +107,7 @@ Write NEXT_SESSION.md when:
 ## Example
 
 ```markdown
-# Next Session
+# Handoff
 
 ## Where We Left Off
 
@@ -139,4 +139,4 @@ Implemented Steps 1-2 of feature implementation. Currently on Step 3: Core modul
 
 ## Conclusion
 
-NEXT_SESSION.md is a handoff tool, not permanent documentation. Write it at session end, delete it at session start. Keep it focused on immediate next action and essential context.
+HANDOFF.md is a handoff tool, not permanent documentation. Write it at session end, delete it at session start. Keep it focused on immediate next action and essential context.

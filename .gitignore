@@ -17,3 +17,6 @@ Thumbs.db
 
 # Local state
 .hegel/
+
+# Session handoff (ephemeral)
+HANDOFF.md

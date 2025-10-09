@@ -36,7 +36,7 @@ Writing guides for DDD artifacts (project-agnostic, reusable):
 - **`README_WRITING.md`** - How to write library READMEs
 - **`CODE_MAP_WRITING.md`** - How to write code maps
 - **`KICKOFF_WRITING.md`** - How to write feature kickoffs
-- **`NEXT_SESSION_WRITING.md`** - How to write session handoffs
+- **`HANDOFF_WRITING.md`** - How to write session handoffs
 
 ### Documentation
 
