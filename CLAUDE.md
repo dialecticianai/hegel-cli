@@ -140,6 +140,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Include: Current status, what was learned/completed, what to do next, key files to review
 - Make it clear where we left off and what's the immediate next action
 
+**After writing HANDOFF.md:**
+- **NO FURTHER CODE WORK** - Writing HANDOFF.md signals session end
+- **Clear todo list** - No pending implementation tasks should remain
+- **Only housekeeping allowed**: Documentation updates (README, LEXICON, CLAUDE.md), committing those changes
+- **NO**: New features, refactorings, test changes, implementation work
+- **NEVER commit HANDOFF.md** - It is gitignored and ephemeral
+
 ---
 
 ## Claude Code Hooks Integration
