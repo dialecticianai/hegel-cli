@@ -407,9 +407,16 @@ fn test_dag_with_energy() {
 
 ## Unresolved Issues
 
-**CRITICAL - Must resolve before implementation:**
+**RESOLVED:**
 
-- [ ] **Verify token usage data availability** - Check actual Claude Code hook event payloads to confirm token metrics are included in PostToolUse events. If not, token-based metrics (lines 43, 340, 383) cannot be implemented as designed.
+- [x] **Token usage data availability** - ✓ AVAILABLE in transcript files at `message.usage` path.
+  - **SOURCE**: Claude transcript JSONL files (`.claude/projects/**/*.jsonl`)
+  - **PATH**: `transcript_path` field in hook events points to transcript file
+  - **FIELDS**: `message.usage.{input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens}`
+  - **REFERENCE**: See `claude-code-leaderboard` npm package for working implementation
+  - **ACTION**: Parse transcript files in addition to hook events to correlate tool usage with token consumption
+
+**CRITICAL - Must resolve before implementation:**
 
 - [ ] **Define workflow run identity** - `Event` struct includes `workflow_id: Option<String>` but Hegel doesn't currently generate or persist workflow run IDs. Need strategy: timestamp? UUID? hash of start time + workflow name?
 

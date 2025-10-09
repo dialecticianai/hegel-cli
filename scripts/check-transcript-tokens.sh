@@ -28,21 +28,14 @@ echo "✓ Transcript file exists"
 echo "Events in transcript: $(wc -l < "$TRANSCRIPT")"
 echo ""
 
-echo "1. Checking for token-related keys:"
-TOKEN_COUNT=$(jq 'select(keys[] | test("token"; "i"))' "$TRANSCRIPT" 2>/dev/null | wc -l)
-echo "   Events with 'token' in keys: $TOKEN_COUNT"
-echo ""
-
-echo "2. Checking for usage-related keys:"
-USAGE_COUNT=$(jq 'select(keys[] | test("usage"; "i"))' "$TRANSCRIPT" 2>/dev/null | wc -l)
-echo "   Events with 'usage' in keys: $USAGE_COUNT"
-echo ""
-
-echo "3. Sample event types:"
-jq -r '.type // "no-type"' "$TRANSCRIPT" | sort | uniq -c | head -10
+echo "1. Checking for message.usage fields (correct path):"
+USAGE_COUNT=$(jq 'select(.message.usage) | .message.usage' "$TRANSCRIPT" 2>/dev/null | wc -l)
+echo "   Events with message.usage: $USAGE_COUNT"
 echo ""
 
 if [[ $USAGE_COUNT -gt 0 ]]; then
-    echo "4. Sample usage data:"
-    jq 'select(.usage) | {type, usage}' "$TRANSCRIPT" 2>/dev/null | head -30
+    echo "2. Sample token usage data:"
+    jq 'select(.message.usage) | {timestamp, model: .message.model, usage: .message.usage}' "$TRANSCRIPT" 2>/dev/null | head -40
+else
+    echo "2. No token usage found at message.usage path"
 fi
