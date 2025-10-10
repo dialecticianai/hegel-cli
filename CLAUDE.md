@@ -69,6 +69,8 @@
 
 ## Critical Patterns
 
+**Scripts over inline commands**: NEVER write multi-line inline shell scripts. Always write to `scripts/` and execute. Check `scripts/` before writing - tool may already exist. Reusable scripts are infrastructure.
+
 **Test helpers**: `src/test_helpers.rs` - `create_{hooks,transcript,states}_file()` compress boilerplate.
 
 **Submodule organization**: Split files >200 impl lines. One parser per file (~100-200 lines each).
