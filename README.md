@@ -175,16 +175,23 @@ Shows:
 - Activity summary (bash commands, file modifications)
 - Top commands and most-edited files
 - Workflow state transitions
+- **Phase breakdown** - Per-phase metrics including:
+  - Duration (time spent in each phase)
+  - Token usage (input/output tokens per phase)
+  - Activity (bash commands and file edits per phase)
+  - Status (active or completed)
 
 **Coming soon:**
 - `hegel top` - Interactive TUI dashboard with live metrics
-- Per-phase budget tracking and alerts
 
 **What's tracked:**
 - Tool usage (Bash, Read, Edit, Write, etc.)
 - File modifications with frequency counts
 - Workflow state transitions (logged to states.jsonl)
 - Token usage from Claude Code transcripts
+- Per-phase metrics (duration, tokens, commands, file edits)
+  - Correlated via timestamps across hooks.jsonl, states.jsonl, and transcripts
+  - Enables budget enforcement rules in Phase 2 (cycle detection)
 
 **Configuration:**
 

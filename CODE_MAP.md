@@ -45,9 +45,10 @@ Three independent event streams correlate via timestamps to provide unified metr
   - Hook belongs to phase X if: `state[X].timestamp <= hook.timestamp < state[X+1].timestamp`
   - Enables: "How many bash commands during SPEC phase?" or "Token usage in PLAN phase"
 
-- **Token aggregation**: Parse transcript file once per workflow, correlate to phases via hook timestamps
-  - Each hook event includes `transcript_path` for lazy transcript loading
+- **Token aggregation**: Parse transcript file, correlate to workflow phases via transcript timestamps
+  - Each hook event includes `transcript_path` for transcript file location
   - Token metrics extracted from `message.usage` (new format) or root `usage` (old format)
+  - TranscriptEvent includes `timestamp` field to bucket assistant turns by workflow phase
 
 **Example Query Pattern** (pseudocode):
 ```rust
@@ -85,10 +86,10 @@ hegel-cli/
 │   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
 │   │
 │   ├── metrics/                 # Metrics parsing and aggregation
-│   │   ├── mod.rs               # Unified metrics aggregator (combines hooks, states, transcripts)
+│   │   ├── mod.rs               # Unified metrics aggregator, builds per-phase metrics from timestamp correlation
 │   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications
 │   │   ├── states.rs            # Parses workflow state transition events
-│   │   └── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format)
+│   │   └── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format, includes timestamp)
 │   │
 │   └── storage/                 # Layer 3: Atomic persistence and event logging
 │       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
