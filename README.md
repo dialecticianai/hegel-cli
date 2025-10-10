@@ -196,7 +196,7 @@ For AI agents or developers working **on** Hegel (not just using it), see **`CLA
 
 ## License
 
-MIT
+Server Side Public License v1 (SSPL)
 
 ## Learn More
 

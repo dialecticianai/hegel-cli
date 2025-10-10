@@ -1,0 +1,85 @@
+                    Server Side Public License
+                          VERSION 1
+                        MongoDB, Inc.
+
+This Server Side Public License (the "License") applies to the Hegel software
+and its related documentation files (the "Software").
+
+1. License Grant
+
+Subject to the terms and conditions of this License, MongoDB, Inc. hereby
+grants you a worldwide, royalty-free, non-exclusive license to use, reproduce,
+modify, and distribute the Software.
+
+2. Conditions
+
+Your use, reproduction, modification, and distribution of the Software is
+subject to the following conditions:
+
+A. You must give any other recipients of the Software a copy of this License;
+
+B. You must cause any modified files to carry prominent notices stating that
+   you changed the files;
+
+C. If the Software includes a "NOTICE" text file as part of its distribution,
+   then any derivative works that you distribute must include a readable copy
+   of the attribution notices contained within such NOTICE file;
+
+D. You may add your own copyright statement to your modifications and may
+   provide additional or different license terms and conditions for use,
+   reproduction, or distribution of your modifications, or for any such
+   derivative works as a whole, provided your use, reproduction, modification,
+   and distribution of the Software otherwise complies with the conditions
+   stated in this License.
+
+3. Service Source Code Offering
+
+If you make the functionality of the Software or a modified version available
+to third parties as a service, you must make the Service Source Code available
+via network download to everyone at no charge, under the terms of this License.
+Making the functionality available to third parties as a service includes,
+without limitation, enabling third parties to interact with the functionality
+of the Software or modified version remotely through a computer network,
+offering a service the value of which entirely or primarily derives from the
+value of the Software or modified version, or offering a service that
+accomplishes for users the primary purpose of the Software or modified version.
+
+"Service Source Code" means the Corresponding Source for the Software or
+modified version, and the Corresponding Source for all programs that you use
+to make the functionality of the Software or modified version available as a
+service, including, without limitation, management software, user interfaces,
+application program interfaces, automation software, monitoring software,
+backup software, storage software and hosting software, all such that a user
+could run an instance of the service using the Service Source Code you make
+available.
+
+4. Disclaimer of Warranty
+
+Unless required by applicable law or agreed to in writing, the Software is
+provided on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied, including, without limitation, any warranties or
+conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+5. Limitation of Liability
+
+In no event and under no legal theory, whether in tort (including negligence),
+contract, or otherwise, unless required by applicable law (such as deliberate
+and grossly negligent acts) or agreed to in writing, shall any Contributor be
+liable to you for damages, including any direct, indirect, special, incidental,
+or consequential damages of any character arising as a result of this License
+or out of the use or inability to use the Software (including but not limited
+to damages for loss of goodwill, work stoppage, computer failure or malfunction,
+or any and all other commercial damages or losses), even if such Contributor
+has been advised of the possibility of such damages.
+
+6. Accepting Warranty or Additional Liability
+
+While redistributing the Software or derivative works thereof, you may choose
+to offer, and charge a fee for, acceptance of support, warranty, indemnity, or
+other liability obligations and/or rights consistent with this License. However,
+in accepting such obligations, you may act only on your own behalf and on your
+sole responsibility, not on behalf of any other Contributor, and only if you
+agree to indemnify, defend, and hold each Contributor harmless for any liability
+incurred by, or claims asserted against, such Contributor by reason of your
+accepting any such warranty or additional liability.
