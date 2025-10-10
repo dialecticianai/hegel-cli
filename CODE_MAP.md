@@ -17,6 +17,46 @@
 - **File locking**: Exclusive locks on JSONL appends prevent concurrent write corruption (fs2 crate)
 - **Hook integration**: Captures Claude Code events to `.hegel/hooks.jsonl`, parses transcripts for token metrics
 
+**Event Stream Correlation** (Metrics Architecture):
+
+Three independent event streams correlate via timestamps to provide unified metrics:
+
+1. **hooks.jsonl** - Claude Code activity (tool usage, bash commands, file edits)
+   - Written by: `hegel hook` (called from `.claude/settings.json` hooks)
+   - Key fields: `session_id`, `hook_event_name`, `timestamp`, `tool_name`, `transcript_path`
+   - Correlation key: `timestamp` (ISO 8601)
+
+2. **states.jsonl** - Hegel workflow transitions (phase changes)
+   - Written by: `hegel next` (workflow state machine transitions)
+   - Key fields: `workflow_id`, `from_node`, `to_node`, `phase`, `mode`, `timestamp`
+   - Correlation key: `workflow_id` (ISO 8601 timestamp from `hegel start`)
+
+3. **Transcripts** - Token usage (input/output/cache metrics)
+   - Location: `~/.claude/projects/<project>/<session_id>.jsonl`
+   - Referenced by: `transcript_path` field in hooks.jsonl
+   - Key fields: `message.usage.{input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens}`
+
+**Correlation Strategy**:
+
+- **Workflow membership**: `WHERE hook.timestamp >= state.workflow_id`
+  - All hooks after workflow start belong to that workflow (workflow_id is start timestamp)
+
+- **Per-phase attribution**: Join hooks to states.jsonl transitions by timestamp ranges
+  - Hook belongs to phase X if: `state[X].timestamp <= hook.timestamp < state[X+1].timestamp`
+  - Enables: "How many bash commands during SPEC phase?" or "Token usage in PLAN phase"
+
+- **Token aggregation**: Parse transcript file once per workflow, correlate to phases via hook timestamps
+  - Each hook event includes `transcript_path` for lazy transcript loading
+  - Token metrics extracted from `message.usage` (new format) or root `usage` (old format)
+
+**Example Query Pattern** (pseudocode):
+```rust
+// Get all hooks for a workflow's SPEC phase
+let workflow_start = state.workflow_id; // "2025-10-10T14:30:00Z"
+let spec_end = states.find(to_node == "plan").timestamp; // "2025-10-10T14:45:00Z"
+let spec_hooks = hooks.filter(|h| h.timestamp >= workflow_start && h.timestamp < spec_end);
+```
+
 ---
 
 ## Project Structure
@@ -45,7 +85,10 @@ hegel-cli/
 │   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
 │   │
 │   ├── metrics/                 # Metrics parsing and aggregation
-│   │   └── mod.rs               # parse_hooks_file, parse_transcript_file, parse_states_file, parse_unified_metrics
+│   │   ├── mod.rs               # Unified metrics aggregator (combines hooks, states, transcripts)
+│   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications
+│   │   ├── states.rs            # Parses workflow state transition events
+│   │   └── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format)
 │   │
 │   └── storage/                 # Layer 3: Atomic persistence and event logging
 │       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
