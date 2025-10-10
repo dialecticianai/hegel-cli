@@ -6,7 +6,7 @@
 use crate::engine::{Node, Transition, Workflow};
 use crate::storage::{FileStorage, WorkflowState};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 
 /// Test workflow YAML - simple 3-node workflow for testing
@@ -346,6 +346,94 @@ pub fn create_states_file(events: &[&str]) -> (TempDir, PathBuf) {
 /// ```
 pub fn create_hooks_file(events: &[&str]) -> (TempDir, PathBuf) {
     create_jsonl_file(events, "hooks.jsonl")
+}
+
+// ========== Metrics Test Helpers ==========
+
+/// Create a state directory with JSONL files already in place
+///
+/// # Arguments
+/// * `hooks` - Optional hooks.jsonl events
+/// * `states` - Optional states.jsonl events
+///
+/// # Returns
+/// (TempDir, state_dir_path) with files already copied into state_dir
+///
+/// # Example
+/// ```ignore
+/// let (temp_dir, state_dir) = setup_state_dir_with_files(
+///     Some(&[r#"{"session_id":"test","hook_event_name":"SessionStart"}"#]),
+///     Some(&[r#"{"timestamp":"2025-01-01T10:00:00Z",...}"#]),
+/// );
+/// ```
+pub fn setup_state_dir_with_files(
+    hooks: Option<&[&str]>,
+    states: Option<&[&str]>,
+) -> (TempDir, PathBuf) {
+    let temp_dir = TempDir::new().unwrap();
+    let state_dir = temp_dir.path().to_path_buf();
+
+    if let Some(hook_events) = hooks {
+        let (_hooks_temp, hooks_path) = create_hooks_file(hook_events);
+        std::fs::copy(&hooks_path, state_dir.join("hooks.jsonl")).unwrap();
+    }
+
+    if let Some(state_events) = states {
+        let (_states_temp, states_path) = create_states_file(state_events);
+        std::fs::copy(&states_path, state_dir.join("states.jsonl")).unwrap();
+    }
+
+    (temp_dir, state_dir)
+}
+
+/// Create FileStorage with JSONL files already in place
+///
+/// # Arguments
+/// * `hooks` - Optional hooks.jsonl events
+/// * `states` - Optional states.jsonl events
+///
+/// # Returns
+/// (TempDir, FileStorage) with files already in the storage directory
+///
+/// # Example
+/// ```ignore
+/// let (_temp_dir, storage) = test_storage_with_files(
+///     Some(&[r#"{"session_id":"test",...}"#]),
+///     None,
+/// );
+/// let result = analyze_metrics(&storage);
+/// ```
+pub fn test_storage_with_files(
+    hooks: Option<&[&str]>,
+    states: Option<&[&str]>,
+) -> (TempDir, crate::storage::FileStorage) {
+    let (temp_dir, state_dir) = setup_state_dir_with_files(hooks, states);
+    let storage = crate::storage::FileStorage::new(&state_dir).unwrap();
+    (temp_dir, storage)
+}
+
+/// Create a hook event that references a transcript file
+///
+/// # Arguments
+/// * `transcript_path` - Path to transcript file
+/// * `session_id` - Session ID for the hook
+/// * `timestamp` - ISO 8601 timestamp
+///
+/// # Returns
+/// Formatted hook JSON string
+///
+/// # Example
+/// ```ignore
+/// let (_transcript_temp, transcript_path) = create_transcript_file(&events);
+/// let hook = hook_with_transcript(&transcript_path, "test", "2025-01-01T10:00:00Z");
+/// ```
+pub fn hook_with_transcript(transcript_path: &Path, session_id: &str, timestamp: &str) -> String {
+    format!(
+        r#"{{"session_id":"{}","hook_event_name":"SessionStart","timestamp":"{}","transcript_path":"{}"}}"#,
+        session_id,
+        timestamp,
+        transcript_path.display()
+    )
 }
 
 // ========== Workflow Command Test Helpers ==========

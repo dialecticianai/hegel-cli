@@ -169,4 +169,89 @@ mod tests {
         assert_eq!(metrics.total_cache_creation_tokens, 100);
         assert_eq!(metrics.assistant_turns, 3);
     }
+
+    #[test]
+    fn test_parse_transcript_empty_file() {
+        let events: Vec<&str> = vec![];
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        assert_eq!(metrics.assistant_turns, 0);
+        assert_eq!(metrics.total_input_tokens, 0);
+        assert_eq!(metrics.total_output_tokens, 0);
+    }
+
+    #[test]
+    fn test_parse_transcript_file_not_found() {
+        use std::path::PathBuf;
+        let nonexistent = PathBuf::from("/nonexistent/path/transcript.jsonl");
+        let result = parse_transcript_file(&nonexistent);
+
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to read transcript file"));
+    }
+
+    #[test]
+    fn test_parse_transcript_malformed_json() {
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
+        let transcript_path = temp_dir.path().join("transcript.jsonl");
+
+        std::fs::write(&transcript_path, "not valid json\n").unwrap();
+
+        let result = parse_transcript_file(&transcript_path);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to parse transcript event"));
+    }
+
+    #[test]
+    fn test_parse_transcript_assistant_without_usage() {
+        // Assistant event without usage field - should be skipped
+        let events = vec![
+            r#"{"type":"assistant","content":"Hello"}"#,
+            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
+        ];
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        // Only one assistant turn should be counted (the one with usage)
+        assert_eq!(metrics.assistant_turns, 1);
+        assert_eq!(metrics.total_input_tokens, 100);
+        assert_eq!(metrics.total_output_tokens, 50);
+    }
+
+    #[test]
+    fn test_parse_transcript_with_timestamps() {
+        // Events with timestamps (new field for phase correlation)
+        let events = vec![
+            r#"{"type":"assistant","timestamp":"2025-01-01T10:00:00Z","usage":{"input_tokens":100,"output_tokens":50}}"#,
+            r#"{"type":"assistant","timestamp":"2025-01-01T10:05:00Z","message":{"usage":{"input_tokens":150,"output_tokens":75}}}"#,
+        ];
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        assert_eq!(metrics.assistant_turns, 2);
+        assert_eq!(metrics.total_input_tokens, 250);
+        assert_eq!(metrics.total_output_tokens, 125);
+    }
+
+    #[test]
+    fn test_parse_transcript_other_event_types() {
+        // Test various event types beyond assistant/user/system
+        let events = vec![
+            r#"{"type":"file-history-snapshot","data":"..."}"#,
+            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
+        ];
+        let (_temp_dir, transcript_path) = create_transcript_file(&events);
+        let metrics = parse_transcript_file(&transcript_path).unwrap();
+
+        assert_eq!(metrics.assistant_turns, 1);
+        assert_eq!(metrics.total_input_tokens, 100);
+    }
 }

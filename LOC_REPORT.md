@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-10 16:43
+**Last Updated**: 2025-10-10 17:02
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,594 | 2,079 | 4,673 |
-| **Comments** | 383 | - | 383 |
-| **Blank Lines** | 467 | - | 467 |
-| **Total Lines** | 3,444 | 2,079 | 5,523 |
+| **Lines** | 2,871 | 2,089 | 4,960 |
+| **Comments** | 449 | - | 449 |
+| **Blank Lines** | 522 | - | 522 |
+| **Total Lines** | 3,842 | 2,089 | 5,931 |
 | **Files** | 13 | 15 | 28 |
 
-**Documentation Ratio**: 0.80 lines of docs per line of code
+**Documentation Ratio**: 0.73 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            13            467            383           2594
+Rust                            13            522            449           2871
 -------------------------------------------------------------------------------
-SUM:                            13            467            383           2594
+SUM:                            13            522            449           2871
 -------------------------------------------------------------------------------
 ```
 
@@ -36,7 +36,7 @@ SUM:                            13            467            383           2594
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `commands/analyze.rs` | 216 | 216 | 0 | 0.0% | ⚠️ Large |
+| `commands/analyze.rs` | 371 | 217 | 154 | 41.5% | ⚠️ Large |
 | `commands/hook.rs` | 127 | 72 | 55 | 43.3% | ✅ |
 | `commands/mod.rs` | 8 | 8 | 0 | 0.0% | ✅ |
 | `commands/workflow.rs` | 400 | 158 | 242 | 60.5% | ✅ |
@@ -45,10 +45,10 @@ SUM:                            13            467            383           2594
 | `main.rs` | 103 | 5 | 98 | 95.1% | ✅ |
 | `metrics/hooks.rs` | 291 | 181 | 110 | 37.8% | ✅ |
 | `metrics/mod.rs` | 394 | 215 | 179 | 45.4% | ⚠️ Large |
-| `metrics/states.rs` | 67 | 33 | 34 | 50.7% | ✅ |
-| `metrics/transcript.rs` | 172 | 100 | 72 | 41.9% | ✅ |
+| `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
+| `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `storage/mod.rs` | 461 | 173 | 288 | 62.5% | ✅ |
-| `test_helpers.rs` | 402 | 402 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers.rs` | 490 | 490 | 0 | 0.0% | ✅ (infra) |
 
 **⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
 
@@ -59,7 +59,7 @@ SUM:                            13            467            383           2594
 | File | Lines |
 |------|-------|
 | `CLAUDE.md` | 117 |
-| `CODE_MAP.md` | 128 |
+| `CODE_MAP.md` | 129 |
 | `COVERAGE_REPORT.md` | 80 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 142 |
@@ -69,9 +69,9 @@ SUM:                            13            467            383           2594
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 97 |
+| `LOC_REPORT.md` | 99 |
 | `PLAN.md` | 436 |
-| `README.md` | 203 |
+| `README.md` | 210 |
 | `ROADMAP.md` | 119 |
 
 ---
@@ -80,7 +80,7 @@ SUM:                            13            467            383           2594
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.80 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.73 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

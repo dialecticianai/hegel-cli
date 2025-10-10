@@ -64,4 +64,74 @@ mod tests {
         assert_eq!(transitions.len(), 1);
         assert_eq!(transitions[0].workflow_id, None);
     }
+
+    #[test]
+    fn test_parse_states_empty_file() {
+        let events: Vec<&str> = vec![];
+        let (_temp_dir, states_path) = create_states_file(&events);
+        let transitions = parse_states_file(&states_path).unwrap();
+
+        assert_eq!(transitions.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_states_file_not_found() {
+        use std::path::PathBuf;
+        let nonexistent = PathBuf::from("/nonexistent/path/states.jsonl");
+        let result = parse_states_file(&nonexistent);
+
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to read states file"));
+    }
+
+    #[test]
+    fn test_parse_states_malformed_json() {
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
+        let states_path = temp_dir.path().join("states.jsonl");
+
+        // Write invalid JSON
+        std::fs::write(&states_path, "not valid json\n").unwrap();
+
+        let result = parse_states_file(&states_path);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Failed to parse state transition"));
+    }
+
+    #[test]
+    fn test_parse_states_missing_field() {
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
+        let states_path = temp_dir.path().join("states.jsonl");
+
+        // Missing required field "mode"
+        std::fs::write(&states_path, r#"{"timestamp":"2025-01-01T00:00:00Z","from_node":"spec","to_node":"plan","phase":"plan"}"#).unwrap();
+
+        let result = parse_states_file(&states_path);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_parse_states_all_fields() {
+        // Verify all fields are parsed correctly
+        let events = vec![
+            r#"{"timestamp":"2025-01-01T10:30:00Z","workflow_id":"wf-test","from_node":"spec","to_node":"plan","phase":"plan","mode":"execution"}"#,
+        ];
+        let (_temp_dir, states_path) = create_states_file(&events);
+        let transitions = parse_states_file(&states_path).unwrap();
+
+        assert_eq!(transitions.len(), 1);
+        assert_eq!(transitions[0].timestamp, "2025-01-01T10:30:00Z");
+        assert_eq!(transitions[0].workflow_id, Some("wf-test".to_string()));
+        assert_eq!(transitions[0].from_node, "spec");
+        assert_eq!(transitions[0].to_node, "plan");
+        assert_eq!(transitions[0].phase, "plan");
+        assert_eq!(transitions[0].mode, "execution");
+    }
 }
