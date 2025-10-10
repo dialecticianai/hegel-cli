@@ -11,13 +11,6 @@
 **Goal**: Parse hook data and build metrics to feed cycle detection and budget enforcement
 
 **Tasks**:
-- [ ] Unified event schema documentation
-  - Document common envelope for hooks.jsonl and states.jsonl
-  - Formalize correlation between Claude activity and workflow state
-- [ ] Telemetry aggregator enhancements
-  - Track phase durations (elapsed time per node)
-  - Correlate epistemic (phase) and energetic (token/time) metrics
-  - Add per-phase budget tracking
 - [ ] TUI "Dialectic Dashboard"
   - Build `hegel top` interactive dashboard using `ratatui/crossterm`
   - Show live workflows, active phases, recent events, resource usage

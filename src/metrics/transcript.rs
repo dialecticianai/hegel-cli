@@ -33,6 +33,10 @@ pub struct TranscriptEvent {
     #[serde(rename = "type")]
     pub event_type: String, // "assistant", "user", "system", "file-history-snapshot"
 
+    // Timestamp for phase correlation
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<String>,
+
     // Old format: token usage directly on event
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage: Option<TokenUsage>,
@@ -47,7 +51,7 @@ pub struct TranscriptEvent {
 }
 
 /// Aggregated token metrics from transcript
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TokenMetrics {
     pub total_input_tokens: u64,
     pub total_output_tokens: u64,

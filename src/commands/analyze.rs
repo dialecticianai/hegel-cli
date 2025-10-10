@@ -142,5 +142,75 @@ pub fn analyze_metrics(storage: &FileStorage) -> Result<()> {
         println!();
     }
 
+    // Phase Breakdown
+    if !metrics.phase_metrics.is_empty() {
+        println!("{}", "Phase Breakdown".bold());
+        for phase in &metrics.phase_metrics {
+            let status = if phase.end_time.is_none() {
+                "active".green()
+            } else {
+                "completed".bright_black()
+            };
+
+            // Format duration
+            let duration_str = if phase.duration_seconds > 0 {
+                let minutes = phase.duration_seconds / 60;
+                let seconds = phase.duration_seconds % 60;
+                format!("{}m {:02}s", minutes, seconds).cyan().to_string()
+            } else {
+                "-".bright_black().to_string()
+            };
+
+            println!();
+            println!(
+                "  {} ({})",
+                phase.phase_name.to_uppercase().bold().cyan(),
+                status
+            );
+            println!("    Duration:          {}", duration_str);
+
+            // Tokens
+            if phase.token_metrics.assistant_turns > 0 {
+                let total_tokens = phase.token_metrics.total_input_tokens
+                    + phase.token_metrics.total_output_tokens;
+                println!(
+                    "    Tokens:            {} ({} in, {} out)",
+                    format!("{:>10}", total_tokens).cyan(),
+                    phase.token_metrics.total_input_tokens,
+                    phase.token_metrics.total_output_tokens
+                );
+                println!(
+                    "    Assistant turns:   {}",
+                    format!("{:>10}", phase.token_metrics.assistant_turns).green()
+                );
+            } else {
+                println!("    Tokens:            {}", "-".bright_black());
+            }
+
+            // Activity
+            println!(
+                "    Bash commands:     {}",
+                if phase.bash_commands.is_empty() {
+                    "-".bright_black().to_string()
+                } else {
+                    format!("{:>10}", phase.bash_commands.len())
+                        .cyan()
+                        .to_string()
+                }
+            );
+            println!(
+                "    File edits:        {}",
+                if phase.file_modifications.is_empty() {
+                    "-".bright_black().to_string()
+                } else {
+                    format!("{:>10}", phase.file_modifications.len())
+                        .cyan()
+                        .to_string()
+                }
+            );
+        }
+        println!();
+    }
+
     Ok(())
 }
