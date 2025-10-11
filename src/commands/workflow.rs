@@ -168,6 +168,47 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
+pub fn continue_prompt(storage: &FileStorage) -> Result<()> {
+    // Load current state
+    let state = storage.load()?;
+
+    let workflow_yaml = state
+        .workflow
+        .as_ref()
+        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
+
+    let workflow_state = state
+        .workflow_state
+        .as_ref()
+        .context("No workflow state found")?;
+
+    // Parse workflow from stored YAML value
+    let workflow: crate::engine::Workflow =
+        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+
+    // Get current node prompt
+    let current_node = &workflow_state.current_node;
+    let node = workflow
+        .nodes
+        .get(current_node)
+        .with_context(|| format!("Current node not found: {}", current_node))?;
+
+    // Render prompt with guides
+    let guides_dir = Path::new("guides");
+    let context = HashMap::new(); // Empty context for now
+    let rendered_prompt = render_template(&node.prompt, guides_dir, &context)
+        .with_context(|| "Failed to render prompt template")?;
+
+    // Display output
+    println!("{}", "Continuing from interrupt".yellow());
+    println!("{}: {}", "Current node".bold(), current_node);
+    println!();
+    println!("{}", "Prompt:".bold().cyan());
+    println!("{}", rendered_prompt);
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -435,5 +476,59 @@ mod tests {
         next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
         let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
         assert_eq!(event["workflow_id"], workflow_id.as_str());
+    }
+
+    // ========== continue_prompt Tests ==========
+
+    #[test]
+    fn test_continue_with_active_workflow_returns_current_node_prompt() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        assert!(continue_prompt(&storage).is_ok());
+    }
+
+    #[test]
+    fn test_continue_with_no_workflow_loaded_returns_error() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let result = continue_prompt(&storage);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("No workflow loaded"));
+    }
+
+    #[test]
+    fn test_continue_renders_template_with_guides() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        // If template rendering fails, continue_prompt will error
+        assert!(continue_prompt(&storage).is_ok());
+    }
+
+    #[test]
+    fn test_continue_does_not_change_workflow_state() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        let state_before = storage.load().unwrap();
+        continue_prompt(&storage).unwrap();
+        let state_after = storage.load().unwrap();
+
+        // State should be identical
+        assert_state_eq(&state_before, "spec", "discovery", &["spec"]);
+        assert_state_eq(&state_after, "spec", "discovery", &["spec"]);
+    }
+
+    #[test]
+    fn test_continue_does_not_log_state_transition() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        continue_prompt(&storage).unwrap();
+
+        // Should be no state transitions logged
+        assert_eq!(
+            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
+            0
+        );
     }
 }

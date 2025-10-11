@@ -37,6 +37,8 @@ enum Commands {
         /// Claims as JSON string (e.g., '{"spec_complete": true}')
         claims: String,
     },
+    /// Continue workflow after interrupt (bypasses rules)
+    Continue,
     /// Show current workflow status
     Status,
     /// Reset workflow state
@@ -88,6 +90,9 @@ fn main() -> Result<()> {
         }
         Commands::Next { claims } => {
             commands::next_prompt(&claims, &storage)?;
+        }
+        Commands::Continue => {
+            commands::continue_prompt(&storage)?;
         }
         Commands::Status => {
             commands::show_status(&storage)?;
