@@ -2,13 +2,16 @@
 
 ## Architecture Overview
 
-**Hegel** is a three-layer Rust CLI for orchestrating Dialectic-Driven Development workflows:
+**Hegel** is a multi-layer Rust CLI for orchestrating Dialectic-Driven Development workflows:
 
-**Layer 1: Commands** (`src/commands/`) - User-facing CLI operations
+**Layer 1: Commands** (`src/commands/`) - User-facing CLI operations (workflow, hook, analyze)
 **Layer 2: Engine** (`src/engine/`) - Workflow state machine with YAML parsing & template rendering
 **Layer 3: Storage** (`src/storage/`) - Atomic file-based persistence (JSON state + JSONL event logs)
+**Layer 4: Metrics** (`src/metrics/`) - Event stream parsing, aggregation, and visualization (DAG reconstruction)
+**Layer 5: TUI** (`src/tui/`) - Interactive dashboard with real-time file watching (`hegel top`)
 
 **Data Flow**: CLI → Load State → Evaluate Transitions → Render Templates → Save State → Display Prompt
+**Metrics Flow**: Hooks + States + Transcripts → Parse → Correlate by Timestamp → Aggregate by Phase → Visualize (analyze/top)
 
 **Key Patterns**:
 - **State machine**: YAML workflows define nodes + transitions, engine evaluates claims to advance state
@@ -16,6 +19,8 @@
 - **Atomic writes**: State updates use temp file + rename to prevent corruption
 - **File locking**: Exclusive locks on JSONL appends prevent concurrent write corruption (fs2 crate)
 - **Hook integration**: Captures Claude Code events to `.hegel/hooks.jsonl`, parses transcripts for token metrics
+- **File watching**: TUI uses `notify` crate for non-blocking real-time updates (100ms poll, auto-reload on modify events)
+- **Timestamp correlation**: Three event streams (hooks, states, transcripts) correlate via ISO 8601 timestamps for per-phase metrics
 
 **Event Stream Correlation** (Metrics Architecture):
 
@@ -72,24 +77,31 @@ hegel-cli/
 ├── Cargo.toml                   # Rust package manifest
 │
 ├── src/                         # Core implementation (three-layer architecture)
-│   ├── main.rs                  # CLI entry point (clap parser, state directory resolution)
-│   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers)
+│   ├── main.rs                  # CLI entry point (clap parser, state directory resolution, analyze + top subcommands)
+│   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers, TUI test helpers, metrics builders)
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
 │   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
 │   │   ├── workflow.rs          # Workflow commands (start, next, status, reset)
 │   │   ├── hook.rs              # Claude Code hook event capture (JSON stdin → hooks.jsonl, with file locking)
-│   │   └── analyze.rs           # Metrics analysis and display (hegel analyze command)
+│   │   └── analyze.rs           # Metrics analysis and display (hegel analyze: session, tokens, activity, phases, workflow graph)
 │   │
 │   ├── engine/                  # Layer 2: State machine and template rendering
 │   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt
 │   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
 │   │
-│   ├── metrics/                 # Metrics parsing and aggregation
+│   ├── metrics/                 # Metrics parsing, aggregation, and visualization
 │   │   ├── mod.rs               # Unified metrics aggregator, builds per-phase metrics from timestamp correlation
-│   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications
+│   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications (silent error handling)
 │   │   ├── states.rs            # Parses workflow state transition events
-│   │   └── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format, includes timestamp)
+│   │   ├── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format, includes timestamp)
+│   │   └── graph.rs             # Workflow DAG reconstruction (build from transitions, cycle detection, ASCII/DOT rendering)
+│   │
+│   ├── tui/                     # Terminal User Interface (hegel top command)
+│   │   ├── mod.rs               # Event loop (keyboard polling, file watching integration, terminal setup/restore)
+│   │   ├── app.rs               # AppState (file watching via notify, keyboard handling, scroll management, tab navigation)
+│   │   ├── ui.rs                # Rendering (colorful 4-tab layout: Overview, Phases, Events, Files; emoji icons, status indicators)
+│   │   └── utils.rs             # Scroll utilities (visible_window, max_scroll, scroll_indicators), timeline builder (merge hooks+states)
 │   │
 │   └── storage/                 # Layer 3: Atomic persistence and event logging
 │       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
@@ -108,7 +120,7 @@ hegel-cli/
 │   ├── HANDOFF_WRITING.md       # Session handoff protocol
 │   └── KICKOFF_WRITING.md       # Project kickoff guidance
 │
-├── tests/                       # Unit tests are co-located in src/ modules (95.41% coverage)
+├── tests/                       # Unit tests are co-located in src/ modules (90.88% coverage, 148 tests passing)
 │   └── (empty)                  # Future integration tests live here
 │
 ├── scripts/                     # Development utilities

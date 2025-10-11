@@ -2,6 +2,7 @@ mod commands;
 mod engine;
 mod metrics;
 mod storage;
+mod tui;
 
 #[cfg(test)]
 mod test_helpers;
@@ -46,6 +47,8 @@ enum Commands {
     },
     /// Analyze captured metrics (hooks, transcripts, states)
     Analyze,
+    /// Interactive TUI dashboard (real-time metrics)
+    Top,
 }
 
 fn main() -> Result<()> {
@@ -96,6 +99,9 @@ fn main() -> Result<()> {
         }
         Commands::Analyze => {
             commands::analyze_metrics(&storage)?;
+        }
+        Commands::Top => {
+            tui::run_tui(storage.state_dir())?;
         }
     }
 

@@ -180,9 +180,32 @@ Shows:
   - Token usage (input/output tokens per phase)
   - Activity (bash commands and file edits per phase)
   - Status (active or completed)
+- **Workflow graph** - ASCII visualization of phase transitions:
+  - Node metrics (visits, tokens, duration, bash commands, file edits)
+  - Cycle detection (identifies workflow loops)
+  - DOT export instructions for Graphviz diagrams
 
-**Coming soon:**
-- `hegel top` - Interactive TUI dashboard with live metrics
+### Interactive Dashboard
+
+Launch a real-time TUI dashboard:
+
+```bash
+hegel top
+```
+
+**Features:**
+- **4 interactive tabs**: Overview, Phases, Events, Files
+- **Live updates**: Auto-reloads when `.hegel/*.jsonl` files change
+- **Scrolling**: Arrow keys, vim bindings (j/k), jump to top/bottom (g/G)
+- **Navigation**: Tab/BackTab to switch tabs
+- **Colorful UI**: Emoji icons, syntax highlighting, status indicators
+
+**Keyboard shortcuts:**
+- `q` - Quit
+- `Tab` / `BackTab` - Navigate tabs
+- `↑↓` / `j`/`k` - Scroll
+- `g` / `G` - Jump to top/bottom
+- `r` - Reload metrics manually
 
 **What's tracked:**
 - Tool usage (Bash, Read, Edit, Write, etc.)

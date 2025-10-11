@@ -488,3 +488,262 @@ pub fn setup_workflow_env() -> (TempDir, FileStorage, WorkingDirGuard) {
 
     (temp_dir, storage, guard)
 }
+
+// ========== TUI Test Helpers ==========
+
+#[cfg(test)]
+pub mod tui {
+    //! TUI testing utilities for ratatui snapshot tests
+
+    use ratatui::backend::TestBackend;
+    use ratatui::buffer::Buffer;
+    use ratatui::Terminal;
+
+    /// Standard terminal sizes for consistent testing
+    pub const SMALL_TERM: (u16, u16) = (40, 10);
+    pub const MEDIUM_TERM: (u16, u16) = (80, 24);
+    pub const LARGE_TERM: (u16, u16) = (120, 40);
+
+    /// Create test terminal with specified size
+    ///
+    /// # Arguments
+    /// * `width` - Terminal width in columns
+    /// * `height` - Terminal height in rows
+    ///
+    /// # Example
+    /// ```ignore
+    /// let mut terminal = test_terminal(80, 24);
+    /// terminal.draw(|f| { ... }).unwrap();
+    /// ```
+    pub fn test_terminal(width: u16, height: u16) -> Terminal<TestBackend> {
+        let backend = TestBackend::new(width, height);
+        Terminal::new(backend).unwrap()
+    }
+
+    /// Convert buffer to string for snapshot comparison
+    ///
+    /// Preserves exact layout including whitespace and newlines.
+    /// Useful for golden file testing.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let buffer = terminal.backend().buffer();
+    /// let output = buffer_to_string(buffer);
+    /// assert_eq!(output, expected_snapshot);
+    /// ```
+    pub fn buffer_to_string(buffer: &Buffer) -> String {
+        let mut output = String::new();
+        for y in 0..buffer.area.height {
+            for x in 0..buffer.area.width {
+                let cell = &buffer[(x, y)];
+                output.push_str(cell.symbol());
+            }
+            output.push('\n');
+        }
+        output
+    }
+
+    /// Render widget to buffer and return string representation
+    ///
+    /// Convenience wrapper that creates a terminal, renders widget,
+    /// and returns string output in one call.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let widget = Paragraph::new("Hello");
+    /// let output = render_to_string(widget, 80, 24);
+    /// assert!(output.contains("Hello"));
+    /// ```
+    pub fn render_to_string<W>(widget: W, width: u16, height: u16) -> String
+    where
+        W: ratatui::widgets::Widget,
+    {
+        let mut terminal = test_terminal(width, height);
+        terminal
+            .draw(|f| {
+                f.render_widget(widget, f.area());
+            })
+            .unwrap();
+        buffer_to_string(terminal.backend().buffer())
+    }
+}
+
+// ========== Metrics Builder ==========
+
+use crate::metrics::{
+    BashCommand, FileModification, HookMetrics, PhaseMetrics, StateTransitionEvent, TokenMetrics,
+    UnifiedMetrics,
+};
+
+/// Fluent builder for creating test UnifiedMetrics with realistic data
+///
+/// # Example
+/// ```ignore
+/// let metrics = UnifiedMetricsBuilder::new()
+///     .with_session("test-session")
+///     .with_phases(3)
+///     .with_events(10, 5)
+///     .build();
+/// ```
+pub struct UnifiedMetricsBuilder {
+    session_id: Option<String>,
+    hook_metrics: HookMetrics,
+    state_transitions: Vec<StateTransitionEvent>,
+    phase_metrics: Vec<PhaseMetrics>,
+}
+
+impl Default for UnifiedMetricsBuilder {
+    fn default() -> Self {
+        Self {
+            session_id: None,
+            hook_metrics: HookMetrics::default(),
+            state_transitions: Vec::new(),
+            phase_metrics: Vec::new(),
+        }
+    }
+}
+
+impl UnifiedMetricsBuilder {
+    /// Create a new metrics builder
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Set session ID
+    pub fn with_session(mut self, id: &str) -> Self {
+        self.session_id = Some(id.to_string());
+        self
+    }
+
+    /// Add realistic phase metrics
+    ///
+    /// Generates phases with increasing timestamps, token usage, and activity.
+    /// Phases cycle through: spec, plan, code
+    ///
+    /// # Arguments
+    /// * `count` - Number of phases to generate
+    pub fn with_phases(mut self, count: usize) -> Self {
+        let phases = vec!["spec", "plan", "code"];
+
+        for i in 0..count {
+            let phase_name = phases[i % phases.len()].to_string();
+            let start_time = format!("2025-01-01T10:{:02}:00Z", i * 15);
+            let end_time = if i == count - 1 {
+                None // Last phase is active
+            } else {
+                Some(format!("2025-01-01T10:{:02}:00Z", (i + 1) * 15))
+            };
+
+            // Add phase metrics
+            self.phase_metrics.push(PhaseMetrics {
+                phase_name: phase_name.clone(),
+                start_time: start_time.clone(),
+                end_time: end_time.clone(),
+                duration_seconds: if end_time.is_some() { 900 } else { 0 },
+                token_metrics: TokenMetrics {
+                    total_input_tokens: 1000 + (i as u64 * 500),
+                    total_output_tokens: 500 + (i as u64 * 250),
+                    total_cache_creation_tokens: 200,
+                    total_cache_read_tokens: 300,
+                    assistant_turns: 5,
+                },
+                bash_commands: vec![],
+                file_modifications: vec![],
+            });
+
+            // Add corresponding state transition
+            self.state_transitions.push(StateTransitionEvent {
+                timestamp: start_time,
+                workflow_id: Some("test-workflow".to_string()),
+                from_node: if i == 0 {
+                    "START".to_string()
+                } else {
+                    phases[(i - 1) % phases.len()].to_string()
+                },
+                to_node: phase_name.clone(),
+                phase: phase_name,
+                mode: "discovery".to_string(),
+            });
+        }
+
+        self
+    }
+
+    /// Add bash commands and file modifications
+    ///
+    /// # Arguments
+    /// * `bash_count` - Number of bash commands to generate
+    /// * `file_count` - Number of file modifications to generate
+    pub fn with_events(mut self, bash_count: usize, file_count: usize) -> Self {
+        // Add bash commands
+        for i in 0..bash_count {
+            self.hook_metrics.bash_commands.push(BashCommand {
+                command: format!("cargo build #{}", i),
+                timestamp: Some(format!("2025-01-01T10:05:{:02}Z", i)),
+                stdout: None,
+                stderr: None,
+            });
+        }
+
+        // Add file modifications
+        for i in 0..file_count {
+            self.hook_metrics.file_modifications.push(FileModification {
+                file_path: format!("src/file{}.rs", i),
+                tool: "Edit".to_string(),
+                timestamp: Some(format!("2025-01-01T10:10:{:02}Z", i)),
+            });
+        }
+
+        self.hook_metrics.total_events = bash_count + file_count;
+        self
+    }
+
+    /// Build the UnifiedMetrics
+    pub fn build(self) -> UnifiedMetrics {
+        // Aggregate token metrics from phases
+        let token_metrics = self
+            .phase_metrics
+            .iter()
+            .fold(TokenMetrics::default(), |acc, p| TokenMetrics {
+                total_input_tokens: acc.total_input_tokens + p.token_metrics.total_input_tokens,
+                total_output_tokens: acc.total_output_tokens + p.token_metrics.total_output_tokens,
+                total_cache_creation_tokens: acc.total_cache_creation_tokens
+                    + p.token_metrics.total_cache_creation_tokens,
+                total_cache_read_tokens: acc.total_cache_read_tokens
+                    + p.token_metrics.total_cache_read_tokens,
+                assistant_turns: acc.assistant_turns + p.token_metrics.assistant_turns,
+            });
+
+        UnifiedMetrics {
+            session_id: self.session_id,
+            hook_metrics: self.hook_metrics,
+            token_metrics,
+            state_transitions: self.state_transitions,
+            phase_metrics: self.phase_metrics,
+        }
+    }
+}
+
+/// Create standard test metrics with sensible defaults
+///
+/// Equivalent to:
+/// ```ignore
+/// UnifiedMetricsBuilder::new()
+///     .with_session("test-session")
+///     .with_phases(3)
+///     .with_events(10, 5)
+///     .build()
+/// ```
+///
+/// # Example
+/// ```ignore
+/// let metrics = test_unified_metrics();
+/// let app = AppState::new(metrics);
+/// ```
+pub fn test_unified_metrics() -> UnifiedMetrics {
+    UnifiedMetricsBuilder::new()
+        .with_session("test-session")
+        .with_phases(3)
+        .with_events(10, 5)
+        .build()
+}

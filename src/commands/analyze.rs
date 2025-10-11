@@ -1,7 +1,7 @@
 use anyhow::Result;
 use colored::Colorize;
 
-use crate::metrics::parse_unified_metrics;
+use crate::metrics::{parse_unified_metrics, WorkflowDAG};
 use crate::storage::FileStorage;
 
 pub fn analyze_metrics(storage: &FileStorage) -> Result<()> {
@@ -209,6 +209,39 @@ pub fn analyze_metrics(storage: &FileStorage) -> Result<()> {
                 }
             );
         }
+        println!();
+    }
+
+    // Workflow Graph
+    if !metrics.state_transitions.is_empty() && !metrics.phase_metrics.is_empty() {
+        println!("{}", "Workflow Graph".bold());
+        println!();
+
+        let graph =
+            WorkflowDAG::from_transitions(&metrics.state_transitions, &metrics.phase_metrics);
+
+        // ASCII visualization
+        print!("{}", graph.render_ascii());
+
+        // Cycle detection
+        let cycles = graph.find_cycles();
+        if !cycles.is_empty() {
+            println!("{}", "⚠ Cycles Detected:".yellow().bold());
+            for cycle in cycles {
+                println!("  {}", cycle.join(" → ").yellow());
+            }
+            println!();
+        }
+
+        println!("{}", "Export Options:".bright_black());
+        println!(
+            "  {} hegel graph --dot > workflow.dot",
+            "Run".bright_black()
+        );
+        println!(
+            "  {} dot -Tpng workflow.dot -o workflow.png",
+            "Then".bright_black()
+        );
         println!();
     }
 
