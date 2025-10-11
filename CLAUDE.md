@@ -51,8 +51,7 @@
 
 **When to write:**
 - User says "done for now"
-- Tokens running low
-- Natural stopping point
+- Tokens running low (<10% remaining)
 
 ---
 
