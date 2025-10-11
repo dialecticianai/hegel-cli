@@ -21,6 +21,8 @@ pub struct Transition {
 pub struct Node {
     pub prompt: String,
     pub transitions: Vec<Transition>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub rules: Vec<crate::rules::RuleConfig>,
 }
 
 /// Complete workflow definition
@@ -448,5 +450,103 @@ nodes:
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("Next node not found"));
         assert!(err_msg.contains("nonexistent"));
+    }
+
+    // ========== Node Struct Rules Field Tests ==========
+
+    #[test]
+    fn test_node_with_rules_field_deserializes() {
+        let yaml = r#"
+mode: test
+start_node: start
+nodes:
+  start:
+    prompt: "Test prompt"
+    transitions: []
+    rules:
+      - type: token_budget
+        max_tokens: 5000
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        let node = &workflow.nodes["start"];
+        assert_eq!(node.rules.len(), 1);
+    }
+
+    #[test]
+    fn test_node_without_rules_field_deserializes() {
+        let yaml = r#"
+mode: test
+start_node: start
+nodes:
+  start:
+    prompt: "Test prompt"
+    transitions: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        let node = &workflow.nodes["start"];
+        assert_eq!(node.rules.len(), 0);
+    }
+
+    #[test]
+    fn test_node_with_empty_rules_list_deserializes() {
+        let yaml = r#"
+mode: test
+start_node: start
+nodes:
+  start:
+    prompt: "Test prompt"
+    transitions: []
+    rules: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        let node = &workflow.nodes["start"];
+        assert_eq!(node.rules.len(), 0);
+    }
+
+    #[test]
+    fn test_node_with_multiple_rules_deserializes() {
+        let yaml = r#"
+mode: test
+start_node: start
+nodes:
+  start:
+    prompt: "Test prompt"
+    transitions: []
+    rules:
+      - type: token_budget
+        max_tokens: 5000
+      - type: phase_timeout
+        max_duration: 600
+      - type: repeated_command
+        pattern: "cargo build"
+        threshold: 5
+        window: 120
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        let node = &workflow.nodes["start"];
+        assert_eq!(node.rules.len(), 3);
+    }
+
+    #[test]
+    fn test_workflow_with_mixed_nodes_deserializes() {
+        let yaml = r#"
+mode: test
+start_node: start
+nodes:
+  start:
+    prompt: "Node with rules"
+    transitions:
+      - when: go
+        to: next
+    rules:
+      - type: token_budget
+        max_tokens: 5000
+  next:
+    prompt: "Node without rules"
+    transitions: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(workflow.nodes["start"].rules.len(), 1);
+        assert_eq!(workflow.nodes["next"].rules.len(), 0);
     }
 }
