@@ -60,6 +60,19 @@ nodes:
       - Clear documentation and logging
 
       Respond when code is complete and all tests pass.
+    rules:
+      - type: repeated_command
+        pattern: "cargo (build|check|test)"
+        threshold: 5
+        window: 120
+      - type: repeated_file_edit
+        path_pattern: "src/.*"
+        threshold: 8
+        window: 240
+      - type: token_budget
+        max_tokens: 8000
+      - type: phase_timeout
+        max_duration: 600
     transitions:
       - when: "code_complete"
         to: review

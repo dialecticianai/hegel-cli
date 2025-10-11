@@ -57,6 +57,17 @@ nodes:
       - Commit after each step completion
 
       Respond when code is complete and all tests pass.
+    rules:
+      - type: repeated_command
+        pattern: "cargo (build|check|test)"
+        threshold: 6
+        window: 180
+      - type: repeated_file_edit
+        path_pattern: "src/.*"
+        threshold: 10
+        window: 300
+      - type: token_budget
+        max_tokens: 10000
     transitions:
       - when: "code_complete"
         to: learnings

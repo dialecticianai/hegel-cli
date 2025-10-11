@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 01:29
+**Last Updated**: 2025-10-11 01:36
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **93.19%** lines | **91.49%** regions | **90.50%** functions
+**Overall Coverage**: **92.73%** lines | **91.02%** regions | **89.65%** functions
 
 ## Summary
 
 ```
-TOTAL                            8485               722    91.49%         421                40    90.50%        5230               356    93.19%           0                 0         -
+TOTAL                            8529               766    91.02%         425                44    89.65%        5256               382    92.73%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -16,7 +16,7 @@ TOTAL                            8485               722    91.49%         421   
 |--------|--------------|-----------------|-----------|--------|
 | `commands/analyze.rs` | 98.15% | 97.09% | 100.00% | 🟢 Excellent |
 | `commands/hook.rs` | 89.61% | 87.10% | 64.71% | 🟡 Good |
-| `commands/workflow.rs` | 97.07% | 94.17% | 90.62% | 🟢 Excellent |
+| `commands/workflow.rs` | 90.77% | 89.39% | 80.56% | 🟢 Excellent |
 | `engine/mod.rs` | 99.80% | 99.41% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -39,7 +39,7 @@ TOTAL                            8485               722    91.49%         421   
 
 ### 🟢 Excellent (≥90% lines)
 - `commands/analyze.rs` - 98.15%
-- `commands/workflow.rs` - 97.07%
+- `commands/workflow.rs` - 90.77%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
 - `metrics/graph.rs` - 99.20%
@@ -69,7 +69,7 @@ TOTAL                            8485               722    91.49%         421   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 93.19% | ✅ Met |
+| Overall | ≥80% | 92.73% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

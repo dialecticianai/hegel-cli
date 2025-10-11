@@ -13,11 +13,54 @@ if ! command -v cargo-llvm-cov &> /dev/null; then
     exit 1
 fi
 
-# Generate coverage data silently
+# Generate coverage data silently with timeout and retry
 echo "Generating coverage data..."
 
-# Run coverage (skip ignored tests to avoid flaky failures)
-cargo llvm-cov --summary-only -- --skip ignored > /tmp/coverage-raw.txt 2>&1
+# Run coverage with timeout and retry (skip ignored tests to avoid flaky failures)
+MAX_ATTEMPTS=3
+ATTEMPT=1
+TIMEOUT=30
+SUCCESS=0
+
+while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+    if [ $ATTEMPT -gt 1 ]; then
+        echo "Retry $ATTEMPT/$MAX_ATTEMPTS..."
+    fi
+
+    # Run with timeout (30 seconds should be plenty for our small codebase)
+    timeout $TIMEOUT cargo llvm-cov --summary-only -- --skip ignored > /tmp/coverage-raw.txt 2>&1
+    EXIT_CODE=$?
+
+    # Check if successful (exit code 0)
+    if [ $EXIT_CODE -eq 0 ]; then
+        SUCCESS=1
+        break
+    fi
+
+    # Exit code 124 means timeout
+    if [ $EXIT_CODE -eq 124 ]; then
+        echo "Warning: cargo llvm-cov timed out after ${TIMEOUT}s"
+    else
+        echo "Warning: cargo llvm-cov failed with exit code $EXIT_CODE"
+    fi
+
+    ATTEMPT=$((ATTEMPT + 1))
+
+    # If this was the last attempt, fail
+    if [ $ATTEMPT -gt $MAX_ATTEMPTS ]; then
+        echo "Error: Failed to generate coverage after $MAX_ATTEMPTS attempts"
+        exit 1
+    fi
+
+    # Wait before retry
+    sleep 1
+done
+
+# Double-check we actually succeeded
+if [ $SUCCESS -eq 0 ]; then
+    echo "Error: Coverage generation did not complete successfully"
+    exit 1
+fi
 
 # Strip ANSI color codes from output
 sed 's/\x1b\[[0-9;]*m//g' /tmp/coverage-raw.txt > /tmp/coverage-summary.txt
