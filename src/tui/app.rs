@@ -164,6 +164,39 @@ impl AppState {
 }
 
 #[cfg(test)]
+impl AppState {
+    /// Create AppState for testing without file watching
+    ///
+    /// This is a minimal constructor for testing rendering without the complexity
+    /// of file watching. For tests that need file watching, use AppState::new().
+    pub fn new_for_test(metrics: UnifiedMetrics) -> Self {
+        use std::sync::mpsc::channel;
+        use tempfile::TempDir;
+
+        let temp_dir = TempDir::new().unwrap();
+        let state_dir = temp_dir.path().to_path_buf();
+        std::mem::forget(temp_dir); // Keep temp dir alive for the test
+
+        let (tx, rx) = channel();
+        let watcher = notify::recommended_watcher(move |res| {
+            let _ = tx.send(res);
+        })
+        .unwrap();
+
+        Self {
+            metrics,
+            selected_tab: Tab::Overview,
+            scroll_offset: 0,
+            should_quit: false,
+            needs_reload: false,
+            state_dir,
+            file_rx: rx,
+            _watcher: watcher,
+        }
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::test_helpers::test_storage_with_files;

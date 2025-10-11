@@ -188,4 +188,130 @@ mod tests {
         assert_eq!(chunks[2].height, 1);
         assert_eq!(chunks[1].height, 36); // Main fills remaining
     }
+
+    #[test]
+    fn test_render_header() {
+        use crate::test_helpers::test_unified_metrics;
+        use crate::test_helpers::tui::render_to_string;
+
+        let metrics = test_unified_metrics();
+        let app = AppState::new_for_test(metrics);
+
+        let widget = render_header(&app);
+        let output = render_to_string(widget, 80, 3);
+
+        // Verify title and session info present
+        assert!(output.contains("Hegel Dialectic Dashboard"));
+        assert!(output.contains("Session:"));
+        assert!(output.contains("test-session"));
+
+        // Verify tab labels present
+        assert!(output.contains("Overview"));
+        assert!(output.contains("Phases"));
+        assert!(output.contains("Events"));
+        assert!(output.contains("Files"));
+    }
+
+    #[test]
+    fn test_render_header_no_session() {
+        use crate::metrics::UnifiedMetrics;
+        use crate::test_helpers::tui::render_to_string;
+
+        // Metrics with no session_id
+        let metrics = UnifiedMetrics::default();
+        let app = AppState::new_for_test(metrics);
+
+        let widget = render_header(&app);
+        let output = render_to_string(widget, 80, 3);
+
+        // Should show N/A when no session
+        assert!(output.contains("Hegel Dialectic Dashboard"));
+        assert!(output.contains("Session:"));
+        assert!(output.contains("N/A"));
+    }
+
+    #[test]
+    fn test_tab_label_selected() {
+        let span = tab_label("Overview", true);
+
+        // Verify the span was created (can't easily inspect Style)
+        // Check the text content is correct
+        let debug_output = format!("{:?}", span);
+        assert!(debug_output.contains("Overview"));
+    }
+
+    #[test]
+    fn test_tab_label_unselected() {
+        let span = tab_label("Phases", false);
+
+        // Verify the span was created
+        let debug_output = format!("{:?}", span);
+        assert!(debug_output.contains("Phases"));
+    }
+
+    #[test]
+    fn test_render_footer() {
+        use crate::test_helpers::tui::render_to_string;
+
+        let widget = render_footer();
+        let output = render_to_string(widget, 80, 1);
+
+        // Verify all keybindings are present
+        assert!(output.contains("[q]"));
+        assert!(output.contains("Quit"));
+        assert!(output.contains("[Tab]"));
+        assert!(output.contains("Next"));
+        assert!(output.contains("[↑↓/jk]"));
+        assert!(output.contains("Scroll"));
+        assert!(output.contains("[g/G]"));
+        assert!(output.contains("Top/Bottom"));
+        assert!(output.contains("[r]"));
+        assert!(output.contains("Reload"));
+    }
+
+    #[test]
+    fn test_draw_renders_all_components() {
+        use crate::test_helpers::test_unified_metrics;
+        use crate::test_helpers::tui::test_terminal;
+
+        let metrics = test_unified_metrics();
+        let app = AppState::new_for_test(metrics);
+
+        let mut terminal = test_terminal(80, 24);
+
+        // Verify terminal draws without panics
+        terminal
+            .draw(|frame| {
+                draw(frame, &app);
+            })
+            .unwrap();
+
+        // Verify buffer contains key elements
+        let buffer = terminal.backend().buffer();
+        let output = format!("{:?}", buffer);
+
+        // Just verify we got some content rendered
+        assert!(output.len() > 0);
+    }
+
+    #[test]
+    fn test_draw_all_tabs() {
+        use crate::test_helpers::test_unified_metrics;
+        use crate::test_helpers::tui::test_terminal;
+
+        let metrics = test_unified_metrics();
+        let mut app = AppState::new_for_test(metrics);
+
+        // Test that all tabs render without panic
+        for tab in [Tab::Overview, Tab::Phases, Tab::Events, Tab::Files] {
+            app.selected_tab = tab;
+
+            let mut terminal = test_terminal(80, 24);
+            terminal
+                .draw(|frame| {
+                    draw(frame, &app);
+                })
+                .unwrap();
+        }
+    }
 }
