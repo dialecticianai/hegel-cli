@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 01:01
+**Last Updated**: 2025-10-11 01:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,133 | 4,192 | 9,325 |
-| **Comments** | 778 | - | 778 |
-| **Blank Lines** | 889 | - | 889 |
-| **Total Lines** | 6,800 | 4,192 | 10,992 |
+| **Lines** | 5,445 | 4,193 | 9,638 |
+| **Comments** | 788 | - | 788 |
+| **Blank Lines** | 933 | - | 933 |
+| **Total Lines** | 7,166 | 4,193 | 11,359 |
 | **Files** | 21 | 17 | 38 |
 
-**Documentation Ratio**: 0.82 lines of docs per line of code
+**Documentation Ratio**: 0.77 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            21            889            778           5133
+Rust                            21            933            788           5445
 -------------------------------------------------------------------------------
-SUM:                            21            889            778           5133
+SUM:                            21            933            788           5445
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,7 @@ SUM:                            21            889            778           5133
 | `metrics/mod.rs` | 465 | 247 | 218 | 46.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 466 | 15 | 451 | 96.8% | ✅ |
+| `rules/evaluator.rs` | 832 | 102 | 730 | 87.7% | ✅ |
 | `rules/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 472 | 184 | 288 | 61.0% | ✅ |
@@ -78,7 +78,7 @@ SUM:                            21            889            778           5133
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 108 |
+| `LOC_REPORT.md` | 109 |
 | `PLAN.md` | 1,348 |
 | `README.md` | 236 |
 | `ROADMAP.md` | 95 |
@@ -90,7 +90,7 @@ SUM:                            21            889            778           5133
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.82 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.77 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

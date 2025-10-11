@@ -13,6 +13,93 @@ pub fn evaluate_rules(
     Ok(None)
 }
 
+/// Evaluate a repeated_file_edit rule
+fn evaluate_repeated_file_edit(
+    rule: &RuleConfig,
+    context: &RuleEvaluationContext,
+) -> Result<Option<RuleViolation>> {
+    let (path_pattern, threshold, window) = match rule {
+        RuleConfig::RepeatedFileEdit {
+            path_pattern,
+            threshold,
+            window,
+        } => (path_pattern, threshold, window),
+        _ => return Ok(None),
+    };
+
+    // Calculate window bounds: [phase_start, phase_start + window]
+    let phase_start = DateTime::parse_from_rfc3339(context.phase_start_time)?;
+    let window_end = phase_start + chrono::Duration::seconds(*window as i64);
+
+    // Compile regex if pattern provided
+    let regex = if let Some(pat) = path_pattern {
+        Some(Regex::new(pat)?)
+    } else {
+        None
+    };
+
+    // Filter file modifications by time window and pattern
+    let matching_edits: Vec<_> = context
+        .hook_metrics
+        .file_modifications
+        .iter()
+        .filter(|file_mod| {
+            // Filter by timestamp (within window: phase_start <= ts <= window_end)
+            if let Some(ts) = &file_mod.timestamp {
+                if let Ok(timestamp) = DateTime::parse_from_rfc3339(ts) {
+                    if timestamp < phase_start || timestamp > window_end {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+
+            // Filter by pattern (if provided)
+            if let Some(ref re) = regex {
+                re.is_match(&file_mod.file_path)
+            } else {
+                true // No pattern = match all
+            }
+        })
+        .collect();
+
+    let count = matching_edits.len();
+
+    if count >= *threshold {
+        // Build recent events list (last 5)
+        let recent_events: Vec<String> = matching_edits
+            .iter()
+            .rev()
+            .take(5)
+            .rev()
+            .map(|file_mod| {
+                format!(
+                    "{}: {} ({})",
+                    file_mod
+                        .timestamp
+                        .as_ref()
+                        .unwrap_or(&"unknown".to_string())[11..19]
+                        .to_string(),
+                    file_mod.file_path,
+                    file_mod.tool
+                )
+            })
+            .collect();
+
+        Ok(Some(RuleViolation {
+            rule_type: "Repeated File Edit".to_string(),
+            diagnostic: format!("Files edited {} times in last {}s", count, window),
+            suggestion: "You're thrashing the same files. Step back and write a failing test that captures the desired behavior, then implement the fix.".to_string(),
+            recent_events,
+        }))
+    } else {
+        Ok(None)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -380,6 +467,285 @@ mod tests {
         let result = evaluate_repeated_command(&rule, &context).unwrap();
 
         assert!(result.is_some()); // All 3 should be included
+    }
+
+    // ========== Repeated File Edit Evaluation Tests ==========
+
+    fn test_context_with_file_edits(
+        edits: Vec<crate::metrics::FileModification>,
+    ) -> RuleEvaluationContext<'static> {
+        let hook_metrics = Box::leak(Box::new(HookMetrics {
+            total_events: edits.len(),
+            bash_commands: vec![],
+            file_modifications: edits,
+            session_start_time: None,
+            session_end_time: None,
+        }));
+
+        RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_metrics: None,
+            hook_metrics,
+        }
+    }
+
+    #[test]
+    fn test_repeated_file_edit_triggers_at_threshold() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:30Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/lib.rs".to_string(),
+                tool: "Write".to_string(),
+                timestamp: Some("2025-01-01T10:01:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:01:30Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/utils.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:02:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:02:30Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/lib.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:02:59Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/types.rs".to_string(),
+                tool: "Write".to_string(),
+                timestamp: Some("2025-01-01T10:03:00Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 8,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_some());
+        let violation = result.unwrap();
+        assert_eq!(violation.rule_type, "Repeated File Edit");
+        assert!(violation.diagnostic.contains("8"));
+    }
+
+    #[test]
+    fn test_repeated_file_edit_below_threshold_no_trigger() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/lib.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:30Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 5,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_repeated_file_edit_path_pattern_matches() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/lib.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:10Z".to_string()),
+            },
+            FileModification {
+                file_path: "README.md".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:20Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/utils.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:30Z".to_string()),
+            },
+            FileModification {
+                file_path: "Cargo.toml".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:40Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 3,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_some()); // 3 src/*.rs files match
+    }
+
+    #[test]
+    fn test_repeated_file_edit_path_pattern_excludes() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            FileModification {
+                file_path: "README.md".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "Cargo.toml".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:10Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:20Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 3,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_none()); // Only 1 src/*.rs file
+    }
+
+    #[test]
+    fn test_repeated_file_edit_no_pattern_matches_all() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "README.md".to_string(),
+                tool: "Write".to_string(),
+                timestamp: Some("2025-01-01T10:00:10Z".to_string()),
+            },
+            FileModification {
+                file_path: "Cargo.toml".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:20Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: None, // Match ALL
+            threshold: 3,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_some()); // All 3 files match
+    }
+
+    #[test]
+    fn test_repeated_file_edit_empty_list_no_trigger() {
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 5,
+            window: 180,
+        };
+
+        let context = test_context_with_file_edits(vec![]);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_repeated_file_edit_outside_window_no_trigger() {
+        use crate::metrics::FileModification;
+
+        let edits = vec![
+            // Outside window (before phase start)
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T09:57:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/lib.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T09:58:00Z".to_string()),
+            },
+            // Inside window
+            FileModification {
+                file_path: "src/utils.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            },
+            FileModification {
+                file_path: "src/types.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:01:00Z".to_string()),
+            },
+        ];
+
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 5,
+            window: 120,
+        };
+
+        let context = test_context_with_file_edits(edits);
+        let result = evaluate_repeated_file_edit(&rule, &context).unwrap();
+
+        assert!(result.is_none()); // Only 2 in window, threshold is 5
     }
 }
 
