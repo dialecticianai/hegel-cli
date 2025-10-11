@@ -7,10 +7,11 @@
 **Progress**: ✅ ALL STEPS COMPLETE (Steps 1-7) | Sessions: 2025-10-10, 2025-10-11
 
 **Post-completion optimization (2025-10-11)**:
-- Added O(1) session metadata lookup via `.hegel/current_session.json`
+- Merged session metadata into `state.json` for single source of truth
+- O(1) session lookup from unified state (session + workflow in one file)
 - Graceful fallback to O(n) hooks.jsonl scan for backward compatibility
-- Resilient to corrupted/missing metadata files (silent degradation)
-- Coverage: 90.55% (159 tests passing)
+- `reset_workflow` preserves session metadata across workflow resets
+- Coverage: 90.50% (153 tests passing)
 
 ---
 
