@@ -1,6 +1,7 @@
 mod commands;
 mod engine;
 mod metrics;
+mod rules;
 mod storage;
 mod tui;
 
