@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 01:06
+**Last Updated**: 2025-10-11 01:07
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,766 | 4,193 | 9,959 |
-| **Comments** | 800 | - | 800 |
-| **Blank Lines** | 1,003 | - | 1,003 |
-| **Total Lines** | 7,569 | 4,193 | 11,762 |
+| **Lines** | 5,980 | 4,193 | 10,173 |
+| **Comments** | 807 | - | 807 |
+| **Blank Lines** | 1,038 | - | 1,038 |
+| **Total Lines** | 7,825 | 4,193 | 12,018 |
 | **Files** | 21 | 17 | 38 |
 
-**Documentation Ratio**: 0.73 lines of docs per line of code
+**Documentation Ratio**: 0.70 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            21           1003            800           5766
+Rust                            21           1038            807           5980
 -------------------------------------------------------------------------------
-SUM:                            21           1003            800           5766
+SUM:                            21           1038            807           5980
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,7 @@ SUM:                            21           1003            800           5766
 | `metrics/mod.rs` | 465 | 247 | 218 | 46.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 1,235 | 102 | 1,133 | 91.7% | ✅ |
+| `rules/evaluator.rs` | 1,491 | 115 | 1,376 | 92.3% | ✅ |
 | `rules/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 472 | 184 | 288 | 61.0% | ✅ |
@@ -90,7 +90,7 @@ SUM:                            21           1003            800           5766
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.73 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.70 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

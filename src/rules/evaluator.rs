@@ -6,11 +6,24 @@ use super::types::{RuleConfig, RuleEvaluationContext, RuleViolation};
 
 /// Evaluate all rules and return the first violation (short-circuit)
 pub fn evaluate_rules(
-    _rules: &[RuleConfig],
-    _context: &RuleEvaluationContext,
+    rules: &[RuleConfig],
+    context: &RuleEvaluationContext,
 ) -> Result<Option<RuleViolation>> {
-    // TODO: Implement in Step 7 (orchestration)
-    Ok(None)
+    // Evaluate each rule in order, short-circuit on first violation
+    for rule in rules {
+        let violation = match rule {
+            RuleConfig::RepeatedCommand { .. } => evaluate_repeated_command(rule, context)?,
+            RuleConfig::RepeatedFileEdit { .. } => evaluate_repeated_file_edit(rule, context)?,
+            RuleConfig::PhaseTimeout { .. } => evaluate_phase_timeout(rule, context)?,
+            RuleConfig::TokenBudget { .. } => evaluate_token_budget(rule, context)?,
+        };
+
+        if violation.is_some() {
+            return Ok(violation); // Short-circuit on first violation
+        }
+    }
+
+    Ok(None) // No violations
 }
 
 /// Evaluate a repeated_file_edit rule
@@ -103,7 +116,250 @@ fn evaluate_repeated_file_edit(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::metrics::{BashCommand, HookMetrics, PhaseMetrics, TokenMetrics};
+    use crate::metrics::{BashCommand, FileModification, HookMetrics, PhaseMetrics, TokenMetrics};
+
+    // ========== Unified Rule Evaluation Tests (Orchestration) ==========
+
+    #[test]
+    fn test_evaluate_rules_returns_first_violation() {
+        // Setup: multiple rules, only first should trigger
+        let commands = vec![
+            BashCommand {
+                command: "cargo build".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+                stdout: None,
+                stderr: None,
+            };
+            5
+        ];
+
+        let hook_metrics = Box::leak(Box::new(HookMetrics {
+            total_events: 5,
+            bash_commands: commands,
+            file_modifications: vec![],
+            session_start_time: None,
+            session_end_time: None,
+        }));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_metrics: None,
+            hook_metrics,
+        };
+
+        let rules = vec![
+            RuleConfig::RepeatedCommand {
+                pattern: Some("cargo build".to_string()),
+                threshold: 5,
+                window: 120,
+            },
+            RuleConfig::TokenBudget { max_tokens: 1 }, // Would also trigger if checked
+        ];
+
+        let result = evaluate_rules(&rules, &context).unwrap();
+
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().rule_type, "Repeated Command"); // First rule
+    }
+
+    #[test]
+    fn test_evaluate_rules_no_violations() {
+        let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_metrics: None,
+            hook_metrics,
+        };
+
+        let rules = vec![
+            RuleConfig::RepeatedCommand {
+                pattern: Some("cargo build".to_string()),
+                threshold: 5,
+                window: 120,
+            },
+            RuleConfig::RepeatedFileEdit {
+                path_pattern: Some(r"src/.*\.rs".to_string()),
+                threshold: 8,
+                window: 180,
+            },
+        ];
+
+        let result = evaluate_rules(&rules, &context).unwrap();
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_evaluate_rules_empty_rules() {
+        let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_metrics: None,
+            hook_metrics,
+        };
+
+        let result = evaluate_rules(&[], &context).unwrap();
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_evaluate_rules_short_circuit() {
+        // Second rule would trigger but first rule triggers first
+        let commands = vec![
+            BashCommand {
+                command: "cargo build".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+                stdout: None,
+                stderr: None,
+            };
+            5
+        ];
+
+        let edits = vec![
+            FileModification {
+                file_path: "src/main.rs".to_string(),
+                tool: "Edit".to_string(),
+                timestamp: Some("2025-01-01T10:00:00Z".to_string()),
+            };
+            10
+        ];
+
+        let hook_metrics = Box::leak(Box::new(HookMetrics {
+            total_events: 15,
+            bash_commands: commands,
+            file_modifications: edits,
+            session_start_time: None,
+            session_end_time: None,
+        }));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_metrics: None,
+            hook_metrics,
+        };
+
+        let rules = vec![
+            RuleConfig::RepeatedCommand {
+                pattern: None,
+                threshold: 5,
+                window: 120,
+            },
+            RuleConfig::RepeatedFileEdit {
+                path_pattern: None,
+                threshold: 8,
+                window: 180,
+            },
+        ];
+
+        let result = evaluate_rules(&rules, &context).unwrap();
+
+        assert!(result.is_some());
+        // Should be first rule (RepeatedCommand) even though both would trigger
+        assert_eq!(result.unwrap().rule_type, "Repeated Command");
+    }
+
+    #[test]
+    fn test_evaluate_rules_mixed_types() {
+        // Test with all four rule types
+        let phase = Box::leak(Box::new(PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:15:00Z".to_string()), // 15 min = 900s
+            duration_seconds: 900,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 6000,
+                total_output_tokens: 1000,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 10,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        }));
+
+        let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: &phase.start_time,
+            phase_metrics: Some(phase),
+            hook_metrics,
+        };
+
+        let rules = vec![
+            RuleConfig::RepeatedCommand {
+                pattern: None,
+                threshold: 100, // Won't trigger
+                window: 120,
+            },
+            RuleConfig::RepeatedFileEdit {
+                path_pattern: None,
+                threshold: 100, // Won't trigger
+                window: 180,
+            },
+            RuleConfig::PhaseTimeout { max_duration: 600 }, // WILL trigger (900s > 600s)
+            RuleConfig::TokenBudget { max_tokens: 10000 },  // Won't trigger
+        ];
+
+        let result = evaluate_rules(&rules, &context).unwrap();
+
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().rule_type, "Phase Timeout");
+    }
+
+    #[test]
+    fn test_evaluate_rules_all_pass() {
+        // Realistic scenario where all rules are configured but none trigger
+        let phase = Box::leak(Box::new(PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:05:00Z".to_string()), // 5 min = 300s
+            duration_seconds: 300,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 2000,
+                total_output_tokens: 1500,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 5,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        }));
+
+        let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+
+        let context = RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: &phase.start_time,
+            phase_metrics: Some(phase),
+            hook_metrics,
+        };
+
+        let rules = vec![
+            RuleConfig::RepeatedCommand {
+                pattern: Some("cargo build".to_string()),
+                threshold: 10,
+                window: 300,
+            },
+            RuleConfig::RepeatedFileEdit {
+                path_pattern: Some(r"src/.*\.rs".to_string()),
+                threshold: 15,
+                window: 300,
+            },
+            RuleConfig::PhaseTimeout { max_duration: 600 },
+            RuleConfig::TokenBudget { max_tokens: 5000 },
+        ];
+
+        let result = evaluate_rules(&rules, &context).unwrap();
+        assert!(result.is_none()); // All rules pass
+    }
+
+    // ========== Individual Evaluator Tests ==========
 
     fn test_context_with_commands(commands: Vec<BashCommand>) -> RuleEvaluationContext<'static> {
         let hook_metrics = Box::leak(Box::new(HookMetrics {
