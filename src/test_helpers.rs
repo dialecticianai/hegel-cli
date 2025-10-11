@@ -491,6 +491,41 @@ pub fn setup_workflow_env() -> (TempDir, FileStorage, WorkingDirGuard) {
     (temp_dir, storage, guard)
 }
 
+/// Setup test environment with production workflows
+///
+/// Copies production workflow files (discovery.yaml, execution.yaml) from project root
+/// to temp directory for isolated testing. Uses compile-time path to avoid working directory races.
+///
+/// Returns (TempDir, WorkingDirGuard) and sets cwd to temp_dir
+pub fn setup_production_workflows() -> (TempDir, WorkingDirGuard) {
+    let guard = WorkingDirGuard::new();
+    let temp_dir = TempDir::new().unwrap();
+
+    // Create workflows directory
+    std::fs::create_dir(temp_dir.path().join("workflows")).unwrap();
+
+    // Use compile-time project root (immune to runtime cwd changes)
+    let project_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+
+    // Copy production workflow files
+    for workflow in &["discovery.yaml", "execution.yaml"] {
+        let src = project_root.join("workflows").join(workflow);
+        let dst = temp_dir.path().join("workflows").join(workflow);
+
+        if src.exists() {
+            std::fs::copy(&src, &dst)
+                .unwrap_or_else(|e| panic!("Failed to copy {}: {}", workflow, e));
+        } else {
+            panic!("Production workflow not found: {}", src.display());
+        }
+    }
+
+    // Change to temp dir
+    std::env::set_current_dir(temp_dir.path()).unwrap();
+
+    (temp_dir, guard)
+}
+
 // ========== TUI Test Helpers ==========
 
 #[cfg(test)]

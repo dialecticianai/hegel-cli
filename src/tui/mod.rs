@@ -3,6 +3,7 @@
 //! Provides interactive dashboard functionality for real-time metrics visualization.
 
 pub mod app;
+mod tabs;
 pub mod ui;
 pub mod utils;
 

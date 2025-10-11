@@ -540,6 +540,7 @@ mod tests {
     fn test_discovery_workflow_loads_with_rules() {
         use crate::engine::load_workflow;
 
+        let (_temp_dir, _guard) = setup_production_workflows();
         let workflow = load_workflow("workflows/discovery.yaml").unwrap();
         assert_eq!(workflow.mode, "discovery");
 
@@ -553,6 +554,7 @@ mod tests {
     fn test_execution_workflow_loads_with_rules() {
         use crate::engine::load_workflow;
 
+        let (_temp_dir, _guard) = setup_production_workflows();
         let workflow = load_workflow("workflows/execution.yaml").unwrap();
         assert_eq!(workflow.mode, "execution");
 
@@ -566,6 +568,7 @@ mod tests {
     fn test_discovery_workflow_rules_are_valid() {
         use crate::engine::load_workflow;
 
+        let (_temp_dir, _guard) = setup_production_workflows();
         let workflow = load_workflow("workflows/discovery.yaml").unwrap();
         let code_node = &workflow.nodes["code"];
 
@@ -580,6 +583,7 @@ mod tests {
     fn test_execution_workflow_rules_are_valid() {
         use crate::engine::load_workflow;
 
+        let (_temp_dir, _guard) = setup_production_workflows();
         let workflow = load_workflow("workflows/execution.yaml").unwrap();
         let code_node = &workflow.nodes["code"];
 

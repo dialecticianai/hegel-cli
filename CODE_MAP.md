@@ -6,9 +6,10 @@
 
 **Layer 1: Commands** (`src/commands/`) - User-facing CLI operations (workflow, hook, analyze)
 **Layer 2: Engine** (`src/engine/`) - Workflow state machine with YAML parsing & template rendering
-**Layer 3: Storage** (`src/storage/`) - Atomic file-based persistence (JSON state + JSONL event logs)
-**Layer 4: Metrics** (`src/metrics/`) - Event stream parsing, aggregation, and visualization (DAG reconstruction)
-**Layer 5: TUI** (`src/tui/`) - Interactive dashboard with real-time file watching (`hegel top`)
+**Layer 3: Rules** (`src/rules/`) - Deterministic workflow enforcement (evaluator, interrupt protocol, rule types)
+**Layer 4: Storage** (`src/storage/`) - Atomic file-based persistence (JSON state + JSONL event logs)
+**Layer 5: Metrics** (`src/metrics/`) - Event stream parsing, aggregation, and visualization (DAG reconstruction)
+**Layer 6: TUI** (`src/tui/`) - Interactive dashboard with real-time file watching (`hegel top`)
 
 **Data Flow**: CLI → Load State → Evaluate Transitions → Render Templates → Save State → Display Prompt
 **Metrics Flow**: Hooks + States + Transcripts → Parse → Correlate by Timestamp → Aggregate by Phase → Visualize (analyze/top)
@@ -77,35 +78,50 @@ hegel-cli/
 ├── LOC_REPORT.md                # Lines of code metrics (auto-generated)
 ├── Cargo.toml                   # Rust package manifest
 │
-├── src/                         # Core implementation (three-layer architecture)
+├── src/                         # Core implementation (six-layer architecture)
 │   ├── main.rs                  # CLI entry point (clap parser, state directory resolution, analyze + top subcommands)
-│   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers, TUI test helpers, metrics builders)
+│   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers, TUI test helpers, metrics builders, production workflow setup)
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
 │   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
-│   │   ├── workflow.rs          # Workflow commands (start, next, status, reset)
+│   │   ├── workflow.rs          # Workflow commands (start, next, status, reset, continue)
 │   │   ├── hook.rs              # Claude Code hook event capture (JSON stdin → hooks.jsonl, with file locking)
-│   │   └── analyze.rs           # Metrics analysis and display (hegel analyze: session, tokens, activity, phases, workflow graph)
+│   │   └── analyze/             # Metrics analysis and display (hegel analyze)
+│   │       ├── mod.rs           # Main analyze command orchestrator
+│   │       └── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
 │   │
 │   ├── engine/                  # Layer 2: State machine and template rendering
-│   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt
+│   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt (integrates rules)
 │   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
 │   │
-│   ├── metrics/                 # Metrics parsing, aggregation, and visualization
-│   │   ├── mod.rs               # Unified metrics aggregator, builds per-phase metrics from timestamp correlation
+│   ├── rules/                   # Layer 3: Deterministic workflow enforcement
+│   │   ├── mod.rs               # Public exports (evaluate_rules, interrupt_if_violated)
+│   │   ├── types.rs             # Rule definitions (require_files, max_tokens, phase_timeout, etc.)
+│   │   ├── evaluator.rs         # Rule evaluation engine (stateless, context-based)
+│   │   └── interrupt.rs         # Interrupt protocol (rule violation → prompt injection)
+│   │
+│   ├── storage/                 # Layer 4: Atomic persistence and event logging
+│   │   └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
+│   │
+│   ├── metrics/                 # Layer 5: Event stream parsing, aggregation, and visualization
+│   │   ├── mod.rs               # Unified metrics orchestrator, parse_unified_metrics entry point
+│   │   ├── aggregation.rs       # Phase metrics builder (timestamp correlation, token aggregation per phase)
 │   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications (silent error handling)
 │   │   ├── states.rs            # Parses workflow state transition events
 │   │   ├── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format, includes timestamp)
 │   │   └── graph.rs             # Workflow DAG reconstruction (build from transitions, cycle detection, ASCII/DOT rendering)
 │   │
-│   ├── tui/                     # Terminal User Interface (hegel top command)
-│   │   ├── mod.rs               # Event loop (keyboard polling, file watching integration, terminal setup/restore)
-│   │   ├── app.rs               # AppState (file watching via notify, keyboard handling, scroll management, tab navigation)
-│   │   ├── ui.rs                # Rendering (colorful 4-tab layout: Overview, Phases, Events, Files; emoji icons, status indicators)
-│   │   └── utils.rs             # Scroll utilities (visible_window, max_scroll, scroll_indicators), timeline builder (merge hooks+states)
-│   │
-│   └── storage/                 # Layer 3: Atomic persistence and event logging
-│       └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
+│   └── tui/                     # Layer 6: Terminal User Interface (hegel top command)
+│       ├── mod.rs               # Event loop (keyboard polling, file watching integration, terminal setup/restore)
+│       ├── app.rs               # AppState (file watching via notify, keyboard handling, scroll management, tab navigation)
+│       ├── ui.rs                # Main rendering orchestrator (header, footer, tab routing)
+│       ├── utils.rs             # Scroll utilities (visible_window, max_scroll, scroll_indicators), timeline builder (merge hooks+states)
+│       └── tabs/                # Tab rendering modules (separation of concerns)
+│           ├── mod.rs           # Tab rendering exports
+│           ├── overview.rs      # Overview tab (session summary, token usage, activity metrics)
+│           ├── phases.rs        # Phases tab (per-phase breakdown with duration, tokens, activity)
+│           ├── events.rs        # Events tab (unified timeline of hooks and states, scrollable)
+│           └── files.rs         # Files tab (file modification frequency, color-coded by intensity)
 │
 ├── workflows/                   # YAML workflow definitions
 │   ├── discovery.yaml           # Learning-focused workflow (SPEC → PLAN → CODE → LEARNINGS → README)
@@ -121,7 +137,7 @@ hegel-cli/
 │   ├── HANDOFF_WRITING.md       # Session handoff protocol
 │   └── KICKOFF_WRITING.md       # Project kickoff guidance
 │
-├── tests/                       # Unit tests are co-located in src/ modules (90.88% coverage, 148 tests passing)
+├── tests/                       # Unit tests are co-located in src/ modules (85%+ coverage, 228 tests passing)
 │   └── (empty)                  # Future integration tests live here
 │
 ├── scripts/                     # Development utilities
