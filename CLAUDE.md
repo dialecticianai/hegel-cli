@@ -50,8 +50,12 @@
 - **NEVER commit HANDOFF.md**
 
 **When to write:**
-- User says "done for now"
-- Tokens running low (<10% remaining)
+- User says "done for now" AND work is incomplete/in-progress
+- Tokens running low (<10% remaining) with work in progress
+
+**When NOT to write:**
+- All planned work completed and committed cleanly
+- Session ending with no incomplete work (git history is the handoff)
 
 ---
 
