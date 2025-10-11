@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 00:56
+**Last Updated**: 2025-10-11 00:57
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.62%** lines | **89.32%** regions | **88.56%** functions
+**Overall Coverage**: **90.73%** lines | **89.39%** regions | **88.86%** functions
 
 ## Summary
 
 ```
-TOTAL                            6431               687    89.32%         341                39    88.56%        3657               343    90.62%           0                 0         -
+TOTAL                            6522               692    89.39%         350                39    88.86%        3734               346    90.73%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -25,7 +25,7 @@ TOTAL                            6431               687    89.32%         341   
 | `metrics/mod.rs` | 96.67% | 95.57% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `rules/types.rs` | 94.44% | 89.71% | 100.00% | 🟢 Excellent |
+| `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 92.49% | 93.13% | 70.00% | 🟢 Excellent |
 | `test_helpers.rs` | 90.14% | 87.47% | 90.48% | 🟢 Excellent |
 | `tui/app.rs` | 83.64% | 84.52% | 90.91% | 🟡 Good |
@@ -45,7 +45,7 @@ TOTAL                            6431               687    89.32%         341   
 - `metrics/mod.rs` - 96.67%
 - `metrics/states.rs` - 100.00%
 - `metrics/transcript.rs` - 100.00%
-- `rules/types.rs` - 94.44%
+- `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 92.49%
 - `test_helpers.rs` - 90.14%
 - `tui/utils.rs` - 96.60%
@@ -65,7 +65,7 @@ TOTAL                            6431               687    89.32%         341   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.62% | ✅ Met |
+| Overall | ≥80% | 90.73% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

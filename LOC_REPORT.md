@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 00:56
+**Last Updated**: 2025-10-11 00:57
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,646 | 4,187 | 8,833 |
-| **Comments** | 755 | - | 755 |
-| **Blank Lines** | 836 | - | 836 |
-| **Total Lines** | 6,237 | 4,187 | 10,424 |
+| **Lines** | 4,731 | 4,190 | 8,921 |
+| **Comments** | 757 | - | 757 |
+| **Blank Lines** | 844 | - | 844 |
+| **Total Lines** | 6,332 | 4,190 | 10,522 |
 | **Files** | 20 | 17 | 37 |
 
-**Documentation Ratio**: 0.90 lines of docs per line of code
+**Documentation Ratio**: 0.89 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            20            836            755           4646
+Rust                            20            844            757           4731
 -------------------------------------------------------------------------------
-SUM:                            20            836            755           4646
+SUM:                            20            844            757           4731
 -------------------------------------------------------------------------------
 ```
 
@@ -49,7 +49,7 @@ SUM:                            20            836            755           4646
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/mod.rs` | 3 | 3 | 0 | 0.0% | ✅ |
-| `rules/types.rs` | 202 | 45 | 157 | 77.7% | ✅ |
+| `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 472 | 184 | 288 | 61.0% | ✅ |
 | `test_helpers.rs` | 750 | 494 | 256 | 34.1% | ✅ (infra) |
 | `tui/app.rs` | 369 | 165 | 204 | 55.3% | ✅ |
@@ -77,7 +77,7 @@ SUM:                            20            836            755           4646
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 105 |
+| `LOC_REPORT.md` | 108 |
 | `PLAN.md` | 1,348 |
 | `README.md` | 236 |
 | `ROADMAP.md` | 95 |
@@ -89,7 +89,7 @@ SUM:                            20            836            755           4646
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.90 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.89 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

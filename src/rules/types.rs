@@ -1,4 +1,5 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 /// Rule configuration enum with all four rule types
@@ -41,6 +42,32 @@ pub struct RuleEvaluationContext<'a> {
     pub phase_start_time: &'a str,
     pub phase_metrics: Option<&'a crate::metrics::PhaseMetrics>,
     pub hook_metrics: &'a crate::metrics::HookMetrics,
+}
+
+impl RuleConfig {
+    /// Validate regex patterns in rules (called at workflow load time)
+    pub fn validate(&self) -> Result<()> {
+        match self {
+            RuleConfig::RepeatedCommand { pattern, .. } => {
+                if let Some(pat) = pattern {
+                    Regex::new(pat).with_context(|| {
+                        format!("Invalid regex pattern for repeated_command: {}", pat)
+                    })?;
+                }
+                Ok(())
+            }
+            RuleConfig::RepeatedFileEdit { path_pattern, .. } => {
+                if let Some(pat) = path_pattern {
+                    Regex::new(pat).with_context(|| {
+                        format!("Invalid regex pattern for repeated_file_edit: {}", pat)
+                    })?;
+                }
+                Ok(())
+            }
+            RuleConfig::PhaseTimeout { .. } => Ok(()),
+            RuleConfig::TokenBudget { .. } => Ok(()),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -198,5 +225,73 @@ window: 60
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
         assert!(err.contains("missing field") || err.contains("threshold"));
+    }
+
+    // ========== Regex Pattern Validation Tests ==========
+
+    #[test]
+    fn test_validate_valid_regex_pattern() {
+        let rule = RuleConfig::RepeatedCommand {
+            pattern: Some("cargo build".to_string()),
+            threshold: 5,
+            window: 120,
+        };
+        assert!(rule.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_invalid_regex_unclosed_bracket() {
+        let rule = RuleConfig::RepeatedCommand {
+            pattern: Some("[invalid".to_string()),
+            threshold: 5,
+            window: 120,
+        };
+        let result = rule.validate();
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("Invalid regex pattern") || err.contains("[invalid"));
+    }
+
+    #[test]
+    fn test_validate_invalid_regex_unclosed_parenthesis() {
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some("(unclosed".to_string()),
+            threshold: 5,
+            window: 120,
+        };
+        let result = rule.validate();
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("Invalid regex pattern") || err.contains("(unclosed"));
+    }
+
+    #[test]
+    fn test_validate_complex_regex_pattern() {
+        let rule = RuleConfig::RepeatedCommand {
+            pattern: Some("cargo (build|test|check)".to_string()),
+            threshold: 5,
+            window: 120,
+        };
+        assert!(rule.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_file_path_regex_pattern() {
+        let rule = RuleConfig::RepeatedFileEdit {
+            path_pattern: Some(r"src/.*\.rs".to_string()),
+            threshold: 8,
+            window: 180,
+        };
+        assert!(rule.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_none_pattern_succeeds() {
+        let rule = RuleConfig::RepeatedCommand {
+            pattern: None,
+            threshold: 5,
+            window: 120,
+        };
+        assert!(rule.validate().is_ok());
     }
 }
