@@ -67,6 +67,7 @@ let spec_hooks = hooks.filter(|h| h.timestamp >= workflow_start && h.timestamp <
 
 ## Project Structure
 
+```
 hegel-cli/
 ├── CLAUDE.md                    # Development guidelines for Claude Code
 ├── README.md                    # User-facing documentation
@@ -139,3 +140,4 @@ hegel-cli/
     ├── state.json               # Current workflow state (workflow + current_node + history + mode)
     ├── states.jsonl             # State transition event log (timestamped from→to transitions)
     └── hooks.jsonl              # Claude Code event log (PostToolUse, PreToolUse, SessionStart, etc.)
+```
