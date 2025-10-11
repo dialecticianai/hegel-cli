@@ -6,6 +6,14 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+/// Session metadata structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SessionMetadata {
+    pub session_id: String,
+    pub transcript_path: String,
+    pub started_at: String,
+}
+
 /// Workflow state structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkflowState {
@@ -168,6 +176,40 @@ impl FileStorage {
         });
 
         self.append_jsonl("states.jsonl", &event)
+    }
+
+    /// Save current session metadata (atomic write)
+    pub fn save_current_session(&self, session: &SessionMetadata) -> Result<()> {
+        let session_file = self.state_dir.join("current_session.json");
+        let temp_file = self.state_dir.join("current_session.json.tmp");
+
+        let content = serde_json::to_string_pretty(session)
+            .with_context(|| "Failed to serialize session metadata")?;
+
+        fs::write(&temp_file, content)
+            .with_context(|| format!("Failed to write temp session file: {:?}", temp_file))?;
+
+        fs::rename(&temp_file, &session_file)
+            .with_context(|| format!("Failed to rename session file: {:?}", session_file))?;
+
+        Ok(())
+    }
+
+    /// Load current session metadata
+    pub fn load_current_session(&self) -> Result<Option<SessionMetadata>> {
+        let session_file = self.state_dir.join("current_session.json");
+
+        if !session_file.exists() {
+            return Ok(None);
+        }
+
+        let content = fs::read_to_string(&session_file)
+            .with_context(|| format!("Failed to read session file: {:?}", session_file))?;
+
+        let session: SessionMetadata = serde_json::from_str(&content)
+            .with_context(|| "Failed to parse session metadata file")?;
+
+        Ok(Some(session))
     }
 }
 
@@ -457,5 +499,79 @@ mod tests {
         let states_file = temp_dir.path().join("states.jsonl");
         let parsed = read_jsonl_line(&states_file, 0);
         assert!(parsed["workflow_id"].is_null());
+    }
+
+    // ========== Session Metadata Tests ==========
+
+    #[test]
+    fn test_load_current_session_returns_none_when_no_file() {
+        let (_temp_dir, storage) = test_storage();
+        let session = storage.load_current_session().unwrap();
+        assert!(session.is_none());
+    }
+
+    #[test]
+    fn test_save_and_load_current_session() {
+        let (temp_dir, storage) = test_storage();
+
+        let session = SessionMetadata {
+            session_id: "test-session-123".to_string(),
+            transcript_path: "/path/to/transcript.jsonl".to_string(),
+            started_at: "2025-10-10T12:00:00Z".to_string(),
+        };
+
+        storage.save_current_session(&session).unwrap();
+
+        let session_file = temp_dir.path().join("current_session.json");
+        assert!(session_file.exists());
+
+        let loaded = storage.load_current_session().unwrap();
+        assert!(loaded.is_some());
+
+        let loaded = loaded.unwrap();
+        assert_eq!(loaded.session_id, "test-session-123");
+        assert_eq!(loaded.transcript_path, "/path/to/transcript.jsonl");
+        assert_eq!(loaded.started_at, "2025-10-10T12:00:00Z");
+    }
+
+    #[test]
+    fn test_save_current_session_is_atomic() {
+        let (temp_dir, storage) = test_storage();
+
+        let session = SessionMetadata {
+            session_id: "session-1".to_string(),
+            transcript_path: "/tmp/transcript.jsonl".to_string(),
+            started_at: "2025-10-10T10:00:00Z".to_string(),
+        };
+
+        storage.save_current_session(&session).unwrap();
+
+        // Temp file should not exist after atomic write
+        assert!(!temp_dir.path().join("current_session.json.tmp").exists());
+        assert!(temp_dir.path().join("current_session.json").exists());
+    }
+
+    #[test]
+    fn test_save_current_session_overwrites_previous() {
+        let (_temp_dir, storage) = test_storage();
+
+        let session1 = SessionMetadata {
+            session_id: "session-1".to_string(),
+            transcript_path: "/tmp/transcript1.jsonl".to_string(),
+            started_at: "2025-10-10T10:00:00Z".to_string(),
+        };
+
+        let session2 = SessionMetadata {
+            session_id: "session-2".to_string(),
+            transcript_path: "/tmp/transcript2.jsonl".to_string(),
+            started_at: "2025-10-10T11:00:00Z".to_string(),
+        };
+
+        storage.save_current_session(&session1).unwrap();
+        storage.save_current_session(&session2).unwrap();
+
+        let loaded = storage.load_current_session().unwrap().unwrap();
+        assert_eq!(loaded.session_id, "session-2");
+        assert_eq!(loaded.transcript_path, "/tmp/transcript2.jsonl");
     }
 }

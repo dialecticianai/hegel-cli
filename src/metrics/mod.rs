@@ -5,13 +5,15 @@ mod transcript;
 
 // Re-export public types from submodules
 pub use graph::WorkflowDAG;
-pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookEvent, HookMetrics};
+pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookMetrics};
 pub use states::{parse_states_file, StateTransitionEvent};
 pub use transcript::{parse_transcript_file, TokenMetrics, TranscriptEvent};
 
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
+
+use crate::storage::FileStorage;
 
 /// Metrics for a single workflow phase
 #[derive(Debug, Default, Clone)]
@@ -47,20 +49,17 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
     let mut transcript_path_opt: Option<String> = None;
     if hooks_path.exists() {
         unified.hook_metrics = parse_hooks_file(&hooks_path)?;
+    }
 
-        // Extract session_id and transcript_path from first hook event
-        let content = fs::read_to_string(&hooks_path)?;
-        if let Some(first_line) = content.lines().next() {
-            let event: HookEvent = serde_json::from_str(first_line)?;
-            unified.session_id = Some(event.session_id.clone());
+    // Load current session metadata from current_session.json (O(1) instead of scanning hooks.jsonl)
+    let storage = FileStorage::new(state_dir)?;
+    if let Some(session) = storage.load_current_session()? {
+        unified.session_id = Some(session.session_id);
 
-            // Parse transcript if we have a path
-            if let Some(transcript_path) = event.transcript_path {
-                if Path::new(&transcript_path).exists() {
-                    unified.token_metrics = parse_transcript_file(&transcript_path)?;
-                    transcript_path_opt = Some(transcript_path);
-                }
-            }
+        // Parse transcript if the file exists
+        if Path::new(&session.transcript_path).exists() {
+            unified.token_metrics = parse_transcript_file(&session.transcript_path)?;
+            transcript_path_opt = Some(session.transcript_path);
         }
     }
 
@@ -360,14 +359,15 @@ mod tests {
         ];
         let (_transcript_temp, transcript_path) = create_transcript_file(&transcript_events);
 
-        // Create hooks that reference the transcript
-        let hook_str = format!(
-            r#"{{"session_id":"test","hook_event_name":"SessionStart","timestamp":"2025-01-01T10:00:00Z","transcript_path":"{}"}}"#,
-            transcript_path.display()
-        );
-        let hooks = vec![hook_str.as_str()];
-        let (_hooks_temp, hooks_path) = create_hooks_file(&hooks);
-        std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
+        // Create current_session.json with the transcript path
+        use crate::storage::{FileStorage, SessionMetadata};
+        let storage = FileStorage::new(temp_dir.path()).unwrap();
+        let session = SessionMetadata {
+            session_id: "test".to_string(),
+            transcript_path: transcript_path.display().to_string(),
+            started_at: "2025-01-01T10:00:00Z".to_string(),
+        };
+        storage.save_current_session(&session).unwrap();
 
         let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
 
