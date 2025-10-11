@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 01:03
+**Last Updated**: 2025-10-11 01:05
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,445 | 4,193 | 9,638 |
-| **Comments** | 788 | - | 788 |
-| **Blank Lines** | 933 | - | 933 |
-| **Total Lines** | 7,166 | 4,193 | 11,359 |
+| **Lines** | 5,590 | 4,193 | 9,783 |
+| **Comments** | 796 | - | 796 |
+| **Blank Lines** | 967 | - | 967 |
+| **Total Lines** | 7,353 | 4,193 | 11,546 |
 | **Files** | 21 | 17 | 38 |
 
-**Documentation Ratio**: 0.77 lines of docs per line of code
+**Documentation Ratio**: 0.75 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            21            933            788           5445
+Rust                            21            967            796           5590
 -------------------------------------------------------------------------------
-SUM:                            21            933            788           5445
+SUM:                            21            967            796           5590
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,7 @@ SUM:                            21            933            788           5445
 | `metrics/mod.rs` | 465 | 247 | 218 | 46.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 832 | 102 | 730 | 87.7% | ✅ |
+| `rules/evaluator.rs` | 1,019 | 102 | 917 | 90.0% | ✅ |
 | `rules/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 472 | 184 | 288 | 61.0% | ✅ |
@@ -90,7 +90,7 @@ SUM:                            21            933            788           5445
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.77 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.75 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

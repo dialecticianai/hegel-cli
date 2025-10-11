@@ -747,6 +747,193 @@ mod tests {
 
         assert!(result.is_none()); // Only 2 in window, threshold is 5
     }
+
+    // ========== Phase Timeout Evaluation Tests ==========
+
+    fn test_context_with_phase(
+        phase_metrics: crate::metrics::PhaseMetrics,
+    ) -> RuleEvaluationContext<'static> {
+        let phase_metrics_ref = Box::leak(Box::new(phase_metrics));
+        let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+
+        RuleEvaluationContext {
+            current_phase: "code",
+            phase_start_time: &phase_metrics_ref.start_time,
+            phase_metrics: Some(phase_metrics_ref),
+            hook_metrics,
+        }
+    }
+
+    #[test]
+    fn test_phase_timeout_triggers_when_exceeded() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:12:00Z".to_string()), // 12 minutes = 720s
+            duration_seconds: 720,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::PhaseTimeout { max_duration: 600 }; // 10 minutes
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_phase_timeout(&rule, &context).unwrap();
+
+        assert!(result.is_some());
+        let violation = result.unwrap();
+        assert_eq!(violation.rule_type, "Phase Timeout");
+        assert!(violation.diagnostic.contains("720"));
+    }
+
+    #[test]
+    fn test_phase_timeout_no_trigger_below_limit() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:08:00Z".to_string()), // 8 minutes = 480s
+            duration_seconds: 480,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::PhaseTimeout { max_duration: 600 }; // 10 minutes
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_phase_timeout(&rule, &context).unwrap();
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_phase_timeout_active_phase_uses_current_time() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+        use chrono::Utc;
+
+        // Active phase with no end_time
+        let start = (Utc::now() - chrono::Duration::seconds(700)).to_rfc3339();
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: start.clone(),
+            end_time: None, // Active phase
+            duration_seconds: 0,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::PhaseTimeout { max_duration: 600 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_phase_timeout(&rule, &context).unwrap();
+
+        // Should trigger since ~700s > 600s
+        assert!(result.is_some());
+    }
+
+    #[test]
+    fn test_phase_timeout_exact_limit_no_trigger() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:10:00Z".to_string()), // Exactly 600s
+            duration_seconds: 600,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::PhaseTimeout { max_duration: 600 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_phase_timeout(&rule, &context).unwrap();
+
+        // Exactly at limit should NOT trigger (> not >=)
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_phase_timeout_zero_duration_no_trigger() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:00:00Z".to_string()), // Zero duration
+            duration_seconds: 0,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::PhaseTimeout { max_duration: 600 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_phase_timeout(&rule, &context).unwrap();
+
+        assert!(result.is_none());
+    }
+}
+
+/// Evaluate a phase_timeout rule
+fn evaluate_phase_timeout(
+    rule: &RuleConfig,
+    context: &RuleEvaluationContext,
+) -> Result<Option<RuleViolation>> {
+    let max_duration = match rule {
+        RuleConfig::PhaseTimeout { max_duration } => max_duration,
+        _ => return Ok(None),
+    };
+
+    let phase_metrics = match context.phase_metrics {
+        Some(pm) => pm,
+        None => return Ok(None), // No phase metrics available
+    };
+
+    // Calculate duration
+    let duration_secs = if let Some(ref end_time) = phase_metrics.end_time {
+        // Completed phase - calculate from timestamps
+        let start = DateTime::parse_from_rfc3339(&phase_metrics.start_time)?;
+        let end = DateTime::parse_from_rfc3339(end_time)?;
+        (end - start).num_seconds() as u64
+    } else {
+        // Active phase - calculate from current time
+        let start = DateTime::parse_from_rfc3339(&phase_metrics.start_time)?;
+        let now = chrono::Utc::now().with_timezone(start.offset());
+        (now - start).num_seconds() as u64
+    };
+
+    if duration_secs > *max_duration {
+        let minutes = duration_secs / 60;
+        let seconds = duration_secs % 60;
+        let limit_minutes = max_duration / 60;
+
+        let recent_events = vec![
+            format!("Phase start: {}", &phase_metrics.start_time[11..19]),
+            format!("Duration: {}m {}s", minutes, seconds),
+            format!("Limit: {}m", limit_minutes),
+        ];
+
+        Ok(Some(RuleViolation {
+            rule_type: "Phase Timeout".to_string(),
+            diagnostic: format!(
+                "{} phase running for {}s (limit: {}s)",
+                phase_metrics.phase_name, duration_secs, max_duration
+            ),
+            suggestion: "This phase is taking too long. Consider breaking the task into smaller steps, transitioning to LEARNINGS to document blockers, or resetting with simplified scope.".to_string(),
+            recent_events,
+        }))
+    } else {
+        Ok(None)
+    }
 }
 
 /// Evaluate a repeated_command rule
