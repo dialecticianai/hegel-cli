@@ -55,7 +55,7 @@ fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
 
     // Lock is automatically released when file goes out of scope
 
-    // If this is a SessionStart event, update current_session.json
+    // If this is a SessionStart event, update state.json with session metadata
     if let serde_json::Value::Object(ref map) = hook_value {
         if let Some(event_name) = map.get("hook_event_name").and_then(|v| v.as_str()) {
             if event_name == "SessionStart" {
@@ -75,16 +75,19 @@ fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
                     .and_then(|v| v.as_str())
                     .context("SessionStart event missing timestamp")?;
 
-                // Save session metadata
+                // Create session metadata
                 let session = SessionMetadata {
                     session_id: session_id.to_string(),
                     transcript_path: transcript_path.to_string(),
                     started_at: started_at.to_string(),
                 };
 
+                // Load current state, update session metadata, save back
+                let mut state = storage.load()?;
+                state.session_metadata = Some(session);
                 storage
-                    .save_current_session(&session)
-                    .context("Failed to save current session metadata to current_session.json")?;
+                    .save(&state)
+                    .context("Failed to save session metadata to state.json")?;
             }
         }
     }
@@ -161,8 +164,8 @@ mod tests {
     }
 
     #[test]
-    fn test_session_start_creates_current_session_file() {
-        let (temp_dir, storage) = test_storage();
+    fn test_session_start_updates_state_json() {
+        let (_temp_dir, storage) = test_storage();
 
         let hook_json = r#"{
             "session_id": "test-session-abc",
@@ -172,23 +175,19 @@ mod tests {
 
         process_hook_event(hook_json, &storage).unwrap();
 
-        // Verify current_session.json was created
-        let session_file = temp_dir.path().join("current_session.json");
-        assert!(session_file.exists());
+        // Load state and verify session_metadata was updated
+        let state = storage.load().unwrap();
+        assert!(state.session_metadata.is_some());
 
-        // Load and verify content
-        let loaded_session = storage.load_current_session().unwrap();
-        assert!(loaded_session.is_some());
-
-        let session = loaded_session.unwrap();
+        let session = state.session_metadata.unwrap();
         assert_eq!(session.session_id, "test-session-abc");
         assert_eq!(session.transcript_path, "/tmp/test-transcript.jsonl");
         assert!(session.started_at.starts_with("20")); // ISO 8601 timestamp starts with year
     }
 
     #[test]
-    fn test_non_session_start_does_not_create_current_session_file() {
-        let (temp_dir, storage) = test_storage();
+    fn test_non_session_start_does_not_update_session_metadata() {
+        let (_temp_dir, storage) = test_storage();
 
         let hook_json = r#"{
             "session_id": "test-session-xyz",
@@ -198,9 +197,9 @@ mod tests {
 
         process_hook_event(hook_json, &storage).unwrap();
 
-        // current_session.json should not exist
-        let session_file = temp_dir.path().join("current_session.json");
-        assert!(!session_file.exists());
+        // session_metadata should remain None
+        let state = storage.load().unwrap();
+        assert!(state.session_metadata.is_none());
     }
 
     #[test]
@@ -222,9 +221,10 @@ mod tests {
         process_hook_event(session1_json, &storage).unwrap();
         process_hook_event(session2_json, &storage).unwrap();
 
-        // Most recent session should be loaded
-        let loaded = storage.load_current_session().unwrap().unwrap();
-        assert_eq!(loaded.session_id, "session-2");
-        assert_eq!(loaded.transcript_path, "/tmp/transcript2.jsonl");
+        // Most recent session should be in state.json
+        let state = storage.load().unwrap();
+        let session = state.session_metadata.unwrap();
+        assert_eq!(session.session_id, "session-2");
+        assert_eq!(session.transcript_path, "/tmp/transcript2.jsonl");
     }
 }

@@ -35,6 +35,7 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     let state = State {
         workflow: Some(serde_yaml::to_value(&workflow)?),
         workflow_state: Some(workflow_state.clone()),
+        session_metadata: None,
     };
     storage.save(&state)?;
 
@@ -82,10 +83,11 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     let rendered_prompt = render_template(&prompt_text, guides_dir, &context)
         .with_context(|| "Failed to render prompt template")?;
 
-    // Save updated state
+    // Save updated state (preserve session_metadata from loaded state)
     let updated_state = State {
         workflow: Some(workflow_yaml.clone()),
         workflow_state: Some(new_state.clone()),
+        session_metadata: state.session_metadata.clone(),
     };
     storage.save(&updated_state)?;
 
@@ -151,7 +153,17 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
 }
 
 pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
-    storage.clear()?;
+    // Load current state to preserve session_metadata
+    let state = storage.load()?;
+
+    // Clear workflow fields but keep session_metadata
+    let cleared_state = State {
+        workflow: None,
+        workflow_state: None,
+        session_metadata: state.session_metadata,
+    };
+
+    storage.save(&cleared_state)?;
     println!("{}", "Workflow state cleared".green());
     Ok(())
 }
@@ -304,6 +316,33 @@ mod tests {
     fn test_reset_workflow_when_no_state() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         assert!(reset_workflow(&storage).is_ok());
+    }
+
+    #[test]
+    fn test_reset_workflow_preserves_session_metadata() {
+        use crate::storage::SessionMetadata;
+
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+
+        // Add session metadata manually
+        let mut state = storage.load().unwrap();
+        state.session_metadata = Some(SessionMetadata {
+            session_id: "test-session".to_string(),
+            transcript_path: "/tmp/transcript.jsonl".to_string(),
+            started_at: "2025-01-01T10:00:00Z".to_string(),
+        });
+        storage.save(&state).unwrap();
+
+        // Reset workflow
+        reset_workflow(&storage).unwrap();
+
+        // Verify workflow cleared but session preserved
+        let state = storage.load().unwrap();
+        assert!(state.workflow.is_none());
+        assert!(state.workflow_state.is_none());
+        assert!(state.session_metadata.is_some());
+        assert_eq!(state.session_metadata.unwrap().session_id, "test-session");
     }
 
     #[test]

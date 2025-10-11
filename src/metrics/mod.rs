@@ -51,10 +51,12 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
         unified.hook_metrics = parse_hooks_file(&hooks_path)?;
     }
 
-    // Load current session metadata - try fast path first, fall back to scanning hooks.jsonl
+    // Load current session metadata - try state.json first, fall back to scanning hooks.jsonl
     let storage = FileStorage::new(state_dir)?;
-    if let Some(session) = storage.load_current_session()? {
-        // Fast path: O(1) lookup from current_session.json
+    let state = storage.load()?;
+
+    if let Some(session) = state.session_metadata {
+        // Fast path: O(1) lookup from state.json
         unified.session_id = Some(session.session_id);
 
         // Parse transcript if the file exists
@@ -64,7 +66,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
         }
     } else if hooks_path.exists() {
         // Fallback: O(n) scan of hooks.jsonl for backward compatibility
-        // (handles sessions that started before current_session.json feature was deployed)
+        // (handles sessions that started before state.json session_metadata feature was deployed)
         let content = fs::read_to_string(&hooks_path)?;
         let mut last_session_start: Option<HookEvent> = None;
 
@@ -388,15 +390,20 @@ mod tests {
         ];
         let (_transcript_temp, transcript_path) = create_transcript_file(&transcript_events);
 
-        // Create current_session.json with the transcript path
-        use crate::storage::{FileStorage, SessionMetadata};
+        // Create state.json with session_metadata
+        use crate::storage::{FileStorage, SessionMetadata, State};
         let storage = FileStorage::new(temp_dir.path()).unwrap();
         let session = SessionMetadata {
             session_id: "test".to_string(),
             transcript_path: transcript_path.display().to_string(),
             started_at: "2025-01-01T10:00:00Z".to_string(),
         };
-        storage.save_current_session(&session).unwrap();
+        let state = State {
+            workflow: None,
+            workflow_state: None,
+            session_metadata: Some(session),
+        };
+        storage.save(&state).unwrap();
 
         let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
 
@@ -424,8 +431,8 @@ mod tests {
     }
 
     #[test]
-    fn test_fallback_to_hooks_jsonl_when_no_current_session() {
-        // Test backward compatibility: if current_session.json doesn't exist,
+    fn test_fallback_to_hooks_jsonl_when_no_state_session_metadata() {
+        // Test backward compatibility: if state.json has no session_metadata,
         // should fall back to scanning hooks.jsonl
         let temp_dir = TempDir::new().unwrap();
 

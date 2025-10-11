@@ -31,6 +31,8 @@ pub struct State {
     pub workflow: Option<serde_yaml::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_state: Option<WorkflowState>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_metadata: Option<SessionMetadata>,
 }
 
 /// File-based state storage
@@ -83,6 +85,7 @@ impl FileStorage {
             return Ok(State {
                 workflow: None,
                 workflow_state: None,
+                session_metadata: None,
             });
         }
 
@@ -176,45 +179,6 @@ impl FileStorage {
         });
 
         self.append_jsonl("states.jsonl", &event)
-    }
-
-    /// Save current session metadata (atomic write)
-    pub fn save_current_session(&self, session: &SessionMetadata) -> Result<()> {
-        let session_file = self.state_dir.join("current_session.json");
-        let temp_file = self.state_dir.join("current_session.json.tmp");
-
-        let content = serde_json::to_string_pretty(session)
-            .with_context(|| "Failed to serialize session metadata")?;
-
-        fs::write(&temp_file, content)
-            .with_context(|| format!("Failed to write temp session file: {:?}", temp_file))?;
-
-        fs::rename(&temp_file, &session_file)
-            .with_context(|| format!("Failed to rename session file: {:?}", session_file))?;
-
-        Ok(())
-    }
-
-    /// Load current session metadata (resilient: returns None if file is corrupted)
-    pub fn load_current_session(&self) -> Result<Option<SessionMetadata>> {
-        let session_file = self.state_dir.join("current_session.json");
-
-        if !session_file.exists() {
-            return Ok(None);
-        }
-
-        // Try to read and parse - if it fails (corrupted file), return None to allow fallback
-        let content = match fs::read_to_string(&session_file) {
-            Ok(c) => c,
-            Err(_) => return Ok(None), // File unreadable, fall back
-        };
-
-        let session: SessionMetadata = match serde_json::from_str(&content) {
-            Ok(s) => s,
-            Err(_) => return Ok(None), // JSON corrupted, fall back
-        };
-
-        Ok(Some(session))
     }
 }
 
@@ -504,93 +468,5 @@ mod tests {
         let states_file = temp_dir.path().join("states.jsonl");
         let parsed = read_jsonl_line(&states_file, 0);
         assert!(parsed["workflow_id"].is_null());
-    }
-
-    // ========== Session Metadata Tests ==========
-
-    #[test]
-    fn test_load_current_session_returns_none_when_no_file() {
-        let (_temp_dir, storage) = test_storage();
-        let session = storage.load_current_session().unwrap();
-        assert!(session.is_none());
-    }
-
-    #[test]
-    fn test_save_and_load_current_session() {
-        let (temp_dir, storage) = test_storage();
-
-        let session = SessionMetadata {
-            session_id: "test-session-123".to_string(),
-            transcript_path: "/path/to/transcript.jsonl".to_string(),
-            started_at: "2025-10-10T12:00:00Z".to_string(),
-        };
-
-        storage.save_current_session(&session).unwrap();
-
-        let session_file = temp_dir.path().join("current_session.json");
-        assert!(session_file.exists());
-
-        let loaded = storage.load_current_session().unwrap();
-        assert!(loaded.is_some());
-
-        let loaded = loaded.unwrap();
-        assert_eq!(loaded.session_id, "test-session-123");
-        assert_eq!(loaded.transcript_path, "/path/to/transcript.jsonl");
-        assert_eq!(loaded.started_at, "2025-10-10T12:00:00Z");
-    }
-
-    #[test]
-    fn test_save_current_session_is_atomic() {
-        let (temp_dir, storage) = test_storage();
-
-        let session = SessionMetadata {
-            session_id: "session-1".to_string(),
-            transcript_path: "/tmp/transcript.jsonl".to_string(),
-            started_at: "2025-10-10T10:00:00Z".to_string(),
-        };
-
-        storage.save_current_session(&session).unwrap();
-
-        // Temp file should not exist after atomic write
-        assert!(!temp_dir.path().join("current_session.json.tmp").exists());
-        assert!(temp_dir.path().join("current_session.json").exists());
-    }
-
-    #[test]
-    fn test_save_current_session_overwrites_previous() {
-        let (_temp_dir, storage) = test_storage();
-
-        let session1 = SessionMetadata {
-            session_id: "session-1".to_string(),
-            transcript_path: "/tmp/transcript1.jsonl".to_string(),
-            started_at: "2025-10-10T10:00:00Z".to_string(),
-        };
-
-        let session2 = SessionMetadata {
-            session_id: "session-2".to_string(),
-            transcript_path: "/tmp/transcript2.jsonl".to_string(),
-            started_at: "2025-10-10T11:00:00Z".to_string(),
-        };
-
-        storage.save_current_session(&session1).unwrap();
-        storage.save_current_session(&session2).unwrap();
-
-        let loaded = storage.load_current_session().unwrap().unwrap();
-        assert_eq!(loaded.session_id, "session-2");
-        assert_eq!(loaded.transcript_path, "/tmp/transcript2.jsonl");
-    }
-
-    #[test]
-    fn test_load_current_session_corrupted_json_returns_none() {
-        // Resilience test: corrupted current_session.json should return None (allowing fallback)
-        let (temp_dir, storage) = test_storage();
-
-        // Write corrupted JSON
-        let session_file = temp_dir.path().join("current_session.json");
-        fs::write(&session_file, "{ invalid json !!!").unwrap();
-
-        // Should return None instead of error (graceful degradation)
-        let result = storage.load_current_session().unwrap();
-        assert!(result.is_none());
     }
 }

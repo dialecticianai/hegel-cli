@@ -280,6 +280,7 @@ pub fn test_state(node: &str, mode: &str, history: &[&str]) -> State {
     State {
         workflow: None,
         workflow_state: Some(test_workflow_state(node, mode, history)),
+        session_metadata: None,
     }
 }
 
