@@ -881,6 +881,222 @@ mod tests {
 
         assert!(result.is_none());
     }
+
+    // ========== Token Budget Evaluation Tests ==========
+
+    #[test]
+    fn test_token_budget_triggers_when_exceeded() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 4000,
+                total_output_tokens: 2500,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 10,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 6000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        assert!(result.is_some());
+        let violation = result.unwrap();
+        assert_eq!(violation.rule_type, "Token Budget");
+        assert!(violation.diagnostic.contains("6500")); // 4000 + 2500
+        assert!(violation.diagnostic.contains("6000"));
+    }
+
+    #[test]
+    fn test_token_budget_no_trigger_below_limit() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 2000,
+                total_output_tokens: 1500,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 5,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 5000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        assert!(result.is_none()); // 3500 < 5000
+    }
+
+    #[test]
+    fn test_token_budget_exact_limit_no_trigger() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 3000,
+                total_output_tokens: 2000,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 5,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 5000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        assert!(result.is_none()); // Exactly 5000, should not trigger (> not >=)
+    }
+
+    #[test]
+    fn test_token_budget_zero_tokens_no_trigger() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 5000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_token_budget_includes_input_and_output() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 3000,
+                total_output_tokens: 3000,
+                total_cache_creation_tokens: 500,
+                total_cache_read_tokens: 1000,
+                assistant_turns: 10,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 5000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        // Total = 3000 + 3000 = 6000 (cache tokens not counted per SPEC)
+        assert!(result.is_some());
+    }
+
+    #[test]
+    fn test_token_budget_only_input_tokens() {
+        use crate::metrics::{PhaseMetrics, TokenMetrics};
+
+        let phase = PhaseMetrics {
+            phase_name: "code".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 6000,
+                total_output_tokens: 0,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: 1,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+        };
+
+        let rule = RuleConfig::TokenBudget { max_tokens: 5000 };
+
+        let context = test_context_with_phase(phase);
+        let result = evaluate_token_budget(&rule, &context).unwrap();
+
+        assert!(result.is_some()); // 6000 > 5000
+    }
+}
+
+/// Evaluate a token_budget rule
+fn evaluate_token_budget(
+    rule: &RuleConfig,
+    context: &RuleEvaluationContext,
+) -> Result<Option<RuleViolation>> {
+    let max_tokens = match rule {
+        RuleConfig::TokenBudget { max_tokens } => max_tokens,
+        _ => return Ok(None),
+    };
+
+    let phase_metrics = match context.phase_metrics {
+        Some(pm) => pm,
+        None => return Ok(None), // No phase metrics available
+    };
+
+    // Calculate total tokens (input + output, per SPEC cache tokens excluded)
+    let total_tokens = phase_metrics.token_metrics.total_input_tokens
+        + phase_metrics.token_metrics.total_output_tokens;
+
+    if total_tokens > *max_tokens {
+        let recent_events = vec![
+            format!(
+                "Input tokens: {}",
+                phase_metrics.token_metrics.total_input_tokens
+            ),
+            format!(
+                "Output tokens: {}",
+                phase_metrics.token_metrics.total_output_tokens
+            ),
+            format!("Total: {} (limit: {})", total_tokens, max_tokens),
+            format!("Turns: {}", phase_metrics.token_metrics.assistant_turns),
+        ];
+
+        Ok(Some(RuleViolation {
+            rule_type: "Token Budget".to_string(),
+            diagnostic: format!(
+                "{} phase used {} tokens (limit: {})",
+                phase_metrics.phase_name, total_tokens, max_tokens
+            ),
+            suggestion: "You've exceeded the token budget for this phase. Consider simplifying scope, deferring non-critical work, or transitioning to document progress before resetting.".to_string(),
+            recent_events,
+        }))
+    } else {
+        Ok(None)
+    }
 }
 
 /// Evaluate a phase_timeout rule

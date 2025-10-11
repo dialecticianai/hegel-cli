@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 01:05
+**Last Updated**: 2025-10-11 01:06
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.01%** lines | **90.42%** regions | **89.50%** functions
+**Overall Coverage**: **92.23%** lines | **90.61%** regions | **89.69%** functions
 
 ## Summary
 
 ```
-TOTAL                            7418               711    90.42%         381                40    89.50%        4505               360    92.01%           0                 0         -
+TOTAL                            7596               713    90.61%         388                40    89.69%        4660               362    92.23%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -25,7 +25,7 @@ TOTAL                            7418               711    90.42%         381   
 | `metrics/mod.rs` | 96.67% | 95.57% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `rules/evaluator.rs` | 98.18% | 97.99% | 96.77% | 🟢 Excellent |
+| `rules/evaluator.rs` | 98.27% | 98.14% | 97.37% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 92.49% | 93.13% | 70.00% | 🟢 Excellent |
 | `test_helpers.rs` | 90.14% | 87.47% | 90.48% | 🟢 Excellent |
@@ -46,7 +46,7 @@ TOTAL                            7418               711    90.42%         381   
 - `metrics/mod.rs` - 96.67%
 - `metrics/states.rs` - 100.00%
 - `metrics/transcript.rs` - 100.00%
-- `rules/evaluator.rs` - 98.18%
+- `rules/evaluator.rs` - 98.27%
 - `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 92.49%
 - `test_helpers.rs` - 90.14%
@@ -67,7 +67,7 @@ TOTAL                            7418               711    90.42%         381   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.01% | ✅ Met |
+| Overall | ≥80% | 92.23% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
