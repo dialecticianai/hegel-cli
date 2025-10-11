@@ -5,7 +5,7 @@ mod transcript;
 
 // Re-export public types from submodules
 pub use graph::WorkflowDAG;
-pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookMetrics};
+pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookEvent, HookMetrics};
 pub use states::{parse_states_file, StateTransitionEvent};
 pub use transcript::{parse_transcript_file, TokenMetrics, TranscriptEvent};
 
@@ -51,15 +51,44 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
         unified.hook_metrics = parse_hooks_file(&hooks_path)?;
     }
 
-    // Load current session metadata from current_session.json (O(1) instead of scanning hooks.jsonl)
+    // Load current session metadata - try fast path first, fall back to scanning hooks.jsonl
     let storage = FileStorage::new(state_dir)?;
     if let Some(session) = storage.load_current_session()? {
+        // Fast path: O(1) lookup from current_session.json
         unified.session_id = Some(session.session_id);
 
         // Parse transcript if the file exists
         if Path::new(&session.transcript_path).exists() {
             unified.token_metrics = parse_transcript_file(&session.transcript_path)?;
             transcript_path_opt = Some(session.transcript_path);
+        }
+    } else if hooks_path.exists() {
+        // Fallback: O(n) scan of hooks.jsonl for backward compatibility
+        // (handles sessions that started before current_session.json feature was deployed)
+        let content = fs::read_to_string(&hooks_path)?;
+        let mut last_session_start: Option<HookEvent> = None;
+
+        for line in content.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            if let Ok(event) = serde_json::from_str::<HookEvent>(line) {
+                if event.hook_event_name == "SessionStart" {
+                    last_session_start = Some(event);
+                }
+            }
+        }
+
+        if let Some(event) = last_session_start {
+            unified.session_id = Some(event.session_id.clone());
+
+            // Parse transcript if we have a path
+            if let Some(transcript_path) = event.transcript_path {
+                if Path::new(&transcript_path).exists() {
+                    unified.token_metrics = parse_transcript_file(&transcript_path)?;
+                    transcript_path_opt = Some(transcript_path);
+                }
+            }
         }
     }
 
@@ -392,5 +421,38 @@ mod tests {
             metrics.phase_metrics[1].token_metrics.total_output_tokens,
             100
         );
+    }
+
+    #[test]
+    fn test_fallback_to_hooks_jsonl_when_no_current_session() {
+        // Test backward compatibility: if current_session.json doesn't exist,
+        // should fall back to scanning hooks.jsonl
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create transcript file
+        let transcript_events = vec![
+            r#"{"type":"assistant","timestamp":"2025-01-01T10:05:00Z","message":{"usage":{"input_tokens":500,"output_tokens":250}}}"#,
+        ];
+        let (_transcript_temp, transcript_path) = create_transcript_file(&transcript_events);
+
+        // Create hooks.jsonl with SessionStart (but NO current_session.json)
+        let hook_str = format!(
+            r#"{{"session_id":"fallback-test","hook_event_name":"SessionStart","timestamp":"2025-01-01T10:00:00Z","transcript_path":"{}"}}"#,
+            transcript_path.display()
+        );
+        let hooks = vec![hook_str.as_str()];
+        let (_hooks_temp, hooks_path) = create_hooks_file(&hooks);
+        std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
+
+        // Parse metrics - should use fallback path
+        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+
+        // Verify session metadata was loaded from hooks.jsonl
+        assert_eq!(metrics.session_id, Some("fallback-test".to_string()));
+
+        // Verify token metrics were loaded from transcript
+        assert_eq!(metrics.token_metrics.total_input_tokens, 500);
+        assert_eq!(metrics.token_metrics.total_output_tokens, 250);
+        assert_eq!(metrics.token_metrics.assistant_turns, 1);
     }
 }

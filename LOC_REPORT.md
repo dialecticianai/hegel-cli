@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-10 23:30
+**Last Updated**: 2025-10-10 23:36
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,462 | 4,067 | 8,529 |
-| **Comments** | 738 | - | 738 |
-| **Blank Lines** | 827 | - | 827 |
-| **Total Lines** | 6,027 | 4,067 | 10,094 |
+| **Lines** | 4,516 | 4,067 | 8,583 |
+| **Comments** | 753 | - | 753 |
+| **Blank Lines** | 839 | - | 839 |
+| **Total Lines** | 6,108 | 4,067 | 10,175 |
 | **Files** | 18 | 16 | 34 |
 
-**Documentation Ratio**: 0.91 lines of docs per line of code
+**Documentation Ratio**: 0.90 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            18            827            738           4462
+Rust                            18            839            753           4516
 -------------------------------------------------------------------------------
-SUM:                            18            827            738           4462
+SUM:                            18            839            753           4516
 -------------------------------------------------------------------------------
 ```
 
@@ -45,10 +45,10 @@ SUM:                            18            827            738           4462
 | `main.rs` | 109 | 6 | 103 | 94.5% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ⚠️ Large |
 | `metrics/hooks.rs` | 286 | 176 | 110 | 38.5% | ✅ |
-| `metrics/mod.rs` | 396 | 216 | 180 | 45.5% | ⚠️ Large |
+| `metrics/mod.rs` | 458 | 245 | 213 | 46.5% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `storage/mod.rs` | 577 | 215 | 362 | 62.7% | ⚠️ Large |
+| `storage/mod.rs` | 596 | 220 | 376 | 63.1% | ⚠️ Large |
 | `test_helpers.rs` | 749 | 493 | 256 | 34.2% | ✅ (infra) |
 | `tui/app.rs` | 369 | 165 | 204 | 55.3% | ✅ |
 | `tui/mod.rs` | 65 | 65 | 0 | 0.0% | ✅ |
@@ -86,7 +86,7 @@ SUM:                            18            827            738           4462
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.91 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.90 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

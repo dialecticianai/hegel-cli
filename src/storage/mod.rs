@@ -195,7 +195,7 @@ impl FileStorage {
         Ok(())
     }
 
-    /// Load current session metadata
+    /// Load current session metadata (resilient: returns None if file is corrupted)
     pub fn load_current_session(&self) -> Result<Option<SessionMetadata>> {
         let session_file = self.state_dir.join("current_session.json");
 
@@ -203,11 +203,16 @@ impl FileStorage {
             return Ok(None);
         }
 
-        let content = fs::read_to_string(&session_file)
-            .with_context(|| format!("Failed to read session file: {:?}", session_file))?;
+        // Try to read and parse - if it fails (corrupted file), return None to allow fallback
+        let content = match fs::read_to_string(&session_file) {
+            Ok(c) => c,
+            Err(_) => return Ok(None), // File unreadable, fall back
+        };
 
-        let session: SessionMetadata = serde_json::from_str(&content)
-            .with_context(|| "Failed to parse session metadata file")?;
+        let session: SessionMetadata = match serde_json::from_str(&content) {
+            Ok(s) => s,
+            Err(_) => return Ok(None), // JSON corrupted, fall back
+        };
 
         Ok(Some(session))
     }
@@ -573,5 +578,19 @@ mod tests {
         let loaded = storage.load_current_session().unwrap().unwrap();
         assert_eq!(loaded.session_id, "session-2");
         assert_eq!(loaded.transcript_path, "/tmp/transcript2.jsonl");
+    }
+
+    #[test]
+    fn test_load_current_session_corrupted_json_returns_none() {
+        // Resilience test: corrupted current_session.json should return None (allowing fallback)
+        let (temp_dir, storage) = test_storage();
+
+        // Write corrupted JSON
+        let session_file = temp_dir.path().join("current_session.json");
+        fs::write(&session_file, "{ invalid json !!!").unwrap();
+
+        // Should return None instead of error (graceful degradation)
+        let result = storage.load_current_session().unwrap();
+        assert!(result.is_none());
     }
 }
