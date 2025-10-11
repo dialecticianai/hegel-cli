@@ -4,7 +4,13 @@
 
 **Context**: Hook events are captured in `.hegel/hooks.jsonl`. This phase processes that data into actionable metrics and visualizes them in a TUI dashboard.
 
-**Progress**: ✅ ALL STEPS COMPLETE (Steps 1-7) | Session: 2025-10-10
+**Progress**: ✅ ALL STEPS COMPLETE (Steps 1-7) | Sessions: 2025-10-10, 2025-10-11
+
+**Post-completion optimization (2025-10-11)**:
+- Added O(1) session metadata lookup via `.hegel/current_session.json`
+- Graceful fallback to O(n) hooks.jsonl scan for backward compatibility
+- Resilient to corrupted/missing metadata files (silent degradation)
+- Coverage: 90.55% (159 tests passing)
 
 ---
 

@@ -6,30 +6,6 @@
 
 ---
 
-## Phase 1: Metrics Collection & Analysis (In Progress)
-
-**Goal**: Parse hook data and build metrics to feed cycle detection and budget enforcement
-
-**Tasks**:
-- [ ] TUI "Dialectic Dashboard"
-  - Build `hegel top` interactive dashboard using `ratatui/crossterm`
-  - Show live workflows, active phases, recent events, resource usage
-  - Display per-phase gauges for token/time budgets
-  - Color-coded differentiation for Hegel vs Claude events
-- [ ] Historical graph reconstruction
-  - Rebuild recursive workflow DAG (mode invocations and merges)
-  - Annotate branches with energy expenditure (token density, cost)
-  - Support playback or time-slider navigation
-
-**Success Criteria**:
-- Token metrics accurately reflect transcript usage
-- `hegel top` displays correlated state and performance telemetry in real-time
-- Phase metrics correlate epistemic state with energetic usage (tokens, duration)
-- Graph reconstruction visualizes branching and synthesis across workflows
-- Everything is beautifully colorful enough for any MUD enthusiast
-
----
-
 ## Phase 2: Cycle Detection & Budget Enforcement
 
 **Goal**: Deterministic guardrails that interrupt workflow when stuck or over-budget
