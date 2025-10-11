@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 01:07
+**Last Updated**: 2025-10-11 01:10
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.67%** lines | **90.85%** regions | **90.10%** functions
+**Overall Coverage**: **92.85%** lines | **91.10%** regions | **90.30%** functions
 
 ## Summary
 
 ```
-TOTAL                            7804               714    90.85%         394                39    90.10%        4855               356    92.67%           0                 0         -
+TOTAL                            8010               713    91.10%         402                39    90.30%        4981               356    92.85%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -20,12 +20,13 @@ TOTAL                            7804               714    90.85%         394   
 | `engine/mod.rs` | 99.67% | 99.43% | 94.74% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `metrics/graph.rs` | 99.20% | 98.51% | 100.00% | 🟢 Excellent |
+| `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 95.30% | 95.83% | 94.12% | 🟢 Excellent |
 | `metrics/mod.rs` | 96.67% | 95.57% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/evaluator.rs` | 99.11% | 98.36% | 100.00% | 🟢 Excellent |
+| `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 92.49% | 93.13% | 70.00% | 🟢 Excellent |
 | `test_helpers.rs` | 90.14% | 87.47% | 90.48% | 🟢 Excellent |
@@ -47,6 +48,7 @@ TOTAL                            7804               714    90.85%         394   
 - `metrics/states.rs` - 100.00%
 - `metrics/transcript.rs` - 100.00%
 - `rules/evaluator.rs` - 99.11%
+- `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 92.49%
 - `test_helpers.rs` - 90.14%
@@ -67,7 +69,7 @@ TOTAL                            7804               714    90.85%         394   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.67% | ✅ Met |
+| Overall | ≥80% | 92.85% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
