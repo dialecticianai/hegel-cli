@@ -34,14 +34,41 @@ Write HANDOFF.md when:
 ## Session Lifecycle
 
 ### At Session Start
-1. Read HANDOFF.md (if exists)
-2. Delete immediately after reading: `rm HANDOFF.md`
-3. Use context to resume work
+
+**CRITICAL: Follow this sequence for proper context loading**
+
+#### Phase 1: Cognitive Tuning
+1. Read `LEXICON.md` first - upgrade your cognition with philosophy, patterns, thresholds
+2. Read `HANDOFF.md` (if exists) - session context and where you left off
+3. Delete immediately: `rm HANDOFF.md` - force explicit handoff, prevent drift
+
+#### Phase 2: Planning Docs
+4. Read `SPEC.md` - understand the what and why
+5. Read `PLAN.md` - step-by-step implementation plan
+6. Read `CODE_MAP.md` - architecture overview and integration points
+
+#### Phase 3: Source Code (Complete Files)
+7. **Read ENTIRE files** relevant to your next steps
+   - Integration targets (files you'll modify)
+   - Completed modules (understand what's available)
+   - Dependencies (storage, state management, etc.)
+   - Test patterns (follow established patterns)
+   - **DO NOT try to save context** - read complete files, not snippets
+
+#### Phase 4: Implementation
+8. Now you have full context - begin work
+
+**Why this order matters**:
+- LEXICON first = cognitive upgrade (refactor thresholds, test patterns)
+- HANDOFF second = session state (where we are, what's next)
+- Planning docs = understanding goals and approach
+- Complete source files = no missing context, no surprises mid-implementation
 
 ### At Session End
 1. Write fresh HANDOFF.md
 2. DO NOT read old content (already deleted at start)
 3. Include current status and immediate next action
+4. **Include startup instructions** following the 4-phase pattern above
 
 ---
 
@@ -119,20 +146,58 @@ Implemented Steps 1-2 of feature implementation. Currently on Step 3: Core modul
 - State persistence pattern validated
 - Initial tests passing, edge cases identified
 
-## What's Next
+## Next Session Startup
 
-**Immediate action**: Complete Step 3 - Implement core module functionality
+### Phase 1: Cognitive Tuning & Context Loading
 
-**Context needed**:
-- Review PLAN.md Step 3 for acceptance criteria
-- Verify integration points after implementation
-- Update documentation once feature is working
+```bash
+# 1. Read LEXICON to upgrade your cognition
+cat LEXICON.md
+
+# 2. Read HANDOFF to refresh session context
+cat HANDOFF.md
+
+# 3. Delete HANDOFF (force explicit handoff)
+rm HANDOFF.md
+```
+
+### Phase 2: Planning Docs
+
+```bash
+cat SPEC.md      # Feature specification
+cat PLAN.md      # Step 3 acceptance criteria
+cat CODE_MAP.md  # Architecture overview
+```
+
+### Phase 3: Source Code (Complete Files - Don't Save Context)
+
+```bash
+# Integration targets (will be modified):
+cat path/to/target_module      # Step 3 implementation target
+cat path/to/integration_point   # Integration point
+
+# Dependencies (understand what's available):
+cat path/to/storage_module      # Storage patterns
+cat path/to/test_utilities      # Test patterns to follow
+```
+
+### Phase 4: Implementation
+
+Now you have full context. Complete Step 3.
+
+```bash
+# Run tests frequently (adapt command to your project)
+<your test command>
+
+# Commit when done
+git add -A && git commit -m "feat(scope): Step 3 - description"
+```
 
 ## Key Files
 
-- `src/module` - Implementation in progress (Step 3)
-- `tests/module_test` - Tests passing for Steps 1-2, Step 3 tests written but failing
-- `PLAN.md` - Step 3 acceptance criteria
+- `path/to/module` - Implementation in progress (Step 3)
+- `path/to/tests` - Tests passing for Steps 1-2, Step 3 tests written but failing
+- `PLAN.md` - Step 3 acceptance criteria and next steps
 ```
 
 ---
