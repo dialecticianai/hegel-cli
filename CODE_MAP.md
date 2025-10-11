@@ -136,8 +136,8 @@ hegel-cli/
 ├── .claude/                     # Claude Code configuration
 │   └── settings.json            # Hook routing to `hegel hook` command
 │
-└── .hegel/                      # Runtime state (gitignored)
-    ├── state.json               # Current workflow state (workflow + current_node + history + mode)
+└── .hegel/                      # Runtime state (gitignored, located in cwd)
+    ├── state.json               # Current workflow state (workflow + workflow_state + session_metadata)
     ├── states.jsonl             # State transition event log (timestamped from→to transitions)
     └── hooks.jsonl              # Claude Code event log (PostToolUse, PreToolUse, SessionStart, etc.)
 ```
