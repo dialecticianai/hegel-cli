@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 01:23
+**Last Updated**: 2025-10-11 01:29
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 6,288 | 4,261 | 10,549 |
-| **Comments** | 826 | - | 826 |
-| **Blank Lines** | 1,089 | - | 1,089 |
-| **Total Lines** | 8,203 | 4,261 | 12,464 |
+| **Lines** | 6,405 | 4,261 | 10,666 |
+| **Comments** | 843 | - | 843 |
+| **Blank Lines** | 1,126 | - | 1,126 |
+| **Total Lines** | 8,374 | 4,261 | 12,635 |
 | **Files** | 22 | 17 | 39 |
 
-**Documentation Ratio**: 0.68 lines of docs per line of code
+**Documentation Ratio**: 0.67 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            22           1089            826           6288
+Rust                            22           1126            843           6405
 -------------------------------------------------------------------------------
-SUM:                            22           1089            826           6288
+SUM:                            22           1126            843           6405
 -------------------------------------------------------------------------------
 ```
 
@@ -39,8 +39,8 @@ SUM:                            22           1089            826           6288
 | `commands/analyze.rs` | 404 | 250 | 154 | 38.1% | ⚠️ Large |
 | `commands/hook.rs` | 230 | 110 | 120 | 52.2% | ✅ |
 | `commands/mod.rs` | 8 | 8 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 534 | 211 | 323 | 60.5% | ⚠️ Large |
-| `engine/mod.rs` | 552 | 99 | 453 | 82.1% | ✅ |
+| `commands/workflow.rs` | 535 | 212 | 323 | 60.4% | ⚠️ Large |
+| `engine/mod.rs` | 722 | 130 | 592 | 82.0% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
 | `main.rs` | 115 | 7 | 108 | 93.9% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ⚠️ Large |
@@ -91,7 +91,7 @@ SUM:                            22           1089            826           6288
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.68 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.67 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

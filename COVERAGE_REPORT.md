@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 01:23
+**Last Updated**: 2025-10-11 01:29
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **93.03%** lines | **91.23%** regions | **90.34%** functions
+**Overall Coverage**: **93.19%** lines | **91.49%** regions | **90.50%** functions
 
 ## Summary
 
 ```
-TOTAL                            8233               722    91.23%         414                40    90.34%        5133               358    93.03%           0                 0         -
+TOTAL                            8485               722    91.49%         421                40    90.50%        5230               356    93.19%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -16,8 +16,8 @@ TOTAL                            8233               722    91.23%         414   
 |--------|--------------|-----------------|-----------|--------|
 | `commands/analyze.rs` | 98.15% | 97.09% | 100.00% | 🟢 Excellent |
 | `commands/hook.rs` | 89.61% | 87.10% | 64.71% | 🟡 Good |
-| `commands/workflow.rs` | 97.06% | 94.16% | 90.62% | 🟢 Excellent |
-| `engine/mod.rs` | 99.75% | 99.50% | 95.83% | 🟢 Excellent |
+| `commands/workflow.rs` | 97.07% | 94.17% | 90.62% | 🟢 Excellent |
+| `engine/mod.rs` | 99.80% | 99.41% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `main.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
@@ -25,7 +25,7 @@ TOTAL                            8233               722    91.23%         414   
 | `metrics/mod.rs` | 96.67% | 95.57% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `rules/evaluator.rs` | 99.11% | 98.36% | 100.00% | 🟢 Excellent |
+| `rules/evaluator.rs` | 99.29% | 98.52% | 100.00% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 92.49% | 93.13% | 70.00% | 🟢 Excellent |
@@ -39,15 +39,15 @@ TOTAL                            8233               722    91.23%         414   
 
 ### 🟢 Excellent (≥90% lines)
 - `commands/analyze.rs` - 98.15%
-- `commands/workflow.rs` - 97.06%
-- `engine/mod.rs` - 99.75%
+- `commands/workflow.rs` - 97.07%
+- `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
 - `metrics/graph.rs` - 99.20%
 - `metrics/hooks.rs` - 95.30%
 - `metrics/mod.rs` - 96.67%
 - `metrics/states.rs` - 100.00%
 - `metrics/transcript.rs` - 100.00%
-- `rules/evaluator.rs` - 99.11%
+- `rules/evaluator.rs` - 99.29%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 92.49%
@@ -69,7 +69,7 @@ TOTAL                            8233               722    91.23%         414   
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 93.03% | ✅ Met |
+| Overall | ≥80% | 93.19% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

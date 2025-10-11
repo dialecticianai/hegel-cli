@@ -73,9 +73,10 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     let claims: HashMap<String, bool> = serde_json::from_str(claims_str)
         .context("Failed to parse claims JSON. Expected format: {\"claim_name\": true}")?;
 
-    // Get next prompt
+    // Get next prompt (pass state_dir for rule evaluation)
     let previous_node = workflow_state.current_node.clone();
-    let (prompt_text, new_state) = get_next_prompt(&workflow, workflow_state, &claims)?;
+    let (prompt_text, new_state) =
+        get_next_prompt(&workflow, workflow_state, &claims, storage.state_dir())?;
 
     // Render prompt with guides
     let guides_dir = Path::new("guides");
