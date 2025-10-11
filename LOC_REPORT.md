@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 00:57
+**Last Updated**: 2025-10-11 01:01
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,731 | 4,190 | 8,921 |
-| **Comments** | 757 | - | 757 |
-| **Blank Lines** | 844 | - | 844 |
-| **Total Lines** | 6,332 | 4,190 | 10,522 |
-| **Files** | 20 | 17 | 37 |
+| **Lines** | 5,133 | 4,192 | 9,325 |
+| **Comments** | 778 | - | 778 |
+| **Blank Lines** | 889 | - | 889 |
+| **Total Lines** | 6,800 | 4,192 | 10,992 |
+| **Files** | 21 | 17 | 38 |
 
-**Documentation Ratio**: 0.89 lines of docs per line of code
+**Documentation Ratio**: 0.82 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            20            844            757           4731
+Rust                            21            889            778           5133
 -------------------------------------------------------------------------------
-SUM:                            20            844            757           4731
+SUM:                            21            889            778           5133
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,8 @@ SUM:                            20            844            757           4731
 | `metrics/mod.rs` | 465 | 247 | 218 | 46.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/mod.rs` | 3 | 3 | 0 | 0.0% | ✅ |
+| `rules/evaluator.rs` | 466 | 15 | 451 | 96.8% | ✅ |
+| `rules/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 472 | 184 | 288 | 61.0% | ✅ |
 | `test_helpers.rs` | 750 | 494 | 256 | 34.1% | ✅ (infra) |
@@ -67,7 +68,7 @@ SUM:                            20            844            757           4731
 |------|-------|
 | `CLAUDE.md` | 117 |
 | `CODE_MAP.md` | 143 |
-| `COVERAGE_REPORT.md` | 92 |
+| `COVERAGE_REPORT.md` | 94 |
 | `DEP_REVIEW.md` | 678 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 142 |
@@ -89,7 +90,7 @@ SUM:                            20            844            757           4731
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.89 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.82 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
