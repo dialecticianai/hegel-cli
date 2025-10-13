@@ -115,6 +115,22 @@
 **Language**: Rust stable
 **Dependencies**: Minimal (serde, anyhow, clap, fs2, ratatui/crossterm for future TUI)
 
+## External Documentation Cache
+
+**.webcache/ for offline reference**
+
+- **Purpose**: Cache external references from the web locally
+- **Location**: `.webcache/` (gitignored)
+- **Why**:
+  - Offline access during development
+  - Version stability (web docs change)
+  - Faster lookup than repeated web fetches
+  - Claude can analyze cached docs in context
+
+**Reading cached HTML files**:
+- Use `lynx -dump -nolist /path/to/file.html` to convert HTML → clean text
+- Strips HTML tags, formats tables, preserves structure, easier to parse than raw HTML
+
 ---
 
 **Remember**: Hegel orchestrates workflows through state transitions. Keep it simple, transparent, local-first.

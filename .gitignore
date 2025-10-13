@@ -18,5 +18,8 @@ Thumbs.db
 # Local state
 .hegel/
 
+# cached external docs from web
+.webcache/
+
 # Session handoff (ephemeral)
 HANDOFF.md
