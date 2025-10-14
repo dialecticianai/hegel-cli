@@ -117,19 +117,13 @@
 
 ## External Documentation Cache
 
-**.webcache/ for offline reference**
+**.webcache/ protocol** (gitignored):
 
-- **Purpose**: Cache external references from the web locally
-- **Location**: `.webcache/` (gitignored)
-- **Why**:
-  - Offline access during development
-  - Version stability (web docs change)
-  - Faster lookup than repeated web fetches
-  - Claude can analyze cached docs in context
+**Cache**: `curl -s <url> -o .webcache/<topic>/<file>.html`
+**Read**: `lynx -dump -nolist .webcache/<path>.html` (HTML → clean text)
+**Prefer**: `cargo doc --no-deps -p <crate>` for Rust crates (always version-correct)
 
-**Reading cached HTML files**:
-- Use `lynx -dump -nolist /path/to/file.html` to convert HTML → clean text
-- Strips HTML tags, formats tables, preserves structure, easier to parse than raw HTML
+Use for offline access, version stability, faster lookup. Reference original URLs in docs, not .webcache paths.
 
 ---
 

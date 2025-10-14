@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-14 19:18
+**Last Updated**: 2025-10-14 19:46
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.60%** lines | **91.39%** regions | **87.45%** functions
+**Overall Coverage**: **92.60%** lines | **91.43%** regions | **87.52%** functions
 
 ## Summary
 
 ```
-TOTAL                              10337               890    91.39%         550                69    87.45%        6341               469    92.60%           0                 0         -
+TOTAL                              10687               916    91.43%         569                71    87.52%        6552               485    92.60%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -16,7 +16,8 @@ TOTAL                              10337               890    91.39%         550
 |--------|--------------|-----------------|-----------|--------|
 | `adapters/claude_code.rs` | 97.18% | 96.81% | 90.00% | 🟢 Excellent |
 | `adapters/codex.rs` | 91.74% | 90.36% | 77.27% | 🟢 Excellent |
-| `adapters/mod.rs` | 60.71% | 53.85% | 50.00% | 🟠 Moderate |
+| `adapters/cursor.rs` | 92.42% | 92.55% | 89.47% | 🟢 Excellent |
+| `adapters/mod.rs` | 60.71% | 55.56% | 50.00% | 🟠 Moderate |
 | `commands/analyze/mod.rs` | 100.00% | 99.52% | 100.00% | 🟢 Excellent |
 | `commands/analyze/sections.rs` | 97.46% | 95.75% | 100.00% | 🟢 Excellent |
 | `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -55,6 +56,7 @@ TOTAL                              10337               890    91.39%         550
 ### 🟢 Excellent (≥90% lines)
 - `adapters/claude_code.rs` - 97.18%
 - `adapters/codex.rs` - 91.74%
+- `adapters/cursor.rs` - 92.42%
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.46%
 - `commands/hook.rs` - 96.64%

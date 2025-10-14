@@ -1,8 +1,10 @@
 mod claude_code;
 mod codex;
+mod cursor;
 
 pub use claude_code::ClaudeCodeAdapter;
 pub use codex::CodexAdapter;
+pub use cursor::CursorAdapter;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -89,7 +91,7 @@ impl AdapterRegistry {
             adapters: vec![
                 Box::new(ClaudeCodeAdapter::new()),
                 Box::new(CodexAdapter::new()),
-                // Future: Box::new(CursorAdapter::new()),
+                Box::new(CursorAdapter::new()),
             ],
         }
     }
