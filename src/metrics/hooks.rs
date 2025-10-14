@@ -4,10 +4,13 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-/// Raw hook event from hooks.jsonl
+// Re-export canonical event from adapters
+use crate::adapters::{CanonicalHookEvent, EventType};
+
+/// Raw hook event from hooks.jsonl (LEGACY - for backward compatibility)
 ///
-/// NOTE: We're capturing aggressively to understand full schema.
-/// Some fields may not be needed long-term (see TODO comments).
+/// New code should use CanonicalHookEvent from adapters module.
+/// This is kept only for reading old hooks.jsonl files.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HookEvent {
     pub session_id: String,
@@ -93,6 +96,8 @@ impl HookMetrics {
 }
 
 /// Parse hooks.jsonl and extract metrics
+///
+/// Supports both new (CanonicalHookEvent) and legacy (HookEvent) formats
 pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
     let content = fs::read_to_string(hooks_path.as_ref())
         .with_context(|| format!("Failed to read hooks file: {:?}", hooks_path.as_ref()))?;
@@ -105,26 +110,35 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
             continue;
         }
 
-        let event: HookEvent = match serde_json::from_str(line) {
+        // Try parsing as canonical event first, fall back to legacy format
+        let event: CanonicalHookEvent = match serde_json::from_str(line) {
             Ok(event) => event,
             Err(_) => {
-                // Skip malformed lines silently (e.g., concatenated JSON, incomplete events)
-                continue;
+                // Try legacy format
+                if let Ok(legacy_event) = serde_json::from_str::<HookEvent>(line) {
+                    // Convert to canonical format
+                    convert_legacy_event(legacy_event)
+                } else {
+                    // Skip malformed lines silently
+                    continue;
+                }
             }
         };
 
         metrics.total_events += 1;
 
         // Track session boundaries
-        if event.hook_event_name == "SessionStart" {
-            metrics.session_start_time = event.timestamp.clone();
+        if matches!(event.event_type, EventType::SessionStart) {
+            metrics.session_start_time = Some(event.timestamp.clone());
         }
-        if event.hook_event_name == "Stop" {
-            metrics.session_end_time = event.timestamp.clone();
+        if matches!(event.event_type, EventType::Stop) {
+            metrics.session_end_time = Some(event.timestamp.clone());
         }
 
         // Extract bash commands (PostToolUse only)
-        if event.hook_event_name == "PostToolUse" && event.tool_name.as_deref() == Some("Bash") {
+        if matches!(event.event_type, EventType::PostToolUse)
+            && event.tool_name.as_deref() == Some("Bash")
+        {
             if let Some(tool_input) = &event.tool_input {
                 if let Some(command) = tool_input.get("command").and_then(|v| v.as_str()) {
                     let stdout = event
@@ -143,7 +157,7 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
 
                     metrics.bash_commands.push(BashCommand {
                         command: command.to_string(),
-                        timestamp: event.timestamp.clone(),
+                        timestamp: Some(event.timestamp.clone()),
                         stdout,
                         stderr,
                     });
@@ -152,7 +166,7 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
         }
 
         // Extract file modifications (Edit/Write tools)
-        if event.hook_event_name == "PostToolUse" {
+        if matches!(event.event_type, EventType::PostToolUse) {
             if let Some(tool_name) = &event.tool_name {
                 if tool_name == "Edit" || tool_name == "Write" {
                     if let Some(tool_input) = &event.tool_input {
@@ -162,7 +176,7 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
                             metrics.file_modifications.push(FileModification {
                                 file_path: file_path.to_string(),
                                 tool: tool_name.clone(),
-                                timestamp: event.timestamp.clone(),
+                                timestamp: Some(event.timestamp.clone()),
                             });
                         }
                     }
@@ -172,6 +186,32 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
     }
 
     Ok(metrics)
+}
+
+/// Convert legacy HookEvent to CanonicalHookEvent
+fn convert_legacy_event(legacy: HookEvent) -> CanonicalHookEvent {
+    let event_type = match legacy.hook_event_name.as_str() {
+        "SessionStart" => EventType::SessionStart,
+        "SessionEnd" => EventType::SessionEnd,
+        "PreToolUse" => EventType::PreToolUse,
+        "PostToolUse" => EventType::PostToolUse,
+        "Stop" => EventType::Stop,
+        other => EventType::Other(other.to_string()),
+    };
+
+    CanonicalHookEvent {
+        timestamp: legacy.timestamp.unwrap_or_else(|| "unknown".to_string()),
+        session_id: legacy.session_id,
+        event_type,
+        tool_name: legacy.tool_name,
+        tool_input: legacy.tool_input,
+        tool_response: legacy.tool_response,
+        cwd: legacy.cwd,
+        transcript_path: legacy.transcript_path,
+        adapter: Some("legacy".to_string()),
+        fallback_used: Some(true),
+        extra: legacy.extra,
+    }
 }
 
 #[cfg(test)]
@@ -191,7 +231,7 @@ mod tests {
     #[test]
     fn test_parse_bash_command() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"},"tool_response":{"stdout":"Compiling...","stderr":""}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"},"tool_response":{"stdout":"Compiling...","stderr":""}}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
@@ -207,8 +247,8 @@ mod tests {
     #[test]
     fn test_parse_file_modifications() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Edit","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/main.rs"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Write","timestamp":"2025-01-01T00:00:01Z","tool_input":{"file_path":"README.md"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Edit","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/main.rs"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Write","timestamp":"2025-01-01T00:00:01Z","tool_input":{"file_path":"README.md"}}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
@@ -223,9 +263,9 @@ mod tests {
     #[test]
     fn test_bash_command_frequency() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo test"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo test"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"}}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
@@ -238,9 +278,9 @@ mod tests {
     #[test]
     fn test_file_modification_frequency() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Edit","tool_input":{"file_path":"src/main.rs"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Write","tool_input":{"file_path":"src/lib.rs"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Edit","tool_input":{"file_path":"src/main.rs"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Edit","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/main.rs"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Write","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/lib.rs"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Edit","timestamp":"2025-01-01T00:00:00Z","tool_input":{"file_path":"src/main.rs"}}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
@@ -253,9 +293,9 @@ mod tests {
     #[test]
     fn test_session_boundaries() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"SessionStart","timestamp":"2025-01-01T00:00:00Z"}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
-            r#"{"session_id":"test","hook_event_name":"Stop","timestamp":"2025-01-01T01:00:00Z"}"#,
+            r#"{"session_id":"test","event_type":"session_start","timestamp":"2025-01-01T00:00:00Z"}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"}}"#,
+            r#"{"session_id":"test","event_type":"stop","timestamp":"2025-01-01T01:00:00Z"}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();
@@ -273,8 +313,8 @@ mod tests {
     #[test]
     fn test_skip_pre_tool_use_for_commands() {
         let events = vec![
-            r#"{"session_id":"test","hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"cargo build"}}"#,
-            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo test"}}"#,
+            r#"{"session_id":"test","event_type":"pre_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo build"}}"#,
+            r#"{"session_id":"test","event_type":"post_tool_use","tool_name":"Bash","timestamp":"2025-01-01T00:00:00Z","tool_input":{"command":"cargo test"}}"#,
         ];
         let (_temp_dir, hooks_path) = create_hooks_file(&events);
         let metrics = parse_hooks_file(&hooks_path).unwrap();

@@ -3,29 +3,37 @@ use fs2::FileExt;
 use std::fs::OpenOptions;
 use std::io::{self, BufRead, Write};
 
+use crate::adapters::{AdapterRegistry, EventType};
 use crate::storage::{FileStorage, SessionMetadata};
 
-/// Process a hook event JSON string and write to hooks.jsonl with timestamp
+/// Process a hook event JSON string using adapter normalization
 fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
     use chrono::Utc;
 
-    // Parse and validate JSON
-    let mut hook_value: serde_json::Value =
+    // Parse raw JSON
+    let raw_value: serde_json::Value =
         serde_json::from_str(hook_json).context("Invalid JSON received")?;
 
+    // Detect and use appropriate adapter
+    let registry = AdapterRegistry::new();
+    let adapter = registry
+        .detect()
+        .context("No agent adapter detected. Is this running in an AI coding environment?")?;
+
+    // Normalize to canonical event
+    let canonical = adapter
+        .normalize(raw_value)?
+        .context("Adapter returned None - event should be skipped")?;
+
     // Inject timestamp if not present
-    if let serde_json::Value::Object(ref mut map) = hook_value {
-        if !map.contains_key("timestamp") {
-            map.insert(
-                "timestamp".to_string(),
-                serde_json::Value::String(Utc::now().to_rfc3339()),
-            );
-        }
+    let mut enriched = canonical;
+    if enriched.timestamp.is_empty() {
+        enriched.timestamp = Utc::now().to_rfc3339();
     }
 
-    // Serialize back to JSON
+    // Serialize enriched canonical event
     let enriched_json =
-        serde_json::to_string(&hook_value).context("Failed to serialize enriched hook event")?;
+        serde_json::to_string(&enriched).context("Failed to serialize enriched hook event")?;
 
     // Get hooks.jsonl path using the storage's state dir
     let state_dir = storage.state_dir();
@@ -56,40 +64,30 @@ fn process_hook_event(hook_json: &str, storage: &FileStorage) -> Result<()> {
     // Lock is automatically released when file goes out of scope
 
     // If this is a SessionStart event, update state.json with session metadata
-    if let serde_json::Value::Object(ref map) = hook_value {
-        if let Some(event_name) = map.get("hook_event_name").and_then(|v| v.as_str()) {
-            if event_name == "SessionStart" {
-                // Extract session metadata
-                let session_id = map
-                    .get("session_id")
-                    .and_then(|v| v.as_str())
-                    .context("SessionStart event missing session_id")?;
+    if matches!(enriched.event_type, EventType::SessionStart) {
+        // Extract session metadata
+        let session_id = &enriched.session_id;
 
-                let transcript_path = map
-                    .get("transcript_path")
-                    .and_then(|v| v.as_str())
-                    .context("SessionStart event missing transcript_path")?;
+        let transcript_path = enriched
+            .transcript_path
+            .as_ref()
+            .context("SessionStart event missing transcript_path")?;
 
-                let started_at = map
-                    .get("timestamp")
-                    .and_then(|v| v.as_str())
-                    .context("SessionStart event missing timestamp")?;
+        let started_at = &enriched.timestamp;
 
-                // Create session metadata
-                let session = SessionMetadata {
-                    session_id: session_id.to_string(),
-                    transcript_path: transcript_path.to_string(),
-                    started_at: started_at.to_string(),
-                };
+        // Create session metadata
+        let session = SessionMetadata {
+            session_id: session_id.to_string(),
+            transcript_path: transcript_path.to_string(),
+            started_at: started_at.to_string(),
+        };
 
-                // Load current state, update session metadata, save back
-                let mut state = storage.load()?;
-                state.session_metadata = Some(session);
-                storage
-                    .save(&state)
-                    .context("Failed to save session metadata to state.json")?;
-            }
-        }
+        // Load current state, update session metadata, save back
+        let mut state = storage.load()?;
+        state.session_metadata = Some(session);
+        storage
+            .save(&state)
+            .context("Failed to save session metadata to state.json")?;
     }
 
     Ok(())
@@ -128,16 +126,16 @@ mod tests {
         let parsed = read_jsonl_line(&hooks_file, 0);
         assert!(parsed.get("timestamp").is_some());
         assert_eq!(parsed["session_id"], "test");
-        assert_eq!(parsed["hook_event_name"], "PostToolUse");
+        assert_eq!(parsed["event_type"], "post_tool_use");
         assert_eq!(parsed["tool_name"], "Read");
+        assert_eq!(parsed["adapter"], "claude_code");
     }
 
     #[test]
     fn test_hook_preserves_existing_timestamp() {
         let (temp_dir, storage) = test_storage();
 
-        let hook_json =
-            r#"{"session_id":"test","timestamp":"2025-01-01T00:00:00Z","tool_name":"Edit"}"#;
+        let hook_json = r#"{"session_id":"test","timestamp":"2025-01-01T00:00:00Z","hook_event_name":"PostToolUse","tool_name":"Edit"}"#;
 
         process_hook_event(hook_json, &storage).unwrap();
 
@@ -150,15 +148,23 @@ mod tests {
     fn test_hook_appends_multiple_events() {
         let (temp_dir, storage) = test_storage();
 
-        process_hook_event(r#"{"event":"first"}"#, &storage).unwrap();
-        process_hook_event(r#"{"event":"second"}"#, &storage).unwrap();
+        process_hook_event(
+            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Read"}"#,
+            &storage,
+        )
+        .unwrap();
+        process_hook_event(
+            r#"{"session_id":"test","hook_event_name":"PostToolUse","tool_name":"Write"}"#,
+            &storage,
+        )
+        .unwrap();
 
         let hooks_file = temp_dir.path().join("hooks.jsonl");
         let events = read_jsonl_all(&hooks_file);
 
         assert_eq!(events.len(), 2);
-        assert_eq!(events[0]["event"], "first");
-        assert_eq!(events[1]["event"], "second");
+        assert_eq!(events[0]["tool_name"], "Read");
+        assert_eq!(events[1]["tool_name"], "Write");
         assert!(events[0].get("timestamp").is_some());
         assert!(events[1].get("timestamp").is_some());
     }

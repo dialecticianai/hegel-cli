@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-14 18:24
+**Last Updated**: 2025-10-14 18:50
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 7,183 | 5,458 | 12,641 |
-| **Comments** | 946 | - | 946 |
-| **Blank Lines** | 1,280 | - | 1,280 |
-| **Total Lines** | 9,409 | 5,458 | 14,867 |
-| **Files** | 36 | 41 | 77 |
+| **Lines** | 7,948 | 15,741 | 23,689 |
+| **Comments** | 1,034 | - | 1,034 |
+| **Blank Lines** | 1,404 | - | 1,404 |
+| **Total Lines** | 10,386 | 15,741 | 26,127 |
+| **Files** | 39 | 96 | 135 |
 
-**Documentation Ratio**: 0.76 lines of docs per line of code
+**Documentation Ratio**: 1.98 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            36           1280            946           7183
+Rust                            39           1404           1034           7948
 -------------------------------------------------------------------------------
-SUM:                            36           1280            946           7183
+SUM:                            39           1404           1034           7948
 -------------------------------------------------------------------------------
 ```
 
@@ -36,11 +36,14 @@ SUM:                            36           1280            946           7183
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
+| `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
+| `adapters/codex.rs` | 557 | 318 | 239 | 42.9% | ⚠️ Large |
+| `adapters/mod.rs` | 118 | 118 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 253 | 253 | 0 | 0.0% | ⚠️ Large |
 | `commands/astq.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/git.rs` | 10 | 10 | 0 | 0.0% | ✅ |
-| `commands/hook.rs` | 230 | 110 | 120 | 52.2% | ✅ |
+| `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/mod.rs` | 16 | 16 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/workflow.rs` | 595 | 212 | 383 | 64.4% | ⚠️ Large |
@@ -50,10 +53,10 @@ SUM:                            36           1280            946           7183
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 171 | 98 | 73 | 42.7% | ✅ |
-| `main.rs` | 165 | 8 | 157 | 95.2% | ✅ |
+| `main.rs` | 166 | 9 | 157 | 94.6% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ⚠️ Large |
-| `metrics/hooks.rs` | 286 | 176 | 110 | 38.5% | ✅ |
+| `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ⚠️ Large |
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
@@ -73,7 +76,7 @@ SUM:                            36           1280            946           7183
 | `tui/ui.rs` | 317 | 158 | 159 | 50.2% | ✅ |
 | `tui/utils.rs` | 320 | 187 | 133 | 41.6% | ✅ |
 
-**⚠️ Warning:** 4 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -81,9 +84,11 @@ SUM:                            36           1280            946           7183
 
 | File | Lines |
 |------|-------|
+| `ADAPTER_PATTERNS.md` | 197 |
 | `CLAUDE.md` | 136 |
 | `CODE_MAP.md` | 159 |
-| `COVERAGE_REPORT.md` | 120 |
+| `CODEX_ADAPTER_GUIDE.md` | 567 |
+| `COVERAGE_REPORT.md` | 126 |
 | `DEP_REVIEW.md` | 678 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 207 |
@@ -94,9 +99,11 @@ SUM:                            36           1280            946           7183
 | `guides/SPEC_WRITING.md` | 111 |
 | `HEGEL_CLAUDE.md` | 523 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 147 |
+| `LOC_REPORT.md` | 148 |
 | `README.md` | 335 |
-| `ROADMAP.md` | 209 |
+| `REFACTOR_PLAN.md` | 488 |
+| `REFACTOR_REVISIONS.md` | 325 |
+| `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
 | `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
 | `vendor/ast-grep/.github/copilot-instructions.md` | 135 |
@@ -122,6 +129,57 @@ SUM:                            36           1280            946           7183
 | `vendor/ast-grep/npm/platforms/win32-x64-msvc/README.md` | 3 |
 | `vendor/ast-grep/npm/README.md` | 11 |
 | `vendor/ast-grep/README.md` | 118 |
+| `vendor/ccusage/.claude/commands/analyze-code.md` | 268 |
+| `vendor/ccusage/.claude/commands/lsmcp-onboarding.md` | 1 |
+| `vendor/ccusage/.claude/commands/reduce-similarities.md` | 1 |
+| `vendor/ccusage/.claude/commands/refactor.md` | 78 |
+| `vendor/ccusage/.lsmcp/memories/symbol_index_info.md` | 39 |
+| `vendor/ccusage/.lsmcp/memories/symbol_index_status.md` | 56 |
+| `vendor/ccusage/AGENTS.md` | 351 |
+| `vendor/ccusage/apps/ccusage/AGENTS.md` | 120 |
+| `vendor/ccusage/apps/ccusage/CLAUDE.md` | 120 |
+| `vendor/ccusage/apps/ccusage/README.md` | 182 |
+| `vendor/ccusage/apps/codex/AGENTS.md` | 58 |
+| `vendor/ccusage/apps/codex/CLAUDE.md` | 58 |
+| `vendor/ccusage/apps/codex/README.md` | 116 |
+| `vendor/ccusage/apps/mcp/AGENTS.md` | 120 |
+| `vendor/ccusage/apps/mcp/CLAUDE.md` | 120 |
+| `vendor/ccusage/apps/mcp/README.md` | 82 |
+| `vendor/ccusage/CLAUDE.md` | 351 |
+| `vendor/ccusage/docs/AGENTS.md` | 113 |
+| `vendor/ccusage/docs/CLAUDE.md` | 113 |
+| `vendor/ccusage/docs/guide/blocks-reports.md` | 357 |
+| `vendor/ccusage/docs/guide/cli-options.md` | 344 |
+| `vendor/ccusage/docs/guide/codex/daily.md` | 26 |
+| `vendor/ccusage/docs/guide/codex/index.md` | 84 |
+| `vendor/ccusage/docs/guide/codex/monthly.md` | 26 |
+| `vendor/ccusage/docs/guide/codex/session.md` | 28 |
+| `vendor/ccusage/docs/guide/config-files.md` | 432 |
+| `vendor/ccusage/docs/guide/configuration.md` | 336 |
+| `vendor/ccusage/docs/guide/cost-modes.md` | 348 |
+| `vendor/ccusage/docs/guide/custom-paths.md` | 430 |
+| `vendor/ccusage/docs/guide/daily-reports.md` | 284 |
+| `vendor/ccusage/docs/guide/directory-detection.md` | 115 |
+| `vendor/ccusage/docs/guide/environment-variables.md` | 243 |
+| `vendor/ccusage/docs/guide/getting-started.md` | 141 |
+| `vendor/ccusage/docs/guide/index.md` | 102 |
+| `vendor/ccusage/docs/guide/installation.md` | 288 |
+| `vendor/ccusage/docs/guide/json-output.md` | 447 |
+| `vendor/ccusage/docs/guide/library-usage.md` | 150 |
+| `vendor/ccusage/docs/guide/live-monitoring.md` | 275 |
+| `vendor/ccusage/docs/guide/mcp-server.md` | 165 |
+| `vendor/ccusage/docs/guide/monthly-reports.md` | 243 |
+| `vendor/ccusage/docs/guide/related-projects.md` | 23 |
+| `vendor/ccusage/docs/guide/session-reports.md` | 321 |
+| `vendor/ccusage/docs/guide/sponsors.md` | 33 |
+| `vendor/ccusage/docs/guide/statusline.md` | 284 |
+| `vendor/ccusage/docs/guide/weekly-reports.md` | 230 |
+| `vendor/ccusage/docs/index.md` | 84 |
+| `vendor/ccusage/packages/internal/AGENTS.md` | 105 |
+| `vendor/ccusage/packages/internal/CLAUDE.md` | 105 |
+| `vendor/ccusage/packages/terminal/AGENTS.md` | 74 |
+| `vendor/ccusage/packages/terminal/CLAUDE.md` | 74 |
+| `vendor/ccusage/README.md` | 182 |
 
 ---
 
@@ -129,7 +187,7 @@ SUM:                            36           1280            946           7183
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.76 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.98 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

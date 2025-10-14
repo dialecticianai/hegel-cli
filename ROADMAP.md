@@ -37,33 +37,6 @@
 
 ## Phase 1: Core Infrastructure
 
-### 1.1 Multi-Agent Support
-
-**Goal:** Abstract Claude Code integration as one of many possible agent integrations.
-
-**Approach:** Logstash-style pluggable input adapters with auto-install on first use.
-
-**Features:**
-- Auto-detect agent from environment variables (`CLAUDE_CODE_SESSION_ID`, `CURSOR_SESSION_ID`, etc.)
-- Pluggable adapters: `hegel-plugin-cursor`, `hegel-plugin-codex`, `hegel-plugin-gemini`
-- Auto-install on demand when agent detected
-- Normalize agent-specific events to canonical schema → `.hegel/hooks.jsonl`
-- Distribution: Pre-compiled binaries from GitHub releases
-- Communication: JSONL stdin/stdout protocol between Hegel and plugins
-
-**Implementation:**
-- `input-claude-code` - Current implementation (baseline)
-- `input-codex` - OpenAI Codex telemetry integration
-- `input-gemini` - Google Gemini integration (post-MVP)
-- `input-cursor` - Cursor event system integration (post-MVP)
-
-**Plugin installation:**
-```bash
-# Auto-triggered on first use:
-# Downloads from: https://github.com/dialecticianai/hegel-plugin-cursor/releases
-# Installs to: ~/.hegel/plugins/cursor-adapter
-```
-
 ### 1.2 Research Mode Workflow
 
 **Goal:** Add Research mode as distinct workflow for external knowledge gathering phase.
@@ -86,7 +59,7 @@
 - `KNOWLEDGE_CAPTURE.md` - How to write learning docs
 - `QUESTION_TRACKING.md` - How to catalogue open questions
 
-### 1.3 Meta-Modes Formalization
+### 1.2 Meta-Modes Formalization
 
 **Goal:** Represent Learning/Porting/Standard progression patterns in Hegel.
 
@@ -98,7 +71,7 @@
 - Automatic transitions between modes based on claims?
 - Analytics that recognize meta-mode patterns?
 
-### 1.4 Project Initialization
+### 1.3 Project Initialization
 
 **Goal:** `hegel init` command to scaffold new projects with DDD structure.
 
