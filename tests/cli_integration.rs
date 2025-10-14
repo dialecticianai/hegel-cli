@@ -161,11 +161,11 @@ fn test_next_invalid_json() {
 }
 
 #[test]
-fn test_continue_no_workflow() {
+fn test_repeat_no_workflow() {
     let temp_dir = TempDir::new().unwrap();
     let state_path = temp_dir.path().to_str().unwrap();
 
-    let output = run_hegel(&["continue"], Some(state_path));
+    let output = run_hegel(&["repeat"], Some(state_path));
 
     assert!(!output.status.success());
     let err = stderr(&output);
@@ -173,19 +173,19 @@ fn test_continue_no_workflow() {
 }
 
 #[test]
-fn test_continue_with_workflow() {
+fn test_repeat_with_workflow() {
     let temp_dir = TempDir::new().unwrap();
     let state_path = temp_dir.path().to_str().unwrap();
 
     // Start workflow
     run_hegel(&["start", "discovery"], Some(state_path));
 
-    // Continue
-    let output = run_hegel(&["continue"], Some(state_path));
+    // Repeat
+    let output = run_hegel(&["repeat"], Some(state_path));
 
     assert!(output.status.success());
     let out = stdout(&output);
-    assert!(out.contains("Continuing from interrupt"));
+    assert!(out.contains("Re-displaying current prompt"));
     assert!(out.contains("Current node: spec"));
 }
 

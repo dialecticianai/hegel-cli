@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-14 02:50
+**Last Updated**: 2025-10-14 18:24
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 7,183 | 4,972 | 12,155 |
+| **Lines** | 7,183 | 5,458 | 12,641 |
 | **Comments** | 946 | - | 946 |
 | **Blank Lines** | 1,280 | - | 1,280 |
-| **Total Lines** | 9,409 | 4,972 | 14,381 |
-| **Files** | 36 | 40 | 76 |
+| **Total Lines** | 9,409 | 5,458 | 14,867 |
+| **Files** | 36 | 41 | 77 |
 
-**Documentation Ratio**: 0.69 lines of docs per line of code
+**Documentation Ratio**: 0.76 lines of docs per line of code
 
 ---
 
@@ -92,10 +92,11 @@ SUM:                            36           1280            946           7183
 | `guides/PLAN_WRITING.md` | 145 |
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
+| `HEGEL_CLAUDE.md` | 523 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 142 |
+| `LOC_REPORT.md` | 147 |
 | `README.md` | 335 |
-| `ROADMAP.md` | 251 |
+| `ROADMAP.md` | 209 |
 | `TESTING.md` | 41 |
 | `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
 | `vendor/ast-grep/.github/copilot-instructions.md` | 135 |
@@ -128,7 +129,7 @@ SUM:                            36           1280            946           7183
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.69 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.76 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

@@ -1,0 +1,9 @@
+[alias]
+# Build and install in one command (uses cargo install, slower)
+bi = "install --path . --force"
+
+# Build release and install (uses cargo install with lockfile)
+install-local = "install --path . --force --locked"
+
+# Build release and copy to ~/.cargo/bin (faster, uses script)
+bai = "!./scripts/build-and-install.sh"

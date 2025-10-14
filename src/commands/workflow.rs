@@ -169,7 +169,7 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
-pub fn continue_prompt(storage: &FileStorage) -> Result<()> {
+pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     // Load current state
     let state = storage.load()?;
 
@@ -201,7 +201,7 @@ pub fn continue_prompt(storage: &FileStorage) -> Result<()> {
         .with_context(|| "Failed to render prompt template")?;
 
     // Display output
-    println!("{}", "Continuing from interrupt".yellow());
+    println!("{}", "Re-displaying current prompt".yellow());
     println!("{}: {}", "Current node".bold(), current_node);
     println!();
     println!("{}", "Prompt:".bold().cyan());
@@ -479,19 +479,19 @@ mod tests {
         assert_eq!(event["workflow_id"], workflow_id.as_str());
     }
 
-    // ========== continue_prompt Tests ==========
+    // ========== repeat_prompt Tests ==========
 
     #[test]
     fn test_continue_with_active_workflow_returns_current_node_prompt() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        assert!(continue_prompt(&storage).is_ok());
+        assert!(repeat_prompt(&storage).is_ok());
     }
 
     #[test]
     fn test_continue_with_no_workflow_loaded_returns_error() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
-        let result = continue_prompt(&storage);
+        let result = repeat_prompt(&storage);
         assert!(result.is_err());
         assert!(result
             .unwrap_err()
@@ -503,8 +503,8 @@ mod tests {
     fn test_continue_renders_template_with_guides() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        // If template rendering fails, continue_prompt will error
-        assert!(continue_prompt(&storage).is_ok());
+        // If template rendering fails, repeat_prompt will error
+        assert!(repeat_prompt(&storage).is_ok());
     }
 
     #[test]
@@ -512,7 +512,7 @@ mod tests {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         let state_before = storage.load().unwrap();
-        continue_prompt(&storage).unwrap();
+        repeat_prompt(&storage).unwrap();
         let state_after = storage.load().unwrap();
 
         // State should be identical
@@ -524,7 +524,7 @@ mod tests {
     fn test_continue_does_not_log_state_transition() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        continue_prompt(&storage).unwrap();
+        repeat_prompt(&storage).unwrap();
 
         // Should be no state transitions logged
         assert_eq!(

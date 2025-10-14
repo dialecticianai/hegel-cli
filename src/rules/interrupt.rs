@@ -24,7 +24,7 @@ pub fn generate_interrupt_prompt(violation: &RuleViolation) -> String {
 
     // Decision prompt
     prompt.push_str("**What next?**\n");
-    prompt.push_str("- Fix the issue and continue: `hegel continue`\n");
+    prompt.push_str("- Fix the issue and re-display prompt: `hegel repeat`\n");
     prompt.push_str("- Escalate to human for review\n");
 
     prompt
@@ -54,7 +54,7 @@ mod tests {
         assert!(prompt.contains("You're stuck in a build loop"));
         assert!(prompt.contains("**Recent Activity:**"));
         assert!(prompt.contains("10:00:00: cargo build"));
-        assert!(prompt.contains("`hegel continue`"));
+        assert!(prompt.contains("`hegel repeat`"));
     }
 
     #[test]
@@ -150,7 +150,7 @@ mod tests {
         let prompt = generate_interrupt_prompt(&violation);
 
         assert!(prompt.contains("**What next?**"));
-        assert!(prompt.contains("`hegel continue`"));
+        assert!(prompt.contains("`hegel repeat`"));
         assert!(prompt.contains("Escalate to human"));
     }
 

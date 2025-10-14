@@ -81,15 +81,15 @@ Shows:
 - Verify workflow state before advancing
 - Check if a workflow is active
 
-### Bypassing Rules (Interrupt Recovery)
+### Re-displaying Current Prompt
 
-If the workflow engine interrupted you with a guardrail violation:
+To see the current phase prompt again without advancing:
 
 ```bash
-hegel continue
+hegel repeat
 ```
 
-This bypasses rule evaluation and returns the current phase prompt. **Only use after addressing the violation.**
+Useful after an interrupt or when you need to review the current phase requirements.
 
 ### Resetting Workflow
 
@@ -499,7 +499,7 @@ Error: "No matching transition"
 hegel start <workflow>          # Start workflow
 hegel next '{"claim": true}'    # Advance phase
 hegel status                    # Check state
-hegel continue                  # Bypass rules
+hegel repeat                    # Re-show prompt
 hegel reset                     # Clear state
 
 # Commands
