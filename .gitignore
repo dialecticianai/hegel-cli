@@ -21,6 +21,9 @@ Thumbs.db
 # Local state
 .hegel/
 
+# Review artifacts (ephemeral)
+.ddd/
+
 # cached external docs from web
 .webcache/
 
