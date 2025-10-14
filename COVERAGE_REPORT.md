@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-11 05:02
+**Last Updated**: 2025-10-14 02:41
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **95.51%** lines | **94.30%** regions | **91.76%** functions
+**Overall Coverage**: **94.02%** lines | **92.92%** regions | **90.95%** functions
 
 ## Summary
 
 ```
-TOTAL                               8831               503    94.30%         449                37    91.76%        5432               244    95.51%           0                 0         -
+TOTAL                               8963               635    92.92%         453                41    90.95%        5518               330    94.02%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -16,11 +16,13 @@ TOTAL                               8831               503    94.30%         449
 |--------|--------------|-----------------|-----------|--------|
 | `commands/analyze/mod.rs` | 100.00% | 99.52% | 100.00% | 🟢 Excellent |
 | `commands/analyze/sections.rs` | 97.46% | 95.75% | 100.00% | 🟢 Excellent |
+| `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/hook.rs` | 95.45% | 92.83% | 70.59% | 🟢 Excellent |
+| `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/workflow.rs` | 89.88% | 88.17% | 80.56% | 🟡 Good |
 | `engine/mod.rs` | 99.80% | 99.41% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
-| `main.rs` | 97.14% | 88.89% | 100.00% | 🟢 Excellent |
+| `main.rs` | 80.95% | 73.56% | 100.00% | 🟡 Good |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 95.30% | 95.83% | 94.12% | 🟢 Excellent |
@@ -49,7 +51,6 @@ TOTAL                               8831               503    94.30%         449
 - `commands/hook.rs` - 95.45%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
-- `main.rs` - 97.14%
 - `metrics/aggregation.rs` - 97.18%
 - `metrics/graph.rs` - 99.20%
 - `metrics/hooks.rs` - 95.30%
@@ -68,6 +69,7 @@ TOTAL                               8831               503    94.30%         449
 
 ### 🟡 Good (70-89% lines)
 - `commands/workflow.rs` - 89.88%
+- `main.rs` - 80.95%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
 - `tui/tabs/files.rs` - 81.63%
@@ -75,13 +77,15 @@ TOTAL                               8831               503    94.30%         449
 ### 🟠 Moderate (40-69% lines)
 
 ### 🔴 Needs Work (<40% lines)
+- `commands/astq.rs` - 0.00%
+- `commands/reflect.rs` - 0.00%
 - `tui/mod.rs` - 0.00%
 
 ## Coverage Targets
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 95.51% | ✅ Met |
+| Overall | ≥80% | 94.02% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -52,6 +52,26 @@ enum Commands {
     Analyze,
     /// Interactive TUI dashboard (real-time metrics)
     Top,
+    /// AST-based code search and transformation (wraps ast-grep)
+    Astq {
+        /// Arguments to pass to ast-grep
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Launch ephemeral Markdown review UI (wraps mirror)
+    Reflect {
+        /// Markdown files to review
+        files: Vec<std::path::PathBuf>,
+        /// Output directory for review files
+        #[arg(long)]
+        out_dir: Option<std::path::PathBuf>,
+        /// Emit JSON with review file paths on exit
+        #[arg(long)]
+        json: bool,
+        /// Headless mode (no-op, for testing)
+        #[arg(long)]
+        headless: bool,
+    },
 }
 
 fn main() -> Result<()> {
@@ -108,6 +128,17 @@ fn main() -> Result<()> {
         }
         Commands::Top => {
             tui::run_tui(storage.state_dir())?;
+        }
+        Commands::Astq { args } => {
+            commands::run_astq(&args)?;
+        }
+        Commands::Reflect {
+            files,
+            out_dir,
+            json,
+            headless,
+        } => {
+            commands::run_reflect(&files, out_dir.as_deref(), json, headless)?;
         }
     }
 

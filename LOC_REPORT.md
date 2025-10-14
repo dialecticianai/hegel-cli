@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-11 05:02
+**Last Updated**: 2025-10-14 02:41
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 6,716 | 2,422 | 9,138 |
-| **Comments** | 879 | - | 879 |
-| **Blank Lines** | 1,194 | - | 1,194 |
-| **Total Lines** | 8,789 | 2,422 | 11,211 |
-| **Files** | 29 | 15 | 44 |
+| **Lines** | 6,832 | 4,883 | 11,715 |
+| **Comments** | 902 | - | 902 |
+| **Blank Lines** | 1,217 | - | 1,217 |
+| **Total Lines** | 8,951 | 4,883 | 13,834 |
+| **Files** | 31 | 40 | 71 |
 
-**Documentation Ratio**: 0.36 lines of docs per line of code
+**Documentation Ratio**: 0.71 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            29           1194            879           6716
+Rust                            31           1217            902           6832
 -------------------------------------------------------------------------------
-SUM:                            29           1194            879           6716
+SUM:                            31           1217            902           6832
 -------------------------------------------------------------------------------
 ```
 
@@ -38,12 +38,14 @@ SUM:                            29           1194            879           6716
 |------|-------------|------------|------------|--------|--------|
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 253 | 253 | 0 | 0.0% | ⚠️ Large |
+| `commands/astq.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/hook.rs` | 230 | 110 | 120 | 52.2% | ✅ |
-| `commands/mod.rs` | 8 | 8 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 12 | 12 | 0 | 0.0% | ✅ |
+| `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/workflow.rs` | 595 | 212 | 383 | 64.4% | ⚠️ Large |
 | `engine/mod.rs` | 722 | 130 | 592 | 82.0% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
-| `main.rs` | 115 | 7 | 108 | 93.9% | ✅ |
+| `main.rs` | 146 | 7 | 139 | 95.2% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ⚠️ Large |
 | `metrics/hooks.rs` | 286 | 176 | 110 | 38.5% | ✅ |
@@ -74,9 +76,9 @@ SUM:                            29           1194            879           6716
 
 | File | Lines |
 |------|-------|
-| `CLAUDE.md` | 120 |
+| `CLAUDE.md` | 136 |
 | `CODE_MAP.md` | 159 |
-| `COVERAGE_REPORT.md` | 108 |
+| `COVERAGE_REPORT.md` | 112 |
 | `DEP_REVIEW.md` | 678 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 207 |
@@ -86,9 +88,34 @@ SUM:                            29           1194            879           6716
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 117 |
-| `README.md` | 236 |
-| `ROADMAP.md` | 40 |
+| `LOC_REPORT.md` | 115 |
+| `README.md` | 281 |
+| `ROADMAP.md` | 251 |
+| `TESTING.md` | 41 |
+| `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
+| `vendor/ast-grep/.github/copilot-instructions.md` | 135 |
+| `vendor/ast-grep/.github/ISSUE_TEMPLATE/feature_request.md` | 20 |
+| `vendor/ast-grep/CHANGELOG.md` | 1,700 |
+| `vendor/ast-grep/crates/napi/npm/darwin-arm64/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/darwin-x64/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/linux-arm64-gnu/README.md` | 2 |
+| `vendor/ast-grep/crates/napi/npm/linux-arm64-musl/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/linux-x64-gnu/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/linux-x64-musl/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/win32-arm64-msvc/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/win32-ia32-msvc/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/npm/win32-x64-msvc/README.md` | 3 |
+| `vendor/ast-grep/crates/napi/README.md` | 34 |
+| `vendor/ast-grep/crates/pyo3/README.md` | 73 |
+| `vendor/ast-grep/npm/platforms/darwin-arm64/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/darwin-x64/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/linux-arm64-gnu/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/linux-x64-gnu/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/win32-arm64-msvc/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/win32-ia32-msvc/README.md` | 3 |
+| `vendor/ast-grep/npm/platforms/win32-x64-msvc/README.md` | 3 |
+| `vendor/ast-grep/npm/README.md` | 11 |
+| `vendor/ast-grep/README.md` | 118 |
 
 ---
 
@@ -96,7 +123,7 @@ SUM:                            29           1194            879           6716
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.36 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.71 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

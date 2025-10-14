@@ -4,6 +4,9 @@ Cargo.lock
 **/*.rs.bk
 *.pdb
 
+# Vendored dependencies
+vendor/
+
 # IDE
 .vscode/
 .idea/
