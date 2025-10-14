@@ -180,6 +180,56 @@ impl FileStorage {
 
         self.append_jsonl("states.jsonl", &event)
     }
+
+    /// Log a command invocation to command_log.jsonl
+    pub fn log_command(
+        &self,
+        command: &str,
+        args: &[String],
+        success: bool,
+        blocked_reason: Option<&str>,
+    ) -> Result<()> {
+        use chrono::Utc;
+
+        let event = serde_json::json!({
+            "timestamp": Utc::now().to_rfc3339(),
+            "command": command,
+            "args": args,
+            "success": success,
+            "blocked": blocked_reason.is_some(),
+            "blocked_reason": blocked_reason,
+        });
+
+        self.append_jsonl("command_log.jsonl", &event)
+    }
+
+    /// Read command log for testing/analysis
+    #[cfg(test)]
+    pub fn read_command_log(&self) -> Result<Vec<CommandLogEntry>> {
+        let log_path = self.state_dir.join("command_log.jsonl");
+        if !log_path.exists() {
+            return Ok(vec![]);
+        }
+
+        let content = fs::read_to_string(&log_path)?;
+        let entries: Vec<CommandLogEntry> = content
+            .lines()
+            .filter(|line| !line.is_empty())
+            .map(|line| serde_json::from_str(line))
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(entries)
+    }
+}
+
+#[cfg(test)]
+#[derive(Debug, Deserialize)]
+pub struct CommandLogEntry {
+    pub command: String,
+    pub args: Vec<String>,
+    pub success: bool,
+    pub blocked: bool,
+    pub blocked_reason: Option<String>,
 }
 
 #[cfg(test)]

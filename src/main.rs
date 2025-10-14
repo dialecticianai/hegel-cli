@@ -1,5 +1,6 @@
 mod commands;
 mod engine;
+mod guardrails;
 mod metrics;
 mod rules;
 mod storage;
@@ -72,6 +73,18 @@ enum Commands {
         #[arg(long)]
         headless: bool,
     },
+    /// Run git with guardrails and audit logging
+    Git {
+        /// Arguments to pass to git
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Run docker with guardrails and audit logging
+    Docker {
+        /// Arguments to pass to docker
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -139,6 +152,12 @@ fn main() -> Result<()> {
             headless,
         } => {
             commands::run_reflect(&files, out_dir.as_deref(), json, headless)?;
+        }
+        Commands::Git { args } => {
+            commands::run_wrapped_command("git", &args, &storage)?;
+        }
+        Commands::Docker { args } => {
+            commands::run_wrapped_command("docker", &args, &storage)?;
         }
     }
 

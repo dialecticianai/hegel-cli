@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-14 02:41
+**Last Updated**: 2025-10-14 02:50
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **94.02%** lines | **92.92%** regions | **90.95%** functions
+**Overall Coverage**: **92.68%** lines | **91.46%** regions | **89.52%** functions
 
 ## Summary
 
 ```
-TOTAL                               8963               635    92.92%         453                41    90.95%        5518               330    94.02%           0                 0         -
+TOTAL                               9399               803    91.46%         477                50    89.52%        5768               422    92.68%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -17,12 +17,16 @@ TOTAL                               8963               635    92.92%         453
 | `commands/analyze/mod.rs` | 100.00% | 99.52% | 100.00% | 🟢 Excellent |
 | `commands/analyze/sections.rs` | 97.46% | 95.75% | 100.00% | 🟢 Excellent |
 | `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `commands/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/hook.rs` | 95.45% | 92.83% | 70.59% | 🟢 Excellent |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/workflow.rs` | 89.88% | 88.17% | 80.56% | 🟡 Good |
+| `commands/wrapped.rs` | 38.46% | 40.72% | 40.00% | 🔴 Needs Work |
 | `engine/mod.rs` | 99.80% | 99.41% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
-| `main.rs` | 80.95% | 73.56% | 100.00% | 🟡 Good |
+| `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
+| `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
+| `main.rs` | 73.91% | 64.65% | 100.00% | 🟡 Good |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 95.30% | 95.83% | 94.12% | 🟢 Excellent |
@@ -32,7 +36,7 @@ TOTAL                               8963               635    92.92%         453
 | `rules/evaluator.rs` | 99.29% | 98.52% | 100.00% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
-| `storage/mod.rs` | 92.49% | 93.13% | 70.00% | 🟢 Excellent |
+| `storage/mod.rs` | 83.64% | 86.86% | 63.64% | 🟡 Good |
 | `test_helpers.rs` | 93.89% | 90.47% | 95.45% | 🟢 Excellent |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -51,6 +55,8 @@ TOTAL                               8963               635    92.92%         453
 - `commands/hook.rs` - 95.45%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
+- `guardrails/parser.rs` - 97.78%
+- `guardrails/types.rs` - 94.38%
 - `metrics/aggregation.rs` - 97.18%
 - `metrics/graph.rs` - 99.20%
 - `metrics/hooks.rs` - 95.30%
@@ -60,7 +66,6 @@ TOTAL                               8963               635    92.92%         453
 - `rules/evaluator.rs` - 99.29%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
-- `storage/mod.rs` - 92.49%
 - `test_helpers.rs` - 93.89%
 - `tui/tabs/overview.rs` - 100.00%
 - `tui/tabs/phases.rs` - 95.18%
@@ -69,7 +74,8 @@ TOTAL                               8963               635    92.92%         453
 
 ### 🟡 Good (70-89% lines)
 - `commands/workflow.rs` - 89.88%
-- `main.rs` - 80.95%
+- `main.rs` - 73.91%
+- `storage/mod.rs` - 83.64%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
 - `tui/tabs/files.rs` - 81.63%
@@ -78,14 +84,16 @@ TOTAL                               8963               635    92.92%         453
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 0.00%
+- `commands/git.rs` - 0.00%
 - `commands/reflect.rs` - 0.00%
+- `commands/wrapped.rs` - 38.46%
 - `tui/mod.rs` - 0.00%
 
 ## Coverage Targets
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 94.02% | ✅ Met |
+| Overall | ≥80% | 92.68% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
