@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-09-11T18:25:30.000Z",
+  "type": "turn_context",
+  "payload": {
+    "model": "gpt-5",
+    "info": {
+      "model": "gpt-5"
+    }
+  }
+}

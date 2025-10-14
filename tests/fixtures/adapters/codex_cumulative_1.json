@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-09-11T18:25:40Z",
+  "type": "event_msg",
+  "payload": {
+    "type": "token_count",
+    "info": {
+      "total_token_usage": {
+        "input_tokens": 1200,
+        "cached_input_tokens": 200,
+        "output_tokens": 500,
+        "total_tokens": 1700
+      },
+      "model": "gpt-5"
+    }
+  }
+}

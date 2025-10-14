@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-14 18:50
+**Last Updated**: 2025-10-14 19:18
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 7,948 | 15,741 | 23,689 |
-| **Comments** | 1,034 | - | 1,034 |
-| **Blank Lines** | 1,404 | - | 1,404 |
-| **Total Lines** | 10,386 | 15,741 | 26,127 |
-| **Files** | 39 | 96 | 135 |
+| **Lines** | 7,895 | 14,222 | 22,117 |
+| **Comments** | 1,052 | - | 1,052 |
+| **Blank Lines** | 1,411 | - | 1,411 |
+| **Total Lines** | 10,358 | 14,222 | 24,580 |
+| **Files** | 39 | 92 | 131 |
 
-**Documentation Ratio**: 1.98 lines of docs per line of code
+**Documentation Ratio**: 1.80 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            39           1404           1034           7948
+Rust                            39           1411           1052           7895
 -------------------------------------------------------------------------------
-SUM:                            39           1404           1034           7948
+SUM:                            39           1411           1052           7895
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            39           1404           1034           7948
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
-| `adapters/codex.rs` | 557 | 318 | 239 | 42.9% | ⚠️ Large |
+| `adapters/codex.rs` | 499 | 318 | 181 | 36.3% | ⚠️ Large |
 | `adapters/mod.rs` | 118 | 118 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 253 | 253 | 0 | 0.0% | ⚠️ Large |
@@ -65,7 +65,7 @@ SUM:                            39           1404           1034           7948
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
 | `storage/mod.rs` | 522 | 224 | 298 | 57.1% | ⚠️ Large |
-| `test_helpers.rs` | 786 | 530 | 256 | 32.6% | ✅ (infra) |
+| `test_helpers.rs` | 816 | 530 | 286 | 35.0% | ✅ (infra) |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
 | `tui/tabs/events.rs` | 100 | 81 | 19 | 19.0% | ✅ |
@@ -84,10 +84,8 @@ SUM:                            39           1404           1034           7948
 
 | File | Lines |
 |------|-------|
-| `ADAPTER_PATTERNS.md` | 197 |
 | `CLAUDE.md` | 136 |
 | `CODE_MAP.md` | 159 |
-| `CODEX_ADAPTER_GUIDE.md` | 567 |
 | `COVERAGE_REPORT.md` | 126 |
 | `DEP_REVIEW.md` | 678 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
@@ -99,10 +97,8 @@ SUM:                            39           1404           1034           7948
 | `guides/SPEC_WRITING.md` | 111 |
 | `HEGEL_CLAUDE.md` | 523 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 148 |
+| `LOC_REPORT.md` | 206 |
 | `README.md` | 335 |
-| `REFACTOR_PLAN.md` | 488 |
-| `REFACTOR_REVISIONS.md` | 325 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
 | `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
@@ -187,7 +183,7 @@ SUM:                            39           1404           1034           7948
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.98 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.80 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

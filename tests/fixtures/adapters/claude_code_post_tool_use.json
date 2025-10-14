@@ -1,0 +1,15 @@
+{
+  "session_id": "test-session-123",
+  "hook_event_name": "PostToolUse",
+  "timestamp": "2025-01-01T10:05:00Z",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "cargo test",
+    "description": "Run tests"
+  },
+  "tool_response": {
+    "stdout": "test result: ok. 10 passed; 0 failed",
+    "stderr": ""
+  },
+  "cwd": "/home/user/project"
+}

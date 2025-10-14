@@ -371,14 +371,10 @@ mod tests {
 
     #[test]
     fn test_normalize_turn_context() {
+        use crate::test_helpers::load_fixture;
+
         let adapter = CodexAdapter::new();
-        let input = json!({
-            "timestamp": "2025-09-11T18:25:30.000Z",
-            "type": "turn_context",
-            "payload": {
-                "model": "gpt-5"
-            }
-        });
+        let input = load_fixture("adapters/codex_turn_context.json");
 
         let result = adapter.normalize(input).unwrap();
         assert!(result.is_none()); // turn_context doesn't emit event
@@ -391,24 +387,10 @@ mod tests {
 
     #[test]
     fn test_normalize_token_count_with_model() {
+        use crate::test_helpers::load_fixture;
+
         let adapter = CodexAdapter::new();
-        let input = json!({
-            "timestamp": "2025-09-11T18:25:40.670Z",
-            "type": "event_msg",
-            "payload": {
-                "type": "token_count",
-                "info": {
-                    "last_token_usage": {
-                        "input_tokens": 1200,
-                        "cached_input_tokens": 200,
-                        "output_tokens": 500,
-                        "reasoning_output_tokens": 0,
-                        "total_tokens": 1700
-                    },
-                    "model": "gpt-5"
-                }
-            }
-        });
+        let input = load_fixture("adapters/codex_token_count.json");
 
         let event = adapter.normalize(input).unwrap().unwrap();
         assert_eq!(event.tool_name, Some("Codex".to_string()));
@@ -427,51 +409,23 @@ mod tests {
 
     #[test]
     fn test_cumulative_to_delta_conversion() {
+        use crate::test_helpers::load_fixture;
+
         let adapter = CodexAdapter::new();
 
         // First event: cumulative totals
-        let input1 = json!({
-            "timestamp": "2025-09-11T18:25:40Z",
-            "type": "event_msg",
-            "payload": {
-                "type": "token_count",
-                "info": {
-                    "total_token_usage": {
-                        "input_tokens": 1200,
-                        "cached_input_tokens": 200,
-                        "output_tokens": 500,
-                        "total_tokens": 1700
-                    },
-                    "model": "gpt-5"
-                }
-            }
-        });
-
+        let input1 = load_fixture("adapters/codex_cumulative_1.json");
         let event1 = adapter.normalize(input1).unwrap().unwrap();
         let response1 = event1.tool_response.unwrap();
         assert_eq!(response1.get("input_tokens").unwrap().as_u64(), Some(1200));
         assert_eq!(response1.get("output_tokens").unwrap().as_u64(), Some(500));
 
         // Second event: new cumulative totals (should compute delta)
-        let input2 = json!({
-            "timestamp": "2025-09-11T18:26:00Z",
-            "type": "event_msg",
-            "payload": {
-                "type": "token_count",
-                "info": {
-                    "total_token_usage": {
-                        "input_tokens": 2000,  // +800
-                        "cached_input_tokens": 300,  // +100
-                        "output_tokens": 800,  // +300
-                        "total_tokens": 2800
-                    },
-                    "model": "gpt-5"
-                }
-            }
-        });
-
+        let input2 = load_fixture("adapters/codex_cumulative_2.json");
         let event2 = adapter.normalize(input2).unwrap().unwrap();
         let response2 = event2.tool_response.unwrap();
+
+        // Deltas: 2000-1200=800, 300-200=100, 800-500=300
         assert_eq!(response2.get("input_tokens").unwrap().as_u64(), Some(800));
         assert_eq!(
             response2.get("cached_input_tokens").unwrap().as_u64(),
@@ -482,22 +436,10 @@ mod tests {
 
     #[test]
     fn test_legacy_fallback_model() {
+        use crate::test_helpers::load_fixture;
+
         let adapter = CodexAdapter::new();
-        let input = json!({
-            "timestamp": "2025-09-15T13:00:00Z",
-            "type": "event_msg",
-            "payload": {
-                "type": "token_count",
-                "info": {
-                    "total_token_usage": {
-                        "input_tokens": 5000,
-                        "output_tokens": 1000,
-                        "total_tokens": 6000
-                    }
-                }
-                // NO model field
-            }
-        });
+        let input = load_fixture("adapters/codex_legacy_fallback.json");
 
         let event = adapter.normalize(input).unwrap().unwrap();
         assert_eq!(event.fallback_used, Some(true));
