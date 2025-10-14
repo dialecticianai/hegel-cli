@@ -277,7 +277,7 @@ cat .hegel/command_log.jsonl
 - The reason from guardrails.yaml
 - Path to edit rules
 
-## Phase 4 Tools
+## Advanced Tools
 
 ### AST-based Code Transformation
 

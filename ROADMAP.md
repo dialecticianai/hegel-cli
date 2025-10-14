@@ -125,48 +125,6 @@
 
 ## Phase 2: Safety and Orchestration
 
-### 2.1 Command Wrapping with Guardrails
-
-**Goal:** Safety wrappers around dangerous commands (`hegel git`, `hegel docker`).
-
-**Approach:** Config-based rules engine with hard blocks (no interactive prompts - agents can't handle them).
-
-**Commands:**
-- `hegel git <args>` - Wrap git with safety rules
-- `hegel docker <args>` - Wrap docker with safety rules
-- Extensible to other commands (npm, cargo, etc.)
-
-**Rules engine:**
-```yaml
-# .hegel/guardrails.yaml
-git:
-  blocked:
-    - pattern: "clean -fd"
-      reason: "Destructive: removes untracked files/directories"
-    - pattern: "commit.*--no-verify"
-      reason: "Bypasses pre-commit hooks"
-    - pattern: "push.*--force"
-      reason: "Force push to main/master blocked"
-
-  allowed:
-    - "status"
-    - "log"
-    - "diff"
-    - "add"
-    - "commit" # Without --no-verify
-
-docker:
-  blocked:
-    - pattern: "rm -f"
-      reason: "Force remove containers blocked"
-```
-
-**Behavior:**
-- Match command against rules
-- If blocked: Exit with error + reason
-- If allowed: Pass through to underlying command
-- Log all invocations to `.hegel/command_log.jsonl`
-
 ### 2.2 Mode-Specific Subagents
 
 **Goal:** Integration with platform subagent features (Claude Code Task tool, Cursor agent spawning, etc.)
