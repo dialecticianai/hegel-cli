@@ -102,7 +102,40 @@
 
 **Goal:** Integration with platform subagent features (Claude Code Task tool, Cursor agent spawning, etc.)
 
-**Features:**
+**Priority use case:** AST-grep pattern library for systematic refactoring
+
+**Initial implementation - `ast-grep` subagent:**
+- **Problem**: `ast-grep` is too niche for LLM training data, pattern syntax is domain-specific
+- **Solution**: Few-shot learning subagent with pattern library
+- **Structure**:
+  - Store working patterns in `.hegel/astq_patterns/` (or similar)
+  - Each pattern includes: tree-sitter query, description, example matches
+  - Subagent loads patterns + ast-grep docs from `.webcache/` as context
+  - Iterative refinement: test pattern → check results → adjust → repeat
+
+**Example pattern library format:**
+```yaml
+rust:
+  method_chains:
+    - pattern: "$OBJ.cyan()"
+      description: "Match .cyan() method calls on any expression"
+      example_file: "examples/color_methods.rs"
+      matches:
+        - '"text".cyan()'
+        - 'format!("{}", x).cyan()'
+        - 'my_var.cyan()'
+```
+
+**Workflow:**
+1. User: "Refactor all `.cyan()` to `Theme::highlight()`"
+2. Hegel spawns ast-grep subagent with pattern library context
+3. Subagent crafts/tests patterns iteratively
+4. Returns working pattern + match list
+5. User approves → Hegel applies rewrite
+
+**Infrastructure compounding:** Pattern library grows with each refactoring, making future refactors faster.
+
+**General subagent features:**
 - Detect when platform supports subagents
 - Provide workflow-aware context to subagents
 - Guide injection already handles phase-specific context
@@ -110,7 +143,7 @@
 
 **Implementation:**
 - Detection: Check for agent capabilities via env vars or config
-- Context: Current workflow phase + relevant guides
+- Context: Current workflow phase + relevant guides + specialized libraries
 - Metrics: Log subagent spawns to hooks.jsonl
 
 ### 2.3 External Agent Orchestration
