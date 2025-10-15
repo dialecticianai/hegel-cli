@@ -1,0 +1,102 @@
+# AST-grep patterns for Rust colored crate method calls
+#
+# Tested with: ast-grep 0.x (vendored in vendor/ast-grep)
+# Language: Rust
+# Purpose: Systematic refactoring of colored::Colorize methods to Theme tokens
+
+patterns:
+  # Color methods (simple)
+  - id: cyan_to_highlight
+    pattern: $X.cyan()
+    rewrite: Theme::highlight($X)
+    description: "Match .cyan() method calls on any expression"
+    theme_token: highlight
+    examples:
+      - before: '"text".cyan()'
+        after: 'Theme::highlight("text")'
+      - before: 'format!("{}", x).cyan()'
+        after: 'Theme::highlight(format!("{}", x))'
+      - before: 'my_var.cyan()'
+        after: 'Theme::highlight(my_var)'
+
+  - id: green_to_success
+    pattern: $X.green()
+    rewrite: Theme::success($X)
+    description: "Match .green() method calls"
+    theme_token: success
+    examples:
+      - before: '"OK".green()'
+        after: 'Theme::success("OK")'
+
+  - id: yellow_to_warning
+    pattern: $X.yellow()
+    rewrite: Theme::warning($X)
+    description: "Match .yellow() method calls"
+    theme_token: warning
+    examples:
+      - before: '"Warning".yellow()'
+        after: 'Theme::warning("Warning")'
+
+  - id: red_to_error
+    pattern: $X.red()
+    rewrite: Theme::error($X)
+    description: "Match .red() method calls"
+    theme_token: error
+
+  - id: bright_black_to_secondary
+    pattern: $X.bright_black()
+    rewrite: Theme::secondary($X)
+    description: "Match .bright_black() method calls"
+    theme_token: secondary
+
+  # Chained methods (.bold().cyan())
+  - id: bold_cyan_to_header
+    pattern: $X.bold().cyan()
+    rewrite: Theme::header($X)
+    description: "Match .bold().cyan() chains"
+    theme_token: header
+    note: "Apply this BEFORE simple cyan pattern to avoid partial matches"
+
+  # Just bold (context-dependent, may need manual review)
+  - id: bold_to_label
+    pattern: $X.bold()
+    rewrite: Theme::label($X)
+    description: "Match .bold() - may need manual review for context"
+    theme_token: label
+    note: "Use with caution - bold is context-dependent"
+
+# Usage instructions:
+#
+# 1. Search for matches:
+#    hegel astq -l rust -p '$X.cyan()' src/
+#
+# 2. Preview rewrite:
+#    hegel astq -l rust -p '$X.cyan()' -r 'Theme::highlight($X)' src/commands/analyze/sections.rs
+#
+# 3. Apply rewrite (with backup):
+#    cp src/file.rs src/file.rs.bak
+#    hegel astq -l rust -p '$X.cyan()' -r 'Theme::highlight($X)' --update src/file.rs
+#
+# 4. Verify with tests:
+#    cargo test
+
+# Pattern application order (important!):
+#
+# 1. Chained methods first (.bold().cyan() before .cyan())
+# 2. Specific colors (cyan, green, yellow, red)
+# 3. Generic modifiers last (.bold(), .bright_black())
+#
+# This prevents partial replacements leaving broken chains.
+
+# Metavariable syntax:
+#
+# $X - Matches any expression (literal, variable, function call, etc.)
+# $$ - Escape literal $ in pattern
+#
+# The pattern is matched against tree-sitter AST nodes, so it respects
+# Rust syntax structure (not just text search).
+
+# Testing new patterns:
+#
+# Use --debug-query to see AST structure:
+# hegel astq -l rust --debug-query=ast -p 'your_pattern' file.rs
