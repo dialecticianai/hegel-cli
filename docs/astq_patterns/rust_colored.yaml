@@ -3,30 +3,40 @@
 # Tested with: ast-grep 0.x (vendored in vendor/ast-grep)
 # Language: Rust
 # Purpose: Systematic refactoring of colored::Colorize methods to Theme tokens
+#
+# IMPORTANT LIMITATIONS:
+# - ast-grep CANNOT match code inside Rust macro invocations
+# - Pattern '$X.cyan()' works: let x = "text".cyan();
+# - Pattern '$X.cyan()' FAILS: println!("{}", "text".cyan())  <- inside macro
+# - Pattern '$X.cyan()' FAILS: format!(...).cyan()  <- macro result
+# - For comprehensive refactoring, use identifier search ('cyan') + manual review
 
 patterns:
-  # Color methods (simple)
+  # Color methods (works outside macro context only)
   - id: cyan_to_highlight
     pattern: $X.cyan()
     rewrite: Theme::highlight($X)
-    description: "Match .cyan() method calls on any expression"
+    description: "Match .cyan() when NOT inside macro invocations"
     theme_token: highlight
+    limitations: "Does NOT match code inside println!(), format!(), etc."
     examples:
-      - before: '"text".cyan()'
-        after: 'Theme::highlight("text")'
-      - before: 'format!("{}", x).cyan()'
-        after: 'Theme::highlight(format!("{}", x))'
-      - before: 'my_var.cyan()'
-        after: 'Theme::highlight(my_var)'
+      - before: 'let x = "text".cyan();'
+        after: 'let x = Theme::highlight("text");'
+      - before: 'let y = my_var.cyan();'
+        after: 'let y = Theme::highlight(my_var);'
+    non_examples:
+      - 'println!("{}", "text".cyan())  # NOT matched - inside macro'
+      - 'format!("{}", x).cyan()        # NOT matched - macro result with method'
 
   - id: green_to_success
     pattern: $X.green()
     rewrite: Theme::success($X)
-    description: "Match .green() method calls"
+    description: "Match .green() when NOT inside macro invocations"
     theme_token: success
+    limitations: "Does NOT match code inside println!(), format!(), etc."
     examples:
-      - before: '"OK".green()'
-        after: 'Theme::success("OK")'
+      - before: 'let status = "OK".green();'
+        after: 'let status = Theme::success("OK");'
 
   - id: yellow_to_warning
     pattern: $X.yellow()
@@ -67,15 +77,17 @@ patterns:
 
 # Usage instructions:
 #
-# 1. Search for matches:
-#    hegel astq -l rust -p '$X.cyan()' src/
+# RECOMMENDED WORKFLOW (due to metavariable limitations):
 #
-# 2. Preview rewrite:
-#    hegel astq -l rust -p '$X.cyan()' -r 'Theme::highlight($X)' src/commands/analyze/sections.rs
+# 1. Find ALL occurrences by method name:
+#    hegel astq -l rust -p 'cyan' src/commands/
 #
-# 3. Apply rewrite (with backup):
-#    cp src/file.rs src/file.rs.bak
-#    hegel astq -l rust -p '$X.cyan()' -r 'Theme::highlight($X)' --update src/file.rs
+# 2. For simple cases, use pattern rewrite:
+#    hegel astq -l rust -p '$X.cyan()' -r 'Theme::highlight($X)' --update-all src/file.rs
+#
+# 3. For complex cases (macros/chains), manual refactoring required:
+#    - format!(...).cyan() → Theme::highlight(format!(...))
+#    - x.to_string().cyan() → Theme::highlight(x.to_string())
 #
 # 4. Verify with tests:
 #    cargo test
@@ -90,11 +102,22 @@ patterns:
 
 # Metavariable syntax:
 #
-# $X - Matches any expression (literal, variable, function call, etc.)
+# $X - Matches any expression (literal, variable, field access, etc.)
 # $$ - Escape literal $ in pattern
 #
-# The pattern is matched against tree-sitter AST nodes, so it respects
-# Rust syntax structure (not just text search).
+# MACRO LIMITATION - ast-grep cannot see inside Rust macros:
+# - ✅ Matches: let x = "text".green();  (statement context)
+# - ✅ Matches: let x = var.green();     (statement context)
+# - ❌ Does NOT match: println!("{}", "text".green())  (inside macro)
+# - ❌ Does NOT match: format!(...).green()            (macro result)
+#
+# Why? Macros aren't expanded in the tree-sitter AST, creating an opaque boundary.
+# The pattern is matched against AST nodes, and macro internals aren't accessible.
+#
+# For finding ALL occurrences (including inside macros):
+# - Search by method name only: hegel astq -l rust -p 'green' src/
+# - This does identifier search, not AST pattern matching
+# - Then manually refactor cases inside macros
 
 # Testing new patterns:
 #

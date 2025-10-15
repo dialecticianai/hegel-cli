@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 18:06
+**Last Updated**: 2025-10-15 18:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,296 | 14,492 | 22,788 |
-| **Comments** | 1,115 | - | 1,115 |
-| **Blank Lines** | 1,482 | - | 1,482 |
-| **Total Lines** | 10,893 | 14,492 | 25,385 |
-| **Files** | 41 | 94 | 135 |
+| **Lines** | 8,324 | 14,392 | 22,716 |
+| **Comments** | 1,119 | - | 1,119 |
+| **Blank Lines** | 1,487 | - | 1,487 |
+| **Total Lines** | 10,930 | 14,392 | 25,322 |
+| **Files** | 41 | 93 | 134 |
 
-**Documentation Ratio**: 1.75 lines of docs per line of code
+**Documentation Ratio**: 1.73 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            41           1482           1115           8296
+Rust                            41           1487           1119           8324
 -------------------------------------------------------------------------------
-SUM:                            41           1482           1115           8296
+SUM:                            41           1487           1119           8324
 -------------------------------------------------------------------------------
 ```
 
@@ -42,7 +42,7 @@ SUM:                            41           1482           1115           8296
 | `adapters/mod.rs` | 120 | 120 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 261 | 261 | 0 | 0.0% | ✅ (infra) |
-| `commands/astq.rs` | 45 | 45 | 0 | 0.0% | ✅ |
+| `commands/astq.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/git.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/mod.rs` | 18 | 18 | 0 | 0.0% | ✅ |
@@ -88,7 +88,7 @@ SUM:                            41           1482           1115           8296
 | `CODE_MAP.md` | 159 |
 | `COVERAGE_REPORT.md` | 130 |
 | `DEP_REVIEW.md` | 678 |
-| `docs/astq_patterns/README.md` | 94 |
+| `docs/astq_patterns/README.md` | 127 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 92 |
@@ -96,10 +96,9 @@ SUM:                            41           1482           1115           8296
 | `guides/PLAN_WRITING.md` | 145 |
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
-| `HANDOFF.md` | 135 |
 | `HEGEL_CLAUDE.md` | 522 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 202 |
+| `LOC_REPORT.md` | 204 |
 | `README.md` | 350 |
 | `ROADMAP.md` | 215 |
 | `TESTING.md` | 41 |
@@ -185,7 +184,7 @@ SUM:                            41           1482           1115           8296
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.75 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.73 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
