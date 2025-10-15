@@ -1,5 +1,16 @@
 use crate::metrics::{PhaseMetrics, UnifiedMetrics, WorkflowDAG};
 use colored::Colorize;
+use std::fmt::Display;
+
+/// Format a numeric metric with right alignment and cyan color
+fn format_metric(value: impl Display) -> String {
+    format!("{:>10}", value).cyan().to_string()
+}
+
+/// Format a total metric with bold green styling
+fn format_total(value: impl Display) -> String {
+    format!("{:>10}", value).bold().green().to_string()
+}
 
 /// Render session information section
 pub fn render_session(metrics: &UnifiedMetrics) {
@@ -18,11 +29,11 @@ pub fn render_tokens(metrics: &UnifiedMetrics) {
     if metrics.token_metrics.assistant_turns > 0 {
         println!(
             "  Input tokens:        {}",
-            format!("{:>10}", metrics.token_metrics.total_input_tokens).cyan()
+            format_metric(metrics.token_metrics.total_input_tokens)
         );
         println!(
             "  Output tokens:       {}",
-            format!("{:>10}", metrics.token_metrics.total_output_tokens).cyan()
+            format_metric(metrics.token_metrics.total_output_tokens)
         );
         println!(
             "  Cache creation:      {}",
@@ -44,7 +55,7 @@ pub fn render_tokens(metrics: &UnifiedMetrics) {
         println!(
             "  {}            {}",
             "Total:".bold(),
-            format!("{:>10}", total_tokens).bold().green()
+            format_total(total_tokens)
         );
     } else {
         println!("  {}", "No token data found".yellow());
@@ -57,15 +68,15 @@ pub fn render_activity(metrics: &UnifiedMetrics) {
     println!("{}", "Activity".bold());
     println!(
         "  Total events:        {}",
-        format!("{:>10}", metrics.hook_metrics.total_events).cyan()
+        format_metric(metrics.hook_metrics.total_events)
     );
     println!(
         "  Bash commands:       {}",
-        format!("{:>10}", metrics.hook_metrics.bash_commands.len()).cyan()
+        format_metric(metrics.hook_metrics.bash_commands.len())
     );
     println!(
         "  File modifications:  {}",
-        format!("{:>10}", metrics.hook_metrics.file_modifications.len()).cyan()
+        format_metric(metrics.hook_metrics.file_modifications.len())
     );
     println!();
 }
@@ -119,7 +130,7 @@ pub fn render_state_transitions(metrics: &UnifiedMetrics) {
         println!("{}", "Workflow Transitions".bold());
         println!(
             "  Total transitions:   {}",
-            format!("{:>10}", metrics.state_transitions.len()).cyan()
+            format_metric(metrics.state_transitions.len())
         );
 
         if let Some(first) = metrics.state_transitions.first() {
@@ -179,7 +190,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
                     + phase.token_metrics.total_output_tokens;
                 println!(
                     "    Tokens:            {} ({} in, {} out)",
-                    format!("{:>10}", total_tokens).cyan(),
+                    format_metric(total_tokens),
                     phase.token_metrics.total_input_tokens,
                     phase.token_metrics.total_output_tokens
                 );
@@ -197,9 +208,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
                 if phase.bash_commands.is_empty() {
                     "-".bright_black().to_string()
                 } else {
-                    format!("{:>10}", phase.bash_commands.len())
-                        .cyan()
-                        .to_string()
+                    format_metric(phase.bash_commands.len())
                 }
             );
             println!(
@@ -207,9 +216,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
                 if phase.file_modifications.is_empty() {
                     "-".bright_black().to_string()
                 } else {
-                    format!("{:>10}", phase.file_modifications.len())
-                        .cyan()
-                        .to_string()
+                    format_metric(phase.file_modifications.len())
                 }
             );
         }

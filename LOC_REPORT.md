@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 17:30
+**Last Updated**: 2025-10-15 17:39
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,248 | 14,229 | 22,477 |
+| **Lines** | 8,222 | 14,229 | 22,451 |
 | **Comments** | 1,085 | - | 1,085 |
-| **Blank Lines** | 1,457 | - | 1,457 |
-| **Total Lines** | 10,790 | 14,229 | 25,019 |
+| **Blank Lines** | 1,456 | - | 1,456 |
+| **Total Lines** | 10,763 | 14,229 | 24,992 |
 | **Files** | 40 | 92 | 132 |
 
 **Documentation Ratio**: 1.73 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            40           1457           1085           8248
+Rust                            40           1456           1085           8222
 -------------------------------------------------------------------------------
-SUM:                            40           1457           1085           8248
+SUM:                            40           1456           1085           8222
 -------------------------------------------------------------------------------
 ```
 
@@ -37,17 +37,17 @@ SUM:                            40           1457           1085           8248
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
-| `adapters/codex.rs` | 499 | 318 | 181 | 36.3% | ⚠️ Large |
+| `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ⚠️ Large |
 | `adapters/cursor.rs` | 308 | 157 | 151 | 49.0% | ✅ |
 | `adapters/mod.rs` | 120 | 120 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
-| `commands/analyze/sections.rs` | 253 | 253 | 0 | 0.0% | ⚠️ Large |
+| `commands/analyze/sections.rs` | 260 | 260 | 0 | 0.0% | ⚠️ Large |
 | `commands/astq.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/git.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/mod.rs` | 18 | 18 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 703 | 256 | 447 | 63.6% | ⚠️ Large |
+| `commands/workflow.rs` | 702 | 255 | 447 | 63.7% | ⚠️ Large |
 | `commands/wrapped.rs` | 128 | 64 | 64 | 50.0% | ✅ |
 | `engine/mod.rs` | 728 | 136 | 592 | 81.3% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |

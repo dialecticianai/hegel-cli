@@ -46,62 +46,29 @@ impl CodexAdapter {
         }
     }
 
+    /// Try extracting a non-empty string field from a JSON path
+    fn try_extract_field(value: &serde_json::Value, path: &[&str]) -> Option<String> {
+        let mut current = value;
+        for &key in path {
+            current = current.get(key)?;
+        }
+        let s = current.as_str()?;
+        if s.trim().is_empty() {
+            None
+        } else {
+            Some(s.to_string())
+        }
+    }
+
     /// Extract model name from nested payload structures
-    /// Checks 9 locations in priority order (per ccusage data-loader.ts:109-158)
+    /// Checks 5 locations in priority order (per ccusage data-loader.ts:109-158)
     fn extract_model(payload: &serde_json::Value) -> Option<String> {
-        // Priority 1: payload.info.model
-        if let Some(model) = payload
-            .get("info")
-            .and_then(|i| i.get("model"))
-            .and_then(|m| m.as_str())
-            .and_then(|s| if s.trim().is_empty() { None } else { Some(s) })
-        {
-            return Some(model.to_string());
-        }
-
-        // Priority 2: payload.info.model_name
-        if let Some(model) = payload
-            .get("info")
-            .and_then(|i| i.get("model_name"))
-            .and_then(|m| m.as_str())
-            .and_then(|s| if s.trim().is_empty() { None } else { Some(s) })
-        {
-            return Some(model.to_string());
-        }
-
-        // Priority 3: payload.info.metadata.model
-        if let Some(model) = payload
-            .get("info")
-            .and_then(|i| i.get("metadata"))
-            .and_then(|m| m.get("model"))
-            .and_then(|m| m.as_str())
-            .and_then(|s| if s.trim().is_empty() { None } else { Some(s) })
-        {
-            return Some(model.to_string());
-        }
-
-        // Priority 4: payload.model
-        if let Some(model) = payload.get("model").and_then(|m| m.as_str()).and_then(|s| {
-            if s.trim().is_empty() {
-                None
-            } else {
-                Some(s)
-            }
-        }) {
-            return Some(model.to_string());
-        }
-
-        // Priority 5: payload.metadata.model
-        if let Some(model) = payload
-            .get("metadata")
-            .and_then(|m| m.get("model"))
-            .and_then(|m| m.as_str())
-            .and_then(|s| if s.trim().is_empty() { None } else { Some(s) })
-        {
-            return Some(model.to_string());
-        }
-
-        None
+        // Priority order from most to least specific
+        Self::try_extract_field(payload, &["info", "model"])
+            .or_else(|| Self::try_extract_field(payload, &["info", "model_name"]))
+            .or_else(|| Self::try_extract_field(payload, &["info", "metadata", "model"]))
+            .or_else(|| Self::try_extract_field(payload, &["model"]))
+            .or_else(|| Self::try_extract_field(payload, &["metadata", "model"]))
     }
 
     /// Normalize raw usage structure, handling field aliases

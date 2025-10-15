@@ -38,6 +38,14 @@ impl ClaimAlias {
     }
 }
 
+/// Render a workflow node's prompt with guide templates
+fn render_node_prompt(prompt: &str) -> Result<String> {
+    let guides_dir = Path::new("guides");
+    let context = HashMap::new(); // Empty context for now
+    render_template(prompt, guides_dir, &context)
+        .with_context(|| "Failed to render prompt template")
+}
+
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
     use chrono::Utc;
 
@@ -58,10 +66,7 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
         .with_context(|| format!("Node not found: {}", current_node))?;
 
     // Render prompt with guides
-    let guides_dir = Path::new("guides");
-    let context = HashMap::new(); // Empty context for now
-    let rendered_prompt = render_template(&node.prompt, guides_dir, &context)
-        .with_context(|| "Failed to render prompt template")?;
+    let rendered_prompt = render_node_prompt(&node.prompt)?;
 
     // Store state
     let state = State {
@@ -111,10 +116,7 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
         get_next_prompt(&workflow, workflow_state, &claims, storage.state_dir())?;
 
     // Render prompt with guides
-    let guides_dir = Path::new("guides");
-    let context = HashMap::new(); // Empty context for now
-    let rendered_prompt = render_template(&prompt_text, guides_dir, &context)
-        .with_context(|| "Failed to render prompt template")?;
+    let rendered_prompt = render_node_prompt(&prompt_text)?;
 
     // Save updated state (preserve session_metadata from loaded state)
     let updated_state = State {
@@ -235,10 +237,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
         .with_context(|| format!("Current node not found: {}", current_node))?;
 
     // Render prompt with guides
-    let guides_dir = Path::new("guides");
-    let context = HashMap::new(); // Empty context for now
-    let rendered_prompt = render_template(&node.prompt, guides_dir, &context)
-        .with_context(|| "Failed to render prompt template")?;
+    let rendered_prompt = render_node_prompt(&node.prompt)?;
 
     // Display output
     println!("{}", "Re-displaying current prompt".yellow());
