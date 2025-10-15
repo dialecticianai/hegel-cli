@@ -163,18 +163,18 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
         println!("{}", "Phase Breakdown".bold());
         for phase in phase_metrics {
             let status = if phase.end_time.is_none() {
-                "active".green()
+                Theme::success("active")
             } else {
-                "completed".bright_black()
+                Theme::secondary("completed")
             };
 
             // Format duration
             let duration_str = if phase.duration_seconds > 0 {
                 let minutes = phase.duration_seconds / 60;
                 let seconds = phase.duration_seconds % 60;
-                format!("{}m {:02}s", minutes, seconds).cyan().to_string()
+                Theme::highlight(format!("{}m {:02}s", minutes, seconds)).to_string()
             } else {
-                "-".bright_black().to_string()
+                Theme::secondary("-").to_string()
             };
 
             println!();

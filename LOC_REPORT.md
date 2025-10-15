@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 17:51
+**Last Updated**: 2025-10-15 18:06
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,296 | 14,229 | 22,525 |
+| **Lines** | 8,296 | 14,492 | 22,788 |
 | **Comments** | 1,115 | - | 1,115 |
 | **Blank Lines** | 1,482 | - | 1,482 |
-| **Total Lines** | 10,893 | 14,229 | 25,122 |
-| **Files** | 41 | 92 | 133 |
+| **Total Lines** | 10,893 | 14,492 | 25,385 |
+| **Files** | 41 | 94 | 135 |
 
-**Documentation Ratio**: 1.72 lines of docs per line of code
+**Documentation Ratio**: 1.75 lines of docs per line of code
 
 ---
 
@@ -88,6 +88,7 @@ SUM:                            41           1482           1115           8296
 | `CODE_MAP.md` | 159 |
 | `COVERAGE_REPORT.md` | 130 |
 | `DEP_REVIEW.md` | 678 |
+| `docs/astq_patterns/README.md` | 94 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 92 |
@@ -95,11 +96,12 @@ SUM:                            41           1482           1115           8296
 | `guides/PLAN_WRITING.md` | 145 |
 | `guides/README_WRITING.md` | 138 |
 | `guides/SPEC_WRITING.md` | 111 |
+| `HANDOFF.md` | 135 |
 | `HEGEL_CLAUDE.md` | 522 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 201 |
+| `LOC_REPORT.md` | 202 |
 | `README.md` | 350 |
-| `ROADMAP.md` | 182 |
+| `ROADMAP.md` | 215 |
 | `TESTING.md` | 41 |
 | `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
 | `vendor/ast-grep/.github/copilot-instructions.md` | 135 |
@@ -183,7 +185,7 @@ SUM:                            41           1482           1115           8296
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.72 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.75 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
