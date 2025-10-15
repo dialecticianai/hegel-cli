@@ -72,6 +72,13 @@
 
 ## Critical Patterns
 
+**Code search: hegel astq > grep**: ALWAYS use `hegel astq -l rust -p 'identifier' src/` for code search, NOT grep/rg. Why:
+- AST-aware: finds only actual code usage, ignores comments/strings/docs
+- Context-aware: understands Rust syntax structure
+- Agent-friendly: provides "No matches found" feedback vs silent failure
+- Example: `hegel astq -l rust -p 'green' src/` finds all `.green()` calls
+- Only use grep for non-code searches (logs, markdown content, etc.)
+
 **Scripts over inline commands**: NEVER write multi-line inline shell scripts. Always write to `scripts/` and execute. Check `scripts/` before writing - tool may already exist. Reusable scripts are infrastructure.
 
 **Test helpers**: `src/test_helpers.rs` - `create_{hooks,transcript,states}_file()` compress boilerplate.
