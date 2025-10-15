@@ -13,7 +13,6 @@ mod test_helpers;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use colored::Colorize;
 use storage::FileStorage;
 use theme::Theme;
 
@@ -96,25 +95,29 @@ enum Commands {
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // If no command provided, show the coming soon message
+    // If no command provided, output HEGEL_CLAUDE.md for LLM onboarding
     if cli.command.is_none() {
-        println!(
-            "{}",
-            Theme::header("Hegel - Dialectic-Driven Development CLI")
-        );
-        println!();
-        println!(
-            "{}",
-            "Thesis. Antithesis. Synthesis.".italic().bright_white()
-        );
-        println!();
-        println!("{}", Theme::warning("Coming soon..."));
-        println!();
-        println!(
-            "{} {}",
-            "Learn more at:".white(),
-            "https://dialectician.ai".bright_blue().underline()
-        );
+        let guide_path = std::path::Path::new("HEGEL_CLAUDE.md");
+        match std::fs::read_to_string(guide_path) {
+            Ok(contents) => {
+                println!("{}", contents);
+            }
+            Err(_) => {
+                // Fallback if HEGEL_CLAUDE.md not found
+                println!(
+                    "{}",
+                    Theme::header("Hegel - Dialectic-Driven Development CLI")
+                );
+                println!();
+                println!(
+                    "{}",
+                    Theme::warning("HEGEL_CLAUDE.md not found in current directory")
+                );
+                println!();
+                println!("Run hegel from the project root directory, or use:");
+                println!("  hegel --help    Show available commands");
+            }
+        }
         return Ok(());
     }
 

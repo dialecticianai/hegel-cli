@@ -30,14 +30,16 @@ fn stderr(output: &std::process::Output) -> String {
 }
 
 #[test]
-fn test_no_command_shows_coming_soon() {
+fn test_no_command_shows_hegel_claude_guide() {
     let output = run_hegel(&[], None);
 
     let out = stdout(&output);
-    assert!(out.contains("Hegel - Dialectic-Driven Development CLI"));
-    assert!(out.contains("Thesis. Antithesis. Synthesis."));
-    assert!(out.contains("Coming soon..."));
-    assert!(out.contains("https://dialectician.ai"));
+    // Should output HEGEL_CLAUDE.md content for LLM onboarding
+    assert!(out.contains("Hegel") || out.contains("HEGEL_CLAUDE.md not found"));
+    // If guide exists, should contain key sections
+    if !out.contains("HEGEL_CLAUDE.md not found") {
+        assert!(out.contains("Workflow") || out.contains("CLI"));
+    }
 }
 
 #[test]

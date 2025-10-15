@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-15 18:42
+**Last Updated**: 2025-10-15 18:44
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.08%** lines | **90.90%** regions | **87.71%** functions
+**Overall Coverage**: **91.86%** lines | **90.80%** regions | **87.71%** functions
 
 ## Summary
 
 ```
-TOTAL                              10862               988    90.90%         586                72    87.71%        6688               530    92.08%           0                 0         -
+TOTAL                              10858               999    90.80%         586                72    87.71%        6694               545    91.86%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -30,7 +30,7 @@ TOTAL                              10862               988    90.90%         586
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `main.rs` | 72.34% | 62.00% | 100.00% | 🟡 Good |
+| `main.rs` | 47.17% | 48.96% | 100.00% | 🟠 Moderate |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
@@ -82,7 +82,6 @@ TOTAL                              10862               988    90.90%         586
 - `tui/utils.rs` - 96.60%
 
 ### 🟡 Good (70-89% lines)
-- `main.rs` - 72.34%
 - `storage/mod.rs` - 83.64%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
@@ -90,6 +89,7 @@ TOTAL                              10862               988    90.90%         586
 
 ### 🟠 Moderate (40-69% lines)
 - `adapters/mod.rs` - 60.71%
+- `main.rs` - 47.17%
 - `theme.rs` - 65.00%
 
 ### 🔴 Needs Work (<40% lines)
@@ -103,7 +103,7 @@ TOTAL                              10862               988    90.90%         586
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.08% | ✅ Met |
+| Overall | ≥80% | 91.86% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
