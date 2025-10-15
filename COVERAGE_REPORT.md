@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-14 19:46
+**Last Updated**: 2025-10-15 17:30
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.60%** lines | **91.43%** regions | **87.52%** functions
+**Overall Coverage**: **92.60%** lines | **91.47%** regions | **87.67%** functions
 
 ## Summary
 
 ```
-TOTAL                              10687               916    91.43%         569                71    87.52%        6552               485    92.60%           0                 0         -
+TOTAL                              10811               922    91.47%         576                71    87.67%        6624               490    92.60%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -24,15 +24,15 @@ TOTAL                              10687               916    91.43%         569
 | `commands/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `commands/workflow.rs` | 89.88% | 88.17% | 80.56% | 🟡 Good |
+| `commands/workflow.rs` | 90.49% | 89.33% | 83.72% | 🟢 Excellent |
 | `commands/wrapped.rs` | 38.46% | 40.72% | 40.00% | 🔴 Needs Work |
-| `engine/mod.rs` | 99.80% | 99.41% | 96.77% | 🟢 Excellent |
+| `engine/mod.rs` | 99.80% | 99.42% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `main.rs` | 73.91% | 64.65% | 100.00% | 🟡 Good |
+| `main.rs` | 72.34% | 63.11% | 100.00% | 🟡 Good |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
-| `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
+| `metrics/graph.rs` | 99.20% | 98.51% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `metrics/mod.rs` | 96.99% | 96.40% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -60,6 +60,7 @@ TOTAL                              10687               916    91.43%         569
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.46%
 - `commands/hook.rs` - 96.64%
+- `commands/workflow.rs` - 90.49%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
 - `guardrails/parser.rs` - 97.78%
@@ -80,8 +81,7 @@ TOTAL                              10687               916    91.43%         569
 - `tui/utils.rs` - 96.60%
 
 ### 🟡 Good (70-89% lines)
-- `commands/workflow.rs` - 89.88%
-- `main.rs` - 73.91%
+- `main.rs` - 72.34%
 - `storage/mod.rs` - 83.64%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%

@@ -47,23 +47,20 @@ hegel start execution    # For production delivery
 
 ### Advancing Through Phases
 
-After completing a phase, make claims to advance:
+Use these ergonomic commands to navigate the workflow:
 
 ```bash
-# Completed SPEC phase
-hegel next '{"spec_complete": true}'
+# Happy path: advance to next phase
+hegel next
 
-# Completed PLAN phase
-hegel next '{"plan_complete": true}'
-
-# Completed implementation
-hegel next '{"code_complete": true}'
-
-# Restart cycle (back to SPEC)
-hegel next '{"restart_cycle": true}'
+# Restart workflow cycle (back to SPEC)
+hegel restart
 ```
 
-**Best practice:** Always check what claims are available in the workflow prompt before calling `next`.
+**How it works:**
+- `hegel next` automatically infers the completion claim for the current phase
+- `hegel restart` always returns to the SPEC phase (universal across all workflows)
+- No manual claim construction needed for common workflows
 
 ### Checking Workflow Status
 
@@ -320,10 +317,10 @@ hegel analyze  # One-shot summary
 
 ```bash
 # Completed current phase
-hegel next '{"phase_complete": true}'
+hegel next
 
 # User requests to restart cycle
-hegel next '{"restart_cycle": true}'
+hegel restart
 ```
 
 ### Reviewing Artifacts
@@ -463,14 +460,15 @@ Error: "⛔ Command blocked by guardrails"
 2. Edit rules: Modify `.hegel/guardrails.yaml` if block is incorrect
 3. Use alternative command: Find non-destructive alternative
 
-### Invalid Claims
+### No Transition Available
 
-Error: "No matching transition"
+Error: "Stayed at current node" when expecting to advance
 
 **Solution:**
 - Check current phase: `hegel status`
-- Review available claims in the workflow prompt
-- Use correct claim name (exact match required)
+- Verify you're not at a terminal node (e.g., "done")
+- Use `hegel restart` to return to SPEC if you want to restart the cycle
+- For custom workflows with special transitions, the user may need to teach you about custom claims
 
 ---
 
@@ -497,7 +495,8 @@ Error: "No matching transition"
 ```bash
 # Workflow
 hegel start <workflow>          # Start workflow
-hegel next '{"claim": true}'    # Advance phase
+hegel next                      # Advance to next phase
+hegel restart                   # Restart cycle (back to SPEC)
 hegel status                    # Check state
 hegel repeat                    # Re-show prompt
 hegel reset                     # Clear state

@@ -34,13 +34,16 @@ enum Commands {
         /// Workflow name (e.g., discovery, execution)
         workflow: String,
     },
-    /// Get next prompt based on claims
+    /// Advance to next phase (implicit: current_complete=true, or provide custom claims)
     Next {
-        /// Claims as JSON string (e.g., '{"spec_complete": true}')
-        claims: String,
+        /// Optional claims as JSON string (e.g., '{"spec_complete": true}')
+        /// If omitted, uses happy-path claim: {"{current}_complete": true}
+        claims: Option<String>,
     },
-    /// Re-display current node prompt (without advancing state)
+    /// Repeat current phase (claim: current_complete=false)
     Repeat,
+    /// Restart workflow cycle (claim: restart_cycle=true)
+    Restart,
     /// Show current workflow status
     Status,
     /// Reset workflow state
@@ -123,10 +126,13 @@ fn main() -> Result<()> {
             commands::start_workflow(&workflow, &storage)?;
         }
         Commands::Next { claims } => {
-            commands::next_prompt(&claims, &storage)?;
+            commands::next_prompt(claims.as_deref(), &storage)?;
         }
         Commands::Repeat => {
             commands::repeat_prompt(&storage)?;
+        }
+        Commands::Restart => {
+            commands::restart_workflow(&storage)?;
         }
         Commands::Status => {
             commands::show_status(&storage)?;

@@ -6,6 +6,38 @@ use std::path::Path;
 use crate::engine::{get_next_prompt, init_state, load_workflow, render_template};
 use crate::storage::{FileStorage, State};
 
+/// Claim aliases for ergonomic workflow transitions
+#[derive(Debug, Clone, PartialEq)]
+pub enum ClaimAlias {
+    /// Happy-path: {"{current_node}_complete": true}
+    Next,
+    /// Repeat current phase: {"{current_node}_complete": false}
+    Repeat,
+    /// Restart workflow cycle: {"restart_cycle": true}
+    Restart,
+    /// Custom claim JSON
+    Custom(String),
+}
+
+impl ClaimAlias {
+    /// Convert claim alias to HashMap for engine consumption
+    pub fn to_claims(&self, current_node: &str) -> Result<HashMap<String, bool>> {
+        match self {
+            Self::Next => Ok(HashMap::from([(
+                format!("{}_complete", current_node),
+                true,
+            )])),
+            Self::Repeat => Ok(HashMap::from([(
+                format!("{}_complete", current_node),
+                false,
+            )])),
+            Self::Restart => Ok(HashMap::from([("restart_cycle".to_string(), true)])),
+            Self::Custom(json) => serde_json::from_str(json)
+                .context("Failed to parse claims JSON. Expected format: {\"claim_name\": true}"),
+        }
+    }
+}
+
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
     use chrono::Utc;
 
@@ -51,7 +83,8 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     Ok(())
 }
 
-pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
+/// Core workflow advancement logic used by next, repeat, and restart
+fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()> {
     // Load current state
     let state = storage.load()?;
 
@@ -69,9 +102,8 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     let workflow =
         serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
 
-    // Parse claims from JSON string
-    let claims: HashMap<String, bool> = serde_json::from_str(claims_str)
-        .context("Failed to parse claims JSON. Expected format: {\"claim_name\": true}")?;
+    // Convert alias to claims
+    let claims = claim_alias.to_claims(&workflow_state.current_node)?;
 
     // Get next prompt (pass state_dir for rule evaluation)
     let previous_node = workflow_state.current_node.clone();
@@ -122,6 +154,14 @@ pub fn next_prompt(claims_str: &str, storage: &FileStorage) -> Result<()> {
     println!("{}", rendered_prompt);
 
     Ok(())
+}
+
+pub fn next_prompt(claims_str: Option<&str>, storage: &FileStorage) -> Result<()> {
+    let claim_alias = match claims_str {
+        Some(json) => ClaimAlias::Custom(json.to_string()),
+        None => ClaimAlias::Next,
+    };
+    advance_workflow(claim_alias, storage)
 }
 
 pub fn show_status(storage: &FileStorage) -> Result<()> {
@@ -210,6 +250,10 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
+pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
+    advance_workflow(ClaimAlias::Restart, storage)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -249,7 +293,7 @@ mod tests {
     fn test_next_prompt_successful_transition() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert_state_eq(
             &storage.load().unwrap(),
             "plan",
@@ -262,14 +306,14 @@ mod tests {
     fn test_next_prompt_no_matching_transition() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"wrong_claim": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
         assert_state_eq(&storage.load().unwrap(), "spec", "discovery", &["spec"]);
     }
 
     #[test]
     fn test_next_prompt_no_workflow_loaded() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
-        let result = next_prompt(r#"{"spec_complete": true}"#, &storage);
+        let result = next_prompt(Some(r#"{"spec_complete": true}"#), &storage);
         assert!(
             result.is_err()
                 && result
@@ -283,7 +327,7 @@ mod tests {
     fn test_next_prompt_invalid_json() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        let result = next_prompt("not valid json", &storage);
+        let result = next_prompt(Some("not valid json"), &storage);
         assert!(
             result.is_err()
                 && result
@@ -297,14 +341,14 @@ mod tests {
     fn test_next_prompt_multiple_transitions() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert_state_eq(
             &storage.load().unwrap(),
             "plan",
             "discovery",
             &["spec", "plan"],
         );
-        next_prompt(r#"{"plan_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"plan_complete": true}"#), &storage).unwrap();
         assert_state_eq(
             &storage.load().unwrap(),
             "done",
@@ -332,7 +376,7 @@ mod tests {
     fn test_show_status_after_transitions() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert!(show_status(&storage).is_ok());
         assert_state_eq(
             &storage.load().unwrap(),
@@ -392,7 +436,7 @@ mod tests {
     fn test_reset_then_start_new_workflow() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         reset_workflow(&storage).unwrap();
         start_workflow("discovery", &storage).unwrap();
         assert_state_eq(&storage.load().unwrap(), "spec", "discovery", &["spec"]);
@@ -405,14 +449,14 @@ mod tests {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         assert_state_eq(&storage.load().unwrap(), "spec", "discovery", &["spec"]);
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert_state_eq(
             &storage.load().unwrap(),
             "plan",
             "discovery",
             &["spec", "plan"],
         );
-        next_prompt(r#"{"plan_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"plan_complete": true}"#), &storage).unwrap();
         assert_state_eq(
             &storage.load().unwrap(),
             "done",
@@ -427,7 +471,7 @@ mod tests {
     fn test_next_prompt_logs_state_transition() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
         assert_eq!(event["from_node"], "spec");
         assert_eq!(event["to_node"], "plan");
@@ -439,8 +483,8 @@ mod tests {
     fn test_next_prompt_logs_multiple_transitions() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
-        next_prompt(r#"{"plan_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
+        next_prompt(Some(r#"{"plan_complete": true}"#), &storage).unwrap();
         let events = read_jsonl_all(&storage.state_dir().join("states.jsonl"));
         assert_eq!(events.len(), 2);
         assert_eq!(events[0]["from_node"], "spec");
@@ -453,7 +497,7 @@ mod tests {
     fn test_next_prompt_no_log_when_no_transition() {
         let (_temp_dir, storage, _guard) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
-        next_prompt(r#"{"wrong_claim": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
         assert_eq!(
             count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
             0
@@ -474,7 +518,7 @@ mod tests {
             .as_ref()
             .unwrap()
             .clone();
-        next_prompt(r#"{"spec_complete": true}"#, &storage).unwrap();
+        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
         assert_eq!(event["workflow_id"], workflow_id.as_str());
     }
@@ -531,6 +575,70 @@ mod tests {
             count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
             0
         );
+    }
+
+    // ========== Implicit Next Tests ==========
+
+    #[test]
+    fn test_next_prompt_implicit_happy_path() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        // Omit claims - should infer {"spec_complete": true}
+        next_prompt(None, &storage).unwrap();
+        assert_state_eq(
+            &storage.load().unwrap(),
+            "plan",
+            "discovery",
+            &["spec", "plan"],
+        );
+    }
+
+    #[test]
+    fn test_next_prompt_implicit_multiple_transitions() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        next_prompt(None, &storage).unwrap(); // spec -> plan
+        next_prompt(None, &storage).unwrap(); // plan -> done
+        assert_state_eq(
+            &storage.load().unwrap(),
+            "done",
+            "discovery",
+            &["spec", "plan", "done"],
+        );
+    }
+
+    // ========== Restart Workflow Tests ==========
+
+    #[test]
+    fn test_restart_workflow_returns_to_spec() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        start_workflow("discovery", &storage).unwrap();
+        next_prompt(None, &storage).unwrap(); // spec -> plan
+        assert_state_eq(
+            &storage.load().unwrap(),
+            "plan",
+            "discovery",
+            &["spec", "plan"],
+        );
+
+        restart_workflow(&storage).unwrap(); // plan -> spec
+        assert_state_eq(
+            &storage.load().unwrap(),
+            "spec",
+            "discovery",
+            &["spec", "plan", "spec"],
+        );
+    }
+
+    #[test]
+    fn test_restart_workflow_no_workflow_loaded() {
+        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let result = restart_workflow(&storage);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("No workflow loaded"));
     }
 
     // ========== Production Workflow Tests ==========

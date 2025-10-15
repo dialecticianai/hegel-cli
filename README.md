@@ -35,18 +35,29 @@ Available workflows:
 
 ### Advancing Through Phases
 
-Transition to the next phase by providing claims:
+Hegel provides ergonomic commands for common workflow transitions:
+
+```bash
+# Happy path: advance to next phase
+hegel next
+
+# Repeat current phase (e.g., after addressing feedback)
+hegel repeat
+
+# Restart workflow cycle (return to SPEC phase)
+hegel restart
+```
+
+**Advanced usage:**
+
+For custom transitions, provide explicit claims:
 
 ```bash
 hegel next '{"spec_complete": true}'
+hegel next '{"custom_claim": true}'
 ```
 
-Common claims:
-- `spec_complete` - SPEC phase finished
-- `plan_complete` - PLAN phase finished
-- `code_complete` - Implementation finished
-- `learnings_complete` - LEARNINGS documented
-- `restart_cycle` - Return to SPEC phase
+The `next` command automatically infers the happy-path claim (`{"{current_phase}_complete": true}`) when no claim is provided
 
 ### Checking Status
 

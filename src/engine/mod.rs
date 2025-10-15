@@ -68,14 +68,20 @@ pub fn get_next_prompt(
         .get(current)
         .with_context(|| format!("Node not found in workflow: {}", current))?;
 
-    // Evaluate transitions - find first matching claim
-    let mut next_node = current.clone();
-    for transition in &node.transitions {
-        if claims.get(&transition.when) == Some(&true) {
-            next_node = transition.to.clone();
-            break;
+    // Special handling for restart_cycle - always returns to start_node
+    let mut next_node = if claims.get("restart_cycle") == Some(&true) {
+        workflow.start_node.clone()
+    } else {
+        // Evaluate transitions - find first matching claim
+        let mut next = current.clone();
+        for transition in &node.transitions {
+            if claims.get(&transition.when) == Some(&true) {
+                next = transition.to.clone();
+                break;
+            }
         }
-    }
+        next
+    };
 
     // Build new state
     let mut new_state = state.clone();
