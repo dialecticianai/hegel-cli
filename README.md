@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="hegel.png" alt="Hegel Logo" width="200">
+</p>
+
 # Hegel - Dialectic-Driven Development CLI
 
 **Thesis. Antithesis. Synthesis.**
