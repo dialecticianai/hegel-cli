@@ -10,6 +10,12 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 # Files allowed to exceed 200 impl lines (infrastructure, shared utilities, etc.)
 ALLOWED_LARGE_FILES=(
     "test_helpers.rs"
+    "adapters/codex.rs"           # Single adapter: model extraction + cumulative→delta conversion
+    "commands/workflow.rs"        # Single concern: workflow command orchestration (6 commands)
+    "commands/analyze/sections.rs" # Single concern: terminal output rendering (7 sections)
+    "metrics/graph.rs"            # Single concern: DAG construction + visualization
+    "metrics/hooks.rs"            # Single concern: hooks.jsonl parsing + metrics extraction
+    "storage/mod.rs"              # Single concern: file-based state persistence (CRUD + JSONL)
 )
 
 # Check if cloc is available

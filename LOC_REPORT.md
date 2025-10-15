@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 17:39
+**Last Updated**: 2025-10-15 17:43
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -37,17 +37,17 @@ SUM:                            40           1456           1085           8222
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
-| `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ⚠️ Large |
+| `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 308 | 157 | 151 | 49.0% | ✅ |
 | `adapters/mod.rs` | 120 | 120 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
-| `commands/analyze/sections.rs` | 260 | 260 | 0 | 0.0% | ⚠️ Large |
+| `commands/analyze/sections.rs` | 260 | 260 | 0 | 0.0% | ✅ (infra) |
 | `commands/astq.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/git.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/mod.rs` | 18 | 18 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 702 | 255 | 447 | 63.7% | ⚠️ Large |
+| `commands/workflow.rs` | 702 | 255 | 447 | 63.7% | ✅ (infra) |
 | `commands/wrapped.rs` | 128 | 64 | 64 | 50.0% | ✅ |
 | `engine/mod.rs` | 728 | 136 | 592 | 81.3% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
@@ -56,8 +56,8 @@ SUM:                            40           1456           1085           8222
 | `guardrails/types.rs` | 171 | 98 | 73 | 42.7% | ✅ |
 | `main.rs` | 172 | 9 | 163 | 94.8% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
-| `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ⚠️ Large |
-| `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ⚠️ Large |
+| `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |
+| `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
@@ -65,7 +65,7 @@ SUM:                            40           1456           1085           8222
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
-| `storage/mod.rs` | 522 | 224 | 298 | 57.1% | ⚠️ Large |
+| `storage/mod.rs` | 522 | 224 | 298 | 57.1% | ✅ (infra) |
 | `test_helpers.rs` | 816 | 530 | 286 | 35.0% | ✅ (infra) |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -76,8 +76,6 @@ SUM:                            40           1456           1085           8222
 | `tui/tabs/phases.rs` | 135 | 103 | 32 | 23.7% | ✅ |
 | `tui/ui.rs` | 317 | 158 | 159 | 50.2% | ✅ |
 | `tui/utils.rs` | 320 | 187 | 133 | 41.6% | ✅ |
-
-**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
