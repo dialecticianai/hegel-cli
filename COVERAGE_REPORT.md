@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-15 17:39
+**Last Updated**: 2025-10-15 17:51
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.68%** lines | **91.66%** regions | **88.58%** functions
+**Overall Coverage**: **92.34%** lines | **91.37%** regions | **87.37%** functions
 
 ## Summary
 
 ```
-TOTAL                              10751               897    91.66%         569                65    88.58%        6589               482    92.68%           0                 0         -
+TOTAL                              10838               935    91.37%         586                74    87.37%        6649               509    92.34%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -19,7 +19,7 @@ TOTAL                              10751               897    91.66%         569
 | `adapters/cursor.rs` | 92.42% | 92.55% | 89.47% | 🟢 Excellent |
 | `adapters/mod.rs` | 60.71% | 55.56% | 50.00% | 🟠 Moderate |
 | `commands/analyze/mod.rs` | 100.00% | 99.52% | 100.00% | 🟢 Excellent |
-| `commands/analyze/sections.rs` | 97.49% | 95.78% | 100.00% | 🟢 Excellent |
+| `commands/analyze/sections.rs` | 97.49% | 95.75% | 100.00% | 🟢 Excellent |
 | `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
@@ -41,7 +41,8 @@ TOTAL                              10751               897    91.66%         569
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 83.64% | 86.86% | 63.64% | 🟡 Good |
-| `test_helpers.rs` | 93.46% | 90.19% | 91.49% | 🟢 Excellent |
+| `test_helpers.rs` | 93.46% | 89.98% | 91.49% | 🟢 Excellent |
+| `theme.rs` | 55.00% | 58.43% | 47.06% | 🟠 Moderate |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `tui/tabs/events.rs` | 88.33% | 83.33% | 100.00% | 🟡 Good |
@@ -89,6 +90,7 @@ TOTAL                              10751               897    91.66%         569
 
 ### 🟠 Moderate (40-69% lines)
 - `adapters/mod.rs` - 60.71%
+- `theme.rs` - 55.00%
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 0.00%
@@ -101,7 +103,7 @@ TOTAL                              10751               897    91.66%         569
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.68% | ✅ Met |
+| Overall | ≥80% | 92.34% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

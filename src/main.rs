@@ -5,6 +5,7 @@ mod guardrails;
 mod metrics;
 mod rules;
 mod storage;
+mod theme;
 mod tui;
 
 #[cfg(test)]

@@ -1,24 +1,25 @@
 use crate::metrics::{PhaseMetrics, UnifiedMetrics, WorkflowDAG};
+use crate::theme::Theme;
 use colored::Colorize;
 use std::fmt::Display;
 
-/// Format a numeric metric with right alignment and cyan color
+/// Format a numeric metric with right alignment and theme styling
 fn format_metric(value: impl Display) -> String {
-    format!("{:>10}", value).cyan().to_string()
+    Theme::metric_value(format!("{:>10}", value)).to_string()
 }
 
-/// Format a total metric with bold green styling
+/// Format a total metric with theme styling
 fn format_total(value: impl Display) -> String {
-    format!("{:>10}", value).bold().green().to_string()
+    Theme::metric_total(format!("{:>10}", value)).to_string()
 }
 
 /// Render session information section
 pub fn render_session(metrics: &UnifiedMetrics) {
-    println!("{}", "Session".bold());
+    println!("{}", Theme::header("Session"));
     if let Some(session_id) = &metrics.session_id {
-        println!("  ID: {}", session_id.bright_black());
+        println!("  ID: {}", Theme::secondary(session_id));
     } else {
-        println!("  {}", "No session data found".yellow());
+        println!("  {}", Theme::warning("No session data found"));
     }
     println!();
 }
