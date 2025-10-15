@@ -15,6 +15,7 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use storage::FileStorage;
+use theme::Theme;
 
 #[derive(Parser)]
 #[command(name = "hegel")]
@@ -99,7 +100,7 @@ fn main() -> Result<()> {
     if cli.command.is_none() {
         println!(
             "{}",
-            "Hegel - Dialectic-Driven Development CLI".bold().cyan()
+            Theme::header("Hegel - Dialectic-Driven Development CLI")
         );
         println!();
         println!(
@@ -107,7 +108,7 @@ fn main() -> Result<()> {
             "Thesis. Antithesis. Synthesis.".italic().bright_white()
         );
         println!();
-        println!("{}", "Coming soon...".yellow());
+        println!("{}", Theme::warning("Coming soon..."));
         println!();
         println!(
             "{} {}",

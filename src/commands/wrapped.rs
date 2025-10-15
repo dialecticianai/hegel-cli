@@ -1,5 +1,6 @@
 use crate::guardrails::{load_guardrails, RuleMatch};
 use crate::storage::FileStorage;
+use crate::theme::Theme;
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::process::Command;
@@ -23,19 +24,22 @@ pub fn run_wrapped_command(
                 storage.log_command(command_name, args, false, Some(&reason))?;
 
                 // Print error and exit
-                eprintln!("{}", "⛔ Command blocked by guardrails".bold().red());
+                eprintln!(
+                    "{}",
+                    Theme::error("⛔ Command blocked by guardrails").bold()
+                );
                 eprintln!();
                 eprintln!(
                     "{}: {} {}",
-                    "Command".bold(),
+                    Theme::label("Command"),
                     command_name,
-                    args.join(" ").bright_black()
+                    Theme::secondary(args.join(" "))
                 );
-                eprintln!("{}: {}", "Reason".bold(), reason.yellow());
+                eprintln!("{}: {}", Theme::label("Reason"), Theme::warning(&reason));
                 eprintln!();
                 eprintln!(
                     "{}",
-                    "Edit .hegel/guardrails.yaml to modify rules.".bright_black()
+                    Theme::secondary("Edit .hegel/guardrails.yaml to modify rules.")
                 );
                 std::process::exit(1);
             }

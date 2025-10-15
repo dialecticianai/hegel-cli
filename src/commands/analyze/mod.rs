@@ -1,14 +1,14 @@
 mod sections;
 
 use anyhow::Result;
-use colored::Colorize;
 
 use crate::metrics::parse_unified_metrics;
 use crate::storage::FileStorage;
+use crate::theme::Theme;
 use sections::*;
 
 pub fn analyze_metrics(storage: &FileStorage) -> Result<()> {
-    println!("{}", "=== Hegel Metrics Analysis ===".bold().cyan());
+    println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
     let metrics = parse_unified_metrics(storage.state_dir())?;

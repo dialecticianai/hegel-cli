@@ -26,7 +26,7 @@ pub fn render_session(metrics: &UnifiedMetrics) {
 
 /// Render token usage section
 pub fn render_tokens(metrics: &UnifiedMetrics) {
-    println!("{}", "Token Usage".bold());
+    println!("{}", Theme::label("Token Usage"));
     if metrics.token_metrics.assistant_turns > 0 {
         println!(
             "  Input tokens:        {}",
@@ -38,15 +38,21 @@ pub fn render_tokens(metrics: &UnifiedMetrics) {
         );
         println!(
             "  Cache creation:      {}",
-            format!("{:>10}", metrics.token_metrics.total_cache_creation_tokens).bright_black()
+            Theme::secondary(format!(
+                "{:>10}",
+                metrics.token_metrics.total_cache_creation_tokens
+            ))
         );
         println!(
             "  Cache reads:         {}",
-            format!("{:>10}", metrics.token_metrics.total_cache_read_tokens).bright_black()
+            Theme::secondary(format!(
+                "{:>10}",
+                metrics.token_metrics.total_cache_read_tokens
+            ))
         );
         println!(
             "  Assistant turns:     {}",
-            format!("{:>10}", metrics.token_metrics.assistant_turns).green()
+            Theme::success(format!("{:>10}", metrics.token_metrics.assistant_turns))
         );
 
         let total_tokens = metrics.token_metrics.total_input_tokens
@@ -55,18 +61,18 @@ pub fn render_tokens(metrics: &UnifiedMetrics) {
             + metrics.token_metrics.total_cache_read_tokens;
         println!(
             "  {}            {}",
-            "Total:".bold(),
+            Theme::label("Total:"),
             format_total(total_tokens)
         );
     } else {
-        println!("  {}", "No token data found".yellow());
+        println!("  {}", Theme::warning("No token data found"));
     }
     println!();
 }
 
 /// Render activity summary section
 pub fn render_activity(metrics: &UnifiedMetrics) {
-    println!("{}", "Activity".bold());
+    println!("{}", Theme::label("Activity"));
     println!(
         "  Total events:        {}",
         format_metric(metrics.hook_metrics.total_events)
@@ -85,7 +91,7 @@ pub fn render_activity(metrics: &UnifiedMetrics) {
 /// Render top bash commands section
 pub fn render_top_bash_commands(metrics: &UnifiedMetrics) {
     if !metrics.hook_metrics.bash_commands.is_empty() {
-        println!("{}", "Top Bash Commands".bold());
+        println!("{}", Theme::label("Top Bash Commands"));
         let mut freq = metrics.hook_metrics.bash_command_frequency();
         let mut sorted: Vec<_> = freq.drain().collect();
         sorted.sort_by(|a, b| b.1.cmp(&a.1));
@@ -98,8 +104,8 @@ pub fn render_top_bash_commands(metrics: &UnifiedMetrics) {
             };
             println!(
                 "  {:>3}x {}",
-                count.to_string().green(),
-                truncated.bright_black()
+                Theme::success(count.to_string()),
+                Theme::secondary(truncated)
             );
         }
         println!();
@@ -109,7 +115,7 @@ pub fn render_top_bash_commands(metrics: &UnifiedMetrics) {
 /// Render top file modifications section
 pub fn render_top_file_modifications(metrics: &UnifiedMetrics) {
     if !metrics.hook_metrics.file_modifications.is_empty() {
-        println!("{}", "Top File Modifications".bold());
+        println!("{}", Theme::label("Top File Modifications"));
         let mut freq = metrics.hook_metrics.file_modification_frequency();
         let mut sorted: Vec<_> = freq.drain().collect();
         sorted.sort_by(|a, b| b.1.cmp(&a.1));
@@ -117,8 +123,8 @@ pub fn render_top_file_modifications(metrics: &UnifiedMetrics) {
         for (file, count) in sorted.iter().take(10) {
             println!(
                 "  {:>3}x {}",
-                count.to_string().green(),
-                file.bright_black()
+                Theme::success(count.to_string()),
+                Theme::secondary(file)
             );
         }
         println!();
@@ -128,31 +134,31 @@ pub fn render_top_file_modifications(metrics: &UnifiedMetrics) {
 /// Render state transitions section
 pub fn render_state_transitions(metrics: &UnifiedMetrics) {
     if !metrics.state_transitions.is_empty() {
-        println!("{}", "Workflow Transitions".bold());
+        println!("{}", Theme::label("Workflow Transitions"));
         println!(
             "  Total transitions:   {}",
             format_metric(metrics.state_transitions.len())
         );
 
         if let Some(first) = metrics.state_transitions.first() {
-            println!("  Mode:                {}", first.mode.cyan());
+            println!("  Mode:                {}", Theme::highlight(&first.mode));
         }
 
         println!();
-        println!("{}", "  Transition History:".bold());
+        println!("{}", Theme::label("  Transition History:"));
         for transition in &metrics.state_transitions {
             println!(
                 "    {} {} {}  ({})",
-                transition.from_node.bright_black(),
-                "→".bright_black(),
-                transition.to_node.cyan(),
-                transition.timestamp.bright_black()
+                Theme::secondary(&transition.from_node),
+                Theme::secondary("→"),
+                Theme::highlight(&transition.to_node),
+                Theme::secondary(&transition.timestamp)
             );
         }
         println!();
     } else {
-        println!("{}", "Workflow Transitions".bold());
-        println!("  {}", "No workflow transitions found".yellow());
+        println!("{}", Theme::label("Workflow Transitions"));
+        println!("  {}", Theme::warning("No workflow transitions found"));
         println!();
     }
 }
@@ -160,7 +166,7 @@ pub fn render_state_transitions(metrics: &UnifiedMetrics) {
 /// Render phase breakdown section
 pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
     if !phase_metrics.is_empty() {
-        println!("{}", "Phase Breakdown".bold());
+        println!("{}", Theme::label("Phase Breakdown"));
         for phase in phase_metrics {
             let status = if phase.end_time.is_none() {
                 Theme::success("active")
@@ -180,7 +186,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
             println!();
             println!(
                 "  {} ({})",
-                phase.phase_name.to_uppercase().bold().cyan(),
+                Theme::header(phase.phase_name.to_uppercase()),
                 status
             );
             println!("    Duration:          {}", duration_str);
@@ -197,17 +203,17 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
                 );
                 println!(
                     "    Assistant turns:   {}",
-                    format!("{:>10}", phase.token_metrics.assistant_turns).green()
+                    Theme::success(format!("{:>10}", phase.token_metrics.assistant_turns))
                 );
             } else {
-                println!("    Tokens:            {}", "-".bright_black());
+                println!("    Tokens:            {}", Theme::secondary("-"));
             }
 
             // Activity
             println!(
                 "    Bash commands:     {}",
                 if phase.bash_commands.is_empty() {
-                    "-".bright_black().to_string()
+                    Theme::secondary("-").to_string()
                 } else {
                     format_metric(phase.bash_commands.len())
                 }
@@ -215,7 +221,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
             println!(
                 "    File edits:        {}",
                 if phase.file_modifications.is_empty() {
-                    "-".bright_black().to_string()
+                    Theme::secondary("-").to_string()
                 } else {
                     format_metric(phase.file_modifications.len())
                 }
@@ -228,7 +234,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
 /// Render workflow graph section
 pub fn render_workflow_graph(metrics: &UnifiedMetrics) {
     if !metrics.state_transitions.is_empty() && !metrics.phase_metrics.is_empty() {
-        println!("{}", "Workflow Graph".bold());
+        println!("{}", Theme::label("Workflow Graph"));
         println!();
 
         let graph =
@@ -240,21 +246,21 @@ pub fn render_workflow_graph(metrics: &UnifiedMetrics) {
         // Cycle detection
         let cycles = graph.find_cycles();
         if !cycles.is_empty() {
-            println!("{}", "⚠ Cycles Detected:".yellow().bold());
+            println!("{}", Theme::warning("⚠ Cycles Detected:").bold());
             for cycle in cycles {
-                println!("  {}", cycle.join(" → ").yellow());
+                println!("  {}", Theme::warning(cycle.join(" → ")));
             }
             println!();
         }
 
-        println!("{}", "Export Options:".bright_black());
+        println!("{}", Theme::secondary("Export Options:"));
         println!(
             "  {} hegel graph --dot > workflow.dot",
-            "Run".bright_black()
+            Theme::secondary("Run")
         );
         println!(
             "  {} dot -Tpng workflow.dot -o workflow.png",
-            "Then".bright_black()
+            Theme::secondary("Then")
         );
         println!();
     }

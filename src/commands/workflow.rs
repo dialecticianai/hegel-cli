@@ -5,6 +5,7 @@ use std::path::Path;
 
 use crate::engine::{get_next_prompt, init_state, load_workflow, render_template};
 use crate::storage::{FileStorage, State};
+use crate::theme::Theme;
 
 /// Claim aliases for ergonomic workflow transitions
 #[derive(Debug, Clone, PartialEq)]
@@ -77,12 +78,12 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     storage.save(&state)?;
 
     // Display output
-    println!("{}", "Workflow started".bold().green());
+    println!("{}", Theme::success("Workflow started").bold());
     println!();
-    println!("{}: {}", "Mode".bold(), workflow_state.mode);
-    println!("{}: {}", "Current node".bold(), current_node);
+    println!("{}: {}", Theme::label("Mode"), workflow_state.mode);
+    println!("{}: {}", Theme::label("Current node"), current_node);
     println!();
-    println!("{}", "Prompt:".bold().cyan());
+    println!("{}", Theme::header("Prompt:"));
     println!("{}", rendered_prompt);
 
     Ok(())
@@ -141,18 +142,22 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
     if transitioned {
         println!(
             "{} {} {} {}",
-            "Transitioned:".bold().green(),
-            previous_node.bright_black(),
-            "→".bright_black(),
-            new_state.current_node.cyan()
+            Theme::success("Transitioned:").bold(),
+            Theme::secondary(&previous_node),
+            Theme::secondary("→"),
+            Theme::highlight(&new_state.current_node)
         );
     } else {
-        println!("{}", "Stayed at current node".yellow());
+        println!("{}", Theme::warning("Stayed at current node"));
     }
     println!();
-    println!("{}: {}", "Current node".bold(), new_state.current_node);
+    println!(
+        "{}: {}",
+        Theme::label("Current node"),
+        new_state.current_node
+    );
     println!();
-    println!("{}", "Prompt:".bold().cyan());
+    println!("{}", Theme::header("Prompt:"));
     println!("{}", rendered_prompt);
 
     Ok(())
@@ -170,25 +175,32 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
 
     if state.workflow.is_none() || state.workflow_state.is_none() {
-        println!("{}", "No workflow loaded".yellow());
+        println!("{}", Theme::warning("No workflow loaded"));
         println!();
-        println!("Start a workflow with: {}", "hegel start <workflow>".cyan());
+        println!(
+            "Start a workflow with: {}",
+            Theme::highlight("hegel start <workflow>")
+        );
         return Ok(());
     }
 
     let workflow_state = state.workflow_state.as_ref().unwrap();
 
-    println!("{}", "Workflow Status".bold().cyan());
+    println!("{}", Theme::header("Workflow Status"));
     println!();
-    println!("{}: {}", "Mode".bold(), workflow_state.mode);
-    println!("{}: {}", "Current node".bold(), workflow_state.current_node);
+    println!("{}: {}", Theme::label("Mode"), workflow_state.mode);
+    println!(
+        "{}: {}",
+        Theme::label("Current node"),
+        workflow_state.current_node
+    );
     println!();
-    println!("{}", "History:".bold());
+    println!("{}", Theme::label("History:"));
     for (i, node) in workflow_state.history.iter().enumerate() {
         if i == workflow_state.history.len() - 1 {
-            println!("  {} {}", "→".cyan(), node.cyan());
+            println!("  {} {}", Theme::highlight("→"), Theme::highlight(node));
         } else {
-            println!("    {}", node.bright_black());
+            println!("    {}", Theme::secondary(node));
         }
     }
 
@@ -207,7 +219,7 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     };
 
     storage.save(&cleared_state)?;
-    println!("{}", "Workflow state cleared".green());
+    println!("{}", Theme::success("Workflow state cleared"));
     Ok(())
 }
 
@@ -240,10 +252,10 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     let rendered_prompt = render_node_prompt(&node.prompt)?;
 
     // Display output
-    println!("{}", "Re-displaying current prompt".yellow());
-    println!("{}: {}", "Current node".bold(), current_node);
+    println!("{}", Theme::warning("Re-displaying current prompt"));
+    println!("{}: {}", Theme::label("Current node"), current_node);
     println!();
-    println!("{}", "Prompt:".bold().cyan());
+    println!("{}", Theme::header("Prompt:"));
     println!("{}", rendered_prompt);
 
     Ok(())
