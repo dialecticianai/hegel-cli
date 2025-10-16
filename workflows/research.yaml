@@ -1,0 +1,141 @@
+# Research mode workflow - optimized for knowledge gathering
+mode: research
+start_node: plan
+
+nodes:
+  plan:
+    prompt: |
+      You are in the PLANNING phase of Research Mode (Dialectic-Driven Development).
+
+      {{STUDY_PLANNING}}
+
+      Your task: Define research priorities and scope.
+      {{?context_note}}
+
+      Focus on:
+      - What knowledge domains need study (external docs, wikis, papers, codebases)
+      - Priority ordering (what's foundational vs what can wait)
+      - Success criteria (when is research phase complete)
+      - Time boxing (don't get lost in infinite reading)
+
+      Research mode is pre-Discovery. You're gathering external knowledge, not building yet.
+
+      Respond with your study plan (can be structured as numbered priorities or phases).
+    transitions:
+      - when: "plan_complete"
+        to: study
+
+  study:
+    prompt: |
+      You are in the STUDY phase of Research Mode (Dialectic-Driven Development).
+
+      {{KNOWLEDGE_CAPTURE}}
+
+      Your task: Study external sources and synthesize into learning documents.
+      {{?context_note}}
+
+      Research activities:
+      - Cache external docs to .webcache/ for offline access (use curl, lynx -dump for reading)
+      - Read systematically (don't jump around, follow your priority plan)
+      - Synthesize into learnings/*.md (not transcription - extract patterns, constraints, gotchas)
+      - Cross-reference sources (link back to originals in attribution footers)
+
+      Focus on:
+      - What patterns emerge across sources
+      - What constraints matter for building
+      - What gotchas/edge cases exist
+      - What questions arise (theory vs practice gaps)
+
+      Knowledge capture is about UNDERSTANDING, not accumulation. Distill, don't dump.
+
+      Respond when you've completed a study priority/phase and are ready to assess.
+    rules:
+      - type: token_budget
+        max_tokens: 15000
+    transitions:
+      - when: "study_phase_complete"
+        to: assess
+      - when: "continue_study"
+        to: study
+
+  assess:
+    prompt: |
+      You are in the ASSESSMENT phase of Research Mode (Dialectic-Driven Development).
+
+      Your task: Meta-cognitive reflection on what you've learned.
+      {{?context_note}}
+
+      Create a phase assessment document (e.g., learnings/.ddd/N_description.md):
+
+      Focus on:
+      - What did you study (pages, docs, sources)
+      - Key insights (not just facts, but implications)
+      - Questions answered (from previous phases)
+      - Questions raised (theory vs practice gaps)
+      - Decisions made (with rationale)
+      - What's next (continue study or transition to Discovery)
+
+      Meta-learning documents are thinking artifacts. They capture:
+      - Progress (what's covered, what remains)
+      - Understanding (insights, not just facts)
+      - Uncertainty (what needs practical validation)
+
+      Number these sequentially (0_, 1_, 2_...) so filesystem keeps them ordered.
+
+      Respond with your completed assessment document.
+    transitions:
+      - when: "continue_research"
+        to: study
+      - when: "research_complete"
+        to: questions
+
+  questions:
+    prompt: |
+      You are in the QUESTIONS phase of Research Mode (Dialectic-Driven Development).
+
+      {{QUESTION_TRACKING}}
+
+      Your task: Catalogue all open questions discovered during research.
+      {{?context_note}}
+
+      Create/update consolidated questions document (e.g., learnings/.ddd/5_open_questions.md):
+
+      Focus on:
+      - Categorize questions by domain/subsystem
+      - Distinguish: answered (during study) vs open (need practice)
+      - Cross-reference to learning docs (where's the theory)
+      - Cross-reference to practice path (which toy/experiment will answer)
+      - Mark decisions made vs deferred
+
+      Open questions become the Discovery mode roadmap:
+      - Each question → potential toy experiment
+      - Each category → potential integration toy
+      - Prioritize by: foundational → advanced
+
+      This document is the bridge: Research → Discovery.
+
+      Respond with your completed/updated questions document.
+    transitions:
+      - when: "questions_complete"
+        to: done
+
+  done:
+    prompt: |
+      Research mode complete.
+
+      Your deliverables:
+      - Learning documents (learnings/*.md) - synthesized knowledge
+      - Meta-assessments (learnings/.ddd/*.md) - progress tracking
+      - Open questions (learnings/.ddd/*_open_questions.md) - Discovery roadmap
+      - Cached sources (.webcache/) - stable offline references
+
+      Final check:
+      - All priority areas studied?
+      - Key concepts documented?
+      - Questions catalogued?
+      - Ready for practical validation (Discovery mode)?
+
+      Next step: Transition to Discovery mode to answer open questions through toy experiments.
+
+      Use 'hegel next' with claim 'transition_to_discovery' when ready to start building.
+    transitions: []

@@ -37,28 +37,6 @@
 
 ## Phase 1: Core Infrastructure
 
-### 1.2 Research Mode Workflow
-
-**Goal:** Add Research mode as distinct workflow for external knowledge gathering phase.
-
-**Workflow structure:**
-- New `workflows/research.yaml` definition
-- Phases: Research activities (study, cache, document, questions)
-- Outputs: Learning documents + catalogued open questions (`.ddd/5_open_questions.md` or similar)
-- Transition: Explicit claim to transition to Discovery mode when ready
-
-**Metrics tracking:**
-- Time spent in research phase
-- Files added to `.webcache/`
-- Learning docs created/updated
-- Questions catalogued
-- Less emphasis on: bash commands, code edits (not coding yet)
-
-**New guides needed:**
-- `STUDY_PLANNING.md` - How to organize research priorities
-- `KNOWLEDGE_CAPTURE.md` - How to write learning docs
-- `QUESTION_TRACKING.md` - How to catalogue open questions
-
 ### 1.2 Meta-Modes Formalization
 
 **Goal:** Represent Learning/Porting/Standard progression patterns in Hegel.

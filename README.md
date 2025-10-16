@@ -29,6 +29,7 @@ hegel start discovery
 ```
 
 Available workflows:
+- `research` - External knowledge gathering (PLAN → STUDY → ASSESS → QUESTIONS)
 - `discovery` - Optimized for learning density (SPEC → PLAN → CODE → LEARNINGS → README)
 - `execution` - Optimized for production delivery
 - `minimal` - Simplified workflow for quick iterations
@@ -91,12 +92,28 @@ Each workflow defines:
 
 ## Dialectic-Driven Development
 
-Hegel implements the Dialectic-Driven Development methodology:
+Hegel implements the Dialectic-Driven Development methodology across three operational modes:
 
-1. **Docs** - Generate or update SPEC.md and PLAN.md
+### Research Mode (External Knowledge Gathering)
+1. **Plan** - Define study priorities and scope
+2. **Study** - Cache external sources, synthesize into learning docs
+3. **Assess** - Meta-cognitive reflection on progress
+4. **Questions** - Catalogue open questions as Discovery roadmap
+
+**Use for**: Pre-implementation knowledge building, unfamiliar domains, systematic study of external sources
+
+### Discovery Mode (Toy Experiments)
+1. **Docs** - Generate SPEC.md and PLAN.md
 2. **Tests** - Derive executable tests from specifications
 3. **Implementation** - Minimal code to pass tests
 4. **Learnings** - Extract insights and architectural decisions
+
+**Use for**: Validating uncertainties, prototype implementations, answering questions from Research
+
+### Execution Mode (Production Delivery)
+Similar cycle to Discovery but with production-grade rigor, comprehensive error handling, and mandatory code review phase.
+
+**Use for**: Building production features with validated patterns from Discovery
 
 This methodology treats artifacts as disposable fuel while preserving clarity and constraints as durable value.
 
