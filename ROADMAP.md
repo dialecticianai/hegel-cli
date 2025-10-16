@@ -37,18 +37,6 @@
 
 ## Phase 1: Core Infrastructure
 
-### 1.2 Meta-Modes Formalization
-
-**Goal:** Represent Learning/Porting/Standard progression patterns in Hegel.
-
-**Concept:** Meta-modes are patterns of mode transitions (Research ↔ Discovery, Discovery → Execution, etc.)
-
-**Implementation TBD:** Need to design how meta-modes surface in Hegel:
-- Workflow composition (multiple .yaml files chained)?
-- Higher-level workflow definitions?
-- Automatic transitions between modes based on claims?
-- Analytics that recognize meta-mode patterns?
-
 ### 1.3 Project Initialization
 
 **Goal:** `hegel init` command to scaffold new projects with DDD structure.

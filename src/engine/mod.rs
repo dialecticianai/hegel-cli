@@ -52,6 +52,7 @@ pub fn init_state(workflow: &Workflow) -> WorkflowState {
         mode: workflow.mode.clone(),
         history: vec![start],
         workflow_id: None,
+        meta_mode: None, // Will be set by caller if needed
     }
 }
 
@@ -424,6 +425,7 @@ nodes:
             mode: "execution".to_string(),
             history: vec!["code".to_string()],
             workflow_id: None,
+            meta_mode: None,
         };
 
         let mut claims = HashMap::new();

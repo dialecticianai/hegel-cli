@@ -63,6 +63,7 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
         mode: mode.to_string(),
         history: history.iter().map(|s| s.to_string()).collect(),
         workflow_id: None,
+        meta_mode: None,
     }
 }
 

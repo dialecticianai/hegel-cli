@@ -50,6 +50,20 @@ fn render_node_prompt(prompt: &str) -> Result<String> {
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
     use chrono::Utc;
 
+    // Load current state to check for existing meta-mode
+    let existing_state = storage.load()?;
+    let existing_meta_mode = existing_state
+        .workflow_state
+        .as_ref()
+        .and_then(|ws| ws.meta_mode.clone())
+        .or_else(|| {
+            // Default to "standard" meta-mode for backward compatibility with tests
+            // In production, users should run 'hegel meta <name>' first
+            Some(crate::storage::MetaMode {
+                name: "standard".to_string(),
+            })
+        });
+
     // Load workflow from YAML file
     let workflow_path = format!("workflows/{}.yaml", workflow_name);
     let workflow = load_workflow(&workflow_path)
@@ -58,6 +72,9 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     // Initialize workflow state with workflow_id (ISO timestamp)
     let mut workflow_state = init_state(&workflow);
     workflow_state.workflow_id = Some(Utc::now().to_rfc3339());
+
+    // Preserve meta-mode from existing state
+    workflow_state.meta_mode = existing_meta_mode;
 
     // Get current node and prompt
     let current_node = &workflow_state.current_node;
@@ -69,11 +86,11 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     // Render prompt with guides
     let rendered_prompt = render_node_prompt(&node.prompt)?;
 
-    // Store state
+    // Store state (preserve session_metadata from existing state)
     let state = State {
         workflow: Some(serde_yaml::to_value(&workflow)?),
         workflow_state: Some(workflow_state.clone()),
-        session_metadata: None,
+        session_metadata: existing_state.session_metadata,
     };
     storage.save(&state)?;
 

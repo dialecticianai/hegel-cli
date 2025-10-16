@@ -2,6 +2,7 @@ mod adapters;
 mod commands;
 mod engine;
 mod guardrails;
+mod metamodes;
 mod metrics;
 mod rules;
 mod storage;
@@ -90,6 +91,11 @@ enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// Declare or view meta-mode (learning, standard)
+    Meta {
+        /// Meta-mode name (learning or standard). Omit to view current meta-mode.
+        name: Option<String>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -170,6 +176,9 @@ fn main() -> Result<()> {
         }
         Commands::Docker { args } => {
             commands::run_wrapped_command("docker", &args, &storage)?;
+        }
+        Commands::Meta { name } => {
+            commands::meta_mode(name.as_deref(), &storage)?;
         }
     }
 

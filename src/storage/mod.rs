@@ -14,6 +14,12 @@ pub struct SessionMetadata {
     pub started_at: String,
 }
 
+/// Meta-mode structure - defines workflow progression pattern
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct MetaMode {
+    pub name: String, // "learning" or "standard"
+}
+
 /// Workflow state structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkflowState {
@@ -22,6 +28,8 @@ pub struct WorkflowState {
     pub history: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub meta_mode: Option<MetaMode>,
 }
 
 /// Complete state including workflow definition and current state

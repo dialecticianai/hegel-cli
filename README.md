@@ -20,12 +20,37 @@ The binary will be available at `./target/release/hegel`.
 
 ## Usage
 
-### Starting a Workflow
+### Declaring a Meta-Mode
 
-Start a new workflow (discovery or execution mode):
+Before starting any workflow, declare which meta-mode pattern you're following:
 
 ```bash
-hegel start discovery
+# For greenfield learning projects
+hegel meta learning
+
+# For standard feature development
+hegel meta standard
+```
+
+This automatically starts the appropriate initial workflow for your meta-mode.
+
+**Available meta-modes:**
+- `learning` - Greenfield learning project (Research ↔ Discovery loop, starts with research)
+- `standard` - Feature development with known patterns (Discovery ↔ Execution, starts with discovery)
+
+**View current meta-mode:**
+```bash
+hegel meta
+```
+
+### Starting Additional Workflows
+
+After declaring your meta-mode, transition between workflows:
+
+```bash
+# Transition to next workflow in your meta-mode
+hegel start discovery  # When in learning mode after research complete
+hegel start execution  # When transitioning to production
 ```
 
 Available workflows:

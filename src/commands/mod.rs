@@ -2,6 +2,7 @@ mod analyze;
 mod astq;
 mod git;
 mod hook;
+mod meta;
 mod reflect;
 mod workflow;
 mod wrapped;
@@ -11,6 +12,7 @@ pub use analyze::analyze_metrics;
 pub use astq::run_astq;
 pub use git::run_git;
 pub use hook::handle_hook;
+pub use meta::meta_mode;
 pub use reflect::run_reflect;
 pub use workflow::{
     next_prompt, repeat_prompt, reset_workflow, restart_workflow, show_status, start_workflow,
