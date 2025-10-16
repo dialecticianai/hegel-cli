@@ -7,8 +7,5 @@
     "url": "https://github.com/dialecticianai"
   },
   "homepage": "https://github.com/dialecticianai/hegel-cli",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dialecticianai/hegel-cli.git"
-  }
+  "repository": "https://github.com/dialecticianai/hegel-cli"
 }
