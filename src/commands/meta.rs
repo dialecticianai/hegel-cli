@@ -158,7 +158,7 @@ mod tests {
 
     #[test]
     fn test_declare_meta_mode_standard() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
 
         let result = declare_meta_mode("standard", &storage);
         assert!(result.is_ok());
@@ -184,7 +184,7 @@ mod tests {
 
     #[test]
     fn test_declare_meta_mode_while_workflow_active() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
 
         // Start with standard
         declare_meta_mode("standard", &storage).unwrap();
@@ -212,7 +212,7 @@ mod tests {
 
     #[test]
     fn test_show_meta_mode_status_defaults_to_standard() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
 
         // Start workflow without explicitly declaring meta-mode (should default to standard)
         crate::commands::start_workflow("discovery", &storage).unwrap();

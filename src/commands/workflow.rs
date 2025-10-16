@@ -40,8 +40,9 @@ impl ClaimAlias {
 }
 
 /// Render a workflow node's prompt with guide templates
-fn render_node_prompt(prompt: &str) -> Result<String> {
-    let guides_dir = Path::new("guides");
+fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String> {
+    let guides_dir_str = storage.guides_dir();
+    let guides_dir = Path::new(&guides_dir_str);
     let context = HashMap::new(); // Empty context for now
     render_template(prompt, guides_dir, &context)
         .with_context(|| "Failed to render prompt template")
@@ -65,7 +66,8 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
         });
 
     // Load workflow from YAML file
-    let workflow_path = format!("workflows/{}.yaml", workflow_name);
+    let workflows_dir = storage.workflows_dir();
+    let workflow_path = format!("{}/{}.yaml", workflows_dir, workflow_name);
     let workflow = load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_name))?;
 
@@ -84,7 +86,7 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
         .with_context(|| format!("Node not found: {}", current_node))?;
 
     // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&node.prompt)?;
+    let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
 
     // Store state (preserve session_metadata from existing state)
     let state = State {
@@ -134,7 +136,7 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
         get_next_prompt(&workflow, workflow_state, &claims, storage.state_dir())?;
 
     // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&prompt_text)?;
+    let rendered_prompt = render_node_prompt(&prompt_text, storage)?;
 
     // Save updated state (preserve session_metadata from loaded state)
     let updated_state = State {
@@ -266,7 +268,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
         .with_context(|| format!("Current node not found: {}", current_node))?;
 
     // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&node.prompt)?;
+    let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
 
     // Display output
     println!("{}", Theme::warning("Re-displaying current prompt"));
@@ -291,7 +293,7 @@ mod tests {
 
     #[test]
     fn test_start_workflow_success() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         let state = storage.load().unwrap();
         assert!(state.workflow.is_some());
@@ -304,7 +306,7 @@ mod tests {
 
     #[test]
     fn test_start_workflow_missing_file() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         let result = start_workflow("nonexistent", &storage);
         assert!(
             result.is_err()
@@ -319,7 +321,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_successful_transition() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert_state_eq(
@@ -332,7 +334,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_no_matching_transition() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
         assert_state_eq(&storage.load().unwrap(), "spec", "discovery", &["spec"]);
@@ -340,7 +342,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_no_workflow_loaded() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         let result = next_prompt(Some(r#"{"spec_complete": true}"#), &storage);
         assert!(
             result.is_err()
@@ -353,7 +355,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_invalid_json() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         let result = next_prompt(Some("not valid json"), &storage);
         assert!(
@@ -367,7 +369,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_multiple_transitions() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert_state_eq(
@@ -389,7 +391,7 @@ mod tests {
 
     #[test]
     fn test_show_status_with_workflow() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         assert!(show_status(&storage).is_ok());
     }
@@ -402,7 +404,7 @@ mod tests {
 
     #[test]
     fn test_show_status_after_transitions() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         assert!(show_status(&storage).is_ok());
@@ -418,7 +420,7 @@ mod tests {
 
     #[test]
     fn test_reset_workflow_clears_state() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         assert!(storage.load().unwrap().workflow.is_some());
         reset_workflow(&storage).unwrap();
@@ -428,7 +430,7 @@ mod tests {
 
     #[test]
     fn test_reset_workflow_when_no_state() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         assert!(reset_workflow(&storage).is_ok());
     }
 
@@ -436,7 +438,7 @@ mod tests {
     fn test_reset_workflow_preserves_session_metadata() {
         use crate::storage::SessionMetadata;
 
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
 
         // Add session metadata manually
@@ -460,9 +462,8 @@ mod tests {
     }
 
     #[test]
-    #[ignore] // FLAKY: Fails intermittently due to working directory race condition when run with other tests
     fn test_reset_then_start_new_workflow() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         reset_workflow(&storage).unwrap();
@@ -474,7 +475,7 @@ mod tests {
 
     #[test]
     fn test_full_workflow_cycle() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         assert_state_eq(&storage.load().unwrap(), "spec", "discovery", &["spec"]);
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
@@ -497,7 +498,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_logs_state_transition() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
@@ -509,7 +510,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_logs_multiple_transitions() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
         next_prompt(Some(r#"{"plan_complete": true}"#), &storage).unwrap();
@@ -523,7 +524,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_no_log_when_no_transition() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
         assert_eq!(
@@ -534,7 +535,7 @@ mod tests {
 
     #[test]
     fn test_state_transition_includes_workflow_id() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         let workflow_id = storage
             .load()
@@ -555,14 +556,14 @@ mod tests {
 
     #[test]
     fn test_continue_with_active_workflow_returns_current_node_prompt() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         assert!(repeat_prompt(&storage).is_ok());
     }
 
     #[test]
     fn test_continue_with_no_workflow_loaded_returns_error() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         let result = repeat_prompt(&storage);
         assert!(result.is_err());
         assert!(result
@@ -573,7 +574,7 @@ mod tests {
 
     #[test]
     fn test_continue_renders_template_with_guides() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         // If template rendering fails, repeat_prompt will error
         assert!(repeat_prompt(&storage).is_ok());
@@ -581,7 +582,7 @@ mod tests {
 
     #[test]
     fn test_continue_does_not_change_workflow_state() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         let state_before = storage.load().unwrap();
         repeat_prompt(&storage).unwrap();
@@ -594,7 +595,7 @@ mod tests {
 
     #[test]
     fn test_continue_does_not_log_state_transition() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         repeat_prompt(&storage).unwrap();
 
@@ -609,7 +610,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_implicit_happy_path() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         // Omit claims - should infer {"spec_complete": true}
         next_prompt(None, &storage).unwrap();
@@ -623,7 +624,7 @@ mod tests {
 
     #[test]
     fn test_next_prompt_implicit_multiple_transitions() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(None, &storage).unwrap(); // spec -> plan
         next_prompt(None, &storage).unwrap(); // plan -> done
@@ -639,7 +640,7 @@ mod tests {
 
     #[test]
     fn test_restart_workflow_returns_to_spec() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         start_workflow("discovery", &storage).unwrap();
         next_prompt(None, &storage).unwrap(); // spec -> plan
         assert_state_eq(
@@ -660,7 +661,7 @@ mod tests {
 
     #[test]
     fn test_restart_workflow_no_workflow_loaded() {
-        let (_temp_dir, storage, _guard) = setup_workflow_env();
+        let (_temp_dir, storage) = setup_workflow_env();
         let result = restart_workflow(&storage);
         assert!(result.is_err());
         assert!(result
@@ -676,8 +677,9 @@ mod tests {
     fn test_discovery_workflow_loads_with_rules() {
         use crate::engine::load_workflow;
 
-        let (_temp_dir, _guard) = setup_production_workflows();
-        let workflow = load_workflow("workflows/discovery.yaml").unwrap();
+        let temp_dir = setup_production_workflows();
+        let workflow_path = temp_dir.path().join("workflows/discovery.yaml");
+        let workflow = load_workflow(&workflow_path).unwrap();
         assert_eq!(workflow.mode, "discovery");
 
         // Verify code node has rules
@@ -690,8 +692,9 @@ mod tests {
     fn test_execution_workflow_loads_with_rules() {
         use crate::engine::load_workflow;
 
-        let (_temp_dir, _guard) = setup_production_workflows();
-        let workflow = load_workflow("workflows/execution.yaml").unwrap();
+        let temp_dir = setup_production_workflows();
+        let workflow_path = temp_dir.path().join("workflows/execution.yaml");
+        let workflow = load_workflow(&workflow_path).unwrap();
         assert_eq!(workflow.mode, "execution");
 
         // Verify code node has rules (4 rules including phase_timeout)
@@ -704,8 +707,9 @@ mod tests {
     fn test_discovery_workflow_rules_are_valid() {
         use crate::engine::load_workflow;
 
-        let (_temp_dir, _guard) = setup_production_workflows();
-        let workflow = load_workflow("workflows/discovery.yaml").unwrap();
+        let temp_dir = setup_production_workflows();
+        let workflow_path = temp_dir.path().join("workflows/discovery.yaml");
+        let workflow = load_workflow(&workflow_path).unwrap();
         let code_node = &workflow.nodes["code"];
 
         // Validate all rules (errors would panic)
@@ -719,8 +723,9 @@ mod tests {
     fn test_execution_workflow_rules_are_valid() {
         use crate::engine::load_workflow;
 
-        let (_temp_dir, _guard) = setup_production_workflows();
-        let workflow = load_workflow("workflows/execution.yaml").unwrap();
+        let temp_dir = setup_production_workflows();
+        let workflow_path = temp_dir.path().join("workflows/execution.yaml");
+        let workflow = load_workflow(&workflow_path).unwrap();
         let code_node = &workflow.nodes["code"];
 
         // Validate all rules (errors would panic)

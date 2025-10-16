@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 20:53
+**Last Updated**: 2025-10-15 21:16
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,757 | 15,388 | 24,145 |
-| **Comments** | 1,158 | - | 1,158 |
-| **Blank Lines** | 1,547 | - | 1,547 |
-| **Total Lines** | 11,462 | 15,388 | 26,850 |
+| **Lines** | 8,775 | 15,393 | 24,168 |
+| **Comments** | 1,161 | - | 1,161 |
+| **Blank Lines** | 1,546 | - | 1,546 |
+| **Total Lines** | 11,482 | 15,393 | 26,875 |
 | **Files** | 43 | 96 | 139 |
 
-**Documentation Ratio**: 1.76 lines of docs per line of code
+**Documentation Ratio**: 1.75 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            43           1547           1158           8757
+Rust                            43           1546           1161           8775
 -------------------------------------------------------------------------------
-SUM:                            43           1547           1158           8757
+SUM:                            43           1546           1161           8775
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,7 @@ SUM:                            43           1547           1158           8757
 | `commands/meta.rs` | 231 | 146 | 85 | 36.8% | ✅ |
 | `commands/mod.rs` | 20 | 20 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 731 | 284 | 447 | 61.1% | ✅ (infra) |
+| `commands/workflow.rs` | 736 | 286 | 450 | 61.1% | ✅ (infra) |
 | `commands/wrapped.rs` | 132 | 68 | 64 | 48.5% | ✅ |
 | `engine/mod.rs` | 730 | 137 | 593 | 81.2% | ✅ |
 | `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
@@ -67,8 +67,8 @@ SUM:                            43           1547           1158           8757
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
-| `storage/mod.rs` | 530 | 232 | 298 | 56.2% | ✅ (infra) |
-| `test_helpers.rs` | 817 | 531 | 286 | 35.0% | ✅ (infra) |
+| `storage/mod.rs` | 569 | 272 | 297 | 52.2% | ✅ (infra) |
+| `test_helpers.rs` | 793 | 507 | 286 | 36.1% | ✅ (infra) |
 | `theme.rs` | 128 | 98 | 30 | 23.4% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -103,7 +103,7 @@ SUM:                            43           1547           1158           8757
 | `guides/STUDY_PLANNING.md` | 230 |
 | `HEGEL_CLAUDE.md` | 522 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 203 |
+| `LOC_REPORT.md` | 208 |
 | `README.md` | 392 |
 | `ROADMAP.md` | 181 |
 | `TESTING.md` | 41 |
@@ -189,7 +189,7 @@ SUM:                            43           1547           1158           8757
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.76 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.75 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

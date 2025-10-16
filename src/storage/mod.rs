@@ -46,6 +46,8 @@ pub struct State {
 /// File-based state storage
 pub struct FileStorage {
     state_dir: PathBuf,
+    workflows_dir: Option<PathBuf>,
+    guides_dir: Option<PathBuf>,
 }
 
 impl FileStorage {
@@ -54,12 +56,50 @@ impl FileStorage {
         let state_dir = state_dir.as_ref().to_path_buf();
         fs::create_dir_all(&state_dir)
             .with_context(|| format!("Failed to create state directory: {:?}", state_dir))?;
-        Ok(Self { state_dir })
+        Ok(Self {
+            state_dir,
+            workflows_dir: None,
+            guides_dir: None,
+        })
+    }
+
+    /// Create a FileStorage with custom workflows and guides directories (for testing)
+    pub fn with_dirs<P: AsRef<Path>>(
+        state_dir: P,
+        workflows_dir: Option<P>,
+        guides_dir: Option<P>,
+    ) -> Result<Self> {
+        let state_dir = state_dir.as_ref().to_path_buf();
+        fs::create_dir_all(&state_dir)
+            .with_context(|| format!("Failed to create state directory: {:?}", state_dir))?;
+        Ok(Self {
+            state_dir,
+            workflows_dir: workflows_dir.map(|p| p.as_ref().to_path_buf()),
+            guides_dir: guides_dir.map(|p| p.as_ref().to_path_buf()),
+        })
     }
 
     /// Get the state directory path
     pub fn state_dir(&self) -> &Path {
         &self.state_dir
+    }
+
+    /// Get the workflows directory (if set), otherwise use env var or default
+    pub fn workflows_dir(&self) -> String {
+        if let Some(ref dir) = self.workflows_dir {
+            dir.to_str().unwrap().to_string()
+        } else {
+            std::env::var("HEGEL_WORKFLOWS_DIR").unwrap_or_else(|_| "workflows".to_string())
+        }
+    }
+
+    /// Get the guides directory (if set), otherwise use env var or default
+    pub fn guides_dir(&self) -> String {
+        if let Some(ref dir) = self.guides_dir {
+            dir.to_str().unwrap().to_string()
+        } else {
+            std::env::var("HEGEL_GUIDES_DIR").unwrap_or_else(|_| "guides".to_string())
+        }
     }
 
     /// Get the default state directory (.hegel in current working directory)
@@ -378,7 +418,6 @@ mod tests {
     // ========== State Directory Resolution Tests ==========
 
     #[test]
-    #[ignore] // TODO: FLAKY - Fails when other tests change/delete the current working directory. Needs refactoring to use a controlled temp directory.
     fn test_resolve_state_dir_default() {
         // When no CLI flag or env var, should use default (.hegel in cwd)
         let resolved = FileStorage::resolve_state_dir(None).unwrap();

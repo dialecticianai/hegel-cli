@@ -441,69 +441,48 @@ pub fn hook_with_transcript(transcript_path: &Path, session_id: &str, timestamp:
 
 // ========== Workflow Command Test Helpers ==========
 
-/// Helper to save and restore working directory
-pub struct WorkingDirGuard {
-    original_dir: Option<PathBuf>,
-}
-
-impl WorkingDirGuard {
-    pub fn new() -> Self {
-        Self {
-            // Handle case where current dir doesn't exist (parallel test race condition)
-            original_dir: std::env::current_dir().ok(),
-        }
-    }
-}
-
-impl Drop for WorkingDirGuard {
-    fn drop(&mut self) {
-        // Only restore if we successfully captured the original dir
-        if let Some(dir) = &self.original_dir {
-            let _ = std::env::set_current_dir(dir);
-        }
-    }
-}
-
 /// Setup test environment for workflow commands
 ///
-/// Creates temp directory with workflows/, guides/, and test storage
-/// Returns (TempDir, FileStorage, WorkingDirGuard) and sets cwd to temp_dir
-pub fn setup_workflow_env() -> (TempDir, FileStorage, WorkingDirGuard) {
-    let guard = WorkingDirGuard::new();
+/// Creates temp directory with workflows/, guides/, and test storage.
+/// Uses FileStorage::with_dirs for thread-safe directory isolation.
+/// DOES NOT use env vars or change working directory.
+///
+/// Returns (TempDir, FileStorage) for test isolation
+pub fn setup_workflow_env() -> (TempDir, FileStorage) {
     let temp_dir = TempDir::new().unwrap();
 
     // Create workflows and guides directories
-    std::fs::create_dir(temp_dir.path().join("workflows")).unwrap();
-    std::fs::create_dir(temp_dir.path().join("guides")).unwrap();
+    let workflows_dir = temp_dir.path().join("workflows");
+    let guides_dir = temp_dir.path().join("guides");
+    let state_dir = temp_dir.path().join("state");
+
+    std::fs::create_dir(&workflows_dir).unwrap();
+    std::fs::create_dir(&guides_dir).unwrap();
 
     // Write test workflow
-    std::fs::write(
-        temp_dir.path().join("workflows/discovery.yaml"),
-        TEST_WORKFLOW_YAML,
-    )
-    .unwrap();
+    std::fs::write(workflows_dir.join("discovery.yaml"), TEST_WORKFLOW_YAML).unwrap();
 
-    // Create storage
-    let storage = FileStorage::new(temp_dir.path().join("state")).unwrap();
+    // Create storage with custom directories (thread-safe, no env vars!)
+    let storage =
+        FileStorage::with_dirs(&state_dir, Some(&workflows_dir), Some(&guides_dir)).unwrap();
 
-    // Change to temp dir
-    std::env::set_current_dir(temp_dir.path()).unwrap();
-
-    (temp_dir, storage, guard)
+    (temp_dir, storage)
 }
 
 /// Setup test environment with production workflows
 ///
 /// Copies production workflow files (discovery.yaml, execution.yaml) from project root
 /// to temp directory for isolated testing. Uses compile-time path to avoid working directory races.
+/// Returns storage with workflows_dir set directly (thread-safe, no env vars).
+/// DOES NOT use env vars or change working directory.
 ///
-/// Returns (TempDir, WorkingDirGuard) and sets cwd to temp_dir
-pub fn setup_production_workflows() -> (TempDir, WorkingDirGuard) {
-    let guard = WorkingDirGuard::new();
+/// Returns TempDir for cleanup
+pub fn setup_production_workflows() -> TempDir {
     let temp_dir = TempDir::new().unwrap();
 
     // Create workflows directory
-    std::fs::create_dir(temp_dir.path().join("workflows")).unwrap();
+    let workflows_dir = temp_dir.path().join("workflows");
+    std::fs::create_dir(&workflows_dir).unwrap();
 
     // Use compile-time project root (immune to runtime cwd changes)
     let project_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -511,7 +490,7 @@ pub fn setup_production_workflows() -> (TempDir, WorkingDirGuard) {
     // Copy production workflow files
     for workflow in &["discovery.yaml", "execution.yaml"] {
         let src = project_root.join("workflows").join(workflow);
-        let dst = temp_dir.path().join("workflows").join(workflow);
+        let dst = workflows_dir.join(workflow);
 
         if src.exists() {
             std::fs::copy(&src, &dst)
@@ -521,10 +500,7 @@ pub fn setup_production_workflows() -> (TempDir, WorkingDirGuard) {
         }
     }
 
-    // Change to temp dir
-    std::env::set_current_dir(temp_dir.path()).unwrap();
-
-    (temp_dir, guard)
+    temp_dir
 }
 
 // ========== TUI Test Helpers ==========

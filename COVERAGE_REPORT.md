@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-15 20:53
+**Last Updated**: 2025-10-15 21:16
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.90%** lines | **90.86%** regions | **88.23%** functions
+**Overall Coverage**: **92.13%** lines | **91.14%** regions | **88.66%** functions
 
 ## Summary
 
 ```
-TOTAL                              11364              1039    90.86%         620                73    88.23%        7026               569    91.90%           0                 0         -
+TOTAL                              11382              1009    91.14%         626                71    88.66%        7051               555    92.13%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -23,9 +23,9 @@ TOTAL                              11364              1039    90.86%         620
 | `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
-| `commands/meta.rs` | 86.00% | 85.20% | 90.91% | 🟡 Good |
+| `commands/meta.rs` | 86.00% | 85.00% | 90.91% | 🟡 Good |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `commands/workflow.rs` | 90.80% | 89.01% | 84.78% | 🟢 Excellent |
+| `commands/workflow.rs` | 91.72% | 90.50% | 86.96% | 🟢 Excellent |
 | `commands/wrapped.rs` | 37.50% | 40.96% | 40.00% | 🔴 Needs Work |
 | `engine/mod.rs` | 99.80% | 99.42% | 96.77% | 🟢 Excellent |
 | `engine/template.rs` | 95.47% | 94.58% | 96.30% | 🟢 Excellent |
@@ -42,8 +42,8 @@ TOTAL                              11364              1039    90.86%         620
 | `rules/evaluator.rs` | 99.29% | 98.52% | 100.00% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
-| `storage/mod.rs` | 83.64% | 86.86% | 63.64% | 🟡 Good |
-| `test_helpers.rs` | 93.48% | 90.21% | 91.49% | 🟢 Excellent |
+| `storage/mod.rs` | 87.61% | 89.37% | 71.15% | 🟡 Good |
+| `test_helpers.rs` | 93.55% | 90.81% | 91.11% | 🟢 Excellent |
 | `theme.rs` | 65.00% | 67.42% | 58.82% | 🟠 Moderate |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -63,7 +63,7 @@ TOTAL                              11364              1039    90.86%         620
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.56%
 - `commands/hook.rs` - 96.64%
-- `commands/workflow.rs` - 90.80%
+- `commands/workflow.rs` - 91.72%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 95.47%
 - `guardrails/parser.rs` - 97.78%
@@ -78,7 +78,7 @@ TOTAL                              11364              1039    90.86%         620
 - `rules/evaluator.rs` - 99.29%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
-- `test_helpers.rs` - 93.48%
+- `test_helpers.rs` - 93.55%
 - `tui/tabs/overview.rs` - 100.00%
 - `tui/tabs/phases.rs` - 95.18%
 - `tui/ui.rs` - 100.00%
@@ -86,7 +86,7 @@ TOTAL                              11364              1039    90.86%         620
 
 ### 🟡 Good (70-89% lines)
 - `commands/meta.rs` - 86.00%
-- `storage/mod.rs` - 83.64%
+- `storage/mod.rs` - 87.61%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
 - `tui/tabs/files.rs` - 81.63%
@@ -107,7 +107,7 @@ TOTAL                              11364              1039    90.86%         620
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 91.90% | ✅ Met |
+| Overall | ≥80% | 92.13% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
