@@ -33,15 +33,30 @@ pub struct Workflow {
     pub nodes: HashMap<String, Node>,
 }
 
-/// Load workflow definition from YAML file
-pub fn load_workflow<P: AsRef<Path>>(yaml_path: P) -> Result<Workflow> {
-    let content = fs::read_to_string(yaml_path.as_ref())
-        .with_context(|| format!("Failed to read workflow file: {:?}", yaml_path.as_ref()))?;
-
+/// Load workflow definition from YAML string
+pub fn load_workflow_from_str(content: &str) -> Result<Workflow> {
     let workflow: Workflow =
-        serde_yaml::from_str(&content).with_context(|| "Failed to parse workflow YAML")?;
-
+        serde_yaml::from_str(content).with_context(|| "Failed to parse workflow YAML")?;
     Ok(workflow)
+}
+
+/// Load workflow definition from YAML file (tries embedded first, then filesystem)
+pub fn load_workflow<P: AsRef<Path>>(yaml_path: P) -> Result<Workflow> {
+    let path = yaml_path.as_ref();
+
+    // Extract workflow name from path (e.g., "workflows/discovery.yaml" -> "discovery")
+    let workflow_name = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+
+    // Try embedded workflow first
+    if let Some(embedded_content) = crate::embedded::get_workflow(workflow_name) {
+        return load_workflow_from_str(embedded_content);
+    }
+
+    // Fall back to filesystem
+    let content = fs::read_to_string(path)
+        .with_context(|| format!("Failed to read workflow file: {:?}", path))?;
+
+    load_workflow_from_str(&content)
 }
 
 /// Initialize workflow state from workflow definition
@@ -174,12 +189,13 @@ nodes:
     prompt: "Complete!"
     transitions: []
 "#;
-        let workflow_path = create_test_workflow_file(&temp_dir, "discovery", yaml_content);
+        // Use different name to avoid collision with embedded "discovery" workflow
+        let workflow_path = create_test_workflow_file(&temp_dir, "test_discovery", yaml_content);
 
         let workflow = load_workflow(&workflow_path).unwrap();
         assert_eq!(workflow.mode, "discovery");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 3);
+        assert_eq!(workflow.nodes.len(), 3); // Test workflow has 3 nodes
         assert!(workflow.nodes.contains_key("spec"));
         assert!(workflow.nodes.contains_key("plan"));
         assert!(workflow.nodes.contains_key("done"));
@@ -218,12 +234,13 @@ nodes:
     prompt: "Complete!"
     transitions: []
 "#;
-        let workflow_path = create_test_workflow_file(&temp_dir, "execution", yaml_content);
+        // Use different name to avoid collision with embedded "execution" workflow
+        let workflow_path = create_test_workflow_file(&temp_dir, "test_execution", yaml_content);
 
         let workflow = load_workflow(&workflow_path).unwrap();
         assert_eq!(workflow.mode, "execution");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 5);
+        assert_eq!(workflow.nodes.len(), 5); // Test workflow has 5 nodes
 
         // Verify review node has multiple transitions
         let review_node = &workflow.nodes["review"];

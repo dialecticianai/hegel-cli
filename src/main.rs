@@ -1,5 +1,7 @@
 mod adapters;
 mod commands;
+mod config;
+mod embedded;
 mod engine;
 mod guardrails;
 mod metamodes;
@@ -103,27 +105,9 @@ fn main() -> Result<()> {
 
     // If no command provided, output HEGEL_CLAUDE.md for LLM onboarding
     if cli.command.is_none() {
-        let guide_path = std::path::Path::new("HEGEL_CLAUDE.md");
-        match std::fs::read_to_string(guide_path) {
-            Ok(contents) => {
-                println!("{}", contents);
-            }
-            Err(_) => {
-                // Fallback if HEGEL_CLAUDE.md not found
-                println!(
-                    "{}",
-                    Theme::header("Hegel - Dialectic-Driven Development CLI")
-                );
-                println!();
-                println!(
-                    "{}",
-                    Theme::warning("HEGEL_CLAUDE.md not found in current directory")
-                );
-                println!();
-                println!("Run hegel from the project root directory, or use:");
-                println!("  hegel --help    Show available commands");
-            }
-        }
+        // Embed HEGEL_CLAUDE.md at compile time
+        const HEGEL_GUIDE: &str = include_str!("../HEGEL_CLAUDE.md");
+        println!("{}", HEGEL_GUIDE);
         return Ok(());
     }
 

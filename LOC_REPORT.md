@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-15 21:16
+**Last Updated**: 2025-10-17 18:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,775 | 15,393 | 24,168 |
-| **Comments** | 1,161 | - | 1,161 |
-| **Blank Lines** | 1,546 | - | 1,546 |
-| **Total Lines** | 11,482 | 15,393 | 26,875 |
-| **Files** | 43 | 96 | 139 |
+| **Lines** | 8,895 | 20,542 | 29,437 |
+| **Comments** | 1,193 | - | 1,193 |
+| **Blank Lines** | 1,585 | - | 1,585 |
+| **Total Lines** | 11,673 | 20,542 | 32,215 |
+| **Files** | 45 | 106 | 151 |
 
-**Documentation Ratio**: 1.75 lines of docs per line of code
+**Documentation Ratio**: 2.31 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            43           1546           1161           8775
+Rust                            45           1585           1193           8895
 -------------------------------------------------------------------------------
-SUM:                            43           1546           1161           8775
+SUM:                            45           1585           1193           8895
 -------------------------------------------------------------------------------
 ```
 
@@ -48,14 +48,16 @@ SUM:                            43           1546           1161           8775
 | `commands/meta.rs` | 231 | 146 | 85 | 36.8% | ✅ |
 | `commands/mod.rs` | 20 | 20 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 736 | 286 | 450 | 61.1% | ✅ (infra) |
+| `commands/workflow.rs` | 728 | 286 | 442 | 60.7% | ✅ (infra) |
 | `commands/wrapped.rs` | 132 | 68 | 64 | 48.5% | ✅ |
-| `engine/mod.rs` | 730 | 137 | 593 | 81.2% | ✅ |
-| `engine/template.rs` | 351 | 87 | 264 | 75.2% | ✅ |
+| `config.rs` | 99 | 56 | 43 | 43.4% | ✅ |
+| `embedded.rs` | 77 | 77 | 0 | 0.0% | ✅ |
+| `engine/mod.rs` | 747 | 152 | 595 | 79.7% | ✅ |
+| `engine/template.rs` | 368 | 94 | 274 | 74.5% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 171 | 98 | 73 | 42.7% | ✅ |
-| `main.rs` | 186 | 11 | 175 | 94.1% | ✅ |
+| `main.rs` | 170 | 13 | 157 | 92.4% | ✅ |
 | `metamodes/mod.rs` | 236 | 111 | 125 | 53.0% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |
@@ -63,7 +65,7 @@ SUM:                            43           1546           1161           8775
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 1,491 | 115 | 1,376 | 92.3% | ✅ |
+| `rules/evaluator.rs` | 1,496 | 115 | 1,381 | 92.3% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
@@ -86,22 +88,32 @@ SUM:                            43           1546           1161           8775
 
 | File | Lines |
 |------|-------|
+| `.webcache/claude_code/cost_tracking.md` | 0 |
+| `.webcache/claude_code/docs_map.md` | 1,097 |
+| `.webcache/claude_code/hooks_guide.md` | 332 |
+| `.webcache/claude_code/hooks.md` | 788 |
+| `.webcache/claude_code/mcp.md` | 1,126 |
+| `.webcache/claude_code/monitoring_usage.md` | 507 |
+| `.webcache/claude_code/plugin-marketplaces.md` | 433 |
+| `.webcache/claude_code/plugins-reference.md` | 337 |
+| `.webcache/claude_code/plugins.md` | 377 |
 | `CLAUDE.md` | 137 |
 | `CODE_MAP.md` | 159 |
-| `COVERAGE_REPORT.md` | 134 |
+| `commands/hegel.md` | 23 |
+| `COVERAGE_REPORT.md` | 138 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/CODE_MAP_WRITING.md` | 95 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 92 |
-| `guides/KNOWLEDGE_CAPTURE.md` | 356 |
-| `guides/LEARNINGS_WRITING.md` | 92 |
-| `guides/PLAN_WRITING.md` | 145 |
-| `guides/QUESTION_TRACKING.md` | 392 |
+| `guides/KNOWLEDGE_CAPTURE.md` | 371 |
+| `guides/LEARNINGS_WRITING.md` | 106 |
+| `guides/PLAN_WRITING.md` | 159 |
+| `guides/QUESTION_TRACKING.md` | 407 |
 | `guides/README_WRITING.md` | 138 |
-| `guides/SPEC_WRITING.md` | 111 |
-| `guides/STUDY_PLANNING.md` | 230 |
-| `HEGEL_CLAUDE.md` | 522 |
+| `guides/SPEC_WRITING.md` | 125 |
+| `guides/STUDY_PLANNING.md` | 245 |
+| `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
 | `LOC_REPORT.md` | 208 |
 | `README.md` | 392 |
@@ -189,7 +201,7 @@ SUM:                            43           1546           1161           8775
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.75 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.31 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

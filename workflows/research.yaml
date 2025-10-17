@@ -11,16 +11,6 @@ nodes:
 
       Your task: Define research priorities and scope.
       {{?context_note}}
-
-      Focus on:
-      - What knowledge domains need study (external docs, wikis, papers, codebases)
-      - Priority ordering (what's foundational vs what can wait)
-      - Success criteria (when is research phase complete)
-      - Time boxing (don't get lost in infinite reading)
-
-      Research mode is pre-Discovery. You're gathering external knowledge, not building yet.
-
-      Respond with your study plan (can be structured as numbered priorities or phases).
     transitions:
       - when: "plan_complete"
         to: study

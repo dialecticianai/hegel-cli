@@ -32,6 +32,20 @@ A **PLAN.md is a strategic roadmap** describing **what to build and how to build
 
 ---
 
+## File Operations
+
+**CRITICAL**: Write your plan to a file, don't paste in chat.
+
+1. **Write to `PLAN.md`** using the Write tool (appropriate location depends on mode)
+2. **Use checkboxes** in Success Criteria sections for tracking progress
+3. **Launch review**: Run `hegel reflect PLAN.md` to open GUI for user review
+4. **Read feedback**: Check `.ddd/PLAN.review.*` files if user adds comments
+5. **Incorporate feedback**: Update plan based on review before starting implementation
+
+The review GUI allows the user to select text and add inline comments.
+
+---
+
 ## Structure
 
 ### Header

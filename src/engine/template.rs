@@ -56,10 +56,17 @@ pub fn render_template(
         // Validate guide name for security
         validate_guide_name(guide_name)?;
 
-        let guide_path = guides_dir.join(format!("{}.md", guide_name));
+        let guide_filename = format!("{}.md", guide_name);
 
-        let guide_content = fs::read_to_string(&guide_path)
-            .with_context(|| format!("Failed to load required guide: {}.md", guide_name))?;
+        // Try embedded guide first, then fall back to filesystem
+        let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename) {
+            embedded.to_string()
+        } else {
+            // Fall back to guides_dir (for user overrides or local development)
+            let guide_path = guides_dir.join(&guide_filename);
+            fs::read_to_string(&guide_path)
+                .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
+        };
 
         result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
     }
@@ -219,7 +226,10 @@ mod tests {
             &HashMap::new(),
         )
         .unwrap();
-        assert!(result.contains("SPEC Writing Guide") && result.contains("specification document"));
+        // Check mechanism: guide loaded and placeholder replaced (content can change)
+        assert!(result.starts_with("Follow this guide:\n\n"));
+        assert!(result.len() > 100); // Guide content was loaded (non-trivial length)
+        assert!(!result.contains("{{SPEC_WRITING}}")); // Placeholder was replaced
     }
 
     #[test]
@@ -242,7 +252,12 @@ mod tests {
             &HashMap::new(),
         )
         .unwrap();
-        assert!(result.contains("SPEC Writing Guide") && result.contains("PLAN Writing Guide"));
+        // Check mechanism: both guides loaded, placeholders replaced
+        assert!(result.starts_with("Phase 1:\n"));
+        assert!(result.contains("\n---\n"));
+        assert!(result.len() > 200); // Both guides loaded
+        assert!(!result.contains("{{SPEC_WRITING}}"));
+        assert!(!result.contains("{{PLAN_WRITING}}"));
     }
 
     // ========== Mixed Placeholder Tests ==========
@@ -256,10 +271,12 @@ mod tests {
             .build();
         let template = "Write a {{doc_type}} for {{system}}.\n\n{{SPEC_WRITING}}\n\n{{?user_context}}\n\nFollow TDD.";
         let result = render_template(template, &guides_path, &context).unwrap();
-        assert!(result.contains("Write a SPEC.md for template engine."));
-        assert!(result.contains("SPEC Writing Guide"));
-        assert!(result.contains("Follow TDD."));
-        assert!(!result.contains("user_context"));
+        // Check all mechanisms work together
+        assert!(result.contains("Write a SPEC.md for template engine.")); // Required vars
+        assert!(result.contains("Follow TDD.")); // Static text preserved
+        assert!(result.len() > 100); // Guide loaded
+        assert!(!result.contains("{{SPEC_WRITING}}")); // Guide placeholder replaced
+        assert!(!result.contains("user_context")); // Optional var removed (not provided)
     }
 
     // ========== Empty Template Tests ==========

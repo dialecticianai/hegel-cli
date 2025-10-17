@@ -21,19 +21,50 @@ If not available, check if it's built locally:
 
 ## Workflow Orchestration
 
-### Starting a Workflow
+### Declaring a Meta-Mode (Required First Step)
 
-Begin a structured development session:
+**IMPORTANT:** Before starting any workflow, declare which meta-mode pattern you're following:
 
 ```bash
-hegel start discovery    # For exploration/learning
-hegel start execution    # For production delivery
+# For greenfield learning projects
+hegel meta learning
+
+# For standard feature development with known patterns
+hegel meta standard
+
+# View current meta-mode
+hegel meta
+```
+
+**Available meta-modes:**
+- `learning` - Greenfield learning project (Research ↔ Discovery loop, starts with research)
+- `standard` - Feature development with known patterns (Discovery ↔ Execution, starts with discovery)
+
+**What happens:**
+- Declares your meta-mode in `.hegel/metamode.json`
+- Automatically starts the appropriate initial workflow for your meta-mode
+- Sets up the workflow transition pattern
+
+### Starting Additional Workflows
+
+After declaring your meta-mode, transition between workflows:
+
+```bash
+hegel start discovery    # When in learning mode after research complete
+hegel start execution    # When transitioning to production delivery
+hegel start research     # External knowledge gathering (learning mode)
 ```
 
 **What happens:**
 - Loads workflow definition from `workflows/*.yaml`
 - Initializes state in `.hegel/state.json`
 - Prints the current phase prompt
+
+**Available workflows:**
+- `research` - External knowledge gathering (PLAN → STUDY → ASSESS → QUESTIONS)
+- `discovery` - Optimized for learning density (SPEC → PLAN → CODE → LEARNINGS → README)
+- `execution` - Optimized for production delivery
+- `minimal` - Simplified workflow for quick iterations
 
 **When to start workflows:**
 - Beginning a new feature or project
@@ -289,11 +320,14 @@ Prints summary of:
 ### Starting a Session
 
 ```bash
+# Check if meta-mode is declared
+hegel meta
+
+# If no meta-mode declared and user wants structure:
+hegel meta standard  # or: hegel meta learning
+
 # Check if workflow is active
 hegel status
-
-# If no workflow and user wants structure:
-hegel start discovery
 
 # If workflow active, check current phase:
 hegel status | grep "Current node"
@@ -493,6 +527,10 @@ Error: "Stayed at current node" when expecting to advance
 ## Quick Reference
 
 ```bash
+# Meta-mode (required first step)
+hegel meta <mode>               # Declare meta-mode (learning/standard)
+hegel meta                      # View current meta-mode
+
 # Workflow
 hegel start <workflow>          # Start workflow
 hegel next                      # Advance to next phase
