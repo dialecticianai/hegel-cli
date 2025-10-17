@@ -1422,6 +1422,11 @@ fn evaluate_repeated_command(
         _ => return Ok(None),
     };
 
+    // Skip evaluation if no phase_start_time available (no active phase)
+    if context.phase_start_time.is_empty() {
+        return Ok(None);
+    }
+
     // Calculate window bounds: [phase_start, phase_start + window]
     let phase_start = DateTime::parse_from_rfc3339(context.phase_start_time)?;
     let window_end = phase_start + chrono::Duration::seconds(*window as i64);

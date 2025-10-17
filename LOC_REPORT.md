@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 8,895 | 20,542 | 29,437 |
+| **Lines** | 8,895 | 20,554 | 29,449 |
 | **Comments** | 1,193 | - | 1,193 |
 | **Blank Lines** | 1,585 | - | 1,585 |
-| **Total Lines** | 11,673 | 20,542 | 32,215 |
+| **Total Lines** | 11,673 | 20,554 | 32,227 |
 | **Files** | 45 | 106 | 151 |
 
 **Documentation Ratio**: 2.31 lines of docs per line of code
@@ -115,7 +115,7 @@ SUM:                            45           1585           1193           8895
 | `guides/STUDY_PLANNING.md` | 245 |
 | `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 208 |
+| `LOC_REPORT.md` | 220 |
 | `README.md` | 392 |
 | `ROADMAP.md` | 181 |
 | `TESTING.md` | 41 |

@@ -11,7 +11,7 @@ use tempfile::TempDir;
 
 /// Test workflow YAML - simple 3-node workflow for testing
 pub const TEST_WORKFLOW_YAML: &str = r#"
-mode: discovery
+mode: test_mode
 start_node: spec
 nodes:
   spec:
@@ -460,7 +460,7 @@ pub fn setup_workflow_env() -> (TempDir, FileStorage) {
     std::fs::create_dir(&guides_dir).unwrap();
 
     // Write test workflow
-    std::fs::write(workflows_dir.join("discovery.yaml"), TEST_WORKFLOW_YAML).unwrap();
+    std::fs::write(workflows_dir.join("test_workflow.yaml"), TEST_WORKFLOW_YAML).unwrap();
 
     // Create storage with custom directories (thread-safe, no env vars!)
     let storage =
