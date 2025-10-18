@@ -27,13 +27,13 @@
 ### 1. Knowledge Domains
 
 What areas need study? Examples:
-- Core architecture (memory maps, timing, constraints)
-- Subsystems (graphics, audio, input, networking)
-- Toolchain (assemblers, compilers, debuggers, build systems)
+- Core architecture (system structure, timing, constraints)
+- Subsystems (rendering, audio, input, networking)
+- Toolchain (compilers, debuggers, build systems, profilers)
 - Patterns (common techniques, optimization strategies)
 - Meta-knowledge (best practices, gotchas, edge cases)
 
-Be specific. "Study graphics" is vague. "PPU architecture, sprite techniques, scrolling patterns" is clear.
+Be specific. "Study rendering" is vague. "Shader pipeline, vertex processing, rasterization flow" is clear.
 
 ### 2. Priority Ordering
 
@@ -41,18 +41,18 @@ What's foundational vs what can defer?
 
 **Priority 0 (Foundational)**: Can't understand anything else without this
 - Core architecture
-- Memory organization
+- System organization
 - Basic operation (how the system works at all)
 
 **Priority 1-2 (Core)**: Need for any real work
-- Key subsystems (graphics, input, timing)
-- Common patterns (init sequences, main loops)
+- Key subsystems (rendering, input, timing)
+- Common patterns (initialization, main loops)
 - Toolchain basics
 
 **Priority 3-4 (Advanced)**: Optimization, special techniques
 - Performance tuning
-- Advanced effects
-- Audio/music systems
+- Advanced features
+- Complex subsystem interactions
 
 **Priority 5+ (Specialized)**: Nice to know, not blocking
 - Historical context
@@ -72,7 +72,7 @@ How do you know when research phase is complete?
 
 **Good criteria**:
 - "Core priorities (0-2) studied and documented"
-- "Toolchain validated (can build hello world)"
+- "Toolchain validated (can build minimal example)"
 - "Open questions catalogued (theory vs practice gaps clear)"
 - "Ready to start practical experiments"
 
@@ -129,54 +129,32 @@ Keep it simple. Numbered priorities work well:
 ---
 
 ## Priority 0: Foundational (MUST KNOW)
-- Core architecture (memory, timing, constraints)
+- Core architecture (system structure, timing, constraints)
 - Basic operation (how system works)
 - Target: 1 session
 
 ## Priority 1: Essential Subsystems (CORE)
-- Graphics/PPU
+- Rendering pipeline
 - Input handling
-- Timing/interrupts
+- Timing/scheduling
 - Target: 1 session
 
 ## Priority 2: Toolchain & Patterns (PRACTICAL)
-- Assembler/compiler selection
+- Compiler/build tool selection
 - Build workflow
-- Common init patterns
+- Common initialization patterns
 - Target: 0.5 session
 
 ## Priority 3: Optimization (ADVANCED) - DEFER
 - Performance techniques
-- Advanced effects
+- Advanced features
 - Study after practical experience
 
-## Priority 4: Audio (SPECIALIZED) - DEFER
-- Sound engines
-- Music systems
+## Priority 4: Specialized Features (DEFER)
+- Domain-specific subsystems
+- Complex integrations
 - Study when needed for project
 ```
-
----
-
-## Pattern from ddd-nes
-
-The ddd-nes project provides a reference implementation:
-
-**Study structure**:
-- 5 priority groups (0-4)
-- 52 wiki pages studied systematically
-- 11 learning documents created
-- 5 meta-assessments tracking progress
-- 43 questions catalogued (36 open, 7 answered)
-
-**Meta-assessments after each priority**:
-- `0_initial_questions.md` - Starting point
-- `1_essential_techniques.md` - Priority 1-2 gaps
-- `2_toolchain_optimization.md` - Priority 2.5-3 insights
-- `3_audio_complete.md` - Priority 4 workflow
-- `4_mappers_complete.md` - Priority 5 strategy
-
-**Outcome**: Clear transition point to Discovery mode with roadmap of questions to answer through toys.
 
 ---
 
@@ -197,7 +175,7 @@ The ddd-nes project provides a reference implementation:
 ### Toolchain Validation
 - Don't just read, test
 - Build minimal example early
-- Validate assumptions (macOS ARM64 vs docs claiming "macOS support")
+- Validate assumptions (platform-specific quirks vs documentation)
 - Document actual setup (not theoretical)
 
 ---
@@ -239,7 +217,4 @@ From LEXICON.md:
 
 Learning docs are the durable artifact. External sources are disposable (cached for reference, but synthesized understanding is what matters).
 
-From ddd-nes blog #1:
-> "The deliverable isn't the game yet. It's the knowledge base."
-
-Research mode embodies this: knowledge capture as primary deliverable.
+Research mode embodies this: knowledge capture as primary deliverable. The code can be rewritten; the understanding cannot.

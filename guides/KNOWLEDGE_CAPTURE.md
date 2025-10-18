@@ -37,7 +37,7 @@ The external source is disposable (cached for reference). Your understanding is 
 - Point to source for exhaustive details
 
 ❌ **Isolated facts without context**
-- "PPU has 8 scanline sprite limit"
+- "System has 8-object render limit per scanline"
 - Missing: Why? What does this constrain? How do you work with it?
 
 ---
@@ -52,17 +52,17 @@ The external source is disposable (cached for reference). Your understanding is 
 ✅ **Constraint identification**
 - What are the hard limits (hardware, timing, memory)?
 - What trade-offs exist (speed vs space, flexibility vs simplicity)?
-- What bottlenecks matter (vblank budget, sprite limit)?
+- What bottlenecks matter (frame budget, resource limits)?
 
 ✅ **Gotcha documentation**
 - What edge cases break naive implementations?
 - What common mistakes do sources warn about?
-- What surprises exist (PPU write toggle, sprite Y-1 offset)?
+- What surprises exist (write ordering, state toggles)?
 
 ✅ **Cross-referencing and integration**
-- How do subsystems interact (DPCM glitches controller reads)?
-- What dependencies exist (mapper choice affects CHR strategy)?
-- Where do sources conflict (wiki vs practice)?
+- How do subsystems interact (unexpected side effects)?
+- What dependencies exist (architectural choices cascade)?
+- Where do sources conflict (documentation vs reality)?
 
 ✅ **Theory vs practice gaps**
 - What can you understand from reading?
@@ -116,8 +116,8 @@ Common patterns (adapt to domain):
 ---
 
 **Sources**:
-- [NESdev Wiki - PPU](https://www.nesdev.org/wiki/PPU) (cached to .webcache/nesdev/ppu.html)
-- [Timing Guide](https://www.nesdev.org/wiki/Cycle_reference_chart)
+- [API Documentation](https://example.org/docs/api) (cached to .webcache/docs/api.html)
+- [Performance Guide](https://example.org/docs/perf)
 
 **Created**: October 2025
 **Last updated**: [Date of significant revision]
@@ -131,10 +131,10 @@ Use `.webcache/` for offline stable copies:
 
 ```bash
 # Cache HTML
-curl -s https://www.nesdev.org/wiki/PPU -o .webcache/nesdev/ppu.html
+curl -s https://example.org/docs/api -o .webcache/docs/api.html
 
 # Read cached HTML as clean text
-lynx -dump -nolist .webcache/nesdev/ppu.html
+lynx -dump -nolist .webcache/docs/api.html
 
 # Or use WebFetch tool in Claude Code
 ```
@@ -161,18 +161,18 @@ From DDD.md section "Design for LLM Consumption":
 
 **Bad (human-optimized verbosity)**:
 ```markdown
-The PPU has a register at memory address $2000 called PPUCTRL.
-When you write to this register, you can control various aspects
-of how the PPU operates, including which nametable is used for
-rendering and whether sprites are 8x8 or 8x16 pixels tall.
+The configuration register at offset 0x100 controls several aspects
+of the rendering system. When you write to this register, you can
+control which buffer is active and whether objects use standard or
+extended dimensions.
 ```
 
 **Good (LLM-optimized density)**:
 ```markdown
-**PPUCTRL ($2000)**: Controls PPU operation
-- Bits 0-1: Base nametable ($2000/$2400/$2800/$2C00)
-- Bit 5: Sprite size (0=8x8, 1=8x16)
-- Bit 7: NMI enable (1=trigger on vblank)
+**CONFIG_REG (0x100)**: Controls rendering behavior
+- Bits 0-1: Active buffer selection (0-3)
+- Bit 5: Object size (0=standard, 1=extended)
+- Bit 7: Interrupt enable (1=trigger on vsync)
 ```
 
 **Key difference**: Facts + relationships in minimal tokens. No hand-holding.
@@ -183,46 +183,46 @@ rendering and whether sprites are 8x8 or 8x16 pixels tall.
 
 ### Bad: Transcription
 ```markdown
-## PPU Registers
+## Hardware Registers
 
-The PPU has 8 registers mapped to CPU memory:
-- $2000: PPUCTRL
-- $2001: PPUMASK
-- $2002: PPUSTATUS
-- $2003: OAMADDR
-- $2004: OAMDATA
-- $2005: PPUSCROLL
-- $2006: PPUADDR
-- $2007: PPUDATA
+The system has 8 registers mapped to memory:
+- 0x100: CONFIG
+- 0x101: MASK
+- 0x102: STATUS
+- 0x103: ADDR_LO
+- 0x104: ADDR_HI
+- 0x105: SCROLL
+- 0x106: DATA_ADDR
+- 0x107: DATA
 
 Each register has different functions...
-[Continues with wiki copy-paste]
+[Continues with documentation copy-paste]
 ```
 
-Why bad: Verbatim enumeration without insight. Just read the wiki.
+Why bad: Verbatim enumeration without insight. Just read the docs.
 
 ### Good: Synthesis
 ```markdown
-## PPU Register Programming
+## Hardware Register Programming
 
-**Mental model**: CPU writes to 8 PPU registers ($2000-$2007) to control graphics.
+**Mental model**: CPU writes to 8 hardware registers (0x100-0x107) to control rendering.
 
-**Key constraint**: Only safe during vblank (2273 cycles NTSC). Writing outside vblank causes corruption.
+**Key constraint**: Only safe during vsync period (~2.3ms). Writing outside vsync causes corruption.
 
 **Common patterns**:
-- Bulk updates: Use $2006 (address) + $2007 (data) for VRAM writes
-- DMA shortcut: $4014 copies 256-byte page to sprite memory (513 cycles)
-- Toggle gotcha: $2005 and $2006 share internal toggle, reset via $2002 read
+- Bulk updates: Use ADDR (0x106) + DATA (0x107) for memory writes
+- DMA shortcut: 0x200 copies page to object memory (efficient batch transfer)
+- Toggle gotcha: SCROLL and ADDR share internal state, reset via STATUS read
 
-**Vblank priority order**:
-1. OAM DMA (513 cycles) - sprites
-2. Scroll updates ($2005) - camera position
-3. VRAM writes ($2006/$2007) - nametable/CHR changes
-4. Defer to main loop: audio updates, game logic
+**Vsync priority order**:
+1. DMA transfer (batch objects)
+2. Scroll updates (camera position)
+3. Memory writes (tilemap/texture changes)
+4. Defer to main loop: audio, input, game logic
 
 **Open questions**:
-- Q: How many VRAM writes fit in remaining vblank budget? (Needs measurement)
-- Q: What's the actual cycle cost of $2006/$2007 sequence? (Profile in emulator)
+- Q: How many memory writes fit in remaining vsync budget? (Needs measurement)
+- Q: What's the actual cycle cost of ADDR+DATA sequence? (Profile on hardware)
 ```
 
 Why good: Mental model → constraints → patterns → gotchas → questions. Synthesized understanding, not transcribed facts.
@@ -238,15 +238,15 @@ Learning docs should interlink:
 - "Constraints covered in Timing section"
 
 **Across docs**:
-- "See timing_and_interrupts.md for vblank budget"
-- "Mapper choice affects CHR strategy (mappers.md)"
+- "See timing_and_interrupts.md for frame budget"
+- "Rendering mode choice affects texture strategy (rendering.md)"
 
 **To external sources**:
-- "NESdev wiki PPU page (cached: .webcache/nesdev/ppu.html)"
-- "Technique from Bisqwit's nescom.txt"
+- "API documentation (cached: .webcache/docs/api.html)"
+- "Technique from reference implementation"
 
 **To open questions**:
-- "Q7.2 in .ddd/5_open_questions.md will measure CHR-RAM performance"
+- "Q7.2 in .ddd/open_questions.md will measure buffer copy performance"
 
 **Goal**: Every fact has a source. Every gap has a question. Nothing is unsupported.
 
@@ -288,18 +288,6 @@ After studying a priority group, step back and assess:
 
 ---
 
-## Pattern from ddd-nes
-
-**Study output**:
-- 11 learning docs (wiki_architecture, sprite_techniques, audio, etc.)
-- 5 meta-assessments (0_initial_questions → 4_mappers_complete)
-- 1 consolidated questions doc (5_open_questions.md with 43 questions)
-
-**Key insight**: Numbered meta-assessments (`0_`, `1_`, `2_`...) keep them filesystem-ordered without dates.
-
-**Blog post #1 quote**:
-> "Every document ends with an attribution footer linking back to the wiki. We're not replacing the community's knowledge—we're condensing it for a specific purpose: building working NES games as an AI-human pair."
-
 ---
 
 ## Common Patterns by Domain
@@ -339,9 +327,6 @@ After studying a priority group, step back and assess:
 ---
 
 ## Key Insight
-
-From blog post #1:
-> "Study revealed what we *understand* versus what we need to *validate through practice*."
 
 Research mode documents your understanding. Discovery mode validates it.
 

@@ -20,8 +20,7 @@
 - Cross-references (theory → practice path)
 - Discovery roadmap emerges naturally
 
-From ddd-nes blog #1:
-> "The open questions document became a roadmap for practical work. Each question cross-references which learning doc has the theory and which test ROM will provide the answer."
+The open questions document becomes a roadmap for practical work. Each question cross-references which learning doc has the theory and which experiment will provide the answer.
 
 ---
 
@@ -92,51 +91,51 @@ The review GUI allows the user to select text and add inline comments.
 **Can be resolved by reading/synthesis**
 
 Examples:
-- Q: Which sound engine should we use?
-- Q: What mapper progression strategy makes sense?
-- Q: Should we avoid unofficial opcodes?
+- Q: Which audio library should we use?
+- Q: What rendering backend progression strategy makes sense?
+- Q: Should we use experimental API features?
 
 **Mark as answered** with rationale and source:
 ```markdown
-**Q3.1**: Which sound engine to use?
-- ✅ **ANSWERED**: FamiTone2 (beginner-friendly)
-  - Source: `learnings/audio.md` - 8 engines compared
-  - Alternative: FamiStudio if rich features needed later
-- **Next step**: Integrate FamiTone2 in audio test ROM
+**Q3.1**: Which audio library to use?
+- ✅ **ANSWERED**: LibAudio (beginner-friendly)
+  - Source: `learnings/audio.md` - 8 libraries compared
+  - Alternative: AdvancedAudio if rich features needed later
+- **Next step**: Integrate LibAudio in audio test program
 ```
 
 ### Practice Questions (Need Experimentation)
 **Require building/measuring to answer**
 
 Examples:
-- Q: How many VRAM writes fit in vblank budget?
-- Q: What's CHR-RAM copy actual performance?
-- Q: How to use Mesen debugger effectively?
+- Q: How many memory writes fit in vsync budget?
+- Q: What's buffer copy actual performance?
+- Q: How to use debugger/profiler effectively?
 
 **Mark as open** with practice path:
 ```markdown
 **Q1.4**: How to measure actual cycle usage?
-- Mesen's cycle counter?
+- Debugger's cycle counter?
 - Manual counting vs profiler?
-- Validate vblank budget adherence?
-- **Answer via**: Profile test ROM routines (OAM DMA, tile copy, etc.)
+- Validate frame budget adherence?
+- **Answer via**: Profile test program routines (DMA, buffer copy, etc.)
 ```
 
 ### Decision Questions (Context-Dependent)
 **Wait for more information**
 
 Examples:
-- Q: CHR-ROM or CHR-RAM for our game?
-- Q: How much zero page to allocate per subsystem?
-- Q: Which advanced mapper features do we need?
+- Q: Buffered or streaming rendering for our application?
+- Q: How much fast memory to allocate per subsystem?
+- Q: Which advanced features do we need?
 
 **Mark as deferred** with decision trigger:
 ```markdown
-**Q5.2**: CHR-ROM or CHR-RAM for ddd-nes?
-- **Pending**: Wait for SPEC.md (game genre decision)
-- Action/platformer → CHR-ROM (speed)
-- RPG/puzzle → CHR-RAM (flexibility)
-- **Answer via**: Define game genre, choose CHR strategy
+**Q5.2**: Buffered or streaming rendering?
+- **Pending**: Wait for SPEC.md (application type decision)
+- Real-time → Buffered (predictable)
+- Interactive → Streaming (flexible)
+- **Answer via**: Define application type, choose rendering strategy
 ```
 
 ---
@@ -144,12 +143,12 @@ Examples:
 ## Categorization Strategies
 
 ### By Domain/Subsystem
-Works well for hardware/architecture projects:
+Works well for system/architecture projects:
 - Toolchain & Build
-- Graphics/PPU
-- Audio/APU
-- Input/Controllers
-- Game Architecture
+- Rendering Pipeline
+- Audio System
+- Input Handling
+- Application Architecture
 - Optimization & Performance
 - Testing & Validation
 
@@ -178,20 +177,20 @@ Every question should link to:
 
 **1. Theory source** (where the concept is documented):
 ```markdown
-**Q6.6**: When to use math routines - cost/benefit?
-- **Theory**: `learnings/math_routines.md` - All routines documented with cycle costs
+**Q6.6**: When to use expensive operations - cost/benefit?
+- **Theory**: `learnings/performance.md` - All operations documented with costs
 ```
 
 **2. Practice path** (how it will be answered):
 ```markdown
-- **Answer via**: Profile math usage in game, pre-compute tables where feasible
+- **Answer via**: Profile operation usage in application, pre-compute tables where feasible
 ```
 
 **3. Related questions** (dependencies or clusters):
 ```markdown
-**Q6.3**: How to allocate 256 bytes of zero page?
-- Related: Q6.4 (which variables deserve ZP)
-- Depends on: Q4.2 (entity system size)
+**Q6.3**: How to allocate limited fast memory?
+- Related: Q6.4 (which data structures deserve fast memory)
+- Depends on: Q4.2 (system architecture size)
 ```
 
 **Goal**: Every question traceable both backward (where theory is) and forward (how it gets answered).
@@ -202,22 +201,22 @@ Every question should link to:
 
 Open questions naturally organize into Discovery phase structure:
 
-**From ddd-nes `5_open_questions.md`**:
+**Example Discovery roadmap**:
 ```markdown
 ## Next Steps to Answer These Questions
 
 ### Phase 1: Toolchain Setup (Answers Q1.1-Q1.8, Q3.4)
-1. Install asm6f, Mesen, NEXXT, FamiTracker
-2. Run blargg test ROM suite
-3. Create build script (Makefile)
+1. Install compiler, debugger, build tools
+2. Run validation test suite
+3. Create build script (Makefile/CMake)
 4. Document toolchain setup process
 
-### Phase 2: First Test ROM (Answers Q1.3-Q1.6, Q2.1-Q2.2, Q6.3)
-1. Build "hello world" NROM ROM
-2. Display sprite (test graphics workflow)
-3. Read controller (test input)
-4. Play beep (test basic audio)
-5. Profile cycle usage (measure actual costs)
+### Phase 2: First Test Program (Answers Q1.3-Q1.6, Q2.1-Q2.2, Q6.3)
+1. Build "hello world" minimal program
+2. Render basic object (test rendering workflow)
+3. Read input device (test input)
+4. Play sound (test basic audio)
+5. Profile performance (measure actual costs)
 6. Document findings in learning docs
 ```
 
@@ -234,18 +233,18 @@ Questions transform over time:
 Example trajectory:
 
 **Research (Study)**:
-- Q: How does sprite DMA work?
-- Answer: Read wiki, document in learning doc
+- Q: How does batch DMA transfer work?
+- Answer: Read documentation, document in learning doc
 
 **Discovery (Toy)**:
-- Q: What's actual cycle cost of OAM DMA?
-- Answer: Build toy1_sprite_dma, measure in emulator
-- Finding: 513-514 cycles (confirms theory)
+- Q: What's actual cycle cost of batch DMA?
+- Answer: Build toy1_dma_test, measure with profiler
+- Finding: ~500 cycles (confirms theory)
 
 **Execution (Production)**:
-- Q: How to integrate sprite DMA with scrolling?
-- Answer: Implement in main game, handle edge cases
-- Finding: Must reset scroll after DMA (PPU quirk)
+- Q: How to integrate DMA with scrolling updates?
+- Answer: Implement in main application, handle edge cases
+- Finding: Must reset scroll state after DMA (hardware quirk)
 
 **Update questions doc** as questions evolve/resolve:
 - Mark answered questions
@@ -253,35 +252,6 @@ Example trajectory:
 - Remove obsolete questions (context changed)
 
 ---
-
-## Pattern from ddd-nes
-
-**43 total questions**:
-- 36 open (need practice)
-- 7 answered (resolved during study)
-
-**Organization**:
-- 7 categories by subsystem
-- Each question numbered (Q1.1, Q1.2, etc.)
-- Answered questions marked with ✅
-- Practice path specified for open questions
-- Discovery roadmap in final section
-
-**Key structure**:
-```markdown
-## 1. Toolchain & Development Workflow
-
-### Build Pipeline Integration
-**Q1.1**: How to integrate asm6f + NEXXT + FamiTracker?
-- Makefile? Shell script? Both?
-- **Answer via**: Build first test ROM, document workflow
-
-### ✅ Sound Engine Integration (ANSWERED)
-**Q3.1**: Which sound engine to use?
-- ✅ **ANSWERED**: FamiTone2 (beginner-friendly)
-  - Source: `learnings/audio.md`
-- **Next step**: Integrate in audio test ROM
-```
 
 ---
 
@@ -333,9 +303,6 @@ Questions document is the **bridge between Research and Discovery**.
 **Discovery input**: Questions (roadmap) → Toys (experiments)
 **Discovery output**: Answers (findings) → Updated learning docs (validated theory)
 
-From blog post #1:
-> "Theory vs practice: The 43 questions. Study revealed what we understand versus what we need to validate through practice."
-
 ---
 
 ## Remember
@@ -345,8 +312,7 @@ From LEXICON.md:
 
 Question tracking makes uncertainty visible. Visible uncertainty becomes actionable roadmap.
 
-From blog post #9 (Productivity FOOM):
-> "Each toy validates one subsystem. The questions become experiments. The experiments become knowledge."
+Each toy validates one subsystem. The questions become experiments. The experiments become knowledge.
 
 Questions aren't just uncertainty. They're potential energy waiting to become understanding through practice.
 
