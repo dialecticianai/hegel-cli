@@ -3,8 +3,9 @@ use colored::Colorize;
 use std::collections::HashMap;
 use std::path::Path;
 
-use crate::engine::{get_next_prompt, init_state, load_workflow, render_template};
-use crate::storage::{FileStorage, State};
+use crate::engine::{get_next_prompt, init_state, load_workflow, render_template, Workflow};
+use crate::metamodes::evaluate_workflow_completion;
+use crate::storage::{FileStorage, SessionMetadata, State, WorkflowState};
 use crate::theme::Theme;
 
 /// Claim aliases for ergonomic workflow transitions
@@ -39,6 +40,72 @@ impl ClaimAlias {
     }
 }
 
+/// Context bundle for workflow operations
+struct WorkflowContext {
+    workflow: Workflow,
+    workflow_state: WorkflowState,
+    session_metadata: Option<SessionMetadata>,
+}
+
+/// Represents the outcome of a transition evaluation
+#[derive(Debug, PartialEq)]
+enum TransitionOutcome {
+    /// Stay at current node (no transition matched)
+    Stay {
+        current_node: String,
+        prompt: String,
+    },
+    /// Transition within the same workflow
+    IntraWorkflow {
+        from_node: String,
+        to_node: String,
+        prompt: String,
+    },
+    /// Transition to a different workflow (meta-mode)
+    InterWorkflow {
+        from_workflow: String,
+        from_node: String,
+        to_workflow: String,
+        to_node: String,
+        prompt: String,
+    },
+    /// Multiple transition options available (user must choose)
+    Ambiguous { options: Vec<TransitionOption> },
+}
+
+/// A possible transition option when multiple are available
+#[derive(Debug, PartialEq)]
+struct TransitionOption {
+    description: String,
+    target_workflow: String,
+    target_node: String,
+}
+
+/// Load complete workflow context from storage
+fn load_workflow_context(storage: &FileStorage) -> Result<WorkflowContext> {
+    let state = storage.load()?;
+
+    let workflow_yaml = state
+        .workflow
+        .as_ref()
+        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
+
+    let workflow_state = state
+        .workflow_state
+        .as_ref()
+        .context("No workflow state found")?
+        .clone();
+
+    let workflow: Workflow =
+        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+
+    Ok(WorkflowContext {
+        workflow,
+        workflow_state,
+        session_metadata: state.session_metadata,
+    })
+}
+
 /// Render a workflow node's prompt with guide templates
 fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String> {
     let guides_dir_str = storage.guides_dir();
@@ -46,6 +113,254 @@ fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String> {
     let context = HashMap::new(); // Empty context for now
     render_template(prompt, guides_dir, &context)
         .with_context(|| "Failed to render prompt template")
+}
+
+/// Display workflow prompt with consistent formatting
+fn display_workflow_prompt(
+    current_node: &str,
+    mode: &str,
+    prompt: &str,
+    storage: &FileStorage,
+) -> Result<()> {
+    let rendered_prompt = render_node_prompt(prompt, storage)?;
+
+    println!("{}: {}", Theme::label("Mode"), mode);
+    println!("{}: {}", Theme::label("Current node"), current_node);
+    println!();
+    println!("{}", Theme::header("Prompt:"));
+    println!("{}", rendered_prompt);
+
+    Ok(())
+}
+
+/// Evaluate what type of transition should occur based on claims and context
+fn evaluate_transition(
+    context: &WorkflowContext,
+    claims: &HashMap<String, bool>,
+    storage: &FileStorage,
+) -> Result<TransitionOutcome> {
+    let current_node = &context.workflow_state.current_node;
+    let workflow_mode = &context.workflow_state.mode;
+
+    // First, try intra-workflow transitions (existing behavior)
+    let (prompt_text, new_state) = get_next_prompt(
+        &context.workflow,
+        &context.workflow_state,
+        claims,
+        storage.state_dir(),
+    )?;
+
+    // If we transitioned to a different node within the workflow
+    if new_state.current_node != *current_node {
+        return Ok(TransitionOutcome::IntraWorkflow {
+            from_node: current_node.clone(),
+            to_node: new_state.current_node.clone(),
+            prompt: prompt_text,
+        });
+    }
+
+    // If we're at a done node with meta-mode, check for workflow transitions
+    if new_state.current_node == "done" {
+        if let Some(meta_mode) = &context.workflow_state.meta_mode {
+            let meta_mode_transitions =
+                evaluate_workflow_completion(&meta_mode.name, workflow_mode, "done");
+
+            if let Some(transitions) = meta_mode_transitions {
+                // Single transition option - auto-transition
+                if transitions.len() == 1 {
+                    let transition = &transitions[0];
+                    let target_node = "spec"; // All workflows start at spec
+
+                    return Ok(TransitionOutcome::InterWorkflow {
+                        from_workflow: workflow_mode.clone(),
+                        from_node: current_node.clone(),
+                        to_workflow: transition.next_workflow.clone(),
+                        to_node: target_node.to_string(),
+                        prompt: transition.description.clone(),
+                    });
+                }
+
+                // Multiple options - return ambiguous
+                if transitions.len() > 1 {
+                    let options = transitions
+                        .iter()
+                        .map(|t| TransitionOption {
+                            description: t.description.clone(),
+                            target_workflow: t.next_workflow.clone(),
+                            target_node: "spec".to_string(),
+                        })
+                        .collect();
+
+                    return Ok(TransitionOutcome::Ambiguous { options });
+                }
+            }
+        }
+    }
+
+    // No transition matched - stay at current node
+    Ok(TransitionOutcome::Stay {
+        current_node: current_node.clone(),
+        prompt: prompt_text,
+    })
+}
+
+/// Execute a transition outcome, performing all necessary side effects
+fn execute_transition(
+    outcome: TransitionOutcome,
+    context: &mut WorkflowContext,
+    storage: &FileStorage,
+) -> Result<()> {
+    use chrono::Utc;
+
+    match outcome {
+        TransitionOutcome::Stay {
+            current_node,
+            prompt,
+        } => {
+            // No state change, just display
+            println!("{}", Theme::warning("Stayed at current node"));
+            println!();
+            display_workflow_prompt(
+                &current_node,
+                &context.workflow_state.mode,
+                &prompt,
+                storage,
+            )?;
+        }
+
+        TransitionOutcome::IntraWorkflow {
+            from_node,
+            to_node,
+            prompt,
+        } => {
+            // Update workflow state
+            context.workflow_state.current_node = to_node.clone();
+            context.workflow_state.history.push(to_node.clone());
+
+            // Persist state
+            let state = State {
+                workflow: Some(serde_yaml::to_value(&context.workflow)?),
+                workflow_state: Some(context.workflow_state.clone()),
+                session_metadata: context.session_metadata.clone(),
+            };
+            storage.save(&state)?;
+
+            // Log transition
+            storage.log_state_transition(
+                &from_node,
+                &to_node,
+                &context.workflow_state.mode,
+                context.workflow_state.workflow_id.as_deref(),
+            )?;
+
+            // Display transition
+            println!(
+                "{} {} {} {}",
+                Theme::success("Transitioned:").bold(),
+                Theme::secondary(&from_node),
+                Theme::secondary("→"),
+                Theme::highlight(&to_node)
+            );
+            println!();
+            display_workflow_prompt(&to_node, &context.workflow_state.mode, &prompt, storage)?;
+        }
+
+        TransitionOutcome::InterWorkflow {
+            from_workflow,
+            from_node,
+            to_workflow,
+            to_node,
+            prompt,
+        } => {
+            // Log completion of old workflow
+            println!(
+                "{} {} workflow completed",
+                Theme::success("✓").bold(),
+                Theme::highlight(&from_workflow)
+            );
+            println!();
+
+            // Load new workflow
+            let workflows_dir = storage.workflows_dir();
+            let workflow_path = format!("{}/{}.yaml", workflows_dir, to_workflow);
+            let new_workflow = load_workflow(&workflow_path)
+                .with_context(|| format!("Failed to load workflow: {}", to_workflow))?;
+
+            // Initialize new workflow state
+            let mut new_state = init_state(&new_workflow);
+            new_state.workflow_id = Some(Utc::now().to_rfc3339());
+            new_state.meta_mode = context.workflow_state.meta_mode.clone(); // Preserve meta-mode
+
+            // Persist new state
+            let state = State {
+                workflow: Some(serde_yaml::to_value(&new_workflow)?),
+                workflow_state: Some(new_state.clone()),
+                session_metadata: context.session_metadata.clone(),
+            };
+            storage.save(&state)?;
+
+            // Log new workflow start
+            storage.log_state_transition(
+                &from_node,
+                &to_node,
+                &to_workflow,
+                new_state.workflow_id.as_deref(),
+            )?;
+
+            // Update context
+            context.workflow = new_workflow;
+            context.workflow_state = new_state;
+
+            // Display transition
+            println!(
+                "{} {} {} {}",
+                Theme::success("Transitioned:").bold(),
+                Theme::secondary(&format!("{}:{}", from_workflow, from_node)),
+                Theme::secondary("→"),
+                Theme::highlight(&format!("{}:{}", to_workflow, to_node))
+            );
+            println!();
+
+            // Get and display the actual node prompt from the new workflow
+            let node = context
+                .workflow
+                .nodes
+                .get(&to_node)
+                .with_context(|| format!("Node not found: {}", to_node))?;
+
+            display_workflow_prompt(&to_node, &to_workflow, &node.prompt, storage)?;
+        }
+
+        TransitionOutcome::Ambiguous { options } => {
+            // Display options to user
+            println!(
+                "{}",
+                Theme::warning("Multiple transition options available:")
+            );
+            println!();
+
+            for (i, option) in options.iter().enumerate() {
+                println!(
+                    "  {}. {} → {}",
+                    i + 1,
+                    Theme::highlight(&option.target_workflow),
+                    option.description
+                );
+            }
+
+            println!();
+            println!(
+                "Use {} to select:",
+                Theme::highlight("hegel start <workflow>")
+            );
+
+            for option in &options {
+                println!("  - hegel start {}", option.target_workflow);
+            }
+        }
+    }
+
+    Ok(())
 }
 
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
@@ -85,9 +400,6 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
         .get(current_node)
         .with_context(|| format!("Node not found: {}", current_node))?;
 
-    // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
-
     // Store state (preserve session_metadata from existing state)
     let state = State {
         workflow: Some(serde_yaml::to_value(&workflow)?),
@@ -99,85 +411,24 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     // Display output
     println!("{}", Theme::success("Workflow started").bold());
     println!();
-    println!("{}: {}", Theme::label("Mode"), workflow_state.mode);
-    println!("{}: {}", Theme::label("Current node"), current_node);
-    println!();
-    println!("{}", Theme::header("Prompt:"));
-    println!("{}", rendered_prompt);
+    display_workflow_prompt(current_node, &workflow_state.mode, &node.prompt, storage)?;
 
     Ok(())
 }
 
 /// Core workflow advancement logic used by next, repeat, and restart
 fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()> {
-    // Load current state
-    let state = storage.load()?;
-
-    let workflow_yaml = state
-        .workflow
-        .as_ref()
-        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
-
-    let workflow_state = state
-        .workflow_state
-        .as_ref()
-        .context("No workflow state found")?;
-
-    // Parse workflow from stored YAML value
-    let workflow =
-        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+    // Load workflow context
+    let mut context = load_workflow_context(storage)?;
 
     // Convert alias to claims
-    let claims = claim_alias.to_claims(&workflow_state.current_node)?;
+    let claims = claim_alias.to_claims(&context.workflow_state.current_node)?;
 
-    // Get next prompt (pass state_dir for rule evaluation)
-    let previous_node = workflow_state.current_node.clone();
-    let (prompt_text, new_state) =
-        get_next_prompt(&workflow, workflow_state, &claims, storage.state_dir())?;
+    // Evaluate transition
+    let outcome = evaluate_transition(&context, &claims, storage)?;
 
-    // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&prompt_text, storage)?;
-
-    // Save updated state (preserve session_metadata from loaded state)
-    let updated_state = State {
-        workflow: Some(workflow_yaml.clone()),
-        workflow_state: Some(new_state.clone()),
-        session_metadata: state.session_metadata.clone(),
-    };
-    storage.save(&updated_state)?;
-
-    // Log state transition if a transition occurred
-    let transitioned = previous_node != new_state.current_node;
-    if transitioned {
-        storage.log_state_transition(
-            &previous_node,
-            &new_state.current_node,
-            &new_state.mode,
-            new_state.workflow_id.as_deref(),
-        )?;
-    }
-
-    // Display transition
-    if transitioned {
-        println!(
-            "{} {} {} {}",
-            Theme::success("Transitioned:").bold(),
-            Theme::secondary(&previous_node),
-            Theme::secondary("→"),
-            Theme::highlight(&new_state.current_node)
-        );
-    } else {
-        println!("{}", Theme::warning("Stayed at current node"));
-    }
-    println!();
-    println!(
-        "{}: {}",
-        Theme::label("Current node"),
-        new_state.current_node
-    );
-    println!();
-    println!("{}", Theme::header("Prompt:"));
-    println!("{}", rendered_prompt);
+    // Execute transition
+    execute_transition(outcome, &mut context, storage)?;
 
     Ok(())
 }
@@ -724,5 +975,375 @@ mod tests {
         for rule in &code_node.rules {
             rule.validate().unwrap();
         }
+    }
+
+    // ========== evaluate_transition Tests ==========
+
+    #[test]
+    fn test_evaluate_intra_workflow_transition() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        let context = load_workflow_context(&storage).unwrap();
+        let claims = claim("spec_complete", true);
+
+        let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+
+        match outcome {
+            TransitionOutcome::IntraWorkflow {
+                from_node, to_node, ..
+            } => {
+                assert_eq!(from_node, "spec");
+                assert_eq!(to_node, "plan");
+            }
+            _ => panic!("Expected IntraWorkflow outcome"),
+        }
+    }
+
+    #[test]
+    fn test_evaluate_stay_at_current_node() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        let context = load_workflow_context(&storage).unwrap();
+        let claims = claim("wrong_claim", true);
+
+        let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+
+        match outcome {
+            TransitionOutcome::Stay { current_node, .. } => {
+                assert_eq!(current_node, "spec");
+            }
+            _ => panic!("Expected Stay outcome"),
+        }
+    }
+
+    #[test]
+    fn test_evaluate_inter_workflow_transition_research_to_discovery() {
+        use crate::storage::MetaMode;
+
+        let (_temp_dir, storage) = setup_meta_mode_workflows();
+
+        // Start research workflow with learning meta-mode
+        start_workflow("research", &storage).unwrap();
+
+        // Manually set state to done node (simulating completion)
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.current_node = "done".to_string();
+        workflow_state.meta_mode = Some(MetaMode {
+            name: "learning".to_string(),
+        });
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        let context = load_workflow_context(&storage).unwrap();
+        let claims = claim("done_complete", true);
+
+        let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+
+        match outcome {
+            TransitionOutcome::InterWorkflow {
+                from_workflow,
+                from_node,
+                to_workflow,
+                to_node,
+                ..
+            } => {
+                assert_eq!(from_workflow, "research");
+                assert_eq!(from_node, "done");
+                assert_eq!(to_workflow, "discovery");
+                assert_eq!(to_node, "spec");
+            }
+            _ => panic!("Expected InterWorkflow outcome, got: {:?}", outcome),
+        }
+    }
+
+    #[test]
+    fn test_evaluate_ambiguous_discovery_done_in_learning_mode() {
+        use crate::storage::MetaMode;
+
+        let (_temp_dir, storage) = setup_meta_mode_workflows();
+
+        // Start discovery workflow with learning meta-mode
+        start_workflow("discovery", &storage).unwrap();
+
+        // Manually set state to done node
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.current_node = "done".to_string();
+        workflow_state.meta_mode = Some(MetaMode {
+            name: "learning".to_string(),
+        });
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        let context = load_workflow_context(&storage).unwrap();
+        let claims = claim("done_complete", true);
+
+        let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+
+        match outcome {
+            TransitionOutcome::Ambiguous { options } => {
+                assert_eq!(options.len(), 2);
+                assert_eq!(options[0].target_workflow, "research");
+                assert_eq!(options[1].target_workflow, "execution");
+            }
+            _ => panic!("Expected Ambiguous outcome, got: {:?}", outcome),
+        }
+    }
+
+    #[test]
+    fn test_evaluate_stay_at_done_no_meta_mode() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        // Advance to done manually
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.current_node = "done".to_string();
+        workflow_state.meta_mode = None; // No meta-mode
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        let context = load_workflow_context(&storage).unwrap();
+        let claims = claim("done_complete", true);
+
+        let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+
+        match outcome {
+            TransitionOutcome::Stay { current_node, .. } => {
+                assert_eq!(current_node, "done");
+            }
+            _ => panic!("Expected Stay outcome at done without meta-mode"),
+        }
+    }
+
+    // ========== execute_transition Tests ==========
+
+    #[test]
+    fn test_execute_intra_workflow_transition() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        let mut context = load_workflow_context(&storage).unwrap();
+        let outcome = TransitionOutcome::IntraWorkflow {
+            from_node: "spec".to_string(),
+            to_node: "plan".to_string(),
+            prompt: "Plan prompt".to_string(),
+        };
+
+        execute_transition(outcome, &mut context, &storage).unwrap();
+
+        // Verify state updated
+        let state = storage.load().unwrap();
+        assert_state_eq(&state, "plan", "test_mode", &["spec", "plan"]);
+
+        // Verify transition logged
+        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        assert_eq!(event["from_node"], "spec");
+        assert_eq!(event["to_node"], "plan");
+    }
+
+    #[test]
+    fn test_execute_stay_no_state_change() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        let mut context = load_workflow_context(&storage).unwrap();
+        let outcome = TransitionOutcome::Stay {
+            current_node: "spec".to_string(),
+            prompt: "Spec prompt".to_string(),
+        };
+
+        execute_transition(outcome, &mut context, &storage).unwrap();
+
+        // Verify state unchanged
+        let state = storage.load().unwrap();
+        assert_state_eq(&state, "spec", "test_mode", &["spec"]);
+
+        // Verify no transition logged
+        assert_eq!(
+            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
+            0
+        );
+    }
+
+    #[test]
+    fn test_execute_inter_workflow_transition() {
+        use crate::storage::MetaMode;
+
+        let (_temp_dir, storage) = setup_meta_mode_workflows();
+
+        // Start research workflow
+        start_workflow("research", &storage).unwrap();
+
+        // Set meta-mode
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.meta_mode = Some(MetaMode {
+            name: "learning".to_string(),
+        });
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        let mut context = load_workflow_context(&storage).unwrap();
+        let outcome = TransitionOutcome::InterWorkflow {
+            from_workflow: "research".to_string(),
+            from_node: "done".to_string(),
+            to_workflow: "discovery".to_string(),
+            to_node: "spec".to_string(),
+            prompt: "Transition description".to_string(),
+        };
+
+        execute_transition(outcome, &mut context, &storage).unwrap();
+
+        // Verify new workflow loaded
+        let state = storage.load().unwrap();
+        assert_eq!(state.workflow_state.as_ref().unwrap().mode, "discovery");
+        assert_eq!(state.workflow_state.as_ref().unwrap().current_node, "spec");
+
+        // Verify meta-mode preserved
+        assert_eq!(
+            state
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .meta_mode
+                .as_ref()
+                .unwrap()
+                .name,
+            "learning"
+        );
+
+        // Verify transition logged
+        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        assert_eq!(event["from_node"], "done");
+        assert_eq!(event["to_node"], "spec");
+        assert_eq!(event["mode"], "discovery");
+    }
+
+    #[test]
+    fn test_execute_ambiguous_no_state_change() {
+        let (_temp_dir, storage) = setup_workflow_env();
+        start_workflow("test_workflow", &storage).unwrap();
+
+        let mut context = load_workflow_context(&storage).unwrap();
+        let outcome = TransitionOutcome::Ambiguous {
+            options: vec![
+                TransitionOption {
+                    description: "Option 1".to_string(),
+                    target_workflow: "workflow1".to_string(),
+                    target_node: "spec".to_string(),
+                },
+                TransitionOption {
+                    description: "Option 2".to_string(),
+                    target_workflow: "workflow2".to_string(),
+                    target_node: "spec".to_string(),
+                },
+            ],
+        };
+
+        execute_transition(outcome, &mut context, &storage).unwrap();
+
+        // Verify state unchanged
+        let state = storage.load().unwrap();
+        assert_state_eq(&state, "spec", "test_mode", &["spec"]);
+
+        // Verify no transition logged
+        assert_eq!(
+            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
+            0
+        );
+    }
+
+    // ========== Integration Tests (End-to-End) ==========
+
+    #[test]
+    fn test_next_at_research_done_auto_transitions_to_discovery() {
+        use crate::storage::MetaMode;
+
+        let (_temp_dir, storage) = setup_meta_mode_workflows();
+
+        // Start research workflow with learning meta-mode
+        start_workflow("research", &storage).unwrap();
+
+        // Set meta-mode to learning
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.meta_mode = Some(MetaMode {
+            name: "learning".to_string(),
+        });
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        // Manually advance to done node (simulating completion of research workflow)
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.current_node = "done".to_string();
+        workflow_state.history.push("done".to_string());
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        // Call next_prompt (implicit happy path)
+        next_prompt(None, &storage).unwrap();
+
+        // Verify transition to discovery workflow
+        let state = storage.load().unwrap();
+        let workflow_state = state.workflow_state.as_ref().unwrap();
+
+        assert_eq!(workflow_state.mode, "discovery");
+        assert_eq!(workflow_state.current_node, "spec");
+        assert_eq!(workflow_state.meta_mode.as_ref().unwrap().name, "learning");
+
+        // Verify transition was logged
+        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        assert_eq!(event["from_node"], "done");
+        assert_eq!(event["to_node"], "spec");
+        assert_eq!(event["mode"], "discovery");
+    }
+
+    #[test]
+    fn test_next_at_discovery_done_shows_ambiguous_options() {
+        use crate::storage::MetaMode;
+
+        let (_temp_dir, storage) = setup_meta_mode_workflows();
+
+        // Start discovery workflow with learning meta-mode
+        start_workflow("discovery", &storage).unwrap();
+
+        // Set meta-mode to learning
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.meta_mode = Some(MetaMode {
+            name: "learning".to_string(),
+        });
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        // Manually advance to done node
+        let mut state = storage.load().unwrap();
+        let mut workflow_state = state.workflow_state.clone().unwrap();
+        workflow_state.current_node = "done".to_string();
+        workflow_state.history.push("done".to_string());
+        state.workflow_state = Some(workflow_state);
+        storage.save(&state).unwrap();
+
+        // Call next_prompt (implicit happy path)
+        // This should display ambiguous options but not transition
+        next_prompt(None, &storage).unwrap();
+
+        // Verify still at done in discovery (no auto-transition)
+        let state = storage.load().unwrap();
+        let workflow_state = state.workflow_state.as_ref().unwrap();
+
+        assert_eq!(workflow_state.mode, "discovery");
+        assert_eq!(workflow_state.current_node, "done");
+
+        // Verify no transition logged (stayed at done)
+        assert_eq!(
+            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
+            0
+        );
     }
 }

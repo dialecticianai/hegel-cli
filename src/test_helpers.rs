@@ -67,6 +67,23 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
     }
 }
 
+pub fn test_workflow_state_with_meta(
+    node: &str,
+    mode: &str,
+    history: &[&str],
+    meta_mode: &str,
+) -> WorkflowState {
+    WorkflowState {
+        current_node: node.to_string(),
+        mode: mode.to_string(),
+        history: history.iter().map(|s| s.to_string()).collect(),
+        workflow_id: Some("test-workflow-id".to_string()),
+        meta_mode: Some(crate::storage::MetaMode {
+            name: meta_mode.to_string(),
+        }),
+    }
+}
+
 /// Read a specific line from a JSONL file and parse as JSON
 ///
 /// # Arguments
@@ -351,6 +368,16 @@ pub fn create_hooks_file(events: &[&str]) -> (TempDir, PathBuf) {
     create_jsonl_file(events, "hooks.jsonl")
 }
 
+// ========== Claims Helpers ==========
+
+pub fn claims(pairs: &[(&str, bool)]) -> HashMap<String, bool> {
+    pairs.iter().map(|(k, v)| (k.to_string(), *v)).collect()
+}
+
+pub fn claim(key: &str, value: bool) -> HashMap<String, bool> {
+    HashMap::from([(key.to_string(), value)])
+}
+
 // ========== Metrics Test Helpers ==========
 
 /// Create a state directory with JSONL files already in place
@@ -463,6 +490,69 @@ pub fn setup_workflow_env() -> (TempDir, FileStorage) {
     std::fs::write(workflows_dir.join("test_workflow.yaml"), TEST_WORKFLOW_YAML).unwrap();
 
     // Create storage with custom directories (thread-safe, no env vars!)
+    let storage =
+        FileStorage::with_dirs(&state_dir, Some(&workflows_dir), Some(&guides_dir)).unwrap();
+
+    (temp_dir, storage)
+}
+
+/// Setup test environment with research + discovery workflows for meta-mode transitions
+pub fn setup_meta_mode_workflows() -> (TempDir, FileStorage) {
+    let temp_dir = TempDir::new().unwrap();
+
+    let workflows_dir = temp_dir.path().join("workflows");
+    let guides_dir = temp_dir.path().join("guides");
+    let state_dir = temp_dir.path().join("state");
+
+    std::fs::create_dir(&workflows_dir).unwrap();
+    std::fs::create_dir(&guides_dir).unwrap();
+
+    // Write research workflow (learning mode)
+    std::fs::write(
+        workflows_dir.join("research.yaml"),
+        r#"mode: research
+start_node: plan
+nodes:
+  plan:
+    prompt: "Plan research"
+    transitions:
+      - when: plan_complete
+        to: study
+  study:
+    prompt: "Study sources"
+    transitions:
+      - when: study_complete
+        to: done
+  done:
+    prompt: "Research complete"
+    transitions: []
+"#,
+    )
+    .unwrap();
+
+    // Write discovery workflow (learning mode)
+    std::fs::write(
+        workflows_dir.join("discovery.yaml"),
+        r#"mode: discovery
+start_node: spec
+nodes:
+  spec:
+    prompt: "Write SPEC"
+    transitions:
+      - when: spec_complete
+        to: plan
+  plan:
+    prompt: "Write PLAN"
+    transitions:
+      - when: plan_complete
+        to: done
+  done:
+    prompt: "Discovery complete"
+    transitions: []
+"#,
+    )
+    .unwrap();
+
     let storage =
         FileStorage::with_dirs(&state_dir, Some(&workflows_dir), Some(&guides_dir)).unwrap();
 

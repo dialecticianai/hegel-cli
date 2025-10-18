@@ -43,7 +43,7 @@ nodes:
       - type: token_budget
         max_tokens: 15000
     transitions:
-      - when: "study_phase_complete"
+      - when: "study_complete"
         to: assess
       - when: "continue_study"
         to: study
@@ -125,7 +125,11 @@ nodes:
       - Questions catalogued?
       - Ready for practical validation (Discovery mode)?
 
-      Next step: Transition to Discovery mode to answer open questions through toy experiments.
+      Your deliverables:
+      - Learning documents (learnings/*.md)
+      - Meta-assessments (learnings/.ddd/*.md)
+      - Open questions (learnings/.ddd/*_open_questions.md)
+      - Cached sources (.webcache/)
 
-      Use 'hegel next' with claim 'transition_to_discovery' when ready to start building.
+      Run 'hegel next' to transition to Discovery mode.
     transitions: []
