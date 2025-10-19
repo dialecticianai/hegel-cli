@@ -16,10 +16,14 @@
 
 **Key Patterns**:
 - **State machine**: YAML workflows define nodes + transitions, engine evaluates claims to advance state
-- **Template system**: Workflow prompts support guide injection ({{GUIDE_NAME}}) and context variables ({{var}})
+- **Template system**: Workflow prompts support guide injection ({{GUIDE_NAME}}), template includes ({{templates/name}}), context variables ({{var}}, {{?optional}})
+- **Parent directory discovery**: Finds `.hegel/` by walking up directory tree (like git), works from any subdirectory
+- **Multi-agent support**: Adapter pattern normalizes events from Claude Code, Cursor, Codex to canonical schema
+- **Meta-modes**: Learning (Research ↔ Discovery) vs Standard (Discovery ↔ Execution) development patterns
 - **Atomic writes**: State updates use temp file + rename to prevent corruption
 - **File locking**: Exclusive locks on JSONL appends prevent concurrent write corruption (fs2 crate)
-- **Hook integration**: Captures Claude Code events to `.hegel/hooks.jsonl`, parses transcripts for token metrics
+- **Hook integration**: Captures agent events via adapters to `.hegel/hooks.jsonl`, parses transcripts for token metrics
+- **Command guardrails**: Pre-execution safety checks for wrapped commands (git, docker, etc.) via guardrails.yaml
 - **File watching**: TUI uses `notify` crate for non-blocking real-time updates (100ms poll, auto-reload on modify events)
 - **Timestamp correlation**: Three event streams (hooks, states, transcripts) correlate via ISO 8601 timestamps for per-phase metrics
 
@@ -81,27 +85,48 @@ hegel-cli/
 ├── src/                         # Core implementation (six-layer architecture)
 │   ├── main.rs                  # CLI entry point (clap parser, state directory resolution, analyze + top subcommands)
 │   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers, TUI test helpers, metrics builders, production workflow setup)
+│   ├── config.rs                # User configuration (load/save .hegel/config.toml, use_reflect_gui setting)
+│   ├── embedded.rs              # Compile-time bundled resources (workflows, guides via include_str!)
+│   ├── theme.rs                 # Terminal color theme (semantic styling: success/error/warning, metric values, headers)
+│   │
+│   ├── adapters/                # Multi-agent support (normalize events from Claude Code, Cursor, Codex to canonical format)
+│   │   ├── claude_code.rs       # Claude Code adapter (env detection, event normalization)
+│   │   ├── cursor.rs            # Cursor adapter (future multi-agent support)
+│   │   ├── codex.rs             # Codex adapter (future multi-agent support)
+│   │   └── mod.rs               # AgentAdapter trait, CanonicalHookEvent schema, AdapterRegistry
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
 │   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
 │   │   ├── workflow.rs          # Workflow commands (start, next, status, reset, continue)
-│   │   ├── hook.rs              # Claude Code hook event capture (JSON stdin → hooks.jsonl, with file locking)
+│   │   ├── meta.rs              # Meta-mode commands (declare, status, auto-start initial workflow)
+│   │   ├── hook.rs              # Hook event capture (JSON stdin → adapter normalization → hooks.jsonl)
+│   │   ├── astq.rs              # AST-grep wrapper (builds from vendor/, LLM-friendly feedback on no matches)
+│   │   ├── git.rs               # Git wrapper with guardrails (delegates to wrapped.rs)
+│   │   ├── reflect.rs           # Mirror GUI launcher (finds binary, passes files for review)
+│   │   ├── wrapped.rs           # Generic command wrapper (guardrails evaluation, audit logging, exits on block)
 │   │   └── analyze/             # Metrics analysis and display (hegel analyze)
 │   │       ├── mod.rs           # Main analyze command orchestrator
 │   │       └── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
 │   │
 │   ├── engine/                  # Layer 2: State machine and template rendering
 │   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt (integrates rules)
-│   │   └── template.rs          # Guide injection ({{UPPERCASE}}), context variables ({{lowercase}}, {{?optional}})
+│   │   └── template.rs          # Template rendering ({{UPPERCASE}} guides, {{templates/name}} includes, {{lowercase}} context vars, recursive expansion)
+│   │
+│   ├── guardrails/              # Command safety layer (pre-execution guardrails for wrapped commands)
+│   │   ├── parser.rs            # Load guardrails.yaml, parse blocked/allowed patterns
+│   │   └── types.rs             # GuardRailsConfig, CommandGuardrails, RuleMatch (Allowed/Blocked/NoMatch)
+│   │
+│   ├── metamodes/               # Meta-mode orchestration (learning vs standard development patterns)
+│   │   └── mod.rs               # MetaModeDefinition (learning/standard), transition evaluation, workflow completion detection
 │   │
 │   ├── rules/                   # Layer 3: Deterministic workflow enforcement
 │   │   ├── mod.rs               # Public exports (evaluate_rules, interrupt_if_violated)
 │   │   ├── types.rs             # Rule definitions (require_files, max_tokens, phase_timeout, etc.)
-│   │   ├── evaluator.rs         # Rule evaluation engine (stateless, context-based)
+│   │   ├── evaluator.rs         # Rule evaluation engine (stateless, context-based, phase_start_time support)
 │   │   └── interrupt.rs         # Interrupt protocol (rule violation → prompt injection)
 │   │
 │   ├── storage/                 # Layer 4: Atomic persistence and event logging
-│   │   └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, with file locking)
+│   │   └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, parent dir discovery, file locking)
 │   │
 │   ├── metrics/                 # Layer 5: Event stream parsing, aggregation, and visualization
 │   │   ├── mod.rs               # Unified metrics orchestrator, parse_unified_metrics entry point
@@ -129,13 +154,18 @@ hegel-cli/
 │   └── minimal.yaml             # Simplified workflow for testing
 │
 ├── guides/                      # Template content for workflow prompts
+│   ├── templates/               # Reusable template fragments (DRY via {{templates/name}} includes)
+│   │   └── mirror_workflow.md   # File operations and Mirror review process (used by all guides)
 │   ├── SPEC_WRITING.md          # Behavioral contract guidance
 │   ├── PLAN_WRITING.md          # TDD roadmap planning
-│   ├── CODE_MAP_WRITING.md      # Code mapping guidelines
+│   ├── KICKOFF_WRITING.md       # Binary-weave execution mode kickoff
 │   ├── LEARNINGS_WRITING.md     # Insight extraction guidance
 │   ├── README_WRITING.md        # Summary documentation guidance
+│   ├── CODE_MAP_WRITING.md      # Code mapping guidelines
 │   ├── HANDOFF_WRITING.md       # Session handoff protocol
-│   └── KICKOFF_WRITING.md       # Project kickoff guidance
+│   ├── STUDY_PLANNING.md        # Research mode study planning
+│   ├── KNOWLEDGE_CAPTURE.md     # Research mode synthesis guidance
+│   └── QUESTION_TRACKING.md     # Research mode open questions
 │
 ├── tests/                       # Unit tests are co-located in src/ modules (85%+ coverage, 228 tests passing)
 │   └── (empty)                  # Future integration tests live here
