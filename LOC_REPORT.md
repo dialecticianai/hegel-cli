@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-18 22:49
+**Last Updated**: 2025-10-18 22:53
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,246 | 20,471 | 29,717 |
+| **Lines** | 9,246 | 15,474 | 24,720 |
 | **Comments** | 1,302 | - | 1,302 |
 | **Blank Lines** | 1,714 | - | 1,714 |
-| **Total Lines** | 12,262 | 20,471 | 32,733 |
-| **Files** | 45 | 107 | 152 |
+| **Total Lines** | 12,262 | 15,474 | 27,736 |
+| **Files** | 45 | 98 | 143 |
 
-**Documentation Ratio**: 2.21 lines of docs per line of code
+**Documentation Ratio**: 1.67 lines of docs per line of code
 
 ---
 
@@ -88,15 +88,6 @@ SUM:                            45           1714           1302           9246
 
 | File | Lines |
 |------|-------|
-| `.webcache/claude_code/cost_tracking.md` | 0 |
-| `.webcache/claude_code/docs_map.md` | 1,097 |
-| `.webcache/claude_code/hooks_guide.md` | 332 |
-| `.webcache/claude_code/hooks.md` | 788 |
-| `.webcache/claude_code/mcp.md` | 1,126 |
-| `.webcache/claude_code/monitoring_usage.md` | 507 |
-| `.webcache/claude_code/plugin-marketplaces.md` | 433 |
-| `.webcache/claude_code/plugins-reference.md` | 337 |
-| `.webcache/claude_code/plugins.md` | 377 |
 | `CLAUDE.md` | 137 |
 | `CODE_MAP.md` | 189 |
 | `commands/hegel.md` | 23 |
@@ -202,7 +193,7 @@ SUM:                            45           1714           1302           9246
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.21 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.67 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
