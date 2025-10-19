@@ -72,7 +72,14 @@ hegel repeat
 
 # Restart workflow cycle (return to SPEC phase)
 hegel restart
+
+# Abandon current workflow and start fresh
+hegel abort
 ```
+
+**Guardrails:**
+- Cannot start a new workflow while one is active - must run `hegel abort` first
+- This prevents accidentally losing workflow progress
 
 **Advanced usage:**
 

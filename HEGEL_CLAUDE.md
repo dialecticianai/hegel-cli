@@ -86,12 +86,20 @@ hegel next
 
 # Restart workflow cycle (back to SPEC)
 hegel restart
+
+# Abandon current workflow and start fresh
+hegel abort
 ```
 
 **How it works:**
 - `hegel next` automatically infers the completion claim for the current phase
 - `hegel restart` always returns to the SPEC phase (universal across all workflows)
+- `hegel abort` clears workflow state (required before starting a new workflow)
 - No manual claim construction needed for common workflows
+
+**Guardrails:**
+- Cannot start a new workflow while one is active - must run `hegel abort` first
+- This prevents accidentally losing workflow progress
 
 ### Checking Workflow Status
 
