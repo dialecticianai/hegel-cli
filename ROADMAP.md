@@ -35,33 +35,6 @@
 
 ---
 
-## Phase 1: Core Infrastructure
-
-### 1.1 Project Initialization
-
-**Goal:** `hegel init` command to scaffold new projects with DDD structure.
-
-**Sub-modes:**
-- **Greenfield**: Starting from scratch
-  - Create directory structure (`.hegel/`, guides/, workflows/)
-  - Copy workflow definitions
-  - Generate initial docs (README, .gitignore, etc.)
-  - Initialize git repo (optional)
-
-- **Retrofit**: Adding DDD to existing project
-  - Detect existing structure
-  - Propose integration points
-  - Non-destructive additions
-  - Generate compatibility layer if needed
-
-**Interactive questions:**
-- Project type (library, CLI, web app, etc.)
-- Preferred workflow (discovery/execution/research)
-- Language/framework (affects tooling guardrails)
-- Git integration (yes/no)
-
----
-
 ## Phase 2: Safety and Orchestration
 
 ### 2.1 Mode-Specific Subagents
