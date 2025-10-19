@@ -56,6 +56,14 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
             "templates/mirror_workflow.md",
             include_str!("../guides/templates/mirror_workflow.md"),
         ),
+        (
+            "templates/code_map_monolithic.md",
+            include_str!("../guides/templates/code_map_monolithic.md"),
+        ),
+        (
+            "templates/code_map_hierarchical.md",
+            include_str!("../guides/templates/code_map_hierarchical.md"),
+        ),
     ]);
     guides.get(name).copied()
 }

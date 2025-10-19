@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-19 17:22
+**Last Updated**: 2025-10-19 18:26
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.65%** lines | **91.02%** regions | **87.95%** functions
+**Overall Coverage**: **91.75%** lines | **91.15%** regions | **88.06%** functions
 
 ## Summary
 
 ```
-TOTAL                              12919              1160    91.02%         730                88    87.95%        7602               635    91.65%           0                 0         -
+TOTAL                              13134              1163    91.15%         737                88    88.06%        7706               636    91.75%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -27,12 +27,12 @@ TOTAL                              12919              1160    91.02%         730
 | `commands/init.rs` | 86.21% | 84.32% | 92.86% | 🟡 Good |
 | `commands/meta.rs` | 86.09% | 85.07% | 90.91% | 🟡 Good |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `commands/workflow.rs` | 90.69% | 90.20% | 87.84% | 🟢 Excellent |
+| `commands/workflow.rs` | 90.73% | 90.20% | 87.84% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
-| `embedded.rs` | 76.81% | 62.26% | 50.00% | 🟡 Good |
+| `embedded.rs` | 79.22% | 63.64% | 50.00% | 🟡 Good |
 | `engine/mod.rs` | 99.80% | 99.58% | 96.88% | 🟢 Excellent |
-| `engine/template.rs` | 96.80% | 96.18% | 97.06% | 🟢 Excellent |
+| `engine/template.rs` | 97.25% | 96.87% | 97.56% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `main.rs` | 46.67% | 40.95% | 100.00% | 🟠 Moderate |
@@ -69,10 +69,10 @@ TOTAL                              12919              1160    91.02%         730
 - `commands/config.rs` - 91.95%
 - `commands/git.rs` - 100.00%
 - `commands/hook.rs` - 96.64%
-- `commands/workflow.rs` - 90.69%
+- `commands/workflow.rs` - 90.73%
 - `config.rs` - 91.67%
 - `engine/mod.rs` - 99.80%
-- `engine/template.rs` - 96.80%
+- `engine/template.rs` - 97.25%
 - `guardrails/parser.rs` - 97.78%
 - `guardrails/types.rs` - 94.38%
 - `metamodes/mod.rs` - 100.00%
@@ -95,7 +95,7 @@ TOTAL                              12919              1160    91.02%         730
 - `commands/init.rs` - 86.21%
 - `commands/meta.rs` - 86.09%
 - `commands/wrapped.rs` - 72.50%
-- `embedded.rs` - 76.81%
+- `embedded.rs` - 79.22%
 - `test_helpers.rs` - 79.09%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
@@ -115,7 +115,7 @@ TOTAL                              12919              1160    91.02%         730
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 91.65% | ✅ Met |
+| Overall | ≥80% | 91.75% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -32,15 +32,9 @@ Update CODE_MAP.md **before** commits that:
 
 ---
 
-## Choosing Your Structure
+## Your Structure
 
-### Monolithic (Small Projects)
-
-{{templates/code_map_monolithic}}
-
-### Hierarchical (Larger Projects)
-
-{{templates/code_map_hierarchical}}
+{{templates/code_map_{{code_map_style}}}}
 
 ---
 

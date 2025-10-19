@@ -3,6 +3,7 @@ use colored::Colorize;
 use std::collections::HashMap;
 use std::path::Path;
 
+use crate::config::HegelConfig;
 use crate::engine::{get_next_prompt, init_state, load_workflow, render_template, Workflow};
 use crate::metamodes::evaluate_workflow_completion;
 use crate::storage::{FileStorage, SessionMetadata, State, WorkflowState};
@@ -110,7 +111,16 @@ fn load_workflow_context(storage: &FileStorage) -> Result<WorkflowContext> {
 fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String> {
     let guides_dir_str = storage.guides_dir();
     let guides_dir = Path::new(&guides_dir_str);
-    let context = HashMap::new(); // Empty context for now
+
+    // Load config and inject values as template context
+    let config = HegelConfig::load(storage.state_dir())?;
+    let mut context = HashMap::new();
+
+    // Inject all config values as context variables
+    for (key, value) in config.list() {
+        context.insert(key, value);
+    }
+
     render_template(prompt, guides_dir, &context)
         .with_context(|| "Failed to render prompt template")
 }

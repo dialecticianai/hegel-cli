@@ -46,6 +46,14 @@ fn validate_guide_name(guide_name: &str) -> Result<()> {
 /// - {{templates/name}} - Load template from guides/templates/name.md (supports nesting)
 /// - {{?lowercase}} - Replace with context value if present, empty string otherwise (optional)
 /// - {{lowercase}} - Replace with context value (required, error if missing)
+///
+/// Processing order:
+/// 1. Expand all context variables ({{lowercase}}, {{?lowercase}}) - single pass
+/// 2. Expand all guide placeholders ({{UPPERCASE}}, {{templates/name}}) - recursive up to 10 levels
+///
+/// This two-phase approach allows:
+/// - Guide names to contain variables: {{templates/code_map_{{style}}}} → {{templates/code_map_hierarchical}}
+/// - Loaded guides to contain variables that get expanded in phase 1
 pub fn render_template(
     template: &str,
     guides_dir: &Path,
@@ -53,50 +61,34 @@ pub fn render_template(
 ) -> Result<String> {
     let mut result = template.to_string();
 
-    // First, handle guide placeholders ({{UPPERCASE}} and {{templates/name}})
-    // Use permissive regex and validate afterwards for security
-    // Recursively expand up to 10 levels (prevents infinite loops)
-    const MAX_RECURSION: usize = 10;
-    for _iteration in 0..MAX_RECURSION {
-        let before_expansion = result.clone();
-        let guide_re = Regex::new(r"\{\{([^{}?]+)\}\}").unwrap();
+    // Interleave context variable expansion and guide loading
+    // This allows: {{GUIDE}} loads "{{templates/file_{{var}}}}" → expand {{var}} → load {{templates/file_X}}
+    const MAX_ITERATIONS: usize = 10;
+    for _iteration in 0..MAX_ITERATIONS {
+        let before = result.clone();
 
-        for cap in guide_re.captures_iter(&before_expansion) {
-            let guide_name = &cap[1];
+        // Expand context variables
+        result = expand_context_variables(&result, context)?;
 
-            // Skip if it's lowercase (context variable, handled later)
-            if guide_name.chars().all(|c| c.is_lowercase() || c == '_') {
-                continue;
-            }
+        // Expand guides
+        result = expand_guides(&result, guides_dir)?;
 
-            // Validate guide name for security
-            validate_guide_name(guide_name)?;
-
-            let guide_filename = format!("{}.md", guide_name);
-
-            // Try embedded guide first, then fall back to filesystem
-            let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename)
-            {
-                embedded.to_string()
-            } else {
-                // Fall back to guides_dir (for user overrides or local development)
-                let guide_path = guides_dir.join(&guide_filename);
-                fs::read_to_string(&guide_path)
-                    .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
-            };
-
-            result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
-        }
-
-        // If nothing changed, we're done with recursive expansion
-        if result == before_expansion {
+        // If nothing changed, we're done
+        if result == before {
             break;
         }
     }
 
+    Ok(result)
+}
+
+/// Expand context variables in a string (one pass)
+fn expand_context_variables(text: &str, context: &HashMap<String, String>) -> Result<String> {
+    let mut result = text.to_string();
+
     // Handle optional context variables ({{?lowercase}})
     let optional_re = Regex::new(r"\{\{\?([a-z_]+)\}\}").unwrap();
-    for cap in optional_re.captures_iter(&result.clone()) {
+    for cap in optional_re.captures_iter(text) {
         let var_name = &cap[1];
         let replacement = context.get(var_name).map(|s| s.as_str()).unwrap_or("");
         result = result.replace(&format!("{{{{?{}}}}}", var_name), replacement);
@@ -104,12 +96,65 @@ pub fn render_template(
 
     // Handle required context variables ({{lowercase}})
     let required_re = Regex::new(r"\{\{([a-z_]+)\}\}").unwrap();
-    for cap in required_re.captures_iter(&result.clone()) {
+    for cap in required_re.captures_iter(text) {
         let var_name = &cap[1];
         let value = context
             .get(var_name)
             .with_context(|| format!("Required context variable missing: {}", var_name))?;
         result = result.replace(&format!("{{{{{}}}}}", var_name), value);
+    }
+
+    Ok(result)
+}
+
+/// Expand guide placeholders in a string (one pass)
+fn expand_guides(text: &str, guides_dir: &Path) -> Result<String> {
+    let mut result = text.to_string();
+
+    // First, check for any invalid guide patterns and error explicitly
+    // This catches security issues like {{/etc/passwd}} or {{../foo}}
+    let all_placeholders_re = Regex::new(r"\{\{([^{}?]+)\}\}").unwrap();
+    for cap in all_placeholders_re.captures_iter(text) {
+        let name = &cap[1];
+
+        // Skip if it's a lowercase variable (context vars are handled separately)
+        if name.chars().all(|c| c.is_lowercase() || c == '_') {
+            continue;
+        }
+
+        // Skip if it matches valid guide pattern (will be processed below)
+        if name.chars().next().map_or(false, |c| c.is_uppercase()) || name.starts_with("templates/")
+        {
+            continue;
+        }
+
+        // If we got here, it's an invalid pattern - validate to get proper error
+        validate_guide_name(name)?;
+    }
+
+    // Now expand valid guide patterns
+    // Pattern: starts with uppercase OR "templates/"
+    let guide_re = Regex::new(r"\{\{([A-Z_][A-Z0-9_]*|templates/[a-z_][a-z0-9_]*)\}\}").unwrap();
+
+    for cap in guide_re.captures_iter(text) {
+        let guide_name = &cap[1];
+
+        // Validate guide name for security (should pass since we pre-validated)
+        validate_guide_name(guide_name)?;
+
+        let guide_filename = format!("{}.md", guide_name);
+
+        // Try embedded guide first, then fall back to filesystem
+        let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename) {
+            embedded.to_string()
+        } else {
+            // Fall back to guides_dir (for user overrides or local development)
+            let guide_path = guides_dir.join(&guide_filename);
+            fs::read_to_string(&guide_path)
+                .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
+        };
+
+        result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
     }
 
     Ok(result)
@@ -508,5 +553,123 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("Subdirectories not allowed in guide names (except templates/)"));
+    }
+
+    // ========== Nested Variable Substitution Tests ==========
+
+    #[test]
+    fn test_nested_variable_in_template_path() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        // Create variant template files
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+        std::fs::write(
+            templates_dir.join("variant_a.md"),
+            "This is variant A content",
+        )
+        .unwrap();
+        std::fs::write(
+            templates_dir.join("variant_b.md"),
+            "This is variant B content",
+        )
+        .unwrap();
+
+        // Test with variant_a
+        let context = ctx().add("style", "variant_a").build();
+        let result =
+            render_template("Content: {{templates/{{style}}}}", &guides_path, &context).unwrap();
+        assert!(result.contains("This is variant A content"));
+        assert!(!result.contains("variant B"));
+
+        // Test with variant_b
+        let context = ctx().add("style", "variant_b").build();
+        let result =
+            render_template("Content: {{templates/{{style}}}}", &guides_path, &context).unwrap();
+        assert!(result.contains("This is variant B content"));
+        assert!(!result.contains("variant A"));
+    }
+
+    #[test]
+    fn test_code_map_style_variant_integration() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        // Create template variants (templates/ works because validation allows it)
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+        std::fs::write(
+            templates_dir.join("style_monolithic.md"),
+            "## Monolithic Structure\nSingle file approach.",
+        )
+        .unwrap();
+        std::fs::write(
+            templates_dir.join("style_hierarchical.md"),
+            "## Hierarchical Structure\nOne file per directory.",
+        )
+        .unwrap();
+
+        // Create a guide with nested variable substitution
+        std::fs::write(
+            guides_path.join("CUSTOM_GUIDE.md"),
+            "# Custom Guide\n\n{{templates/style_{{code_map_style}}}}\n\nEnd of guide.",
+        )
+        .unwrap();
+
+        // Test hierarchical style
+        let context = ctx().add("code_map_style", "hierarchical").build();
+        let result = render_template("{{CUSTOM_GUIDE}}", &guides_path, &context).unwrap();
+        assert!(result.contains("Hierarchical Structure"));
+        assert!(result.contains("One file per directory"));
+        assert!(!result.contains("Monolithic"));
+
+        // Test monolithic style
+        let context = ctx().add("code_map_style", "monolithic").build();
+        let result = render_template("{{CUSTOM_GUIDE}}", &guides_path, &context).unwrap();
+        assert!(result.contains("Monolithic Structure"));
+        assert!(result.contains("Single file approach"));
+        assert!(!result.contains("Hierarchical"));
+    }
+
+    #[test]
+    fn test_multiple_nested_variables() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+        std::fs::write(templates_dir.join("header_en.md"), "English Header").unwrap();
+        std::fs::write(templates_dir.join("footer_compact.md"), "Compact Footer").unwrap();
+
+        let context = ctx().add("lang", "en").add("layout", "compact").build();
+
+        let result = render_template(
+            "{{templates/header_{{lang}}}}\n\n{{templates/footer_{{layout}}}}",
+            &guides_path,
+            &context,
+        )
+        .unwrap();
+
+        assert!(result.contains("English Header"));
+        assert!(result.contains("Compact Footer"));
+    }
+
+    #[test]
+    fn test_nested_variable_missing_context() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+
+        // Missing 'style' in context should error
+        let result = render_template(
+            "{{templates/variant_{{style}}}}",
+            &guides_path,
+            &HashMap::new(),
+        );
+
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Required context variable missing"));
     }
 }
