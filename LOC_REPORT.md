@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-18 22:53
+**Last Updated**: 2025-10-18 22:56
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,246 | 15,474 | 24,720 |
+| **Lines** | 9,246 | 4,593 | 13,839 |
 | **Comments** | 1,302 | - | 1,302 |
 | **Blank Lines** | 1,714 | - | 1,714 |
-| **Total Lines** | 12,262 | 15,474 | 27,736 |
-| **Files** | 45 | 98 | 143 |
+| **Total Lines** | 12,262 | 4,593 | 16,855 |
+| **Files** | 45 | 23 | 68 |
 
-**Documentation Ratio**: 1.67 lines of docs per line of code
+**Documentation Ratio**: 0.50 lines of docs per line of code
 
 ---
 
@@ -107,85 +107,10 @@ SUM:                            45           1714           1302           9246
 | `guides/templates/mirror_workflow.md` | 11 |
 | `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 221 |
+| `LOC_REPORT.md` | 212 |
 | `README.md` | 392 |
 | `ROADMAP.md` | 181 |
 | `TESTING.md` | 41 |
-| `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
-| `vendor/ast-grep/.github/copilot-instructions.md` | 135 |
-| `vendor/ast-grep/.github/ISSUE_TEMPLATE/feature_request.md` | 20 |
-| `vendor/ast-grep/CHANGELOG.md` | 1,700 |
-| `vendor/ast-grep/crates/napi/npm/darwin-arm64/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/darwin-x64/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/linux-arm64-gnu/README.md` | 2 |
-| `vendor/ast-grep/crates/napi/npm/linux-arm64-musl/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/linux-x64-gnu/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/linux-x64-musl/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/win32-arm64-msvc/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/win32-ia32-msvc/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/npm/win32-x64-msvc/README.md` | 3 |
-| `vendor/ast-grep/crates/napi/README.md` | 34 |
-| `vendor/ast-grep/crates/pyo3/README.md` | 73 |
-| `vendor/ast-grep/npm/platforms/darwin-arm64/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/darwin-x64/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/linux-arm64-gnu/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/linux-x64-gnu/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/win32-arm64-msvc/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/win32-ia32-msvc/README.md` | 3 |
-| `vendor/ast-grep/npm/platforms/win32-x64-msvc/README.md` | 3 |
-| `vendor/ast-grep/npm/README.md` | 11 |
-| `vendor/ast-grep/README.md` | 118 |
-| `vendor/ccusage/.claude/commands/analyze-code.md` | 268 |
-| `vendor/ccusage/.claude/commands/lsmcp-onboarding.md` | 1 |
-| `vendor/ccusage/.claude/commands/reduce-similarities.md` | 1 |
-| `vendor/ccusage/.claude/commands/refactor.md` | 78 |
-| `vendor/ccusage/.lsmcp/memories/symbol_index_info.md` | 39 |
-| `vendor/ccusage/.lsmcp/memories/symbol_index_status.md` | 56 |
-| `vendor/ccusage/AGENTS.md` | 351 |
-| `vendor/ccusage/apps/ccusage/AGENTS.md` | 120 |
-| `vendor/ccusage/apps/ccusage/CLAUDE.md` | 120 |
-| `vendor/ccusage/apps/ccusage/README.md` | 182 |
-| `vendor/ccusage/apps/codex/AGENTS.md` | 58 |
-| `vendor/ccusage/apps/codex/CLAUDE.md` | 58 |
-| `vendor/ccusage/apps/codex/README.md` | 116 |
-| `vendor/ccusage/apps/mcp/AGENTS.md` | 120 |
-| `vendor/ccusage/apps/mcp/CLAUDE.md` | 120 |
-| `vendor/ccusage/apps/mcp/README.md` | 82 |
-| `vendor/ccusage/CLAUDE.md` | 351 |
-| `vendor/ccusage/docs/AGENTS.md` | 113 |
-| `vendor/ccusage/docs/CLAUDE.md` | 113 |
-| `vendor/ccusage/docs/guide/blocks-reports.md` | 357 |
-| `vendor/ccusage/docs/guide/cli-options.md` | 344 |
-| `vendor/ccusage/docs/guide/codex/daily.md` | 26 |
-| `vendor/ccusage/docs/guide/codex/index.md` | 84 |
-| `vendor/ccusage/docs/guide/codex/monthly.md` | 26 |
-| `vendor/ccusage/docs/guide/codex/session.md` | 28 |
-| `vendor/ccusage/docs/guide/config-files.md` | 432 |
-| `vendor/ccusage/docs/guide/configuration.md` | 336 |
-| `vendor/ccusage/docs/guide/cost-modes.md` | 348 |
-| `vendor/ccusage/docs/guide/custom-paths.md` | 430 |
-| `vendor/ccusage/docs/guide/daily-reports.md` | 284 |
-| `vendor/ccusage/docs/guide/directory-detection.md` | 115 |
-| `vendor/ccusage/docs/guide/environment-variables.md` | 243 |
-| `vendor/ccusage/docs/guide/getting-started.md` | 141 |
-| `vendor/ccusage/docs/guide/index.md` | 102 |
-| `vendor/ccusage/docs/guide/installation.md` | 288 |
-| `vendor/ccusage/docs/guide/json-output.md` | 447 |
-| `vendor/ccusage/docs/guide/library-usage.md` | 150 |
-| `vendor/ccusage/docs/guide/live-monitoring.md` | 275 |
-| `vendor/ccusage/docs/guide/mcp-server.md` | 165 |
-| `vendor/ccusage/docs/guide/monthly-reports.md` | 243 |
-| `vendor/ccusage/docs/guide/related-projects.md` | 23 |
-| `vendor/ccusage/docs/guide/session-reports.md` | 321 |
-| `vendor/ccusage/docs/guide/sponsors.md` | 33 |
-| `vendor/ccusage/docs/guide/statusline.md` | 284 |
-| `vendor/ccusage/docs/guide/weekly-reports.md` | 230 |
-| `vendor/ccusage/docs/index.md` | 84 |
-| `vendor/ccusage/packages/internal/AGENTS.md` | 105 |
-| `vendor/ccusage/packages/internal/CLAUDE.md` | 105 |
-| `vendor/ccusage/packages/terminal/AGENTS.md` | 74 |
-| `vendor/ccusage/packages/terminal/CLAUDE.md` | 74 |
-| `vendor/ccusage/README.md` | 182 |
 
 ---
 
@@ -193,7 +118,7 @@ SUM:                            45           1714           1302           9246
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.67 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.50 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

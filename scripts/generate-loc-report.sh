@@ -7,6 +7,9 @@ set -e
 OUTPUT_FILE="LOC_REPORT.md"
 TEMP_FILE="${OUTPUT_FILE}.tmp"
 
+# Paths to exclude from documentation counts
+EXCLUDE_PATHS=(-not -path "./target/*" -not -path "./.git/*" -not -path "./.webcache/*" -not -path "./vendor/*")
+
 # Files allowed to exceed 200 impl lines (infrastructure, shared utilities, etc.)
 ALLOWED_LARGE_FILES=(
     "test_helpers.rs"
@@ -44,11 +47,11 @@ RUST_TOTAL=$((RUST_CODE + RUST_COMMENT + RUST_BLANK))
 
 # Count markdown documentation
 echo "Counting documentation LOC..."
-MD_FILES=$(find . -name "*.md" -not -path "./target/*" -not -path "./.git/*" -not -path "./.webcache/*" 2>/dev/null | wc -l | tr -d ' ')
+MD_FILES=$(find . -name "*.md" "${EXCLUDE_PATHS[@]}" 2>/dev/null | wc -l | tr -d ' ')
 MD_LINES=0
 
 if [ "$MD_FILES" -gt 0 ]; then
-    MD_LINES=$(find . -name "*.md" -not -path "./target/*" -not -path "./.git/*" -not -path "./.webcache/*" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
+    MD_LINES=$(find . -name "*.md" "${EXCLUDE_PATHS[@]}" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
 fi
 
 # Calculate documentation ratio
@@ -172,7 +175,7 @@ if [ "$MD_FILES" -gt 0 ]; then
     echo "| File | Lines |" >> "$TEMP_FILE"
     echo "|------|-------|" >> "$TEMP_FILE"
 
-    find . -name "*.md" -not -path "./target/*" -not -path "./.git/*" -not -path "./.webcache/*" 2>/dev/null | sort | while IFS= read -r file; do
+    find . -name "*.md" "${EXCLUDE_PATHS[@]}" 2>/dev/null | sort | while IFS= read -r file; do
         LINES=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
         DISPLAY_PATH=$(echo "$file" | sed 's|^\./||')
         echo "| \`$DISPLAY_PATH\` | $(format_number $LINES) |" >> "$TEMP_FILE"
