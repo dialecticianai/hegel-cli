@@ -19,6 +19,79 @@ If not available, check if it's built locally:
 
 ---
 
+## Project Initialization
+
+### Initialize New or Existing Projects
+
+```bash
+hegel init
+```
+
+**Smart detection:**
+- Scans current directory for non-.md files (ignores `.git/` and `.hegel/`)
+- **Greenfield**: No non-.md files → starts `init-greenfield` workflow
+- **Retrofit**: Non-.md files found → starts `init-retrofit` workflow
+
+**Greenfield workflow (`init-greenfield`):**
+1. `customize_claude` - Create CLAUDE.md with project conventions
+   - Prompts for: language/framework, testing approach, code organization, git workflow
+   - Generates CLAUDE.md with methodology + project-specific rules
+2. `vision` - Write VISION.md defining product goals
+   - Uses `{{VISION_WRITING}}` guide
+   - Defines problem, users, success metrics, scope
+3. `architecture` - Write ARCHITECTURE.md documenting tech stack
+   - Uses `{{ARCHITECTURE_WRITING}}` guide
+   - Documents language, frameworks, tools, constraints
+4. `init_git` - Initialize git repository with initial commit
+   - Creates `.git/` if missing
+   - Commits all files with message documenting initialization
+
+**Retrofit workflow (`init-retrofit`):**
+1. `detect_existing` - Analyze current project structure
+   - Checks for git repo, identifies language, finds docs, detects tests
+   - Asks about branching strategy and conventions to preserve
+2. `code_map` - Create CODE_MAP.md files
+   - Counts source files to determine structure:
+     - <50 files → monolithic (single `CODE_MAP.md`)
+     - ≥50 files → hierarchical (one per directory)
+   - Uses `{{CODE_MAP_WRITING}}` guide
+   - Respects `code_map_style` config override
+3. `integrate_conventions` - Adapt DDD to existing patterns
+   - Preserves existing test framework, code organization, git workflow
+   - Adds DDD on top without disrupting existing conventions
+4. `git_strategy` - Discuss branching strategy
+   - Recommends creating feature branch for retrofit
+   - Helps plan incremental adoption
+
+### Configuration
+
+```bash
+# View all configuration
+hegel config list
+
+# Get specific value
+hegel config get code_map_style
+
+# Set values
+hegel config set code_map_style monolithic
+hegel config set code_map_style hierarchical
+hegel config set use_reflect_gui false
+```
+
+**Available config keys:**
+- `code_map_style` - CODE_MAP structure: `monolithic` or `hierarchical` (default: `hierarchical`)
+- `use_reflect_gui` - Auto-launch GUI after doc generation: `true` or `false` (default: `true`)
+
+**Storage:** `.hegel/config.toml` (persists across sessions)
+
+**When to use:**
+- Run `hegel init` when starting new DDD project or retrofitting existing code
+- Run `hegel config` to customize initialization behavior before `hegel init`
+- Set `code_map_style` based on project size preference
+- Disable `use_reflect_gui` if you prefer inline doc review
+
+---
+
 ## Workflow Orchestration
 
 ### Declaring a Meta-Mode (Required First Step)
@@ -535,7 +608,13 @@ Error: "Stayed at current node" when expecting to advance
 ## Quick Reference
 
 ```bash
-# Meta-mode (required first step)
+# Initialization
+hegel init                      # Initialize DDD project (greenfield/retrofit)
+hegel config list               # View configuration
+hegel config get <key>          # Get config value
+hegel config set <key> <value>  # Set config value
+
+# Meta-mode (required first step for workflows)
 hegel meta <mode>               # Declare meta-mode (learning/standard)
 hegel meta                      # View current meta-mode
 
@@ -543,6 +622,7 @@ hegel meta                      # View current meta-mode
 hegel start <workflow>          # Start workflow
 hegel next                      # Advance to next phase
 hegel restart                   # Restart cycle (back to SPEC)
+hegel abort                     # Abandon current workflow
 hegel status                    # Check state
 hegel repeat                    # Re-show prompt
 hegel reset                     # Clear state

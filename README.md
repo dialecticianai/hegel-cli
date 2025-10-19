@@ -20,6 +20,58 @@ The binary will be available at `./target/release/hegel`.
 
 ## Usage
 
+### Project Initialization
+
+Bootstrap a new DDD project or retrofit DDD to an existing codebase:
+
+```bash
+hegel init
+```
+
+**What it does:**
+- Automatically detects project type (greenfield vs retrofit)
+- **Greenfield** (no non-.md files): Guides you through creating CLAUDE.md, VISION.md, and ARCHITECTURE.md
+- **Retrofit** (existing code): Analyzes project structure and creates CODE_MAP.md files
+- Walks through initialization workflow with prompts for each phase
+
+**Greenfield workflow phases:**
+1. `customize_claude` - Create CLAUDE.md with project conventions
+2. `vision` - Write VISION.md defining product goals
+3. `architecture` - Write ARCHITECTURE.md documenting tech stack
+4. `init_git` - Initialize git repository with initial commit
+
+**Retrofit workflow phases:**
+1. `detect_existing` - Analyze current project structure
+2. `code_map` - Create CODE_MAP.md (monolithic or hierarchical based on size)
+3. `integrate_conventions` - Adapt DDD to existing patterns
+4. `git_strategy` - Discuss branching strategy for retrofit
+
+**Configuration:**
+
+Customize initialization behavior:
+
+```bash
+# View all settings
+hegel config list
+
+# Get specific setting
+hegel config get code_map_style
+
+# Set CODE_MAP style (monolithic or hierarchical)
+hegel config set code_map_style hierarchical
+hegel config set code_map_style monolithic
+
+# Toggle auto-launching reflect GUI after doc generation
+hegel config set use_reflect_gui true
+hegel config set use_reflect_gui false
+```
+
+**Available config keys:**
+- `code_map_style` - CODE_MAP structure: `monolithic` (single file) or `hierarchical` (per-directory). Default: `hierarchical`
+- `use_reflect_gui` - Auto-launch GUI for document review after writing docs. Default: `true`
+
+Configuration is persisted to `.hegel/config.toml`.
+
 ### Declaring a Meta-Mode
 
 Before starting any workflow, declare which meta-mode pattern you're following:
