@@ -97,13 +97,20 @@ hegel-cli/
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
 │   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
-│   │   ├── workflow.rs          # Workflow commands (start, next, status, reset, continue)
 │   │   ├── meta.rs              # Meta-mode commands (declare, status, auto-start initial workflow)
 │   │   ├── hook.rs              # Hook event capture (JSON stdin → adapter normalization → hooks.jsonl)
 │   │   ├── astq.rs              # AST-grep wrapper (builds from vendor/, LLM-friendly feedback on no matches)
 │   │   ├── git.rs               # Git wrapper with guardrails (delegates to wrapped.rs)
 │   │   ├── reflect.rs           # Mirror GUI launcher (finds binary, passes files for review)
 │   │   ├── wrapped.rs           # Generic command wrapper (guardrails evaluation, audit logging, exits on block)
+│   │   ├── init.rs              # Project initialization (greenfield vs retrofit workflow detection)
+│   │   ├── config.rs            # Configuration commands (get, set, list config values)
+│   │   ├── workflow/            # Workflow orchestration (252 impl + 740 test lines, refactored for SoC)
+│   │   │   ├── mod.rs           # Command handlers (start, next, status, reset, abort, repeat, restart)
+│   │   │   ├── claims.rs        # ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
+│   │   │   ├── context.rs       # WorkflowContext (loading, prompt rendering with guide injection)
+│   │   │   ├── transitions.rs   # Transition evaluation and execution (Stay/IntraWorkflow/InterWorkflow/Ambiguous outcomes)
+│   │   │   └── tests.rs         # All workflow tests (49 tests covering orchestration, transitions, meta-modes)
 │   │   └── analyze/             # Metrics analysis and display (hegel analyze)
 │   │       ├── mod.rs           # Main analyze command orchestrator
 │   │       └── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
