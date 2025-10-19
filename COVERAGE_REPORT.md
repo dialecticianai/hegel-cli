@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-19 18:26
+**Last Updated**: 2025-10-19 19:19
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.75%** lines | **91.15%** regions | **88.06%** functions
+**Overall Coverage**: **91.75%** lines | **91.14%** regions | **88.06%** functions
 
 ## Summary
 
 ```
-TOTAL                              13134              1163    91.15%         737                88    88.06%        7706               636    91.75%           0                 0         -
+TOTAL                                  13133              1163    91.14%         737                88    88.06%        7705               636    91.75%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -27,7 +27,11 @@ TOTAL                              13134              1163    91.15%         737
 | `commands/init.rs` | 86.21% | 84.32% | 92.86% | 🟡 Good |
 | `commands/meta.rs` | 86.09% | 85.07% | 90.91% | 🟡 Good |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `commands/workflow.rs` | 90.73% | 90.20% | 87.84% | 🟢 Excellent |
+| `commands/workflow/claims.rs` | 71.43% | 84.62% | 100.00% | 🟡 Good |
+| `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
+| `commands/workflow/mod.rs` | 79.87% | 80.53% | 76.92% | 🟡 Good |
+| `commands/workflow/tests.rs` | 92.26% | 92.02% | 92.31% | 🟢 Excellent |
+| `commands/workflow/transitions.rs` | 95.06% | 92.86% | 60.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `embedded.rs` | 79.22% | 63.64% | 50.00% | 🟡 Good |
@@ -69,7 +73,9 @@ TOTAL                              13134              1163    91.15%         737
 - `commands/config.rs` - 91.95%
 - `commands/git.rs` - 100.00%
 - `commands/hook.rs` - 96.64%
-- `commands/workflow.rs` - 90.73%
+- `commands/workflow/context.rs` - 100.00%
+- `commands/workflow/tests.rs` - 92.26%
+- `commands/workflow/transitions.rs` - 95.06%
 - `config.rs` - 91.67%
 - `engine/mod.rs` - 99.80%
 - `engine/template.rs` - 97.25%
@@ -94,6 +100,8 @@ TOTAL                              13134              1163    91.15%         737
 ### 🟡 Good (70-89% lines)
 - `commands/init.rs` - 86.21%
 - `commands/meta.rs` - 86.09%
+- `commands/workflow/claims.rs` - 71.43%
+- `commands/workflow/mod.rs` - 79.87%
 - `commands/wrapped.rs` - 72.50%
 - `embedded.rs` - 79.22%
 - `test_helpers.rs` - 79.09%

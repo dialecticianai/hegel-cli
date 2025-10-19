@@ -66,6 +66,21 @@ enum Commands {
     /// Interactive TUI dashboard (real-time metrics)
     Top,
     /// AST-based code search and transformation (wraps ast-grep)
+    ///
+    /// Pattern syntax (tree-sitter):
+    ///   $VAR  - Single AST node (identifier, expression, etc.)
+    ///   $$$   - Variadic (zero or more nodes)
+    ///
+    /// Examples:
+    ///   hegel astq -l rust -p 'pub fn $FUNC' src/
+    ///   hegel astq -l rust -p 'println!($X)' -r 'log::info!($X)' src/
+    ///   hegel astq -l rust -p 'fn $NAME($$$) { $$$ }' --apply src/
+    ///
+    /// Common flags:
+    ///   -l <lang>    Language (rust, go, js, py, etc.)
+    ///   -p <pattern> Search pattern
+    ///   -r <repl>    Replacement pattern
+    ///   --apply      Apply changes (default: preview only)
     Astq {
         /// Arguments to pass to ast-grep
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]

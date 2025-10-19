@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 18:55
+**Last Updated**: 2025-10-19 19:19
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,727 | 5,492 | 15,219 |
-| **Comments** | 1,364 | - | 1,364 |
+| **Lines** | 9,727 | 5,132 | 14,859 |
+| **Comments** | 1,379 | - | 1,379 |
 | **Blank Lines** | 1,810 | - | 1,810 |
-| **Total Lines** | 12,901 | 5,492 | 18,393 |
+| **Total Lines** | 12,916 | 5,132 | 18,048 |
 | **Files** | 51 | 28 | 79 |
 
-**Documentation Ratio**: 0.56 lines of docs per line of code
+**Documentation Ratio**: 0.53 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            51           1810           1364           9727
+Rust                            51           1810           1379           9727
 -------------------------------------------------------------------------------
-SUM:                            51           1810           1364           9727
+SUM:                            51           1810           1379           9727
 -------------------------------------------------------------------------------
 ```
 
@@ -63,7 +63,7 @@ SUM:                            51           1810           1364           9727
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 171 | 98 | 73 | 42.7% | ✅ |
-| `main.rs` | 197 | 13 | 184 | 93.4% | ✅ |
+| `main.rs` | 212 | 13 | 199 | 93.9% | ✅ |
 | `metamodes/mod.rs` | 236 | 111 | 125 | 53.0% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |
@@ -97,9 +97,9 @@ SUM:                            51           1810           1364           9727
 | File | Lines |
 |------|-------|
 | `CLAUDE.md` | 137 |
-| `CODE_MAP.md` | 189 |
+| `CODE_MAP.md` | 196 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 142 |
+| `COVERAGE_REPORT.md` | 150 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -118,9 +118,9 @@ SUM:                            51           1810           1364           9727
 | `guides/templates/code_map_monolithic.md` | 40 |
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
-| `HEGEL_CLAUDE.md` | 648 |
+| `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 144 |
+| `LOC_REPORT.md` | 150 |
 | `README.md` | 451 |
 | `ROADMAP.md` | 154 |
 | `TESTING.md` | 41 |
@@ -131,7 +131,7 @@ SUM:                            51           1810           1364           9727
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.56 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
