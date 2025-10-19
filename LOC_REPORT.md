@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-17 22:07
+**Last Updated**: 2025-10-18 21:41
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,428 | 20,966 | 30,394 |
-| **Comments** | 1,255 | - | 1,255 |
-| **Blank Lines** | 1,701 | - | 1,701 |
-| **Total Lines** | 12,384 | 20,966 | 33,350 |
+| **Lines** | 9,447 | 21,000 | 30,447 |
+| **Comments** | 1,259 | - | 1,259 |
+| **Blank Lines** | 1,703 | - | 1,703 |
+| **Total Lines** | 12,409 | 21,000 | 33,409 |
 | **Files** | 45 | 107 | 152 |
 
 **Documentation Ratio**: 2.22 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            45           1701           1255           9428
+Rust                            45           1703           1259           9447
 -------------------------------------------------------------------------------
-SUM:                            45           1701           1255           9428
+SUM:                            45           1703           1259           9447
 -------------------------------------------------------------------------------
 ```
 
@@ -45,14 +45,14 @@ SUM:                            45           1701           1255           9428
 | `commands/astq.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/git.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
-| `commands/meta.rs` | 231 | 146 | 85 | 36.8% | ✅ |
+| `commands/meta.rs` | 232 | 147 | 85 | 36.6% | ✅ |
 | `commands/mod.rs` | 20 | 20 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 1,349 | 537 | 812 | 60.2% | ✅ (infra) |
+| `commands/workflow.rs` | 1,350 | 538 | 812 | 60.1% | ✅ (infra) |
 | `commands/wrapped.rs` | 132 | 68 | 64 | 48.5% | ✅ |
 | `config.rs` | 99 | 56 | 43 | 43.4% | ✅ |
 | `embedded.rs` | 77 | 77 | 0 | 0.0% | ✅ |
-| `engine/mod.rs` | 747 | 152 | 595 | 79.7% | ✅ |
+| `engine/mod.rs` | 749 | 153 | 596 | 79.6% | ✅ |
 | `engine/template.rs` | 368 | 94 | 274 | 74.5% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
@@ -65,12 +65,12 @@ SUM:                            45           1701           1255           9428
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 1,496 | 115 | 1,381 | 92.3% | ✅ |
+| `rules/evaluator.rs` | 1,512 | 121 | 1,391 | 92.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
-| `storage/mod.rs` | 569 | 272 | 297 | 52.2% | ✅ (infra) |
-| `test_helpers.rs` | 883 | 597 | 286 | 32.4% | ✅ (infra) |
+| `storage/mod.rs` | 572 | 275 | 297 | 51.9% | ✅ (infra) |
+| `test_helpers.rs` | 885 | 599 | 286 | 32.3% | ✅ (infra) |
 | `theme.rs` | 128 | 98 | 30 | 23.4% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -103,22 +103,22 @@ SUM:                            45           1701           1255           9428
 | `COVERAGE_REPORT.md` | 138 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
-| `guides/CODE_MAP_WRITING.md` | 95 |
+| `guides/CODE_MAP_WRITING.md` | 109 |
 | `guides/HANDOFF_WRITING.md` | 207 |
-| `guides/KICKOFF_WRITING.md` | 92 |
-| `guides/KNOWLEDGE_CAPTURE.md` | 371 |
+| `guides/KICKOFF_WRITING.md` | 106 |
+| `guides/KNOWLEDGE_CAPTURE.md` | 356 |
 | `guides/LEARNINGS_WRITING.md` | 106 |
 | `guides/PLAN_WRITING.md` | 159 |
-| `guides/QUESTION_TRACKING.md` | 407 |
-| `guides/README_WRITING.md` | 138 |
+| `guides/QUESTION_TRACKING.md` | 373 |
+| `guides/README_WRITING.md` | 152 |
 | `guides/SPEC_WRITING.md` | 125 |
-| `guides/STUDY_PLANNING.md` | 245 |
+| `guides/STUDY_PLANNING.md` | 220 |
 | `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 220 |
+| `LOC_REPORT.md` | 221 |
 | `README.md` | 392 |
 | `REFACTOR_PLAN.md` | 412 |
-| `ROADMAP.md` | 181 |
+| `ROADMAP.md` | 246 |
 | `TESTING.md` | 41 |
 | `vendor/ast-grep/.github/CONTRIBUTING.md` | 8 |
 | `vendor/ast-grep/.github/copilot-instructions.md` | 135 |

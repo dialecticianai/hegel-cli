@@ -30,6 +30,9 @@ pub struct WorkflowState {
     pub workflow_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub meta_mode: Option<MetaMode>,
+    /// RFC3339 timestamp when current phase started (for time-based rules)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phase_start_time: Option<String>,
 }
 
 /// Complete state including workflow definition and current state

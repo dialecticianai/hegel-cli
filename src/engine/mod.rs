@@ -68,6 +68,7 @@ pub fn init_state(workflow: &Workflow) -> WorkflowState {
         history: vec![start],
         workflow_id: None,
         meta_mode: None, // Will be set by caller if needed
+        phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
     }
 }
 
@@ -132,7 +133,7 @@ pub fn get_next_prompt(
 
         let context = RuleEvaluationContext {
             current_phase: &new_state.current_node,
-            phase_start_time: phase_metrics.map(|p| p.start_time.as_str()).unwrap_or(""),
+            phase_start_time: new_state.phase_start_time.as_ref(),
             phase_metrics,
             hook_metrics: &metrics.hook_metrics,
         };
@@ -443,6 +444,7 @@ nodes:
             history: vec!["code".to_string()],
             workflow_id: None,
             meta_mode: None,
+            phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
         };
 
         let mut claims = HashMap::new();

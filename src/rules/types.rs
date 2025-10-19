@@ -39,7 +39,7 @@ pub struct RuleViolation {
 #[derive(Debug, Clone)]
 pub struct RuleEvaluationContext<'a> {
     pub current_phase: &'a str,
-    pub phase_start_time: &'a str,
+    pub phase_start_time: Option<&'a String>,
     pub phase_metrics: Option<&'a crate::metrics::PhaseMetrics>,
     pub hook_metrics: &'a crate::metrics::HookMetrics,
 }

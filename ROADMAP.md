@@ -74,7 +74,35 @@ guides/
 
 **Benefit:** Update Mirror workflow once, applies to all guides automatically.
 
-### 1.2 Project Initialization
+### 1.2 Parent Directory .hegel Discovery
+
+**Goal:** `hegel` commands work from any subdirectory within a project (like `git`).
+
+**Problem:** Currently hegel only finds `.hegel/` in current working directory. Running commands from subdirectories (e.g., `toys/toy1/`) fails.
+
+**Solution:** Crawl up directory tree to find `.hegel/`, similar to git's `.git` discovery.
+
+**Implementation:**
+- When any command runs, start from `cwd` and walk up parent directories
+- Stop when finding `.hegel/` directory or hitting filesystem root
+- If found: use that directory as project root
+- If not found: error with helpful message ("No .hegel found in current or parent directories")
+- Cache discovered project root for session (avoid repeated filesystem walks)
+
+**User experience improvement:**
+```bash
+# Before (broken)
+cd toys/toy1_gpu_noise_match
+hegel status  # ERROR: No workflow loaded
+
+# After (works)
+cd toys/toy1_gpu_noise_match
+hegel status  # Mode: discovery, Current node: plan
+```
+
+**Benefit:** Natural workflow - developers can run hegel commands from wherever they're working, just like git.
+
+### 1.3 Project Initialization
 
 **Goal:** `hegel init` command to scaffold new projects with DDD structure.
 

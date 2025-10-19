@@ -64,6 +64,7 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
         history: history.iter().map(|s| s.to_string()).collect(),
         workflow_id: None,
         meta_mode: None,
+        phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
     }
 }
 
@@ -81,6 +82,7 @@ pub fn test_workflow_state_with_meta(
         meta_mode: Some(crate::storage::MetaMode {
             name: meta_mode.to_string(),
         }),
+        phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
     }
 }
 

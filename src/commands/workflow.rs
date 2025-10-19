@@ -236,6 +236,7 @@ fn execute_transition(
             // Update workflow state
             context.workflow_state.current_node = to_node.clone();
             context.workflow_state.history.push(to_node.clone());
+            context.workflow_state.phase_start_time = Some(chrono::Utc::now().to_rfc3339());
 
             // Persist state
             let state = State {

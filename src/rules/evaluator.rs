@@ -41,7 +41,13 @@ fn evaluate_repeated_file_edit(
     };
 
     // Calculate window bounds: [phase_start, phase_start + window]
-    let phase_start = DateTime::parse_from_rfc3339(context.phase_start_time)?;
+    // If phase_start_time is missing, use current time (graceful fallback for old state files)
+    let phase_start = context
+        .phase_start_time
+        .as_ref()
+        .map(|s| DateTime::parse_from_rfc3339(s))
+        .transpose()?
+        .unwrap_or_else(|| chrono::Utc::now().into());
     let window_end = phase_start + chrono::Duration::seconds(*window as i64);
 
     // Compile regex if pattern provided
@@ -143,7 +149,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(&"2025-01-01T10:00:00Z".to_string()),
             phase_metrics: None,
             hook_metrics,
         };
@@ -169,7 +175,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(&"2025-01-01T10:00:00Z".to_string()),
             phase_metrics: None,
             hook_metrics,
         };
@@ -197,7 +203,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(&"2025-01-01T10:00:00Z".to_string()),
             phase_metrics: None,
             hook_metrics,
         };
@@ -238,7 +244,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(&"2025-01-01T10:00:00Z".to_string()),
             phase_metrics: None,
             hook_metrics,
         };
@@ -286,7 +292,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: &phase.start_time,
+            phase_start_time: Some(&phase.start_time),
             phase_metrics: Some(phase),
             hook_metrics,
         };
@@ -335,7 +341,7 @@ mod tests {
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: &phase.start_time,
+            phase_start_time: Some(&phase.start_time),
             phase_metrics: Some(phase),
             hook_metrics,
         };
@@ -370,9 +376,11 @@ mod tests {
             session_end_time: None,
         }));
 
+        let phase_start_time = Box::leak(Box::new("2025-01-01T10:00:00Z".to_string()));
+
         RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(phase_start_time),
             phase_metrics: None,
             hook_metrics,
         }
@@ -738,9 +746,11 @@ mod tests {
             session_end_time: None,
         }));
 
+        let phase_start_time = Box::leak(Box::new("2025-01-01T10:00:00Z".to_string()));
+
         RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: "2025-01-01T10:00:00Z",
+            phase_start_time: Some(phase_start_time),
             phase_metrics: None,
             hook_metrics,
         }
@@ -1014,7 +1024,7 @@ mod tests {
 
         RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: &phase_metrics_ref.start_time,
+            phase_start_time: Some(&phase_metrics_ref.start_time),
             phase_metrics: Some(phase_metrics_ref),
             hook_metrics,
         }
@@ -1371,7 +1381,7 @@ fn evaluate_phase_timeout(
     };
 
     // Calculate duration
-    let duration_secs = if let Some(ref end_time) = phase_metrics.end_time {
+    let duration_secs = if let Some(end_time) = &phase_metrics.end_time {
         // Completed phase - calculate from timestamps
         let start = DateTime::parse_from_rfc3339(&phase_metrics.start_time)?;
         let end = DateTime::parse_from_rfc3339(end_time)?;
@@ -1422,13 +1432,19 @@ fn evaluate_repeated_command(
         _ => return Ok(None),
     };
 
-    // Skip evaluation if no phase_start_time available (no active phase)
-    if context.phase_start_time.is_empty() {
-        return Ok(None);
+    // Skip evaluation if no phase_start_time available (gracefully handled in fallback below)
+    if context.phase_start_time.is_none() {
+        // Will use current time as fallback
     }
 
     // Calculate window bounds: [phase_start, phase_start + window]
-    let phase_start = DateTime::parse_from_rfc3339(context.phase_start_time)?;
+    // If phase_start_time is missing, use current time (graceful fallback for old state files)
+    let phase_start = context
+        .phase_start_time
+        .as_ref()
+        .map(|s| DateTime::parse_from_rfc3339(s))
+        .transpose()?
+        .unwrap_or_else(|| chrono::Utc::now().into());
     let window_end = phase_start + chrono::Duration::seconds(*window as i64);
 
     // Compile regex if pattern provided
