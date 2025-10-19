@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-18 22:40
+**Last Updated**: 2025-10-18 22:45
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,264 | 20,472 | 29,736 |
-| **Comments** | 1,339 | - | 1,339 |
-| **Blank Lines** | 1,726 | - | 1,726 |
-| **Total Lines** | 12,329 | 20,472 | 32,801 |
+| **Lines** | 9,245 | 20,471 | 29,716 |
+| **Comments** | 1,305 | - | 1,305 |
+| **Blank Lines** | 1,710 | - | 1,710 |
+| **Total Lines** | 12,260 | 20,471 | 32,731 |
 | **Files** | 45 | 107 | 152 |
 
 **Documentation Ratio**: 2.21 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            45           1726           1339           9264
+Rust                            45           1710           1305           9245
 -------------------------------------------------------------------------------
-SUM:                            45           1726           1339           9264
+SUM:                            45           1710           1305           9245
 -------------------------------------------------------------------------------
 ```
 
@@ -48,7 +48,7 @@ SUM:                            45           1726           1339           9264
 | `commands/meta.rs` | 232 | 147 | 85 | 36.6% | ✅ |
 | `commands/mod.rs` | 20 | 20 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 1,350 | 538 | 812 | 60.1% | ✅ (infra) |
+| `commands/workflow.rs` | 1,281 | 538 | 743 | 58.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 99 | 56 | 43 | 43.4% | ✅ |
 | `embedded.rs` | 82 | 82 | 0 | 0.0% | ✅ |
@@ -116,7 +116,7 @@ SUM:                            45           1726           1339           9264
 | `guides/templates/mirror_workflow.md` | 11 |
 | `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 222 |
+| `LOC_REPORT.md` | 221 |
 | `README.md` | 392 |
 | `ROADMAP.md` | 181 |
 | `TESTING.md` | 41 |

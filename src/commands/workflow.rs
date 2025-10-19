@@ -541,16 +541,76 @@ mod tests {
     use super::*;
     use crate::test_helpers::*;
 
+    // ========== Test Helpers ==========
+
+    /// Start workflow and return storage (ergonomic wrapper)
+    fn start(storage: &FileStorage) {
+        start_workflow("test_workflow", storage).unwrap();
+    }
+
+    /// Advance workflow with next (None = implicit happy path)
+    fn next(storage: &FileStorage) {
+        next_prompt(None, storage).unwrap();
+    }
+
+    /// Advance workflow with custom claims JSON
+    fn next_with(claims: &str, storage: &FileStorage) {
+        next_prompt(Some(claims), storage).unwrap();
+    }
+
+    /// Load and assert current state
+    fn assert_at(storage: &FileStorage, node: &str, mode: &str, history: &[&str]) {
+        assert_state_eq(&storage.load().unwrap(), node, mode, history);
+    }
+
+    /// Get current workflow state from storage
+    fn get_state(storage: &FileStorage) -> State {
+        storage.load().unwrap()
+    }
+
+    /// Manually set current node (for testing completion scenarios)
+    fn set_node(storage: &FileStorage, node: &str) {
+        let mut state = storage.load().unwrap();
+        let mut ws = state.workflow_state.clone().unwrap();
+        ws.current_node = node.to_string();
+        if !ws.history.contains(&node.to_string()) {
+            ws.history.push(node.to_string());
+        }
+        state.workflow_state = Some(ws);
+        storage.save(&state).unwrap();
+    }
+
+    /// Set meta-mode on current state
+    fn set_meta_mode(storage: &FileStorage, meta_mode_name: &str) {
+        let mut state = storage.load().unwrap();
+        let mut ws = state.workflow_state.clone().unwrap();
+        ws.meta_mode = Some(crate::storage::MetaMode {
+            name: meta_mode_name.to_string(),
+        });
+        state.workflow_state = Some(ws);
+        storage.save(&state).unwrap();
+    }
+
+    /// Count transitions logged in states.jsonl
+    fn transition_count(storage: &FileStorage) -> usize {
+        count_jsonl_lines(&storage.state_dir().join("states.jsonl"))
+    }
+
+    /// Get first transition from states.jsonl
+    fn first_transition(storage: &FileStorage) -> serde_json::Value {
+        read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0)
+    }
+
     // ========== start_workflow Tests ==========
 
     #[test]
     fn test_start_workflow_success() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        let state = storage.load().unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        let state = get_state(&storage);
         assert!(state.workflow.is_some());
-        assert_state_eq(&state, "spec", "test_mode", &["spec"]);
-        // Verify workflow_id is set and parseable
+        assert_at(&storage, "spec", "test_mode", &["spec"]);
+
         let wf_id = state.workflow_state.unwrap().workflow_id.unwrap();
         use chrono::DateTime;
         assert!(DateTime::parse_from_rfc3339(&wf_id).is_ok());
@@ -558,7 +618,7 @@ mod tests {
 
     #[test]
     fn test_start_workflow_missing_file() {
-        let (_temp_dir, storage) = setup_workflow_env();
+        let (_tmp, storage) = setup_workflow_env();
         let result = start_workflow("nonexistent", &storage);
         assert!(
             result.is_err()
@@ -573,28 +633,23 @@ mod tests {
 
     #[test]
     fn test_next_prompt_successful_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
-        assert_state_eq(
-            &storage.load().unwrap(),
-            "plan",
-            "test_mode",
-            &["spec", "plan"],
-        );
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"spec_complete": true}"#, &storage);
+        assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
     }
 
     #[test]
     fn test_next_prompt_no_matching_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
-        assert_state_eq(&storage.load().unwrap(), "spec", "test_mode", &["spec"]);
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"wrong_claim": true}"#, &storage);
+        assert_at(&storage, "spec", "test_mode", &["spec"]);
     }
 
     #[test]
     fn test_next_prompt_no_workflow_loaded() {
-        let (_temp_dir, storage) = setup_workflow_env();
+        let (_tmp, storage) = setup_workflow_env();
         let result = next_prompt(Some(r#"{"spec_complete": true}"#), &storage);
         assert!(
             result.is_err()
@@ -607,8 +662,8 @@ mod tests {
 
     #[test]
     fn test_next_prompt_invalid_json() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
         let result = next_prompt(Some("not valid json"), &storage);
         assert!(
             result.is_err()
@@ -621,63 +676,71 @@ mod tests {
 
     #[test]
     fn test_next_prompt_multiple_transitions() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
-        // Use implicit next (None) to avoid hardcoding node names
-        next_prompt(None, &storage).unwrap();
-        let state = storage.load().unwrap();
-        assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 2);
+        next(&storage);
+        assert_eq!(
+            get_state(&storage)
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .history
+                .len(),
+            2
+        );
 
-        next_prompt(None, &storage).unwrap();
-        let state = storage.load().unwrap();
-        assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 3); // Two transitions
+        next(&storage);
+        assert_eq!(
+            get_state(&storage)
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .history
+                .len(),
+            3
+        );
     }
 
     // ========== show_status Tests ==========
 
     #[test]
     fn test_show_status_with_workflow() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
         assert!(show_status(&storage).is_ok());
     }
 
     #[test]
     fn test_show_status_no_workflow() {
-        let (_temp_dir, storage) = test_storage();
+        let (_tmp, storage) = test_storage();
         assert!(show_status(&storage).is_ok());
     }
 
     #[test]
     fn test_show_status_after_transitions() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"spec_complete": true}"#, &storage);
         assert!(show_status(&storage).is_ok());
-        assert_state_eq(
-            &storage.load().unwrap(),
-            "plan",
-            "test_mode",
-            &["spec", "plan"],
-        );
+        assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
     }
 
     // ========== reset_workflow Tests ==========
 
     #[test]
     fn test_reset_workflow_clears_state() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        assert!(storage.load().unwrap().workflow.is_some());
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        assert!(get_state(&storage).workflow.is_some());
         reset_workflow(&storage).unwrap();
-        let state = storage.load().unwrap();
+        let state = get_state(&storage);
         assert!(state.workflow.is_none() && state.workflow_state.is_none());
     }
 
     #[test]
     fn test_reset_workflow_when_no_state() {
-        let (_temp_dir, storage) = setup_workflow_env();
+        let (_tmp, storage) = setup_workflow_env();
         assert!(reset_workflow(&storage).is_ok());
     }
 
@@ -685,11 +748,10 @@ mod tests {
     fn test_reset_workflow_preserves_session_metadata() {
         use crate::storage::SessionMetadata;
 
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
-        // Add session metadata manually
-        let mut state = storage.load().unwrap();
+        let mut state = get_state(&storage);
         state.session_metadata = Some(SessionMetadata {
             session_id: "test-session".to_string(),
             transcript_path: "/tmp/transcript.jsonl".to_string(),
@@ -697,11 +759,9 @@ mod tests {
         });
         storage.save(&state).unwrap();
 
-        // Reset workflow
         reset_workflow(&storage).unwrap();
 
-        // Verify workflow cleared but session preserved
-        let state = storage.load().unwrap();
+        let state = get_state(&storage);
         assert!(state.workflow.is_none());
         assert!(state.workflow_state.is_none());
         assert!(state.session_metadata.is_some());
@@ -710,41 +770,45 @@ mod tests {
 
     #[test]
     fn test_reset_then_start_new_workflow() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"spec_complete": true}"#, &storage);
         reset_workflow(&storage).unwrap();
-        start_workflow("test_workflow", &storage).unwrap();
-        assert_state_eq(&storage.load().unwrap(), "spec", "test_mode", &["spec"]);
+        start(&storage);
+        assert_at(&storage, "spec", "test_mode", &["spec"]);
     }
 
     // ========== Integration Tests ==========
 
     #[test]
     fn test_full_workflow_cycle() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        let state = storage.load().unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        let state = get_state(&storage);
 
-        // Test mechanism: advance through workflow using transitions
-        // Don't hardcode specific nodes - workflow structure can change
         assert!(state.workflow.is_some());
         assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 1);
 
-        // Advance one step using implicit next
-        next_prompt(None, &storage).unwrap();
-        let state = storage.load().unwrap();
-        assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 2); // Transitioned
+        next(&storage);
+        assert_eq!(
+            get_state(&storage)
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .history
+                .len(),
+            2
+        );
     }
 
     // ========== State Transition Logging Tests ==========
 
     #[test]
     fn test_next_prompt_logs_state_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
-        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"spec_complete": true}"#, &storage);
+        let event = first_transition(&storage);
         assert_eq!(event["from_node"], "spec");
         assert_eq!(event["to_node"], "plan");
         assert_eq!(event["phase"], "plan");
@@ -753,36 +817,26 @@ mod tests {
 
     #[test]
     fn test_next_prompt_logs_multiple_transitions() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-
-        // Use implicit next to avoid hardcoded node names
-        next_prompt(None, &storage).unwrap();
-        next_prompt(None, &storage).unwrap();
-
-        let events = read_jsonl_all(&storage.state_dir().join("states.jsonl"));
-        assert_eq!(events.len(), 2); // Two transitions logged
-                                     // Don't check specific node names - just verify mechanism works
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next(&storage);
+        next(&storage);
+        assert_eq!(transition_count(&storage), 2);
     }
 
     #[test]
     fn test_next_prompt_no_log_when_no_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(Some(r#"{"wrong_claim": true}"#), &storage).unwrap();
-        assert_eq!(
-            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
-            0
-        );
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next_with(r#"{"wrong_claim": true}"#, &storage);
+        assert_eq!(transition_count(&storage), 0);
     }
 
     #[test]
     fn test_state_transition_includes_workflow_id() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        let workflow_id = storage
-            .load()
-            .unwrap()
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        let workflow_id = get_state(&storage)
             .workflow_state
             .as_ref()
             .unwrap()
@@ -790,8 +844,8 @@ mod tests {
             .as_ref()
             .unwrap()
             .clone();
-        next_prompt(Some(r#"{"spec_complete": true}"#), &storage).unwrap();
-        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        next_with(r#"{"spec_complete": true}"#, &storage);
+        let event = first_transition(&storage);
         assert_eq!(event["workflow_id"], workflow_id.as_str());
     }
 
@@ -799,119 +853,113 @@ mod tests {
 
     #[test]
     fn test_continue_with_active_workflow_returns_current_node_prompt() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
         assert!(repeat_prompt(&storage).is_ok());
     }
 
     #[test]
     fn test_continue_with_no_workflow_loaded_returns_error() {
-        let (_temp_dir, storage) = setup_workflow_env();
+        let (_tmp, storage) = setup_workflow_env();
         let result = repeat_prompt(&storage);
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("No workflow loaded"));
+        assert!(
+            result.is_err()
+                && result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("No workflow loaded")
+        );
     }
 
     #[test]
     fn test_continue_renders_template_with_guides() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        // If template rendering fails, repeat_prompt will error
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
         assert!(repeat_prompt(&storage).is_ok());
     }
 
     #[test]
     fn test_continue_does_not_change_workflow_state() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        let state_before = storage.load().unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        let state_before = get_state(&storage);
         repeat_prompt(&storage).unwrap();
-        let state_after = storage.load().unwrap();
+        let state_after = get_state(&storage);
 
-        // State should be identical
         assert_state_eq(&state_before, "spec", "test_mode", &["spec"]);
         assert_state_eq(&state_after, "spec", "test_mode", &["spec"]);
     }
 
     #[test]
     fn test_continue_does_not_log_state_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
         repeat_prompt(&storage).unwrap();
-
-        // Should be no state transitions logged
-        assert_eq!(
-            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
-            0
-        );
+        assert_eq!(transition_count(&storage), 0);
     }
 
     // ========== Implicit Next Tests ==========
 
     #[test]
     fn test_next_prompt_implicit_happy_path() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        // Omit claims - should infer {"spec_complete": true}
-        next_prompt(None, &storage).unwrap();
-        assert_state_eq(
-            &storage.load().unwrap(),
-            "plan",
-            "test_mode",
-            &["spec", "plan"],
-        );
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next(&storage);
+        assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
     }
 
     #[test]
     fn test_next_prompt_implicit_multiple_transitions() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
-        // Test mechanism: implicit next (using current_node_complete)
-        next_prompt(None, &storage).unwrap(); // First transition
-        let state = storage.load().unwrap();
-        assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 2);
+        next(&storage);
+        assert_eq!(
+            get_state(&storage)
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .history
+                .len(),
+            2
+        );
 
-        next_prompt(None, &storage).unwrap(); // Second transition
-        let state = storage.load().unwrap();
-        assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 3);
+        next(&storage);
+        assert_eq!(
+            get_state(&storage)
+                .workflow_state
+                .as_ref()
+                .unwrap()
+                .history
+                .len(),
+            3
+        );
     }
 
     // ========== Restart Workflow Tests ==========
 
     #[test]
     fn test_restart_workflow_returns_to_spec() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-        next_prompt(None, &storage).unwrap(); // spec -> plan
-        assert_state_eq(
-            &storage.load().unwrap(),
-            "plan",
-            "test_mode",
-            &["spec", "plan"],
-        );
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        next(&storage);
+        assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
 
-        restart_workflow(&storage).unwrap(); // plan -> spec
-        assert_state_eq(
-            &storage.load().unwrap(),
-            "spec",
-            "test_mode",
-            &["spec", "plan", "spec"],
-        );
+        restart_workflow(&storage).unwrap();
+        assert_at(&storage, "spec", "test_mode", &["spec", "plan", "spec"]);
     }
 
     #[test]
     fn test_restart_workflow_no_workflow_loaded() {
-        let (_temp_dir, storage) = setup_workflow_env();
+        let (_tmp, storage) = setup_workflow_env();
         let result = restart_workflow(&storage);
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("No workflow loaded"));
+        assert!(
+            result.is_err()
+                && result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("No workflow loaded")
+        );
     }
 
     // ========== Production Workflow Tests ==========
@@ -982,12 +1030,11 @@ mod tests {
 
     #[test]
     fn test_evaluate_intra_workflow_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
         let context = load_workflow_context(&storage).unwrap();
         let claims = claim("spec_complete", true);
-
         let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
 
         match outcome {
@@ -1003,12 +1050,11 @@ mod tests {
 
     #[test]
     fn test_evaluate_stay_at_current_node() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
         let context = load_workflow_context(&storage).unwrap();
         let claims = claim("wrong_claim", true);
-
         let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
 
         match outcome {
@@ -1021,26 +1067,14 @@ mod tests {
 
     #[test]
     fn test_evaluate_inter_workflow_transition_research_to_discovery() {
-        use crate::storage::MetaMode;
+        let (_tmp, storage) = setup_meta_mode_workflows();
 
-        let (_temp_dir, storage) = setup_meta_mode_workflows();
-
-        // Start research workflow with learning meta-mode
         start_workflow("research", &storage).unwrap();
-
-        // Manually set state to done node (simulating completion)
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.current_node = "done".to_string();
-        workflow_state.meta_mode = Some(MetaMode {
-            name: "learning".to_string(),
-        });
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        set_node(&storage, "done");
+        set_meta_mode(&storage, "learning");
 
         let context = load_workflow_context(&storage).unwrap();
         let claims = claim("done_complete", true);
-
         let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
 
         match outcome {
@@ -1062,26 +1096,14 @@ mod tests {
 
     #[test]
     fn test_evaluate_ambiguous_discovery_done_in_learning_mode() {
-        use crate::storage::MetaMode;
+        let (_tmp, storage) = setup_meta_mode_workflows();
 
-        let (_temp_dir, storage) = setup_meta_mode_workflows();
-
-        // Start discovery workflow with learning meta-mode
         start_workflow("discovery", &storage).unwrap();
-
-        // Manually set state to done node
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.current_node = "done".to_string();
-        workflow_state.meta_mode = Some(MetaMode {
-            name: "learning".to_string(),
-        });
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        set_node(&storage, "done");
+        set_meta_mode(&storage, "learning");
 
         let context = load_workflow_context(&storage).unwrap();
         let claims = claim("done_complete", true);
-
         let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
 
         match outcome {
@@ -1096,20 +1118,12 @@ mod tests {
 
     #[test]
     fn test_evaluate_stay_at_done_no_meta_mode() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
-
-        // Advance to done manually
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.current_node = "done".to_string();
-        workflow_state.meta_mode = None; // No meta-mode
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
+        set_node(&storage, "done");
 
         let context = load_workflow_context(&storage).unwrap();
         let claims = claim("done_complete", true);
-
         let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
 
         match outcome {
@@ -1124,8 +1138,8 @@ mod tests {
 
     #[test]
     fn test_execute_intra_workflow_transition() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
         let mut context = load_workflow_context(&storage).unwrap();
         let outcome = TransitionOutcome::IntraWorkflow {
@@ -1136,20 +1150,17 @@ mod tests {
 
         execute_transition(outcome, &mut context, &storage).unwrap();
 
-        // Verify state updated
-        let state = storage.load().unwrap();
-        assert_state_eq(&state, "plan", "test_mode", &["spec", "plan"]);
+        assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
 
-        // Verify transition logged
-        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        let event = first_transition(&storage);
         assert_eq!(event["from_node"], "spec");
         assert_eq!(event["to_node"], "plan");
     }
 
     #[test]
     fn test_execute_stay_no_state_change() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
         let mut context = load_workflow_context(&storage).unwrap();
         let outcome = TransitionOutcome::Stay {
@@ -1159,34 +1170,16 @@ mod tests {
 
         execute_transition(outcome, &mut context, &storage).unwrap();
 
-        // Verify state unchanged
-        let state = storage.load().unwrap();
-        assert_state_eq(&state, "spec", "test_mode", &["spec"]);
-
-        // Verify no transition logged
-        assert_eq!(
-            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
-            0
-        );
+        assert_at(&storage, "spec", "test_mode", &["spec"]);
+        assert_eq!(transition_count(&storage), 0);
     }
 
     #[test]
     fn test_execute_inter_workflow_transition() {
-        use crate::storage::MetaMode;
+        let (_tmp, storage) = setup_meta_mode_workflows();
 
-        let (_temp_dir, storage) = setup_meta_mode_workflows();
-
-        // Start research workflow
         start_workflow("research", &storage).unwrap();
-
-        // Set meta-mode
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.meta_mode = Some(MetaMode {
-            name: "learning".to_string(),
-        });
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        set_meta_mode(&storage, "learning");
 
         let mut context = load_workflow_context(&storage).unwrap();
         let outcome = TransitionOutcome::InterWorkflow {
@@ -1199,12 +1192,9 @@ mod tests {
 
         execute_transition(outcome, &mut context, &storage).unwrap();
 
-        // Verify new workflow loaded
-        let state = storage.load().unwrap();
+        let state = get_state(&storage);
         assert_eq!(state.workflow_state.as_ref().unwrap().mode, "discovery");
         assert_eq!(state.workflow_state.as_ref().unwrap().current_node, "spec");
-
-        // Verify meta-mode preserved
         assert_eq!(
             state
                 .workflow_state
@@ -1217,8 +1207,7 @@ mod tests {
             "learning"
         );
 
-        // Verify transition logged
-        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        let event = first_transition(&storage);
         assert_eq!(event["from_node"], "done");
         assert_eq!(event["to_node"], "spec");
         assert_eq!(event["mode"], "discovery");
@@ -1226,8 +1215,8 @@ mod tests {
 
     #[test]
     fn test_execute_ambiguous_no_state_change() {
-        let (_temp_dir, storage) = setup_workflow_env();
-        start_workflow("test_workflow", &storage).unwrap();
+        let (_tmp, storage) = setup_workflow_env();
+        start(&storage);
 
         let mut context = load_workflow_context(&storage).unwrap();
         let outcome = TransitionOutcome::Ambiguous {
@@ -1247,58 +1236,28 @@ mod tests {
 
         execute_transition(outcome, &mut context, &storage).unwrap();
 
-        // Verify state unchanged
-        let state = storage.load().unwrap();
-        assert_state_eq(&state, "spec", "test_mode", &["spec"]);
-
-        // Verify no transition logged
-        assert_eq!(
-            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
-            0
-        );
+        assert_at(&storage, "spec", "test_mode", &["spec"]);
+        assert_eq!(transition_count(&storage), 0);
     }
 
     // ========== Integration Tests (End-to-End) ==========
 
     #[test]
     fn test_next_at_research_done_auto_transitions_to_discovery() {
-        use crate::storage::MetaMode;
+        let (_tmp, storage) = setup_meta_mode_workflows();
 
-        let (_temp_dir, storage) = setup_meta_mode_workflows();
-
-        // Start research workflow with learning meta-mode
         start_workflow("research", &storage).unwrap();
+        set_meta_mode(&storage, "learning");
+        set_node(&storage, "done");
 
-        // Set meta-mode to learning
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.meta_mode = Some(MetaMode {
-            name: "learning".to_string(),
-        });
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        next(&storage);
 
-        // Manually advance to done node (simulating completion of research workflow)
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.current_node = "done".to_string();
-        workflow_state.history.push("done".to_string());
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        let ws = get_state(&storage).workflow_state.unwrap();
+        assert_eq!(ws.mode, "discovery");
+        assert_eq!(ws.current_node, "spec");
+        assert_eq!(ws.meta_mode.unwrap().name, "learning");
 
-        // Call next_prompt (implicit happy path)
-        next_prompt(None, &storage).unwrap();
-
-        // Verify transition to discovery workflow
-        let state = storage.load().unwrap();
-        let workflow_state = state.workflow_state.as_ref().unwrap();
-
-        assert_eq!(workflow_state.mode, "discovery");
-        assert_eq!(workflow_state.current_node, "spec");
-        assert_eq!(workflow_state.meta_mode.as_ref().unwrap().name, "learning");
-
-        // Verify transition was logged
-        let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0);
+        let event = first_transition(&storage);
         assert_eq!(event["from_node"], "done");
         assert_eq!(event["to_node"], "spec");
         assert_eq!(event["mode"], "discovery");
@@ -1306,45 +1265,17 @@ mod tests {
 
     #[test]
     fn test_next_at_discovery_done_shows_ambiguous_options() {
-        use crate::storage::MetaMode;
+        let (_tmp, storage) = setup_meta_mode_workflows();
 
-        let (_temp_dir, storage) = setup_meta_mode_workflows();
-
-        // Start discovery workflow with learning meta-mode
         start_workflow("discovery", &storage).unwrap();
+        set_meta_mode(&storage, "learning");
+        set_node(&storage, "done");
 
-        // Set meta-mode to learning
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.meta_mode = Some(MetaMode {
-            name: "learning".to_string(),
-        });
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
+        next(&storage);
 
-        // Manually advance to done node
-        let mut state = storage.load().unwrap();
-        let mut workflow_state = state.workflow_state.clone().unwrap();
-        workflow_state.current_node = "done".to_string();
-        workflow_state.history.push("done".to_string());
-        state.workflow_state = Some(workflow_state);
-        storage.save(&state).unwrap();
-
-        // Call next_prompt (implicit happy path)
-        // This should display ambiguous options but not transition
-        next_prompt(None, &storage).unwrap();
-
-        // Verify still at done in discovery (no auto-transition)
-        let state = storage.load().unwrap();
-        let workflow_state = state.workflow_state.as_ref().unwrap();
-
-        assert_eq!(workflow_state.mode, "discovery");
-        assert_eq!(workflow_state.current_node, "done");
-
-        // Verify no transition logged (stayed at done)
-        assert_eq!(
-            count_jsonl_lines(&storage.state_dir().join("states.jsonl")),
-            0
-        );
+        let ws = get_state(&storage).workflow_state.unwrap();
+        assert_eq!(ws.mode, "discovery");
+        assert_eq!(ws.current_node, "done");
+        assert_eq!(transition_count(&storage), 0);
     }
 }
