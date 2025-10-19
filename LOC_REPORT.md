@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 19:19
+**Last Updated**: 2025-10-19 19:41
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,727 | 5,132 | 14,859 |
-| **Comments** | 1,379 | - | 1,379 |
-| **Blank Lines** | 1,810 | - | 1,810 |
-| **Total Lines** | 12,916 | 5,132 | 18,048 |
+| **Lines** | 9,767 | 5,132 | 14,899 |
+| **Comments** | 1,421 | - | 1,421 |
+| **Blank Lines** | 1,819 | - | 1,819 |
+| **Total Lines** | 13,007 | 5,132 | 18,139 |
 | **Files** | 51 | 28 | 79 |
 
 **Documentation Ratio**: 0.53 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            51           1810           1379           9727
+Rust                            51           1819           1421           9767
 -------------------------------------------------------------------------------
-SUM:                            51           1810           1379           9727
+SUM:                            51           1819           1421           9767
 -------------------------------------------------------------------------------
 ```
 
@@ -47,12 +47,12 @@ SUM:                            51           1810           1379           9727
 | `commands/git.rs` | 49 | 9 | 40 | 81.6% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/init.rs` | 167 | 72 | 95 | 56.9% | ✅ |
-| `commands/meta.rs` | 232 | 147 | 85 | 36.6% | ✅ |
+| `commands/meta.rs` | 248 | 163 | 85 | 34.3% | ✅ |
 | `commands/mod.rs` | 25 | 25 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 34 | 34 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 242 | 239 | 3 | 1.2% | ⚠️ Large |
+| `commands/workflow/mod.rs` | 271 | 268 | 3 | 1.1% | ⚠️ Large |
 | `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ⚠️ Large |
 | `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ⚠️ Large |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
@@ -63,7 +63,7 @@ SUM:                            51           1810           1379           9727
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 171 | 98 | 73 | 42.7% | ✅ |
-| `main.rs` | 212 | 13 | 199 | 93.9% | ✅ |
+| `main.rs` | 258 | 13 | 245 | 95.0% | ✅ |
 | `metamodes/mod.rs` | 236 | 111 | 125 | 53.0% | ✅ |
 | `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |

@@ -4,10 +4,14 @@ use crate::theme::Theme;
 use anyhow::{Context, Result};
 
 /// Declare or view meta-mode
-pub fn meta_mode(meta_mode_name: Option<&str>, storage: &FileStorage) -> Result<()> {
-    match meta_mode_name {
-        Some(name) => declare_meta_mode(name, storage),
-        None => show_meta_mode_status(storage),
+pub fn meta_mode(meta_mode_name: Option<&str>, list: bool, storage: &FileStorage) -> Result<()> {
+    if list {
+        list_meta_modes()
+    } else {
+        match meta_mode_name {
+            Some(name) => declare_meta_mode(name, storage),
+            None => show_meta_mode_status(storage),
+        }
     }
 }
 
@@ -143,6 +147,18 @@ fn get_meta_mode_pattern(name: &str) -> String {
         "standard" => "Discovery ↔ Execution".to_string(),
         _ => "Unknown".to_string(),
     }
+}
+
+/// List all available meta-modes
+fn list_meta_modes() -> Result<()> {
+    let all_modes = MetaModeDefinition::all();
+
+    println!("Available meta-modes:");
+    for mode in all_modes {
+        println!("  {} - {}", mode.name, mode.description);
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]

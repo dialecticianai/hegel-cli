@@ -237,6 +237,35 @@ pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
     advance_workflow(ClaimAlias::Restart, storage)
 }
 
+/// List all available workflows
+pub fn list_workflows(storage: &FileStorage) -> Result<()> {
+    use std::fs;
+
+    let workflows_dir = storage.workflows_dir();
+    let entries = fs::read_dir(&workflows_dir)
+        .with_context(|| format!("Failed to read workflows directory: {}", workflows_dir))?;
+
+    let mut workflows = Vec::new();
+    for entry in entries {
+        let entry = entry?;
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) == Some("yaml") {
+            if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
+                workflows.push(name.to_string());
+            }
+        }
+    }
+
+    workflows.sort();
+
+    println!("Available workflows:");
+    for workflow in workflows {
+        println!("  {}", workflow);
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 #[path = "tests.rs"]
 mod tests;

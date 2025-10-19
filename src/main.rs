@@ -33,13 +33,15 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Initialize a new DDD project (greenfield or retrofit)
+    /// Initialize project (auto-detects greenfield or retrofit)
     Init,
     /// Start a new workflow
     Start {
         /// Workflow name (e.g., discovery, execution)
         workflow: String,
     },
+    /// List available workflows
+    Workflows,
     /// Advance to next phase (implicit: current_complete=true, or provide custom claims)
     Next {
         /// Optional claims as JSON string (e.g., '{"spec_complete": true}')
@@ -87,6 +89,14 @@ enum Commands {
         args: Vec<String>,
     },
     /// Launch ephemeral Markdown review UI (wraps mirror)
+    ///
+    /// Workflow:
+    ///   1. Mirror GUI launches
+    ///   2. User selects text → adds comment → submits
+    ///   3. Review saved to .ddd/<filename>.review.N (JSONL format)
+    ///   4. Mirror exits (ephemeral, no persistent state)
+    ///
+    /// Read reviews with: cat .ddd/SPEC.review.1 | jq -r '.comment'
     Reflect {
         /// Markdown files to review
         files: Vec<std::path::PathBuf>,
@@ -101,21 +111,54 @@ enum Commands {
         headless: bool,
     },
     /// Run git with guardrails and audit logging
+    ///
+    /// Guardrails configuration: .hegel/guardrails.yaml
+    ///   - Blocks commands matching regex patterns
+    ///   - Exits with code 1 and prints reason when blocked
+    ///   - If no guardrails.yaml exists, commands pass through
+    ///
+    /// All invocations logged to: .hegel/command_log.jsonl
+    ///
+    /// Example guardrails.yaml:
+    ///   git:
+    ///     blocked:
+    ///       - pattern: "reset --hard"
+    ///         reason: "Destructive: permanently discards uncommitted changes"
+    ///       - pattern: "push.*--force"
+    ///         reason: "Force push can overwrite remote history"
     Git {
         /// Arguments to pass to git
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
     /// Run docker with guardrails and audit logging
+    ///
+    /// Guardrails configuration: .hegel/guardrails.yaml
+    ///   - Blocks commands matching regex patterns
+    ///   - Exits with code 1 and prints reason when blocked
+    ///   - If no guardrails.yaml exists, commands pass through
+    ///
+    /// All invocations logged to: .hegel/command_log.jsonl
+    ///
+    /// Example guardrails.yaml:
+    ///   docker:
+    ///     blocked:
+    ///       - pattern: "rm -f"
+    ///         reason: "Force remove containers blocked"
+    ///       - pattern: "system prune -a"
+    ///         reason: "Destructive: removes all unused containers, networks, images"
     Docker {
         /// Arguments to pass to docker
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
-    /// Declare or view meta-mode (learning, standard)
+    /// Declare or view current meta-mode
     Meta {
-        /// Meta-mode name (learning or standard). Omit to view current meta-mode.
+        /// Meta-mode name. Omit to view current meta-mode
         name: Option<String>,
+        /// List available meta-modes
+        #[arg(long)]
+        list: bool,
     },
     /// Get, set, or list configuration values
     Config {
@@ -150,6 +193,9 @@ fn main() -> Result<()> {
         }
         Commands::Start { workflow } => {
             commands::start_workflow(&workflow, &storage)?;
+        }
+        Commands::Workflows => {
+            commands::list_workflows(&storage)?;
         }
         Commands::Next { claims } => {
             commands::next_prompt(claims.as_deref(), &storage)?;
@@ -195,8 +241,8 @@ fn main() -> Result<()> {
         Commands::Docker { args } => {
             commands::run_wrapped_command("docker", &args, &storage)?;
         }
-        Commands::Meta { name } => {
-            commands::meta_mode(name.as_deref(), &storage)?;
+        Commands::Meta { name, list } => {
+            commands::meta_mode(name.as_deref(), list, &storage)?;
         }
         Commands::Config { action, key, value } => {
             commands::handle_config(

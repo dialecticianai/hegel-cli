@@ -19,7 +19,7 @@ pub use init::init_project;
 pub use meta::meta_mode;
 pub use reflect::run_reflect;
 pub use workflow::{
-    abort_workflow, next_prompt, repeat_prompt, reset_workflow, restart_workflow, show_status,
-    start_workflow,
+    abort_workflow, list_workflows, next_prompt, repeat_prompt, reset_workflow, restart_workflow,
+    show_status, start_workflow,
 };
 pub use wrapped::run_wrapped_command;
