@@ -171,32 +171,31 @@ mod tests {
 
     #[test]
     fn test_load_workflow_discovery() {
+        use crate::test_helpers::*;
         let temp_dir = TempDir::new().unwrap();
-        let yaml_content = r#"
-mode: discovery
-start_node: spec
-nodes:
-  spec:
-    prompt: "Write SPEC.md"
-    transitions:
-      - when: spec_complete
-        to: plan
-  plan:
-    prompt: "Write PLAN.md"
-    transitions:
-      - when: plan_complete
-        to: done
-  done:
-    prompt: "Complete!"
-    transitions: []
-"#;
-        // Use different name to avoid collision with embedded "discovery" workflow
-        let workflow_path = create_test_workflow_file(&temp_dir, "test_discovery", yaml_content);
 
+        let wf = workflow("discovery", "spec")
+            .with_node(
+                "spec",
+                node("Write SPEC.md", vec![transition("spec_complete", "plan")]),
+            )
+            .with_node(
+                "plan",
+                node("Write PLAN.md", vec![transition("plan_complete", "done")]),
+            )
+            .with_node("done", node("Complete!", vec![]))
+            .build();
+
+        let workflow_path = create_test_workflow_file(
+            &temp_dir,
+            "test_discovery",
+            &serde_yaml::to_string(&wf).unwrap(),
+        );
         let workflow = load_workflow(&workflow_path).unwrap();
+
         assert_eq!(workflow.mode, "discovery");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 3); // Test workflow has 3 nodes
+        assert_eq!(workflow.nodes.len(), 3);
         assert!(workflow.nodes.contains_key("spec"));
         assert!(workflow.nodes.contains_key("plan"));
         assert!(workflow.nodes.contains_key("done"));
@@ -204,46 +203,49 @@ nodes:
 
     #[test]
     fn test_load_workflow_execution() {
+        use crate::test_helpers::*;
         let temp_dir = TempDir::new().unwrap();
-        let yaml_content = r#"
-mode: execution
-start_node: spec
-nodes:
-  spec:
-    prompt: "Write SPEC.md"
-    transitions:
-      - when: spec_complete
-        to: code
-  code:
-    prompt: "Write code"
-    transitions:
-      - when: code_complete
-        to: review
-  review:
-    prompt: "Review code"
-    transitions:
-      - when: review_passed
-        to: done
-      - when: review_failed
-        to: refactor
-  refactor:
-    prompt: "Refactor code"
-    transitions:
-      - when: refactor_complete
-        to: code
-  done:
-    prompt: "Complete!"
-    transitions: []
-"#;
-        // Use different name to avoid collision with embedded "execution" workflow
-        let workflow_path = create_test_workflow_file(&temp_dir, "test_execution", yaml_content);
 
+        let wf = workflow("execution", "spec")
+            .with_node(
+                "spec",
+                node("Write SPEC.md", vec![transition("spec_complete", "code")]),
+            )
+            .with_node(
+                "code",
+                node("Write code", vec![transition("code_complete", "review")]),
+            )
+            .with_node(
+                "review",
+                node(
+                    "Review code",
+                    vec![
+                        transition("review_passed", "done"),
+                        transition("review_failed", "refactor"),
+                    ],
+                ),
+            )
+            .with_node(
+                "refactor",
+                node(
+                    "Refactor code",
+                    vec![transition("refactor_complete", "code")],
+                ),
+            )
+            .with_node("done", node("Complete!", vec![]))
+            .build();
+
+        let workflow_path = create_test_workflow_file(
+            &temp_dir,
+            "test_execution",
+            &serde_yaml::to_string(&wf).unwrap(),
+        );
         let workflow = load_workflow(&workflow_path).unwrap();
+
         assert_eq!(workflow.mode, "execution");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 5); // Test workflow has 5 nodes
+        assert_eq!(workflow.nodes.len(), 5);
 
-        // Verify review node has multiple transitions
         let review_node = &workflow.nodes["review"];
         assert_eq!(review_node.transitions.len(), 2);
     }
