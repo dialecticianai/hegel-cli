@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 18:26
+**Last Updated**: 2025-10-19 18:55
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,703 | 5,492 | 15,195 |
+| **Lines** | 9,727 | 5,492 | 15,219 |
 | **Comments** | 1,364 | - | 1,364 |
-| **Blank Lines** | 1,805 | - | 1,805 |
-| **Total Lines** | 12,872 | 5,492 | 18,364 |
-| **Files** | 47 | 28 | 75 |
+| **Blank Lines** | 1,810 | - | 1,810 |
+| **Total Lines** | 12,901 | 5,492 | 18,393 |
+| **Files** | 51 | 28 | 79 |
 
-**Documentation Ratio**: 0.57 lines of docs per line of code
+**Documentation Ratio**: 0.56 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            47           1805           1364           9703
+Rust                            51           1810           1364           9727
 -------------------------------------------------------------------------------
-SUM:                            47           1805           1364           9703
+SUM:                            51           1810           1364           9727
 -------------------------------------------------------------------------------
 ```
 
@@ -50,7 +50,11 @@ SUM:                            47           1805           1364           9703
 | `commands/meta.rs` | 232 | 147 | 85 | 36.6% | ✅ |
 | `commands/mod.rs` | 25 | 25 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
-| `commands/workflow.rs` | 1,339 | 596 | 743 | 55.5% | ✅ (infra) |
+| `commands/workflow/claims.rs` | 34 | 34 | 0 | 0.0% | ✅ |
+| `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
+| `commands/workflow/mod.rs` | 242 | 239 | 3 | 1.2% | ⚠️ Large |
+| `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ⚠️ Large |
+| `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ⚠️ Large |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 90 | 90 | 0 | 0.0% | ✅ |
@@ -83,6 +87,8 @@ SUM:                            47           1805           1364           9703
 | `tui/tabs/phases.rs` | 135 | 103 | 32 | 23.7% | ✅ |
 | `tui/ui.rs` | 317 | 158 | 159 | 50.2% | ✅ |
 | `tui/utils.rs` | 320 | 187 | 133 | 41.6% | ✅ |
+
+**⚠️ Warning:** 3 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -125,7 +131,7 @@ SUM:                            47           1805           1364           9703
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.57 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.56 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

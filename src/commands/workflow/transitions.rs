@@ -1,0 +1,276 @@
+use anyhow::{Context, Result};
+use colored::Colorize;
+use std::collections::HashMap;
+
+use crate::engine::get_next_prompt;
+use crate::metamodes::evaluate_workflow_completion;
+use crate::storage::{FileStorage, State};
+use crate::theme::Theme;
+
+use super::context::{display_workflow_prompt, WorkflowContext};
+
+/// Represents the outcome of a transition evaluation
+#[derive(Debug, PartialEq)]
+pub enum TransitionOutcome {
+    /// Stay at current node (no transition matched)
+    Stay {
+        current_node: String,
+        prompt: String,
+    },
+    /// Transition within the same workflow
+    IntraWorkflow {
+        from_node: String,
+        to_node: String,
+        prompt: String,
+    },
+    /// Transition to a different workflow (meta-mode)
+    InterWorkflow {
+        from_workflow: String,
+        from_node: String,
+        to_workflow: String,
+        to_node: String,
+        prompt: String,
+    },
+    /// Multiple transition options available (user must choose)
+    Ambiguous { options: Vec<TransitionOption> },
+}
+
+/// A possible transition option when multiple are available
+#[derive(Debug, PartialEq)]
+pub struct TransitionOption {
+    pub description: String,
+    pub target_workflow: String,
+    pub target_node: String,
+}
+
+/// Evaluate what type of transition should occur based on claims and context
+pub fn evaluate_transition(
+    context: &WorkflowContext,
+    claims: &HashMap<String, bool>,
+    storage: &FileStorage,
+) -> Result<TransitionOutcome> {
+    let current_node = &context.workflow_state.current_node;
+    let workflow_mode = &context.workflow_state.mode;
+
+    // First, try intra-workflow transitions (existing behavior)
+    let (prompt_text, new_state) = get_next_prompt(
+        &context.workflow,
+        &context.workflow_state,
+        claims,
+        storage.state_dir(),
+    )?;
+
+    // If we transitioned to a different node within the workflow
+    if new_state.current_node != *current_node {
+        return Ok(TransitionOutcome::IntraWorkflow {
+            from_node: current_node.clone(),
+            to_node: new_state.current_node.clone(),
+            prompt: prompt_text,
+        });
+    }
+
+    // If we're at a done node with meta-mode, check for workflow transitions
+    if new_state.current_node == "done" {
+        if let Some(meta_mode) = &context.workflow_state.meta_mode {
+            let meta_mode_transitions =
+                evaluate_workflow_completion(&meta_mode.name, workflow_mode, "done");
+
+            if let Some(transitions) = meta_mode_transitions {
+                // Single transition option - auto-transition
+                if transitions.len() == 1 {
+                    let transition = &transitions[0];
+                    let target_node = "spec"; // All workflows start at spec
+
+                    return Ok(TransitionOutcome::InterWorkflow {
+                        from_workflow: workflow_mode.clone(),
+                        from_node: current_node.clone(),
+                        to_workflow: transition.next_workflow.clone(),
+                        to_node: target_node.to_string(),
+                        prompt: transition.description.clone(),
+                    });
+                }
+
+                // Multiple options - return ambiguous
+                if transitions.len() > 1 {
+                    let options = transitions
+                        .iter()
+                        .map(|t| TransitionOption {
+                            description: t.description.clone(),
+                            target_workflow: t.next_workflow.clone(),
+                            target_node: "spec".to_string(),
+                        })
+                        .collect();
+
+                    return Ok(TransitionOutcome::Ambiguous { options });
+                }
+            }
+        }
+    }
+
+    // No transition matched - stay at current node
+    Ok(TransitionOutcome::Stay {
+        current_node: current_node.clone(),
+        prompt: prompt_text,
+    })
+}
+
+/// Execute a transition outcome, performing all necessary side effects
+pub fn execute_transition(
+    outcome: TransitionOutcome,
+    context: &mut WorkflowContext,
+    storage: &FileStorage,
+) -> Result<()> {
+    use crate::engine::{init_state, load_workflow};
+    use chrono::Utc;
+
+    match outcome {
+        TransitionOutcome::Stay {
+            current_node,
+            prompt,
+        } => {
+            // No state change, just display
+            println!("{}", Theme::warning("Stayed at current node"));
+            println!();
+            display_workflow_prompt(
+                &current_node,
+                &context.workflow_state.mode,
+                &prompt,
+                storage,
+            )?;
+        }
+
+        TransitionOutcome::IntraWorkflow {
+            from_node,
+            to_node,
+            prompt,
+        } => {
+            // Update workflow state
+            context.workflow_state.current_node = to_node.clone();
+            context.workflow_state.history.push(to_node.clone());
+            context.workflow_state.phase_start_time = Some(chrono::Utc::now().to_rfc3339());
+
+            // Persist state
+            let state = State {
+                workflow: Some(serde_yaml::to_value(&context.workflow)?),
+                workflow_state: Some(context.workflow_state.clone()),
+                session_metadata: context.session_metadata.clone(),
+            };
+            storage.save(&state)?;
+
+            // Log transition
+            storage.log_state_transition(
+                &from_node,
+                &to_node,
+                &context.workflow_state.mode,
+                context.workflow_state.workflow_id.as_deref(),
+            )?;
+
+            // Display transition
+            println!(
+                "{} {} {} {}",
+                Theme::success("Transitioned:").bold(),
+                Theme::secondary(&from_node),
+                Theme::secondary("→"),
+                Theme::highlight(&to_node)
+            );
+            println!();
+            display_workflow_prompt(&to_node, &context.workflow_state.mode, &prompt, storage)?;
+        }
+
+        TransitionOutcome::InterWorkflow {
+            from_workflow,
+            from_node,
+            to_workflow,
+            to_node,
+            prompt: _,
+        } => {
+            // Log completion of old workflow
+            println!(
+                "{} {} workflow completed",
+                Theme::success("✓").bold(),
+                Theme::highlight(&from_workflow)
+            );
+            println!();
+
+            // Load new workflow
+            let workflows_dir = storage.workflows_dir();
+            let workflow_path = format!("{}/{}.yaml", workflows_dir, to_workflow);
+            let new_workflow = load_workflow(&workflow_path)
+                .with_context(|| format!("Failed to load workflow: {}", to_workflow))?;
+
+            // Initialize new workflow state
+            let mut new_state = init_state(&new_workflow);
+            new_state.workflow_id = Some(Utc::now().to_rfc3339());
+            new_state.meta_mode = context.workflow_state.meta_mode.clone(); // Preserve meta-mode
+
+            // Persist new state
+            let state = State {
+                workflow: Some(serde_yaml::to_value(&new_workflow)?),
+                workflow_state: Some(new_state.clone()),
+                session_metadata: context.session_metadata.clone(),
+            };
+            storage.save(&state)?;
+
+            // Log new workflow start
+            storage.log_state_transition(
+                &from_node,
+                &to_node,
+                &to_workflow,
+                new_state.workflow_id.as_deref(),
+            )?;
+
+            // Update context
+            context.workflow = new_workflow;
+            context.workflow_state = new_state;
+
+            // Display transition
+            println!(
+                "{} {} {} {}",
+                Theme::success("Transitioned:").bold(),
+                Theme::secondary(&format!("{}:{}", from_workflow, from_node)),
+                Theme::secondary("→"),
+                Theme::highlight(&format!("{}:{}", to_workflow, to_node))
+            );
+            println!();
+
+            // Get and display the actual node prompt from the new workflow
+            let node = context
+                .workflow
+                .nodes
+                .get(&to_node)
+                .with_context(|| format!("Node not found: {}", to_node))?;
+
+            display_workflow_prompt(&to_node, &to_workflow, &node.prompt, storage)?;
+        }
+
+        TransitionOutcome::Ambiguous { options } => {
+            // Display options to user
+            println!(
+                "{}",
+                Theme::warning("Multiple transition options available:")
+            );
+            println!();
+
+            for (i, option) in options.iter().enumerate() {
+                println!(
+                    "  {}. {} → {}",
+                    i + 1,
+                    Theme::highlight(&option.target_workflow),
+                    option.description
+                );
+            }
+
+            println!();
+            println!(
+                "Use {} to select:",
+                Theme::highlight("hegel start <workflow>")
+            );
+
+            for option in &options {
+                println!("  - hegel start {}", option.target_workflow);
+            }
+        }
+    }
+
+    Ok(())
+}
