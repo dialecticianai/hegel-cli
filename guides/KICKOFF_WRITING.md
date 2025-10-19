@@ -79,17 +79,7 @@ The weave always alternates: *new primitive → integration with prior product*.
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write KICKOFF.md to disk, don't paste in chat.
-
-1. **Write to `.ddd/feat/<feature_name>/KICKOFF.md`** using the Write tool
-2. **Use markdown formatting** with clear stage numbering
-3. **Launch review**: Run `hegel reflect .ddd/feat/<feature_name>/KICKOFF.md` to open GUI for user review
-4. **Read feedback**: Check `.ddd/feat/<feature_name>/KICKOFF.review.*` files if user adds comments
-5. **Incorporate feedback**: Update kickoff based on review before proceeding to SPEC
-
-The review GUI allows the user to select text and add inline comments. This is how they provide feedback on your plan.
+{{templates/mirror_workflow}}
 
 ---
 

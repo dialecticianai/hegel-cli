@@ -24,18 +24,7 @@ The open questions document becomes a roadmap for practical work. Each question 
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write your questions document to a file, don't paste in chat.
-
-1. **Write to `learnings/.ddd/open_questions.md`** using the Write tool (or appropriate location for consolidated questions)
-2. **Use numbered questions** (e.g., Q1.1, Q1.2) for cross-referencing
-3. **Mark answered questions** with ✅ and keep them for tracking
-4. **Launch review**: Run `hegel reflect learnings/.ddd/open_questions.md` to open GUI for user review
-5. **Read feedback**: Check `.ddd/open_questions.review.*` files if user adds comments
-6. **Incorporate feedback**: Update questions doc based on review before proceeding to Discovery phase
-
-The review GUI allows the user to select text and add inline comments.
+{{templates/mirror_workflow}}
 
 ---
 

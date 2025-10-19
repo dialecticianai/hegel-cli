@@ -82,17 +82,7 @@ Brief description of subdirectory purpose. See subdirectory/CODE_MAP.md.
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write CODE_MAP.md files to disk, don't paste in chat.
-
-1. **Write to `CODE_MAP.md`** in the appropriate directory using the Write tool
-2. **Use markdown formatting** with clear section headers
-3. **Launch review**: Run `hegel reflect CODE_MAP.md` to open GUI for user review
-4. **Read feedback**: Check `.ddd/CODE_MAP.review.*` files if user adds comments
-5. **Incorporate feedback**: Update CODE_MAP based on review before proceeding
-
-The review GUI allows the user to select text and add inline comments. This is how they provide feedback on your documentation.
+{{templates/mirror_workflow}}
 
 ---
 

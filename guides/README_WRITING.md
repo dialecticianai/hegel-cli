@@ -127,17 +127,7 @@ utility_method(params) -> return_value
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write README.md to disk, don't paste in chat.
-
-1. **Write to `README.md`** in the appropriate directory using the Write tool
-2. **Use markdown formatting** following the structure above
-3. **Launch review**: Run `hegel reflect README.md` to open GUI for user review
-4. **Read feedback**: Check `.ddd/README.review.*` files if user adds comments
-5. **Incorporate feedback**: Update README based on review before considering it complete
-
-The review GUI allows the user to select text and add inline comments. This is how they provide feedback on your documentation.
+{{templates/mirror_workflow}}
 
 ---
 

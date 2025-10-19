@@ -71,18 +71,7 @@ The external source is disposable (cached for reference). Your understanding is 
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write your learning documents to files, don't paste in chat.
-
-1. **Write to `learnings/[topic].md`** using the Write tool
-2. **Use markdown formatting** with clear headers and structure
-3. **Cross-reference** other learning docs and external sources
-4. **Launch review**: Run `hegel reflect learnings/[topic].md` to open GUI for user review
-5. **Read feedback**: Check `.ddd/[topic].review.*` files if user adds comments
-6. **Incorporate feedback**: Update learning doc based on review before proceeding
-
-The review GUI allows the user to select text and add inline comments.
+{{templates/mirror_workflow}}
 
 ---
 

@@ -96,18 +96,7 @@ How long should research take?
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write your study plan to a file, don't paste in chat.
-
-1. **Write to `STUDY_PLAN.md`** in project root using the Write tool
-2. **Use checkboxes** for tracking progress (`- [ ]` unchecked, `- [x]` checked)
-3. **Cross-reference** learning docs (e.g., "See `learnings/topic.md`")
-4. **Launch review**: Run `hegel reflect STUDY_PLAN.md` to open GUI for user review
-5. **Read feedback**: Check `.ddd/STUDY_PLAN.review.*` files if user adds comments
-6. **Incorporate feedback**: Update plan based on review before proceeding
-
-The review GUI allows the user to select text and add inline comments. This is how they provide feedback on your plan.
+{{templates/mirror_workflow}}
 
 ---
 

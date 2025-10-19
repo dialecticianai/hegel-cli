@@ -47,17 +47,7 @@ Its job: extract maximum value from an experiment by recording **what worked, wh
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write your learnings to a file, don't paste in chat.
-
-1. **Write to `LEARNINGS.md`** using the Write tool (appropriate location depends on mode)
-2. **Be concise** - one page max, dense and factual
-3. **Launch review**: Run `hegel reflect LEARNINGS.md` to open GUI for user review
-4. **Read feedback**: Check `.ddd/LEARNINGS.review.*` files if user adds comments
-5. **Incorporate feedback**: Update learnings based on review before closing the work
-
-The review GUI allows the user to select text and add inline comments.
+{{templates/mirror_workflow}}
 
 ---
 
