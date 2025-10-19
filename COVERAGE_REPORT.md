@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-18 21:41
+**Last Updated**: 2025-10-18 21:48
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.18%** lines | **91.30%** regions | **87.57%** functions
+**Overall Coverage**: **92.25%** lines | **91.41%** regions | **87.67%** functions
 
 ## Summary
 
 ```
-TOTAL                              12366              1076    91.30%         668                83    87.57%        7582               593    92.18%           0                 0         -
+TOTAL                              12520              1076    91.41%         673                83    87.67%        7650               593    92.25%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -44,7 +44,7 @@ TOTAL                              12366              1076    91.30%         668
 | `rules/evaluator.rs` | 99.04% | 98.17% | 95.83% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
-| `storage/mod.rs` | 87.61% | 89.37% | 71.15% | 🟡 Good |
+| `storage/mod.rs` | 89.60% | 91.41% | 73.68% | 🟡 Good |
 | `test_helpers.rs` | 88.60% | 87.31% | 84.31% | 🟡 Good |
 | `theme.rs` | 65.00% | 67.42% | 58.82% | 🟠 Moderate |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
@@ -89,7 +89,7 @@ TOTAL                              12366              1076    91.30%         668
 ### 🟡 Good (70-89% lines)
 - `commands/meta.rs` - 86.09%
 - `embedded.rs` - 75.00%
-- `storage/mod.rs` - 87.61%
+- `storage/mod.rs` - 89.60%
 - `test_helpers.rs` - 88.60%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
@@ -111,7 +111,7 @@ TOTAL                              12366              1076    91.30%         668
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.18% | ✅ Met |
+| Overall | ≥80% | 92.25% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

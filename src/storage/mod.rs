@@ -105,11 +105,33 @@ impl FileStorage {
         }
     }
 
+    /// Find .hegel directory by walking up from current directory (like git)
+    pub fn find_project_root() -> Result<PathBuf> {
+        let mut current =
+            std::env::current_dir().context("Could not determine current working directory")?;
+
+        loop {
+            let hegel_dir = current.join(".hegel");
+            if hegel_dir.exists() && hegel_dir.is_dir() {
+                return Ok(hegel_dir);
+            }
+
+            // Try parent directory
+            match current.parent() {
+                Some(parent) => current = parent.to_path_buf(),
+                None => {
+                    anyhow::bail!(
+                        "No .hegel directory found in current or parent directories.\n\
+                         Run this command from within a Hegel project, or use 'hegel init' to create one."
+                    );
+                }
+            }
+        }
+    }
+
     /// Get the default state directory (.hegel in current working directory)
     pub fn default_state_dir() -> Result<PathBuf> {
-        let cwd =
-            std::env::current_dir().context("Could not determine current working directory")?;
-        Ok(cwd.join(".hegel"))
+        Self::find_project_root()
     }
 
     /// Resolve state directory with precedence: CLI flag > env var > default
@@ -422,10 +444,12 @@ mod tests {
 
     #[test]
     fn test_resolve_state_dir_default() {
-        // When no CLI flag or env var, should use default (.hegel in cwd)
+        // When no CLI flag or env var, should find .hegel by walking up from cwd
         let resolved = FileStorage::resolve_state_dir(None).unwrap();
-        let expected = std::env::current_dir().unwrap().join(".hegel");
-        assert_eq!(resolved, expected);
+        // Should find the project's .hegel directory
+        assert!(resolved.exists());
+        assert!(resolved.is_dir());
+        assert_eq!(resolved.file_name().unwrap(), ".hegel");
     }
 
     #[test]
@@ -463,6 +487,105 @@ mod tests {
         assert_eq!(resolved, cli_path);
 
         std::env::remove_var("HEGEL_STATE_DIR");
+    }
+
+    // ========== Parent Directory Discovery Tests ==========
+
+    #[test]
+    fn test_find_project_root_in_current_dir() {
+        // Create temp dir with .hegel subdirectory
+        let temp_dir = TempDir::new().unwrap();
+        let hegel_dir = temp_dir.path().join(".hegel");
+        fs::create_dir(&hegel_dir).unwrap();
+
+        // Change to temp dir and find project root
+        let original_dir = std::env::current_dir().unwrap();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        let found = FileStorage::find_project_root().unwrap();
+        // Canonicalize both paths to handle symlinks (e.g., /var -> /private/var on macOS)
+        assert_eq!(
+            found.canonicalize().unwrap(),
+            hegel_dir.canonicalize().unwrap()
+        );
+
+        // Restore original directory
+        std::env::set_current_dir(original_dir).unwrap();
+    }
+
+    #[test]
+    fn test_find_project_root_in_parent_dir() {
+        // Create nested structure: temp/.hegel and temp/subdir/subdir2
+        let temp_dir = TempDir::new().unwrap();
+        let hegel_dir = temp_dir.path().join(".hegel");
+        fs::create_dir(&hegel_dir).unwrap();
+
+        let subdir1 = temp_dir.path().join("subdir");
+        let subdir2 = subdir1.join("subdir2");
+        fs::create_dir_all(&subdir2).unwrap();
+
+        // Change to deeply nested subdir
+        let original_dir = std::env::current_dir().unwrap();
+        std::env::set_current_dir(&subdir2).unwrap();
+
+        // Should find .hegel in ancestor directory
+        let found = FileStorage::find_project_root().unwrap();
+        assert_eq!(
+            found.canonicalize().unwrap(),
+            hegel_dir.canonicalize().unwrap()
+        );
+
+        // Restore original directory
+        std::env::set_current_dir(original_dir).unwrap();
+    }
+
+    #[test]
+    fn test_find_project_root_not_found() {
+        // Create temp dir WITHOUT .hegel
+        let temp_dir = TempDir::new().unwrap();
+
+        let original_dir = std::env::current_dir().unwrap();
+        std::env::set_current_dir(temp_dir.path()).unwrap();
+
+        // Should error with helpful message
+        let result = FileStorage::find_project_root();
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("No .hegel directory found"));
+        assert!(err_msg.contains("current or parent directories"));
+
+        // Restore original directory
+        std::env::set_current_dir(original_dir).unwrap();
+    }
+
+    #[test]
+    fn test_find_project_root_stops_at_first_hegel() {
+        // Create nested structure with multiple .hegel dirs
+        // temp/.hegel and temp/project/.hegel
+        let temp_dir = TempDir::new().unwrap();
+        let outer_hegel = temp_dir.path().join(".hegel");
+        fs::create_dir(&outer_hegel).unwrap();
+
+        let project_dir = temp_dir.path().join("project");
+        fs::create_dir(&project_dir).unwrap();
+        let inner_hegel = project_dir.join(".hegel");
+        fs::create_dir(&inner_hegel).unwrap();
+
+        let subdir = project_dir.join("src");
+        fs::create_dir(&subdir).unwrap();
+
+        // From project/src, should find project/.hegel (closest one)
+        let original_dir = std::env::current_dir().unwrap();
+        std::env::set_current_dir(&subdir).unwrap();
+
+        let found = FileStorage::find_project_root().unwrap();
+        assert_eq!(
+            found.canonicalize().unwrap(),
+            inner_hegel.canonicalize().unwrap()
+        );
+
+        // Restore original directory
+        std::env::set_current_dir(original_dir).unwrap();
     }
 
     // ========== Round-trip Tests ==========
