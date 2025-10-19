@@ -369,6 +369,19 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
 
     // Load current state to check for existing meta-mode
     let existing_state = storage.load()?;
+
+    // Check if there's already an active workflow
+    if let Some(existing_ws) = &existing_state.workflow_state {
+        if existing_state.workflow.is_some() {
+            anyhow::bail!(
+                "Cannot start new workflow: already in workflow '{}' at node '{}'.\n\
+                 Run 'hegel abort' to abandon the current workflow first.",
+                existing_ws.mode,
+                existing_ws.current_node
+            );
+        }
+    }
+
     let existing_meta_mode = existing_state
         .workflow_state
         .as_ref()
@@ -491,6 +504,41 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
 
     storage.save(&cleared_state)?;
     println!("{}", Theme::success("Workflow state cleared"));
+    Ok(())
+}
+
+pub fn abort_workflow(storage: &FileStorage) -> Result<()> {
+    // Load current state
+    let state = storage.load()?;
+
+    // Check if there's an active workflow
+    if state.workflow.is_none() {
+        println!("No active workflow to abort.");
+        return Ok(());
+    }
+
+    let workflow_state = state
+        .workflow_state
+        .as_ref()
+        .context("No workflow state found")?;
+
+    println!(
+        "{}",
+        Theme::warning(&format!(
+            "Aborting workflow '{}' at node '{}'",
+            workflow_state.mode, workflow_state.current_node
+        ))
+    );
+
+    // Clear workflow fields but keep session_metadata
+    let cleared_state = State {
+        workflow: None,
+        workflow_state: None,
+        session_metadata: state.session_metadata,
+    };
+
+    storage.save(&cleared_state)?;
+    println!("{}", Theme::success("Workflow aborted"));
     Ok(())
 }
 

@@ -54,6 +54,8 @@ enum Commands {
     Status,
     /// Reset workflow state
     Reset,
+    /// Abort current workflow (clears state)
+    Abort,
     /// Handle Claude Code hook events
     Hook {
         /// Hook event name (e.g., PostToolUse, PreToolUse)
@@ -148,6 +150,9 @@ fn main() -> Result<()> {
         }
         Commands::Reset => {
             commands::reset_workflow(&storage)?;
+        }
+        Commands::Abort => {
+            commands::abort_workflow(&storage)?;
         }
         Commands::Hook { event_name } => {
             commands::handle_hook(&event_name, &storage)?;
