@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-18 22:32
+**Last Updated**: 2025-10-18 22:40
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,724 | 20,562 | 30,286 |
-| **Comments** | 1,349 | - | 1,349 |
-| **Blank Lines** | 1,770 | - | 1,770 |
-| **Total Lines** | 12,843 | 20,562 | 33,405 |
-| **Files** | 45 | 108 | 153 |
+| **Lines** | 9,264 | 20,472 | 29,736 |
+| **Comments** | 1,339 | - | 1,339 |
+| **Blank Lines** | 1,726 | - | 1,726 |
+| **Total Lines** | 12,329 | 20,472 | 32,801 |
+| **Files** | 45 | 107 | 152 |
 
-**Documentation Ratio**: 2.11 lines of docs per line of code
+**Documentation Ratio**: 2.21 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            45           1770           1349           9724
+Rust                            45           1726           1339           9264
 -------------------------------------------------------------------------------
-SUM:                            45           1770           1349           9724
+SUM:                            45           1726           1339           9264
 -------------------------------------------------------------------------------
 ```
 
@@ -65,7 +65,7 @@ SUM:                            45           1770           1349           9724
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
-| `rules/evaluator.rs` | 1,512 | 121 | 1,391 | 92.0% | ✅ |
+| `rules/evaluator.rs` | 998 | 121 | 877 | 87.9% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 297 | 72 | 225 | 75.8% | ✅ |
@@ -114,10 +114,9 @@ SUM:                            45           1770           1349           9724
 | `guides/SPEC_WRITING.md` | 115 |
 | `guides/STUDY_PLANNING.md` | 209 |
 | `guides/templates/mirror_workflow.md` | 11 |
-| `HANDOFF.md` | 91 |
 | `HEGEL_CLAUDE.md` | 560 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 221 |
+| `LOC_REPORT.md` | 222 |
 | `README.md` | 392 |
 | `ROADMAP.md` | 181 |
 | `TESTING.md` | 41 |
@@ -203,7 +202,7 @@ SUM:                            45           1770           1349           9724
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.11 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.21 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

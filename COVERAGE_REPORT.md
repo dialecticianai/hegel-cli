@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-18 22:32
+**Last Updated**: 2025-10-18 22:40
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.60%** lines | **91.72%** regions | **88.21%** functions
+**Overall Coverage**: **92.16%** lines | **91.55%** regions | **88.28%** functions
 
 ## Summary
 
 ```
-TOTAL                              12833              1063    91.72%         687                81    88.21%        7813               578    92.60%           0                 0         -
+TOTAL                              12586              1063    91.55%         691                81    88.28%        7376               578    92.16%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -41,7 +41,7 @@ TOTAL                              12833              1063    91.72%         687
 | `metrics/mod.rs` | 96.99% | 96.40% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `rules/evaluator.rs` | 99.04% | 98.17% | 95.83% | 🟢 Excellent |
+| `rules/evaluator.rs` | 98.44% | 97.74% | 96.15% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 96.69% | 96.14% | 80.70% | 🟢 Excellent |
@@ -79,7 +79,7 @@ TOTAL                              12833              1063    91.72%         687
 - `metrics/mod.rs` - 96.99%
 - `metrics/states.rs` - 100.00%
 - `metrics/transcript.rs` - 100.00%
-- `rules/evaluator.rs` - 99.04%
+- `rules/evaluator.rs` - 98.44%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 96.69%
@@ -111,7 +111,7 @@ TOTAL                              12833              1063    91.72%         687
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.60% | ✅ Met |
+| Overall | ≥80% | 92.16% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
