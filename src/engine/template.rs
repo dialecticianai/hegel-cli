@@ -21,9 +21,19 @@ fn validate_guide_name(guide_name: &str) -> Result<()> {
         return Err(anyhow!("Absolute paths not allowed in guide names"));
     }
 
-    // Reject subdirectories
+    // Allow templates/ subdirectory (for template includes)
+    // Reject all other subdirectories
     if guide_name.contains('/') || guide_name.contains('\\') {
-        return Err(anyhow!("Subdirectories not allowed in guide names"));
+        if !guide_name.starts_with("templates/") {
+            return Err(anyhow!(
+                "Subdirectories not allowed in guide names (except templates/)"
+            ));
+        }
+        // Validate that templates/ is followed by a simple name (no further slashes)
+        let after_prefix = guide_name.strip_prefix("templates/").unwrap();
+        if after_prefix.contains('/') || after_prefix.contains('\\') {
+            return Err(anyhow!("Nested subdirectories not allowed in templates/"));
+        }
     }
 
     Ok(())
@@ -33,6 +43,7 @@ fn validate_guide_name(guide_name: &str) -> Result<()> {
 ///
 /// Placeholder types:
 /// - {{UPPERCASE}} - Load guide from guides/UPPERCASE.md (required, error if missing)
+/// - {{templates/name}} - Load template from guides/templates/name.md (supports nesting)
 /// - {{?lowercase}} - Replace with context value if present, empty string otherwise (optional)
 /// - {{lowercase}} - Replace with context value (required, error if missing)
 pub fn render_template(
@@ -42,33 +53,45 @@ pub fn render_template(
 ) -> Result<String> {
     let mut result = template.to_string();
 
-    // First, handle guide placeholders ({{UPPERCASE}})
+    // First, handle guide placeholders ({{UPPERCASE}} and {{templates/name}})
     // Use permissive regex and validate afterwards for security
-    let guide_re = Regex::new(r"\{\{([^{}?]+)\}\}").unwrap();
-    for cap in guide_re.captures_iter(template) {
-        let guide_name = &cap[1];
+    // Recursively expand up to 10 levels (prevents infinite loops)
+    const MAX_RECURSION: usize = 10;
+    for _iteration in 0..MAX_RECURSION {
+        let before_expansion = result.clone();
+        let guide_re = Regex::new(r"\{\{([^{}?]+)\}\}").unwrap();
 
-        // Skip if it's lowercase (context variable, handled later)
-        if guide_name.chars().all(|c| c.is_lowercase() || c == '_') {
-            continue;
+        for cap in guide_re.captures_iter(&before_expansion) {
+            let guide_name = &cap[1];
+
+            // Skip if it's lowercase (context variable, handled later)
+            if guide_name.chars().all(|c| c.is_lowercase() || c == '_') {
+                continue;
+            }
+
+            // Validate guide name for security
+            validate_guide_name(guide_name)?;
+
+            let guide_filename = format!("{}.md", guide_name);
+
+            // Try embedded guide first, then fall back to filesystem
+            let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename)
+            {
+                embedded.to_string()
+            } else {
+                // Fall back to guides_dir (for user overrides or local development)
+                let guide_path = guides_dir.join(&guide_filename);
+                fs::read_to_string(&guide_path)
+                    .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
+            };
+
+            result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
         }
 
-        // Validate guide name for security
-        validate_guide_name(guide_name)?;
-
-        let guide_filename = format!("{}.md", guide_name);
-
-        // Try embedded guide first, then fall back to filesystem
-        let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename) {
-            embedded.to_string()
-        } else {
-            // Fall back to guides_dir (for user overrides or local development)
-            let guide_path = guides_dir.join(&guide_filename);
-            fs::read_to_string(&guide_path)
-                .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
-        };
-
-        result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
+        // If nothing changed, we're done with recursive expansion
+        if result == before_expansion {
+            break;
+        }
     }
 
     // Handle optional context variables ({{?lowercase}})
@@ -364,5 +387,126 @@ mod tests {
     fn test_validate_guide_name_valid() {
         assert!(validate_guide_name("SPEC_WRITING").is_ok());
         assert!(validate_guide_name("PLAN_WRITING").is_ok());
+        assert!(validate_guide_name("templates/mirror_workflow").is_ok());
+    }
+
+    // ========== Template Include Tests ==========
+
+    #[test]
+    fn test_template_include_basic() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        // Create a template file
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+        std::fs::write(templates_dir.join("footer.md"), "This is a common footer.").unwrap();
+
+        // Create a guide that uses the template
+        std::fs::write(
+            guides_path.join("TEST_GUIDE.md"),
+            "# Test Guide\n\n{{templates/footer}}",
+        )
+        .unwrap();
+
+        let result = render_template("{{TEST_GUIDE}}", &guides_path, &HashMap::new()).unwrap();
+
+        assert!(result.contains("# Test Guide"));
+        assert!(result.contains("This is a common footer."));
+        assert!(!result.contains("{{templates/footer}}"));
+    }
+
+    #[test]
+    fn test_template_include_with_context_variables() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        // Create a template that uses context variables
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+        std::fs::write(
+            templates_dir.join("doc_header.md"),
+            "# {{doc_type}} Document\n\nFile: {{doc_filename}}",
+        )
+        .unwrap();
+
+        let context = ctx()
+            .add("doc_type", "SPEC")
+            .add("doc_filename", "SPEC.md")
+            .build();
+
+        let result = render_template(
+            "{{templates/doc_header}}\n\nContent here.",
+            &guides_path,
+            &context,
+        )
+        .unwrap();
+
+        assert!(result.contains("# SPEC Document"));
+        assert!(result.contains("File: SPEC.md"));
+        assert!(result.contains("Content here."));
+    }
+
+    #[test]
+    fn test_template_include_nested() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        // Create nested templates
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+
+        std::fs::write(templates_dir.join("inner.md"), "Inner template content").unwrap();
+
+        std::fs::write(
+            templates_dir.join("outer.md"),
+            "Outer starts\n{{templates/inner}}\nOuter ends",
+        )
+        .unwrap();
+
+        let result = render_template("{{templates/outer}}", &guides_path, &HashMap::new()).unwrap();
+
+        assert!(result.contains("Outer starts"));
+        assert!(result.contains("Inner template content"));
+        assert!(result.contains("Outer ends"));
+        assert!(!result.contains("{{templates/"));
+    }
+
+    #[test]
+    fn test_template_include_missing_file() {
+        let (_temp_dir, guides_path) = test_guides();
+
+        let templates_dir = guides_path.join("templates");
+        std::fs::create_dir_all(&templates_dir).unwrap();
+
+        let result = render_template("{{templates/nonexistent}}", &guides_path, &HashMap::new());
+
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Failed to load required guide"));
+        assert!(err_msg.contains("templates/nonexistent.md"));
+    }
+
+    #[test]
+    fn test_validate_templates_subdirectory_allowed() {
+        assert!(validate_guide_name("templates/footer").is_ok());
+        assert!(validate_guide_name("templates/mirror_workflow").is_ok());
+    }
+
+    #[test]
+    fn test_validate_nested_templates_rejected() {
+        let result = validate_guide_name("templates/nested/file");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Nested subdirectories not allowed"));
+    }
+
+    #[test]
+    fn test_validate_other_subdirectories_still_rejected() {
+        let result = validate_guide_name("other/guide");
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Subdirectories not allowed in guide names (except templates/)"));
     }
 }

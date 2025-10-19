@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-18 21:54
+**Last Updated**: 2025-10-18 22:06
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **93.06%** lines | **92.23%** regions | **88.74%** functions
+**Overall Coverage**: **93.15%** lines | **92.34%** regions | **88.86%** functions
 
 ## Summary
 
 ```
-TOTAL                              12578               977    92.23%         675                76    88.74%        7671               532    93.06%           0                 0         -
+TOTAL                              12747               977    92.34%         682                76    88.86%        7767               532    93.15%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -28,9 +28,9 @@ TOTAL                              12578               977    92.23%         675
 | `commands/workflow.rs` | 93.76% | 93.11% | 87.50% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 96.00% | 94.57% | 77.78% | 🟢 Excellent |
-| `embedded.rs` | 75.00% | 61.54% | 50.00% | 🟡 Good |
+| `embedded.rs` | 76.81% | 62.26% | 50.00% | 🟡 Good |
 | `engine/mod.rs` | 99.80% | 99.54% | 96.88% | 🟢 Excellent |
-| `engine/template.rs` | 95.65% | 94.79% | 96.30% | 🟢 Excellent |
+| `engine/template.rs` | 96.80% | 96.18% | 97.06% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `main.rs` | 58.33% | 49.43% | 100.00% | 🟠 Moderate |
@@ -69,7 +69,7 @@ TOTAL                              12578               977    92.23%         675
 - `commands/workflow.rs` - 93.76%
 - `config.rs` - 96.00%
 - `engine/mod.rs` - 99.80%
-- `engine/template.rs` - 95.65%
+- `engine/template.rs` - 96.80%
 - `guardrails/parser.rs` - 97.78%
 - `guardrails/types.rs` - 94.38%
 - `metamodes/mod.rs` - 99.39%
@@ -91,7 +91,7 @@ TOTAL                              12578               977    92.23%         675
 ### 🟡 Good (70-89% lines)
 - `commands/meta.rs` - 86.09%
 - `commands/wrapped.rs` - 72.50%
-- `embedded.rs` - 75.00%
+- `embedded.rs` - 76.81%
 - `test_helpers.rs` - 88.60%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
@@ -111,7 +111,7 @@ TOTAL                              12578               977    92.23%         675
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 93.06% | ✅ Met |
+| Overall | ≥80% | 93.15% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

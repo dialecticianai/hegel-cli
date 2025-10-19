@@ -51,6 +51,11 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
             "QUESTION_TRACKING.md",
             include_str!("../guides/QUESTION_TRACKING.md"),
         ),
+        // Templates
+        (
+            "templates/mirror_workflow.md",
+            include_str!("../guides/templates/mirror_workflow.md"),
+        ),
     ]);
     guides.get(name).copied()
 }

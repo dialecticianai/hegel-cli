@@ -37,17 +37,7 @@ It exists to make implementation falsifiable — to ensure tests and validation 
 
 ---
 
-## File Operations
-
-**CRITICAL**: Write your specification to a file, don't paste in chat.
-
-1. **Write to `SPEC.md`** using the Write tool (appropriate location depends on mode)
-2. **Use checkboxes** in Success Criteria section for tracking
-3. **Launch review**: Run `hegel reflect SPEC.md` to open GUI for user review
-4. **Read feedback**: Check `.ddd/SPEC.review.*` files if user adds comments
-5. **Incorporate feedback**: Update spec based on review before proceeding to PLAN
-
-The review GUI allows the user to select text and add inline comments.
+{{templates/mirror_workflow}}
 
 ---
 

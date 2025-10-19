@@ -37,44 +37,7 @@
 
 ## Phase 1: Core Infrastructure
 
-### 1.1 Guide Templates
-
-**Goal:** Reduce duplication in writing guides by extracting shared chunks into reusable templates.
-
-**Problem:** Multiple guides repeat identical instructions (File Operations, Mirror workflow, etc.). Changes require updates across multiple files.
-
-**Solution:** Template system for guide composition.
-
-**Structure:**
-```
-guides/
-  templates/
-    file_operations.md    # Common file writing workflow
-    mirror_workflow.md    # 5-step Mirror review process
-    formatting.md         # Markdown formatting standards
-  SPEC_WRITING.md         # Uses {{file_operations}} {{mirror_workflow}}
-  PLAN_WRITING.md         # Uses {{file_operations}} {{mirror_workflow}}
-  ...
-```
-
-**Template inclusion syntax:**
-```markdown
-## File Operations
-
-{{templates/file_operations}}
-
-{{templates/mirror_workflow}}
-```
-
-**Implementation:**
-- Expand templates at workflow load time (in `render_template()`)
-- Templates directory: `guides/templates/`
-- Support nested templates (templates can include templates)
-- Keep it simple: string replacement, no complex logic
-
-**Benefit:** Update Mirror workflow once, applies to all guides automatically.
-
-### 1.2 Project Initialization
+### 1.1 Project Initialization
 
 **Goal:** `hegel init` command to scaffold new projects with DDD structure.
 
