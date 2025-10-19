@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-18 21:48
+**Last Updated**: 2025-10-18 21:54
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.25%** lines | **91.41%** regions | **87.67%** functions
+**Overall Coverage**: **93.06%** lines | **92.23%** regions | **88.74%** functions
 
 ## Summary
 
 ```
-TOTAL                              12520              1076    91.41%         673                83    87.67%        7650               593    92.25%           0                 0         -
+TOTAL                              12578               977    92.23%         675                76    88.74%        7671               532    93.06%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -21,12 +21,12 @@ TOTAL                              12520              1076    91.41%         673
 | `commands/analyze/mod.rs` | 100.00% | 99.51% | 100.00% | 🟢 Excellent |
 | `commands/analyze/sections.rs` | 97.56% | 95.62% | 100.00% | 🟢 Excellent |
 | `commands/astq.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `commands/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `commands/git.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `commands/meta.rs` | 86.09% | 85.07% | 90.91% | 🟡 Good |
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/workflow.rs` | 93.76% | 93.11% | 87.50% | 🟢 Excellent |
-| `commands/wrapped.rs` | 37.50% | 40.96% | 40.00% | 🔴 Needs Work |
+| `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 96.00% | 94.57% | 77.78% | 🟢 Excellent |
 | `embedded.rs` | 75.00% | 61.54% | 50.00% | 🟡 Good |
 | `engine/mod.rs` | 99.80% | 99.54% | 96.88% | 🟢 Excellent |
@@ -44,7 +44,7 @@ TOTAL                              12520              1076    91.41%         673
 | `rules/evaluator.rs` | 99.04% | 98.17% | 95.83% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
-| `storage/mod.rs` | 89.60% | 91.41% | 73.68% | 🟡 Good |
+| `storage/mod.rs` | 96.69% | 96.14% | 80.70% | 🟢 Excellent |
 | `test_helpers.rs` | 88.60% | 87.31% | 84.31% | 🟡 Good |
 | `theme.rs` | 65.00% | 67.42% | 58.82% | 🟠 Moderate |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
@@ -64,6 +64,7 @@ TOTAL                              12520              1076    91.41%         673
 - `adapters/cursor.rs` - 92.42%
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.56%
+- `commands/git.rs` - 100.00%
 - `commands/hook.rs` - 96.64%
 - `commands/workflow.rs` - 93.76%
 - `config.rs` - 96.00%
@@ -81,6 +82,7 @@ TOTAL                              12520              1076    91.41%         673
 - `rules/evaluator.rs` - 99.04%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
+- `storage/mod.rs` - 96.69%
 - `tui/tabs/overview.rs` - 100.00%
 - `tui/tabs/phases.rs` - 95.18%
 - `tui/ui.rs` - 100.00%
@@ -88,8 +90,8 @@ TOTAL                              12520              1076    91.41%         673
 
 ### 🟡 Good (70-89% lines)
 - `commands/meta.rs` - 86.09%
+- `commands/wrapped.rs` - 72.50%
 - `embedded.rs` - 75.00%
-- `storage/mod.rs` - 89.60%
 - `test_helpers.rs` - 88.60%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
@@ -102,16 +104,14 @@ TOTAL                              12520              1076    91.41%         673
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 0.00%
-- `commands/git.rs` - 0.00%
 - `commands/reflect.rs` - 0.00%
-- `commands/wrapped.rs` - 37.50%
 - `tui/mod.rs` - 0.00%
 
 ## Coverage Targets
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.25% | ✅ Met |
+| Overall | ≥80% | 93.06% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

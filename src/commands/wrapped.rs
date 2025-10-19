@@ -72,20 +72,19 @@ mod tests {
     use tempfile::TempDir;
 
     #[test]
-    #[ignore] // Ignore because it actually runs git and can fail when temp dirs are cleaned up
     fn test_wrapped_command_with_no_guardrails() {
         let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path().to_path_buf()).unwrap();
+        let storage = FileStorage::new(temp_dir.path()).unwrap();
 
-        // Should succeed (actually runs git status)
-        let result = run_wrapped_command("git", &["status".to_string()], &storage);
+        // Use git --version instead of git status (doesn't need a repo)
+        let result = run_wrapped_command("git", &["--version".to_string()], &storage);
         assert!(result.is_ok());
 
         // Check audit log
         let log = storage.read_command_log().unwrap();
         assert_eq!(log.len(), 1);
         assert_eq!(log[0].command, "git");
-        assert_eq!(log[0].args, vec!["status"]);
+        assert_eq!(log[0].args, vec!["--version"]);
         assert!(log[0].success);
     }
 
