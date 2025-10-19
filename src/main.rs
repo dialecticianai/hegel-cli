@@ -33,6 +33,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Initialize a new DDD project (greenfield or retrofit)
+    Init,
     /// Start a new workflow
     Start {
         /// Workflow name (e.g., discovery, execution)
@@ -98,6 +100,15 @@ enum Commands {
         /// Meta-mode name (learning or standard). Omit to view current meta-mode.
         name: Option<String>,
     },
+    /// Get, set, or list configuration values
+    Config {
+        /// Action: get, set, or list (default: list)
+        action: Option<String>,
+        /// Config key (for get/set)
+        key: Option<String>,
+        /// Config value (for set)
+        value: Option<String>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -117,6 +128,9 @@ fn main() -> Result<()> {
 
     // Execute command
     match cli.command.unwrap() {
+        Commands::Init => {
+            commands::init_project(&storage)?;
+        }
         Commands::Start { workflow } => {
             commands::start_workflow(&workflow, &storage)?;
         }
@@ -163,6 +177,14 @@ fn main() -> Result<()> {
         }
         Commands::Meta { name } => {
             commands::meta_mode(name.as_deref(), &storage)?;
+        }
+        Commands::Config { action, key, value } => {
+            commands::handle_config(
+                action.as_deref(),
+                key.as_deref(),
+                value.as_deref(),
+                &storage,
+            )?;
         }
     }
 

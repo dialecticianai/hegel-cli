@@ -12,12 +12,16 @@ use std::path::Path;
 pub struct HegelConfig {
     /// Whether to automatically open GUI for document review after writing docs
     pub use_reflect_gui: bool,
+
+    /// CODE_MAP.md structure style: "monolithic" (single file) or "hierarchical" (per-directory)
+    pub code_map_style: String,
 }
 
 impl Default for HegelConfig {
     fn default() -> Self {
         Self {
-            use_reflect_gui: true, // Default to on
+            use_reflect_gui: true,                      // Default to on
+            code_map_style: "hierarchical".to_string(), // Default to hierarchical
         }
     }
 }
@@ -52,6 +56,48 @@ impl HegelConfig {
 
         Ok(())
     }
+
+    /// Get a config value by key
+    pub fn get(&self, key: &str) -> Option<String> {
+        match key {
+            "use_reflect_gui" => Some(self.use_reflect_gui.to_string()),
+            "code_map_style" => Some(self.code_map_style.clone()),
+            _ => None,
+        }
+    }
+
+    /// Set a config value by key
+    pub fn set(&mut self, key: &str, value: &str) -> Result<()> {
+        match key {
+            "use_reflect_gui" => {
+                self.use_reflect_gui = value.parse().with_context(|| {
+                    format!("Invalid boolean value for use_reflect_gui: {}", value)
+                })?;
+            }
+            "code_map_style" => {
+                if value != "monolithic" && value != "hierarchical" {
+                    anyhow::bail!(
+                        "Invalid code_map_style: {}. Must be 'monolithic' or 'hierarchical'",
+                        value
+                    );
+                }
+                self.code_map_style = value.to_string();
+            }
+            _ => anyhow::bail!("Unknown config key: {}", key),
+        }
+        Ok(())
+    }
+
+    /// List all config keys and values
+    pub fn list(&self) -> Vec<(String, String)> {
+        vec![
+            (
+                "use_reflect_gui".to_string(),
+                self.use_reflect_gui.to_string(),
+            ),
+            ("code_map_style".to_string(), self.code_map_style.clone()),
+        ]
+    }
 }
 
 #[cfg(test)]
@@ -78,12 +124,14 @@ mod tests {
 
         let original = HegelConfig {
             use_reflect_gui: false,
+            code_map_style: "monolithic".to_string(),
         };
 
         original.save(temp_dir.path()).unwrap();
         let loaded = HegelConfig::load(temp_dir.path()).unwrap();
 
         assert!(!loaded.use_reflect_gui);
+        assert_eq!(loaded.code_map_style, "monolithic");
     }
 
     #[test]

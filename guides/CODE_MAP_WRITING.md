@@ -20,12 +20,27 @@ A **CODE_MAP.md** is a directory-level index that provides quick orientation:
 
 ## When to Create
 
-Every directory containing source code files should have a CODE_MAP.md.
+CODE_MAP.md files help navigate codebases. The structure depends on project size:
+
+**Small projects (<50 files)**: Single root-level CODE_MAP.md
+**Larger projects (>50 files)**: One CODE_MAP.md per directory
 
 Update CODE_MAP.md **before** commits that:
 - Add, remove, or rename files
 - Change file responsibilities
 - Reorganize directory structure
+
+---
+
+## Choosing Your Structure
+
+### Monolithic (Small Projects)
+
+{{templates/code_map_monolithic}}
+
+### Hierarchical (Larger Projects)
+
+{{templates/code_map_hierarchical}}
 
 ---
 
