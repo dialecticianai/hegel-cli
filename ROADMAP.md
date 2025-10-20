@@ -35,6 +35,51 @@
 
 ---
 
+## Phase 1.5: Incomplete Features (TODO Backlog)
+
+These features have partial implementations marked with `#[allow(dead_code)]` + TODO comments.
+
+### Multi-Agent Hook Routing
+**Files:** `src/adapters/mod.rs`
+- `AgentAdapter::name()` - Adapter name method
+- `AdapterRegistry::get()` - Get adapter by name for explicit selection
+**Use case:** Route hook events to different adapters based on agent type
+
+### Resource Introspection
+**Files:** `src/embedded.rs`
+- `list_workflows()` - List embedded workflow definitions
+- `list_guides()` - List embedded guide documents
+**Use case:** Validation, debugging, and discovery of embedded resources
+
+### Validation & Error Handling
+**Files:** `src/metamodes/mod.rs`, `src/rules/types.rs`
+- `MetaModeDefinition::validate()` - Validate meta-mode names
+- `RuleConfig::validate()` - Validate regex patterns in workflow rules
+**Use case:** Catch invalid configurations at load time instead of runtime
+
+### Workflow Visualization
+**Files:** `src/metrics/graph.rs`
+- `WorkflowDAG::export_dot()` - Export workflow graphs as Graphviz DOT format
+**Use case:** `hegel analyze --export-dot` to visualize workflow structure
+
+### Detailed Command Metrics
+**Files:** `src/metrics/hooks.rs`
+- `BashCommand.stdout/stderr` - Command output fields
+**Use case:** Analyze command output patterns for debugging/optimization
+
+### Phase-Specific Rules
+**Files:** `src/rules/types.rs`
+- `RuleEvaluationContext.current_phase` - Current workflow phase field
+**Use case:** Enable rules that only trigger in specific phases
+
+### TUI Enhancements
+**Files:** `src/tui/utils.rs`
+- `scroll_indicators()` - Show scroll direction indicators
+- `format_timestamp()` - Format ISO 8601 timestamps to HH:MM:SS
+**Use case:** Investigate why these weren't needed in current TUI implementation
+
+---
+
 ## Phase 2: Safety and Orchestration
 
 ### 2.1 Mode-Specific Subagents
