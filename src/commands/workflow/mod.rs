@@ -10,12 +10,12 @@ use crate::storage::{FileStorage, State};
 use crate::theme::Theme;
 
 pub use claims::ClaimAlias;
-pub use context::{
-    display_workflow_prompt, load_workflow_context, render_node_prompt, WorkflowContext,
-};
-pub use transitions::{
-    evaluate_transition, execute_transition, TransitionOption, TransitionOutcome,
-};
+pub use context::{display_workflow_prompt, load_workflow_context, render_node_prompt};
+pub use transitions::{evaluate_transition, execute_transition};
+
+// Re-export for tests
+#[cfg(test)]
+pub use transitions::{TransitionOption, TransitionOutcome};
 
 pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
     use chrono::Utc;

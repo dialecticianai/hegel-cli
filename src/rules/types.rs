@@ -38,6 +38,8 @@ pub struct RuleViolation {
 /// Rule evaluation context for assessing violations
 #[derive(Debug, Clone)]
 pub struct RuleEvaluationContext<'a> {
+    /// TODO: Use for phase-specific rule evaluation
+    #[allow(dead_code)]
     pub current_phase: &'a str,
     pub phase_start_time: Option<&'a String>,
     pub phase_metrics: Option<&'a crate::metrics::PhaseMetrics>,
@@ -46,6 +48,8 @@ pub struct RuleEvaluationContext<'a> {
 
 impl RuleConfig {
     /// Validate regex patterns in rules (called at workflow load time)
+    /// TODO: Call this when loading workflows to catch invalid regex early
+    #[allow(dead_code)]
     pub fn validate(&self) -> Result<()> {
         match self {
             RuleConfig::RepeatedCommand { pattern, .. } => {

@@ -66,6 +66,8 @@ pub struct CanonicalHookEvent {
 /// Agent adapter trait - normalizes agent-specific events to canonical format
 pub trait AgentAdapter {
     /// Adapter name (e.g., "claude_code", "cursor", "codex")
+    /// TODO: Used for future multi-agent hook routing
+    #[allow(dead_code)]
     fn name(&self) -> &str;
 
     /// Check if this adapter should handle the current environment
@@ -105,6 +107,8 @@ impl AdapterRegistry {
     }
 
     /// Get adapter by name (for explicit selection)
+    /// TODO: Used for future multi-agent hook routing
+    #[allow(dead_code)]
     pub fn get(&self, name: &str) -> Option<&dyn AgentAdapter> {
         self.adapters
             .iter()

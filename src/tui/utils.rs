@@ -67,6 +67,8 @@ pub fn max_scroll(content_height: usize, visible_height: usize) -> usize {
 /// let (top, bottom) = scroll_indicators(0, 10);
 /// assert_eq!((top, bottom), ("·", "↓")); // Can only scroll down
 /// ```
+/// TODO: Investigate why this wasn't used in TUI implementation
+#[allow(dead_code)]
 pub fn scroll_indicators(scroll_offset: usize, max_scroll: usize) -> (&'static str, &'static str) {
     let can_scroll_up = scroll_offset > 0;
     let can_scroll_down = scroll_offset < max_scroll;
@@ -172,6 +174,8 @@ pub fn build_timeline(metrics: &UnifiedMetrics) -> Vec<TimelineEvent> {
 /// let formatted = format_timestamp("2025-01-01T10:30:45Z");
 /// assert_eq!(formatted, "10:30:45");
 /// ```
+/// TODO: Investigate why this wasn't used in TUI implementation
+#[allow(dead_code)]
 pub fn format_timestamp(timestamp: &str) -> String {
     // Extract time portion (HH:MM:SS) from ISO 8601
     if let Some(time_start) = timestamp.find('T') {

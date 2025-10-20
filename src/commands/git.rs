@@ -1,16 +1,15 @@
-use crate::commands::wrapped::run_wrapped_command;
-use crate::storage::FileStorage;
-use anyhow::Result;
-
-/// Wrap git command with guardrails and audit logging
-pub fn run_git(args: &[String], storage: &FileStorage) -> Result<()> {
-    run_wrapped_command("git", args, storage)
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::commands::wrapped::run_wrapped_command;
+    use crate::storage::FileStorage;
+    use anyhow::Result;
     use tempfile::TempDir;
+
+    /// Wrap git command with guardrails and audit logging
+    /// Test-only helper function
+    fn run_git(args: &[String], storage: &FileStorage) -> Result<()> {
+        run_wrapped_command("git", args, storage)
+    }
 
     #[test]
     fn test_run_git_delegates_to_wrapped_command() {

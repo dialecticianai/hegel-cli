@@ -6,8 +6,6 @@ use std::collections::HashMap;
 pub enum ClaimAlias {
     /// Happy-path: {"{current_node}_complete": true}
     Next,
-    /// Repeat current phase: {"{current_node}_complete": false}
-    Repeat,
     /// Restart workflow cycle: {"restart_cycle": true}
     Restart,
     /// Custom claim JSON
@@ -21,10 +19,6 @@ impl ClaimAlias {
             Self::Next => Ok(HashMap::from([(
                 format!("{}_complete", current_node),
                 true,
-            )])),
-            Self::Repeat => Ok(HashMap::from([(
-                format!("{}_complete", current_node),
-                false,
             )])),
             Self::Restart => Ok(HashMap::from([("restart_cycle".to_string(), true)])),
             Self::Custom(json) => serde_json::from_str(json)

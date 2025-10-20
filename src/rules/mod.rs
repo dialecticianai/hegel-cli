@@ -4,4 +4,4 @@ mod types;
 
 pub use evaluator::evaluate_rules;
 pub use interrupt::generate_interrupt_prompt;
-pub use types::{RuleConfig, RuleEvaluationContext, RuleViolation};
+pub use types::{RuleConfig, RuleEvaluationContext};

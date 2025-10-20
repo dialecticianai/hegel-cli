@@ -8,7 +8,7 @@ mod transcript;
 pub use graph::WorkflowDAG;
 pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookEvent, HookMetrics};
 pub use states::{parse_states_file, StateTransitionEvent};
-pub use transcript::{parse_transcript_file, TokenMetrics, TranscriptEvent};
+pub use transcript::{parse_transcript_file, TokenMetrics};
 
 // Re-export aggregation functions
 use aggregation::build_phase_metrics;

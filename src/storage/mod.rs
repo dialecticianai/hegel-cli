@@ -67,6 +67,7 @@ impl FileStorage {
     }
 
     /// Create a FileStorage with custom workflows and guides directories (for testing)
+    #[cfg(test)]
     pub fn with_dirs<P: AsRef<Path>>(
         state_dir: P,
         workflows_dir: Option<P>,
@@ -189,6 +190,7 @@ impl FileStorage {
     }
 
     /// Clear all state
+    #[cfg(test)]
     pub fn clear(&self) -> Result<()> {
         let state_file = self.state_dir.join("state.json");
         if state_file.exists() {

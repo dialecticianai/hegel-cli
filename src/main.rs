@@ -17,7 +17,6 @@ mod test_helpers;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use storage::FileStorage;
-use theme::Theme;
 
 #[derive(Parser)]
 #[command(name = "hegel")]

@@ -53,7 +53,11 @@ pub struct HookEvent {
 pub struct BashCommand {
     pub command: String,
     pub timestamp: Option<String>,
+    /// TODO: Use for detailed command output analysis
+    #[allow(dead_code)]
     pub stdout: Option<String>,
+    /// TODO: Use for detailed command output analysis
+    #[allow(dead_code)]
     pub stderr: Option<String>,
 }
 

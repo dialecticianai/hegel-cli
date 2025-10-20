@@ -62,38 +62,6 @@ impl Theme {
     pub fn highlight(text: impl AsRef<str>) -> ColoredString {
         text.as_ref().cyan()
     }
-
-    /// Active/current state indicator
-    pub fn active(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().green()
-    }
-
-    /// Completed/past state
-    pub fn completed(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().bright_black()
-    }
-
-    // Workflow-specific
-
-    /// Workflow mode display
-    pub fn mode(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().cyan()
-    }
-
-    /// Node/phase names
-    pub fn node(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().cyan()
-    }
-
-    /// Transition arrows/connectors
-    pub fn connector(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().bright_black()
-    }
-
-    /// Prompt content indicator
-    pub fn prompt_label(text: impl AsRef<str>) -> ColoredString {
-        text.as_ref().bold().cyan()
-    }
 }
 
 #[cfg(test)]

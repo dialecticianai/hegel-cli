@@ -48,6 +48,8 @@ impl MetaModeDefinition {
     }
 
     /// Validate meta-mode name
+    /// TODO: Call this during meta-mode declaration for better error messages
+    #[allow(dead_code)]
     pub fn validate(name: &str) -> Result<()> {
         let valid = Self::all().iter().any(|m| m.name == name);
         if !valid {

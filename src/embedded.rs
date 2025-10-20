@@ -69,11 +69,15 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
 }
 
 /// List available embedded workflows
+/// TODO: Use for introspection/validation of embedded resources
+#[allow(dead_code)]
 pub fn list_workflows() -> Vec<&'static str> {
     vec!["discovery", "execution", "research", "minimal"]
 }
 
 /// List available embedded guides
+/// TODO: Use for introspection/validation of embedded resources
+#[allow(dead_code)]
 pub fn list_guides() -> Vec<&'static str> {
     vec![
         "SPEC_WRITING.md",

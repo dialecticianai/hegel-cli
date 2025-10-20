@@ -186,6 +186,8 @@ impl WorkflowDAG {
     }
 
     /// Export as DOT format for Graphviz
+    /// TODO: Add `hegel analyze --export-dot` flag to generate workflow graphs
+    #[allow(dead_code)]
     pub fn export_dot(&self) -> String {
         let mut dot = String::from("digraph workflow {\n");
         dot.push_str("  rankdir=LR;\n");

@@ -13,7 +13,6 @@ mod wrapped;
 pub use analyze::analyze_metrics;
 pub use astq::run_astq;
 pub use config::handle_config;
-pub use git::run_git;
 pub use hook::handle_hook;
 pub use init::init_project;
 pub use meta::meta_mode;

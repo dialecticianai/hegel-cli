@@ -86,7 +86,7 @@ pub fn get_next_prompt(
         .with_context(|| format!("Node not found in workflow: {}", current))?;
 
     // Special handling for restart_cycle - always returns to start_node
-    let mut next_node = if claims.get("restart_cycle") == Some(&true) {
+    let next_node = if claims.get("restart_cycle") == Some(&true) {
         workflow.start_node.clone()
     } else {
         // Evaluate transitions - find first matching claim
