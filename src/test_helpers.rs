@@ -68,24 +68,6 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
     }
 }
 
-pub fn test_workflow_state_with_meta(
-    node: &str,
-    mode: &str,
-    history: &[&str],
-    meta_mode: &str,
-) -> WorkflowState {
-    WorkflowState {
-        current_node: node.to_string(),
-        mode: mode.to_string(),
-        history: history.iter().map(|s| s.to_string()).collect(),
-        workflow_id: Some("test-workflow-id".to_string()),
-        meta_mode: Some(crate::storage::MetaMode {
-            name: meta_mode.to_string(),
-        }),
-        phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
-    }
-}
-
 /// Read a specific line from a JSONL file and parse as JSON
 ///
 /// # Arguments
@@ -372,137 +354,11 @@ pub fn create_hooks_file(events: &[&str]) -> (TempDir, PathBuf) {
 
 // ========== Claims Helpers ==========
 
-pub fn claims(pairs: &[(&str, bool)]) -> HashMap<String, bool> {
-    pairs.iter().map(|(k, v)| (k.to_string(), *v)).collect()
-}
-
 pub fn claim(key: &str, value: bool) -> HashMap<String, bool> {
     HashMap::from([(key.to_string(), value)])
 }
 
-// ========== Enhanced Assertion Helpers ==========
-
-/// Assert that a JSONL file has the expected number of lines
-///
-/// # Example
-/// ```ignore
-/// assert_jsonl_count(&storage, "states.jsonl", 2);
-/// ```
-pub fn assert_jsonl_count(storage: &FileStorage, filename: &str, expected: usize) {
-    let path = storage.state_dir().join(filename);
-    let actual = count_jsonl_lines(&path);
-    assert_eq!(
-        actual, expected,
-        "Expected {} lines in {}, found {}",
-        expected, filename, actual
-    );
-}
-
-/// Assert that two states are identical (no mutation occurred)
-///
-/// # Example
-/// ```ignore
-/// let before = storage.load().unwrap();
-/// do_something(&storage);
-/// let after = storage.load().unwrap();
-/// assert_state_unchanged(&before, &after);
-/// ```
-pub fn assert_state_unchanged(before: &State, after: &State) {
-    let before_ws = before.workflow_state.as_ref().unwrap();
-    let after_ws = after.workflow_state.as_ref().unwrap();
-
-    assert_eq!(
-        before_ws.current_node, after_ws.current_node,
-        "State mutated: current_node changed"
-    );
-    assert_eq!(before_ws.mode, after_ws.mode, "State mutated: mode changed");
-    assert_eq!(
-        before_ws.history, after_ws.history,
-        "State mutated: history changed"
-    );
-}
-
-/// Get the most recent state transition from states.jsonl
-///
-/// # Returns
-/// The last transition as a JSON value, or None if file is empty
-///
-/// # Example
-/// ```ignore
-/// let transition = last_state_transition(&storage).unwrap();
-/// assert_eq!(transition["to_node"], "plan");
-/// ```
-pub fn last_state_transition(storage: &FileStorage) -> Option<serde_json::Value> {
-    let path = storage.state_dir().join("states.jsonl");
-    if !path.exists() {
-        return None;
-    }
-
-    let events = read_jsonl_all(&path);
-    events.last().cloned()
-}
-
-/// Create a simple 2-node workflow for testing basic transitions
-///
-/// # Arguments
-/// * `start` - Start node name
-/// * `claim` - Claim required to transition
-/// * `end` - End node name
-///
-/// # Example
-/// ```ignore
-/// let wf = simple_workflow("begin", "done_claim", "finish");
-/// // begin --[done_claim]--> finish
-/// ```
-pub fn simple_workflow(start: &str, claim: &str, end: &str) -> Workflow {
-    workflow("test", start)
-        .with_node(start, node("Start", vec![transition(claim, end)]))
-        .with_node(end, node("End", vec![]))
-        .build()
-}
-
-/// Setup workflow environment and advance to a specific node
-///
-/// # Arguments
-/// * `workflow_name` - Name of workflow to start (must exist in test env)
-/// * `target_node` - Node to advance to
-/// * `claims_sequence` - Sequence of claims to apply to reach target node
-///
-/// # Returns
-/// (TempDir, FileStorage) with workflow at target_node
-///
-/// # Example
-/// ```ignore
-/// let (_tmp, storage) = active_workflow_at("test_workflow", "plan", &["spec_complete"]);
-/// // Workflow is now at "plan" node
-/// ```
-pub fn active_workflow_at(
-    workflow_name: &str,
-    target_node: &str,
-    claims_sequence: &[&str],
-) -> (TempDir, FileStorage) {
-    let (temp_dir, storage) = setup_workflow_env();
-
-    // Start workflow
-    crate::commands::start_workflow(workflow_name, &storage).unwrap();
-
-    // Apply claims to reach target node
-    for claim_key in claims_sequence {
-        let claim_json = format!(r#"{{"{}": true}}"#, claim_key);
-        crate::commands::next_prompt(Some(&claim_json), &storage).unwrap();
-    }
-
-    // Verify we're at the target node
-    let state = storage.load().unwrap();
-    let current = &state.workflow_state.as_ref().unwrap().current_node;
-    assert_eq!(
-        current, target_node,
-        "Expected to be at node '{}', but at '{}'",
-        target_node, current
-    );
-
-    (temp_dir, storage)
-}
+// ========== Workflow Builder Helpers (Advanced) ==========
 
 // ========== Metrics Test Helpers ==========
 

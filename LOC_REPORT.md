@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 20:07
+**Last Updated**: 2025-10-19 20:27
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,752 | 5,132 | 14,884 |
-| **Comments** | 1,427 | - | 1,427 |
-| **Blank Lines** | 1,812 | - | 1,812 |
-| **Total Lines** | 12,991 | 5,132 | 18,123 |
+| **Lines** | 9,675 | 5,189 | 14,864 |
+| **Comments** | 1,373 | - | 1,373 |
+| **Blank Lines** | 1,797 | - | 1,797 |
+| **Total Lines** | 12,845 | 5,189 | 18,034 |
 | **Files** | 51 | 28 | 79 |
 
-**Documentation Ratio**: 0.53 lines of docs per line of code
+**Documentation Ratio**: 0.54 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            51           1812           1427           9752
+Rust                            51           1797           1373           9675
 -------------------------------------------------------------------------------
-SUM:                            51           1812           1427           9752
+SUM:                            51           1797           1373           9675
 -------------------------------------------------------------------------------
 ```
 
@@ -38,7 +38,7 @@ SUM:                            51           1812           1427           9752
 |------|-------------|------------|------------|--------|--------|
 | `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
-| `adapters/cursor.rs` | 308 | 157 | 151 | 49.0% | ✅ |
+| `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 124 | 124 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 267 | 267 | 0 | 0.0% | ✅ (infra) |
@@ -47,7 +47,7 @@ SUM:                            51           1812           1427           9752
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/init.rs` | 167 | 72 | 95 | 56.9% | ✅ |
-| `commands/meta.rs` | 248 | 163 | 85 | 34.3% | ✅ |
+| `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
 | `commands/mod.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
@@ -65,7 +65,7 @@ SUM:                            51           1812           1427           9752
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `main.rs` | 257 | 13 | 244 | 94.9% | ✅ |
 | `metamodes/mod.rs` | 238 | 113 | 125 | 52.5% | ✅ |
-| `metrics/aggregation.rs` | 204 | 144 | 60 | 29.4% | ✅ |
+| `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 372 | 224 | 148 | 39.8% | ✅ (infra) |
 | `metrics/hooks.rs` | 330 | 220 | 110 | 33.3% | ✅ (infra) |
 | `metrics/mod.rs` | 333 | 115 | 218 | 65.5% | ✅ |
@@ -75,8 +75,8 @@ SUM:                            51           1812           1427           9752
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 301 | 76 | 225 | 74.8% | ✅ |
-| `storage/mod.rs` | 697 | 299 | 398 | 57.1% | ✅ (infra) |
-| `test_helpers.rs` | 1,009 | 723 | 286 | 28.3% | ✅ (infra) |
+| `storage/mod.rs` | 698 | 311 | 387 | 55.4% | ✅ (infra) |
+| `test_helpers.rs` | 865 | 579 | 286 | 33.1% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -96,7 +96,7 @@ SUM:                            51           1812           1427           9752
 
 | File | Lines |
 |------|-------|
-| `CLAUDE.md` | 137 |
+| `CLAUDE.md` | 149 |
 | `CODE_MAP.md` | 196 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 150 |
@@ -122,7 +122,7 @@ SUM:                            51           1812           1427           9752
 | `LEXICON.md` | 84 |
 | `LOC_REPORT.md` | 150 |
 | `README.md` | 451 |
-| `ROADMAP.md` | 154 |
+| `ROADMAP.md` | 199 |
 | `TESTING.md` | 41 |
 
 ---
@@ -131,7 +131,7 @@ SUM:                            51           1812           1427           9752
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.54 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

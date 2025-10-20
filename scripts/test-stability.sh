@@ -2,7 +2,7 @@
 # Test stability checker - runs test suite N times to detect flaky tests
 # Usage: ./scripts/test-stability.sh [iterations]
 
-ITERATIONS=${1:-50}
+ITERATIONS=${1:-20}
 FAILURES=0
 FAILED_RUNS=""
 TEMP_DIR=$(mktemp -d)

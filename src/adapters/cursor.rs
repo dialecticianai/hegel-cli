@@ -158,7 +158,6 @@ impl AgentAdapter for CursorAdapter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_helpers::load_fixture;
 
     #[test]
     fn test_detect_with_env_var() {

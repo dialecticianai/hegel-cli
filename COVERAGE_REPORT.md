@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-19 20:07
+**Last Updated**: 2025-10-19 20:27
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.60%** lines | **90.92%** regions | **88.18%** functions
+**Overall Coverage**: **92.39%** lines | **91.68%** regions | **89.29%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13166              1196    90.92%         736                87    88.18%        7717               648    91.60%           0                 0         -
+TOTAL                                  13046              1086    91.68%         728                78    89.29%        7650               582    92.39%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -50,8 +50,8 @@ TOTAL                                  13166              1196    90.92%        
 | `rules/evaluator.rs` | 98.44% | 97.74% | 96.15% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
-| `storage/mod.rs` | 96.69% | 96.14% | 80.70% | 🟢 Excellent |
-| `test_helpers.rs` | 79.09% | 76.07% | 76.79% | 🟡 Good |
+| `storage/mod.rs` | 96.68% | 96.09% | 81.03% | 🟢 Excellent |
+| `test_helpers.rs` | 94.86% | 92.94% | 91.49% | 🟢 Excellent |
 | `theme.rs` | 92.86% | 93.75% | 90.91% | 🟢 Excellent |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -92,7 +92,8 @@ TOTAL                                  13166              1196    90.92%        
 - `rules/evaluator.rs` - 98.44%
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
-- `storage/mod.rs` - 96.69%
+- `storage/mod.rs` - 96.68%
+- `test_helpers.rs` - 94.86%
 - `theme.rs` - 92.86%
 - `tui/tabs/overview.rs` - 100.00%
 - `tui/tabs/phases.rs` - 95.18%
@@ -104,7 +105,6 @@ TOTAL                                  13166              1196    90.92%        
 - `commands/meta.rs` - 80.75%
 - `commands/wrapped.rs` - 72.50%
 - `embedded.rs` - 79.22%
-- `test_helpers.rs` - 79.09%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
 - `tui/tabs/files.rs` - 81.63%
@@ -123,7 +123,7 @@ TOTAL                                  13166              1196    90.92%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 91.60% | ✅ Met |
+| Overall | ≥80% | 92.39% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

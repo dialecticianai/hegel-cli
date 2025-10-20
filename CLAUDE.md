@@ -81,6 +81,18 @@
 
 **Scripts over inline commands**: NEVER write multi-line inline shell scripts. Always write to `scripts/` and execute. Check `scripts/` before writing - tool may already exist. Reusable scripts are infrastructure.
 
+**Available scripts** (`scripts/`):
+- `generate-coverage-report.sh` - Update COVERAGE_REPORT.md (auto-run by pre-commit)
+- `generate-loc-report.sh` - Update LOC_REPORT.md (auto-run by pre-commit)
+- `test-stability.sh [N]` - Run tests N times (default 20) to detect flaky tests
+- `build-and-install.sh` - Build release binary and install to ~/.cargo/bin
+- `check-transcript-tokens.sh` - Validate conversation token usage
+- `analyze-hook-schema.sh` - Explore hook event schema
+- `check-hook-fields.sh` - Verify hook field availability
+- `analyze-transcripts.sh` - Explore transcript structure
+- `summarize-findings.sh` - Summary of hook/transcript analysis
+- `debug-analyze.sh` - Debug metrics analysis with sample data
+
 **Test helpers**: `src/test_helpers.rs` - `create_{hooks,transcript,states}_file()` compress boilerplate.
 
 **Submodule organization**: Split files >200 impl lines. One parser per file (~100-200 lines each).

@@ -106,10 +106,17 @@ impl FileStorage {
         }
     }
 
-    /// Find .hegel directory by walking up from current directory (like git)
-    pub fn find_project_root() -> Result<PathBuf> {
-        let mut current =
-            std::env::current_dir().context("Could not determine current working directory")?;
+    /// Find .hegel directory by walking up from given starting path (like git)
+    ///
+    /// # Arguments
+    /// * `start_path` - Optional starting path (defaults to current working directory)
+    pub fn find_project_root_from(start_path: Option<PathBuf>) -> Result<PathBuf> {
+        let mut current = match start_path {
+            Some(path) => path,
+            None => {
+                std::env::current_dir().context("Could not determine current working directory")?
+            }
+        };
 
         loop {
             let hegel_dir = current.join(".hegel");
@@ -128,6 +135,11 @@ impl FileStorage {
                 }
             }
         }
+    }
+
+    /// Find .hegel directory by walking up from current directory (like git)
+    pub fn find_project_root() -> Result<PathBuf> {
+        Self::find_project_root_from(None)
     }
 
     /// Get the default state directory (.hegel in current working directory)
@@ -500,19 +512,15 @@ mod tests {
         let hegel_dir = temp_dir.path().join(".hegel");
         fs::create_dir(&hegel_dir).unwrap();
 
-        // Change to temp dir and find project root
-        let original_dir = std::env::current_dir().unwrap();
-        std::env::set_current_dir(temp_dir.path()).unwrap();
+        // Find project root starting from temp_dir (no cwd mutation!)
+        let found =
+            FileStorage::find_project_root_from(Some(temp_dir.path().to_path_buf())).unwrap();
 
-        let found = FileStorage::find_project_root().unwrap();
         // Canonicalize both paths to handle symlinks (e.g., /var -> /private/var on macOS)
         assert_eq!(
             found.canonicalize().unwrap(),
             hegel_dir.canonicalize().unwrap()
         );
-
-        // Restore original directory
-        std::env::set_current_dir(original_dir).unwrap();
     }
 
     #[test]
@@ -526,19 +534,12 @@ mod tests {
         let subdir2 = subdir1.join("subdir2");
         fs::create_dir_all(&subdir2).unwrap();
 
-        // Change to deeply nested subdir
-        let original_dir = std::env::current_dir().unwrap();
-        std::env::set_current_dir(&subdir2).unwrap();
-
-        // Should find .hegel in ancestor directory
-        let found = FileStorage::find_project_root().unwrap();
+        // Should find .hegel in ancestor directory starting from subdir2 (no cwd mutation!)
+        let found = FileStorage::find_project_root_from(Some(subdir2)).unwrap();
         assert_eq!(
             found.canonicalize().unwrap(),
             hegel_dir.canonicalize().unwrap()
         );
-
-        // Restore original directory
-        std::env::set_current_dir(original_dir).unwrap();
     }
 
     #[test]

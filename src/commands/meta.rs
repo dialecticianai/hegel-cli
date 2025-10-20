@@ -165,7 +165,6 @@ fn list_meta_modes() -> Result<()> {
 mod tests {
     use super::*;
     use crate::test_helpers::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_declare_meta_mode_learning() {
