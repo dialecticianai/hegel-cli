@@ -84,10 +84,18 @@ hegel-cli/
 │
 ├── src/                         # Core implementation (six-layer architecture)
 │   ├── main.rs                  # CLI entry point (clap parser, state directory resolution, analyze + top subcommands)
-│   ├── test_helpers.rs          # Shared test utilities (builders, fixtures, JSONL readers, TUI test helpers, metrics builders, production workflow setup)
 │   ├── config.rs                # User configuration (load/save .hegel/config.toml, use_reflect_gui setting)
 │   ├── embedded.rs              # Compile-time bundled resources (workflows, guides via include_str!)
 │   ├── theme.rs                 # Terminal color theme (semantic styling: success/error/warning, metric values, headers)
+│   │
+│   ├── test_helpers/            # Modular test utilities (579 lines split into focused modules)
+│   │   ├── mod.rs               # Module root with re-exports for backwards compatibility
+│   │   ├── storage.rs           # Storage helpers (test_storage, test_workflow_state, assert_state_eq)
+│   │   ├── jsonl.rs             # JSONL utilities (read_jsonl_all, create_{hooks,states,transcript}_file)
+│   │   ├── workflow.rs          # Workflow builders (WorkflowBuilder, setup_workflow_env, TEST_WORKFLOW_YAML, claims helper)
+│   │   ├── metrics.rs           # Metrics builders (UnifiedMetricsBuilder, test_storage_with_files, hook_with_transcript)
+│   │   ├── tui.rs               # TUI test utilities (test_terminal, buffer_to_string, render_to_string)
+│   │   └── fixtures.rs          # Test fixture loader (load_fixture for adapter tests)
 │   │
 │   ├── adapters/                # Multi-agent support (normalize events from Claude Code, Cursor, Codex to canonical format)
 │   │   ├── claude_code.rs       # Claude Code adapter (env detection, event normalization)
