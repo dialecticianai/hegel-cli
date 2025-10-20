@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 20:27
+**Last Updated**: 2025-10-19 22:06
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,675 | 5,189 | 14,864 |
-| **Comments** | 1,373 | - | 1,373 |
-| **Blank Lines** | 1,797 | - | 1,797 |
-| **Total Lines** | 12,845 | 5,189 | 18,034 |
-| **Files** | 51 | 28 | 79 |
+| **Lines** | 9,692 | 5,199 | 14,891 |
+| **Comments** | 1,374 | - | 1,374 |
+| **Blank Lines** | 1,794 | - | 1,794 |
+| **Total Lines** | 12,860 | 5,199 | 18,059 |
+| **Files** | 57 | 28 | 85 |
 
 **Documentation Ratio**: 0.54 lines of docs per line of code
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            51           1797           1373           9675
+Rust                            57           1794           1374           9692
 -------------------------------------------------------------------------------
-SUM:                            51           1797           1373           9675
+SUM:                            57           1794           1374           9692
 -------------------------------------------------------------------------------
 ```
 
@@ -76,7 +76,13 @@ SUM:                            51           1797           1373           9675
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 301 | 76 | 225 | 74.8% | ✅ |
 | `storage/mod.rs` | 698 | 311 | 387 | 55.4% | ✅ (infra) |
-| `test_helpers.rs` | 865 | 579 | 286 | 33.1% | ✅ (infra) |
+| `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
+| `test_helpers/jsonl.rs` | 124 | 124 | 0 | 0.0% | ✅ |
+| `test_helpers/metrics.rs` | 272 | 272 | 0 | 0.0% | ⚠️ Large |
+| `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
+| `test_helpers/storage.rs` | 66 | 66 | 0 | 0.0% | ✅ |
+| `test_helpers/tui.rs` | 73 | 73 | 0 | 0.0% | ✅ |
+| `test_helpers/workflow.rs` | 296 | 296 | 0 | 0.0% | ⚠️ Large |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -88,7 +94,7 @@ SUM:                            51           1797           1373           9675
 | `tui/ui.rs` | 317 | 158 | 159 | 50.2% | ✅ |
 | `tui/utils.rs` | 324 | 191 | 133 | 41.0% | ✅ |
 
-**⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 4 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -99,7 +105,7 @@ SUM:                            51           1797           1373           9675
 | `CLAUDE.md` | 149 |
 | `CODE_MAP.md` | 196 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 150 |
+| `COVERAGE_REPORT.md` | 160 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |

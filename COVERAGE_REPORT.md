@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-19 20:27
+**Last Updated**: 2025-10-19 22:06
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **92.39%** lines | **91.68%** regions | **89.29%** functions
 
@@ -51,7 +51,12 @@ TOTAL                                  13046              1086    91.68%        
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 96.68% | 96.09% | 81.03% | 🟢 Excellent |
-| `test_helpers.rs` | 94.86% | 92.94% | 91.49% | 🟢 Excellent |
+| `test_helpers/fixtures.rs` | 80.00% | 77.78% | 33.33% | 🟡 Good |
+| `test_helpers/jsonl.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `test_helpers/metrics.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `test_helpers/storage.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `test_helpers/workflow.rs` | 86.11% | 81.55% | 87.50% | 🟡 Good |
 | `theme.rs` | 92.86% | 93.75% | 90.91% | 🟢 Excellent |
 | `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -93,7 +98,10 @@ TOTAL                                  13046              1086    91.68%        
 - `rules/interrupt.rs` - 100.00%
 - `rules/types.rs` - 95.14%
 - `storage/mod.rs` - 96.68%
-- `test_helpers.rs` - 94.86%
+- `test_helpers/jsonl.rs` - 100.00%
+- `test_helpers/metrics.rs` - 100.00%
+- `test_helpers/storage.rs` - 100.00%
+- `test_helpers/tui.rs` - 100.00%
 - `theme.rs` - 92.86%
 - `tui/tabs/overview.rs` - 100.00%
 - `tui/tabs/phases.rs` - 95.18%
@@ -105,6 +113,8 @@ TOTAL                                  13046              1086    91.68%        
 - `commands/meta.rs` - 80.75%
 - `commands/wrapped.rs` - 72.50%
 - `embedded.rs` - 79.22%
+- `test_helpers/fixtures.rs` - 80.00%
+- `test_helpers/workflow.rs` - 86.11%
 - `tui/app.rs` - 83.83%
 - `tui/tabs/events.rs` - 88.33%
 - `tui/tabs/files.rs` - 81.63%
