@@ -1,15 +1,20 @@
 use anyhow::Result;
+use std::path::Path;
 use std::process::Command;
 
-/// Known agent CLIs to detect
-const KNOWN_AGENTS: &[(&str, &str)] = &[
-    ("claude", "Claude Code CLI (Anthropic)"),
-    ("aider", "AI pair programming (aider.chat)"),
-    ("cursor", "Cursor IDE CLI"),
-    ("copilot", "GitHub Copilot CLI"),
-    ("codex", "OpenAI Codex CLI"),
-    ("gemini", "Google Gemini CLI"),
-    ("cody", "Sourcegraph Cody CLI"),
+/// Known agent CLIs to detect with common installation locations
+const KNOWN_AGENTS: &[(&str, &str, &[&str])] = &[
+    (
+        "claude",
+        "Claude Code CLI (Anthropic)",
+        &["~/.claude/local/claude", "~/.claude/claude"],
+    ),
+    ("aider", "AI pair programming (aider.chat)", &[]),
+    ("cursor", "Cursor IDE CLI", &[]),
+    ("copilot", "GitHub Copilot CLI", &[]),
+    ("codex", "OpenAI Codex CLI", &[]),
+    ("gemini", "Google Gemini CLI", &[]),
+    ("cody", "Sourcegraph Cody CLI", &[]),
 ];
 
 /// Agent detection result
@@ -21,11 +26,22 @@ pub struct Agent {
     pub available: bool,
 }
 
-/// Detect installed agent CLIs using `which` command
+/// Expand tilde in path to home directory
+fn expand_tilde(path: &str) -> Option<String> {
+    if path.starts_with("~/") {
+        if let Some(home) = std::env::var("HOME").ok() {
+            return Some(path.replacen("~", &home, 1));
+        }
+    }
+    Some(path.to_string())
+}
+
+/// Detect installed agent CLIs using `which` command and fallback locations
 pub fn detect_agents() -> Result<Vec<Agent>> {
     let mut agents = Vec::new();
 
-    for (name, description) in KNOWN_AGENTS {
+    for (name, description, fallback_paths) in KNOWN_AGENTS {
+        // First try `which` command
         let output = Command::new("which").arg(name).output();
 
         let (available, path) = match output {
@@ -33,7 +49,23 @@ pub fn detect_agents() -> Result<Vec<Agent>> {
                 let path = String::from_utf8_lossy(&result.stdout).trim().to_string();
                 (true, path)
             }
-            _ => (false, String::new()),
+            _ => {
+                // If `which` fails, check fallback locations
+                let mut found = false;
+                let mut found_path = String::new();
+
+                for fallback in *fallback_paths {
+                    if let Some(expanded) = expand_tilde(fallback) {
+                        if Path::new(&expanded).exists() {
+                            found = true;
+                            found_path = expanded;
+                            break;
+                        }
+                    }
+                }
+
+                (found, found_path)
+            }
         };
 
         agents.push(Agent {
