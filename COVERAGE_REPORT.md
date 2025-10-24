@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 23:36
+**Last Updated**: 2025-10-23 23:43
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.50%** lines | **91.37%** regions | **90.48%** functions
+**Overall Coverage**: **92.41%** lines | **91.28%** regions | **90.28%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13912              1200    91.37%         767                73    90.48%        8201               615    92.50%           0                 0         -
+TOTAL                                  12862              1121    91.28%         710                69    90.28%        7588               576    92.41%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -31,7 +31,6 @@ TOTAL                                  13912              1200    91.37%        
 | `commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
 | `commands/workflow/mod.rs` | 54.92% | 55.53% | 54.17% | 🟠 Moderate |
-| `commands/workflow/tests.rs` | 93.64% | 92.48% | 92.98% | 🟢 Excellent |
 | `commands/workflow/transitions.rs` | 95.06% | 92.86% | 60.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
@@ -82,7 +81,6 @@ TOTAL                                  13912              1200    91.37%        
 - `commands/hook.rs` - 96.64%
 - `commands/workflow/claims.rs` - 100.00%
 - `commands/workflow/context.rs` - 100.00%
-- `commands/workflow/tests.rs` - 93.64%
 - `commands/workflow/transitions.rs` - 95.06%
 - `config.rs` - 91.67%
 - `engine/mod.rs` - 99.82%
@@ -135,7 +133,7 @@ TOTAL                                  13912              1200    91.37%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.50% | ✅ Met |
+| Overall | ≥80% | 92.41% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

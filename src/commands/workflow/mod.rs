@@ -394,5 +394,4 @@ pub fn list_guides(storage: &FileStorage) -> Result<()> {
 }
 
 #[cfg(test)]
-#[path = "tests.rs"]
 mod tests;
