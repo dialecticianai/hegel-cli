@@ -48,8 +48,6 @@ pub struct RuleEvaluationContext<'a> {
 
 impl RuleConfig {
     /// Validate regex patterns in rules (called at workflow load time)
-    /// TODO: Call this when loading workflows to catch invalid regex early
-    #[allow(dead_code)]
     pub fn validate(&self) -> Result<()> {
         match self {
             RuleConfig::RepeatedCommand { pattern, .. } => {

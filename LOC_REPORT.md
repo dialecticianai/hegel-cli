@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-19 22:06
+**Last Updated**: 2025-10-23 22:02
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,692 | 5,199 | 14,891 |
-| **Comments** | 1,374 | - | 1,374 |
-| **Blank Lines** | 1,794 | - | 1,794 |
-| **Total Lines** | 12,860 | 5,199 | 18,059 |
+| **Lines** | 9,725 | 5,208 | 14,933 |
+| **Comments** | 1,372 | - | 1,372 |
+| **Blank Lines** | 1,793 | - | 1,793 |
+| **Total Lines** | 12,890 | 5,208 | 18,098 |
 | **Files** | 57 | 28 | 85 |
 
 **Documentation Ratio**: 0.54 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            57           1794           1374           9692
+Rust                            57           1793           1372           9725
 -------------------------------------------------------------------------------
-SUM:                            57           1794           1374           9692
+SUM:                            57           1793           1372           9725
 -------------------------------------------------------------------------------
 ```
 
@@ -58,13 +58,13 @@ SUM:                            57           1794           1374           9692
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 94 | 94 | 0 | 0.0% | ✅ |
-| `engine/mod.rs` | 751 | 153 | 598 | 79.6% | ✅ |
+| `engine/mod.rs` | 817 | 167 | 650 | 79.6% | ✅ |
 | `engine/template.rs` | 675 | 162 | 513 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `main.rs` | 257 | 13 | 244 | 94.9% | ✅ |
-| `metamodes/mod.rs` | 238 | 113 | 125 | 52.5% | ✅ |
+| `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 372 | 224 | 148 | 39.8% | ✅ (infra) |
 | `metrics/hooks.rs` | 330 | 220 | 110 | 33.3% | ✅ (infra) |
@@ -74,7 +74,7 @@ SUM:                            57           1794           1374           9692
 | `rules/evaluator.rs` | 998 | 121 | 877 | 87.9% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
-| `rules/types.rs` | 301 | 76 | 225 | 74.8% | ✅ |
+| `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
 | `storage/mod.rs` | 698 | 311 | 387 | 55.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 124 | 124 | 0 | 0.0% | ✅ |
@@ -103,7 +103,7 @@ SUM:                            57           1794           1374           9692
 | File | Lines |
 |------|-------|
 | `CLAUDE.md` | 149 |
-| `CODE_MAP.md` | 196 |
+| `CODE_MAP.md` | 204 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 160 |
 | `DEP_REVIEW.md` | 678 |
@@ -126,9 +126,9 @@ SUM:                            57           1794           1374           9692
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 150 |
+| `LOC_REPORT.md` | 156 |
 | `README.md` | 451 |
-| `ROADMAP.md` | 199 |
+| `ROADMAP.md` | 194 |
 | `TESTING.md` | 41 |
 
 ---

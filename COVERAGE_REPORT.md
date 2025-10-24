@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-19 22:06
+**Last Updated**: 2025-10-23 22:02
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.39%** lines | **91.68%** regions | **89.29%** functions
+**Overall Coverage**: **92.44%** lines | **91.69%** regions | **89.27%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13046              1086    91.68%         728                78    89.29%        7650               582    92.39%           0                 0         -
+TOTAL                                  13060              1085    91.69%         727                78    89.27%        7684               581    92.44%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -35,7 +35,7 @@ TOTAL                                  13046              1086    91.68%        
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `embedded.rs` | 79.22% | 63.64% | 50.00% | 🟡 Good |
-| `engine/mod.rs` | 99.80% | 99.58% | 96.88% | 🟢 Excellent |
+| `engine/mod.rs` | 99.82% | 99.60% | 97.22% | 🟢 Excellent |
 | `engine/template.rs` | 97.25% | 96.87% | 97.56% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -49,7 +49,7 @@ TOTAL                                  13046              1086    91.68%        
 | `metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `rules/evaluator.rs` | 98.44% | 97.74% | 96.15% | 🟢 Excellent |
 | `rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `rules/types.rs` | 95.14% | 91.63% | 100.00% | 🟢 Excellent |
+| `rules/types.rs` | 95.68% | 92.07% | 100.00% | 🟢 Excellent |
 | `storage/mod.rs` | 96.68% | 96.09% | 81.03% | 🟢 Excellent |
 | `test_helpers/fixtures.rs` | 80.00% | 77.78% | 33.33% | 🟡 Good |
 | `test_helpers/jsonl.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -83,7 +83,7 @@ TOTAL                                  13046              1086    91.68%        
 - `commands/workflow/tests.rs` - 92.26%
 - `commands/workflow/transitions.rs` - 95.06%
 - `config.rs` - 91.67%
-- `engine/mod.rs` - 99.80%
+- `engine/mod.rs` - 99.82%
 - `engine/template.rs` - 97.25%
 - `guardrails/parser.rs` - 97.78%
 - `guardrails/types.rs` - 94.38%
@@ -96,7 +96,7 @@ TOTAL                                  13046              1086    91.68%        
 - `metrics/transcript.rs` - 100.00%
 - `rules/evaluator.rs` - 98.44%
 - `rules/interrupt.rs` - 100.00%
-- `rules/types.rs` - 95.14%
+- `rules/types.rs` - 95.68%
 - `storage/mod.rs` - 96.68%
 - `test_helpers/jsonl.rs` - 100.00%
 - `test_helpers/metrics.rs` - 100.00%
@@ -133,7 +133,7 @@ TOTAL                                  13046              1086    91.68%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.39% | ✅ Met |
+| Overall | ≥80% | 92.44% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -46,20 +46,6 @@ impl MetaModeDefinition {
                 )
             })
     }
-
-    /// Validate meta-mode name
-    /// TODO: Call this during meta-mode declaration for better error messages
-    #[allow(dead_code)]
-    pub fn validate(name: &str) -> Result<()> {
-        let valid = Self::all().iter().any(|m| m.name == name);
-        if !valid {
-            bail!(
-                "Invalid meta-mode: {}. Valid options: learning, standard",
-                name
-            );
-        }
-        Ok(())
-    }
 }
 
 /// Evaluate available transitions when a workflow completes
@@ -142,26 +128,6 @@ mod tests {
     #[test]
     fn test_get_invalid_meta_mode() {
         let result = MetaModeDefinition::get("invalid");
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("Invalid meta-mode"));
-    }
-
-    #[test]
-    fn test_validate_learning() {
-        assert!(MetaModeDefinition::validate("learning").is_ok());
-    }
-
-    #[test]
-    fn test_validate_standard() {
-        assert!(MetaModeDefinition::validate("standard").is_ok());
-    }
-
-    #[test]
-    fn test_validate_invalid() {
-        let result = MetaModeDefinition::validate("invalid");
         assert!(result.is_err());
         assert!(result
             .unwrap_err()

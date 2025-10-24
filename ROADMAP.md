@@ -51,11 +51,6 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 - `list_guides()` - List embedded guide documents
 **Use case:** Validation, debugging, and discovery of embedded resources
 
-### Validation & Error Handling
-**Files:** `src/metamodes/mod.rs`, `src/rules/types.rs`
-- `MetaModeDefinition::validate()` - Validate meta-mode names
-- `RuleConfig::validate()` - Validate regex patterns in workflow rules
-**Use case:** Catch invalid configurations at load time instead of runtime
 
 ### Workflow Visualization
 **Files:** `src/metrics/graph.rs`

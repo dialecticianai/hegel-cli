@@ -33,10 +33,24 @@ pub struct Workflow {
     pub nodes: HashMap<String, Node>,
 }
 
+impl Workflow {
+    /// Validate all rules in all nodes
+    pub fn validate(&self) -> Result<()> {
+        for (node_name, node) in &self.nodes {
+            for rule in &node.rules {
+                rule.validate()
+                    .with_context(|| format!("Invalid rule in node '{}'", node_name))?;
+            }
+        }
+        Ok(())
+    }
+}
+
 /// Load workflow definition from YAML string
 pub fn load_workflow_from_str(content: &str) -> Result<Workflow> {
     let workflow: Workflow =
         serde_yaml::from_str(content).with_context(|| "Failed to parse workflow YAML")?;
+    workflow.validate()?;
     Ok(workflow)
 }
 
@@ -268,6 +282,58 @@ mod tests {
 
         let result = load_workflow(&workflow_path);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_load_workflow_invalid_repeated_command_regex() {
+        let yaml = r#"
+mode: discovery
+start_node: spec
+nodes:
+  spec:
+    prompt: "Test"
+    transitions:
+      - when: done
+        to: done
+    rules:
+      - type: repeated_command
+        pattern: "[invalid"
+        threshold: 5
+        window: 120
+  done:
+    prompt: "Done"
+    transitions: []
+"#;
+        let result = load_workflow_from_str(yaml);
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("Invalid rule in node 'spec'"));
+    }
+
+    #[test]
+    fn test_load_workflow_invalid_repeated_file_edit_regex() {
+        let yaml = r#"
+mode: execution
+start_node: code
+nodes:
+  code:
+    prompt: "Write code"
+    transitions:
+      - when: done
+        to: done
+    rules:
+      - type: repeated_file_edit
+        path_pattern: "(unclosed"
+        threshold: 8
+        window: 180
+  done:
+    prompt: "Done"
+    transitions: []
+"#;
+        let result = load_workflow_from_str(yaml);
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("Invalid rule in node 'code'"));
     }
 
     // ========== init_state Tests ==========
