@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:27
+**Last Updated**: 2025-10-23 23:30
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 10,088 | 5,281 | 15,369 |
-| **Comments** | 1,411 | - | 1,411 |
-| **Blank Lines** | 1,853 | - | 1,853 |
-| **Total Lines** | 13,352 | 5,281 | 18,633 |
+| **Lines** | 10,207 | 5,281 | 15,488 |
+| **Comments** | 1,415 | - | 1,415 |
+| **Blank Lines** | 1,869 | - | 1,869 |
+| **Total Lines** | 13,491 | 5,281 | 18,772 |
 | **Files** | 58 | 28 | 86 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            58           1853           1411          10088
+Rust                            58           1869           1415          10207
 -------------------------------------------------------------------------------
-SUM:                            58           1853           1411          10088
+SUM:                            58           1869           1415          10207
 -------------------------------------------------------------------------------
 ```
 
@@ -54,7 +54,7 @@ SUM:                            58           1853           1411          10088
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 398 | 16 | 382 | 96.0% | ✅ |
-| `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests.rs` | 879 | 879 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
