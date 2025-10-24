@@ -187,6 +187,9 @@ fn main() -> Result<()> {
     let state_dir = FileStorage::resolve_state_dir(cli.state_dir)?;
     let storage = FileStorage::new(state_dir)?;
 
+    // Auto-install Claude Code hooks if needed (silently fails if not in Claude Code)
+    let _ = commands::auto_install_hooks();
+
     // Execute command
     match cli.command.unwrap() {
         Commands::Init => {
