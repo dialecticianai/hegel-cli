@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:11
+**Last Updated**: 2025-10-23 23:18
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,968 | 5,282 | 15,250 |
-| **Comments** | 1,398 | - | 1,398 |
-| **Blank Lines** | 1,827 | - | 1,827 |
-| **Total Lines** | 13,193 | 5,282 | 18,475 |
+| **Lines** | 10,043 | 5,283 | 15,326 |
+| **Comments** | 1,407 | - | 1,407 |
+| **Blank Lines** | 1,846 | - | 1,846 |
+| **Total Lines** | 13,296 | 5,283 | 18,579 |
 | **Files** | 58 | 28 | 86 |
 
 **Documentation Ratio**: 0.53 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            58           1827           1398           9968
+Rust                            58           1846           1407          10043
 -------------------------------------------------------------------------------
-SUM:                            58           1827           1398           9968
+SUM:                            58           1846           1407          10043
 -------------------------------------------------------------------------------
 ```
 
@@ -46,7 +46,7 @@ SUM:                            58           1827           1398           9968
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
-| `commands/hooks_setup.rs` | 132 | 102 | 30 | 22.7% | ✅ |
+| `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 167 | 72 | 95 | 56.9% | ✅ |
 | `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
 | `commands/mod.rs` | 26 | 26 | 0 | 0.0% | ✅ |
@@ -127,7 +127,7 @@ SUM:                            58           1827           1398           9968
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 156 |
+| `LOC_REPORT.md` | 157 |
 | `README.md` | 535 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
