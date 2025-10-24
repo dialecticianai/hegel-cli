@@ -111,6 +111,90 @@ Available workflows:
 - `execution` - Optimized for production delivery
 - `minimal` - Simplified workflow for quick iterations
 
+### Listing Available Resources
+
+Discover what workflows and guides are available:
+
+```bash
+# List all workflows (embedded + user-defined)
+hegel workflows
+
+# List all guides (embedded + user-defined)
+hegel guides
+```
+
+Output shows where each resource comes from:
+```
+Available workflows:
+  discovery (embedded, local)   # Both embedded and user-defined version exist
+  execution (embedded)           # Only embedded version
+  my-custom (local)              # User-defined only
+
+Available guides:
+  SPEC_WRITING.md (embedded, local)
+  MY_GUIDE.md (local)
+```
+
+### Customizing Workflows and Guides
+
+Hegel supports user-defined workflows and guides that can extend or override the embedded defaults:
+
+**Create custom workflows:**
+```bash
+# Create workflows directory
+mkdir -p .hegel/workflows
+
+# Add a new custom workflow
+cat > .hegel/workflows/my-workflow.yaml <<EOF
+mode: discovery
+start_node: start
+nodes:
+  start:
+    prompt: "Custom workflow step"
+    transitions:
+      - when: done
+        to: done
+  done:
+    prompt: "Complete!"
+    transitions: []
+EOF
+
+# Use your custom workflow
+hegel start my-workflow
+```
+
+**Override embedded workflows:**
+```bash
+# Copy embedded workflow to customize it
+# (filesystem versions take priority over embedded)
+cp workflows/discovery.yaml .hegel/workflows/discovery.yaml
+
+# Edit .hegel/workflows/discovery.yaml to customize
+# Hegel will now use your customized version!
+```
+
+**Create custom guides:**
+```bash
+# Create guides directory
+mkdir -p .hegel/guides
+
+# Add a custom guide
+echo "# My Custom Spec Guide" > .hegel/guides/MY_GUIDE.md
+
+# Reference it in workflow prompts with {{MY_GUIDE}}
+```
+
+**Override embedded guides:**
+```bash
+# Override the default SPEC_WRITING guide
+cp guides/SPEC_WRITING.md .hegel/guides/SPEC_WRITING.md
+
+# Edit .hegel/guides/SPEC_WRITING.md to match your style
+# Workflows using {{SPEC_WRITING}} will now use your version
+```
+
+**Priority:** Filesystem (`.hegel/`) takes precedence over embedded resources, allowing you to customize any aspect of Hegel's workflows.
+
 ### Advancing Through Phases
 
 Hegel provides ergonomic commands for common workflow transitions:
