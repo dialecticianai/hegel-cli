@@ -1,4 +1,5 @@
 use anyhow::Result;
+use semver::{Version, VersionReq};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -96,34 +97,10 @@ fn expand_tilde(path: &str) -> Option<String> {
     Some(path.to_string())
 }
 
-/// Parse version string (e.g., "v18.20.8" or "18.20.8") into (major, minor, patch)
-fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
+/// Parse version string (e.g., "v18.20.8" or "18.20.8") into semver Version
+fn parse_version(version: &str) -> Option<Version> {
     let version = version.trim().trim_start_matches('v');
-    let parts: Vec<&str> = version.split('.').collect();
-    if parts.len() < 2 {
-        return None;
-    }
-
-    let major = parts[0].parse().ok()?;
-    let minor = parts[1].parse().ok()?;
-    let patch = if parts.len() > 2 {
-        parts[2].parse().ok()?
-    } else {
-        0
-    };
-
-    Some((major, minor, patch))
-}
-
-/// Compare two versions, returns true if actual >= required
-fn version_satisfies(actual: (u32, u32, u32), required: (u32, u32, u32)) -> bool {
-    if actual.0 != required.0 {
-        return actual.0 > required.0;
-    }
-    if actual.1 != required.1 {
-        return actual.1 > required.1;
-    }
-    actual.2 >= required.2
+    Version::parse(version).ok()
 }
 
 /// Get current node version by running `node --version`
@@ -139,7 +116,7 @@ fn get_current_node_version() -> Option<String> {
 
 /// Find compatible Node.js version in nvm directory
 fn find_nvm_compatible_version(min_version: &str) -> Option<PathBuf> {
-    let required = parse_version(min_version)?;
+    let required = VersionReq::parse(&format!(">={}", min_version)).ok()?;
 
     // Check if nvm directory exists
     let nvm_dir = expand_tilde("~/.nvm/versions/node")?;
@@ -156,19 +133,14 @@ fn find_nvm_compatible_version(min_version: &str) -> Option<PathBuf> {
     for entry in entries.flatten() {
         let version_name = entry.file_name().to_string_lossy().to_string();
         if let Some(actual) = parse_version(&version_name) {
-            if version_satisfies(actual, required) {
+            if required.matches(&actual) {
                 compatible_versions.push((actual, entry.path()));
             }
         }
     }
 
     // Sort by version (descending) and return the highest compatible version
-    compatible_versions.sort_by(|a, b| {
-        b.0 .0
-            .cmp(&a.0 .0)
-            .then_with(|| b.0 .1.cmp(&a.0 .1))
-            .then_with(|| b.0 .2.cmp(&a.0 .2))
-    });
+    compatible_versions.sort_by(|a, b| b.0.cmp(&a.0));
 
     compatible_versions
         .first()
@@ -180,14 +152,16 @@ fn check_runtime_compatibility(runtime: &AgentRuntime) -> RuntimeCompatibility {
     match runtime {
         AgentRuntime::NodeJs { min_version } => {
             if let Some(min_ver) = min_version {
-                // Check current node version
-                if let Some(current) = get_current_node_version() {
-                    let current_parsed = parse_version(&current);
-                    let required_parsed = parse_version(min_ver);
+                let required = match VersionReq::parse(&format!(">={}", min_ver)) {
+                    Ok(req) => req,
+                    Err(_) => return RuntimeCompatibility::Unknown,
+                };
 
-                    if let (Some(curr), Some(req)) = (current_parsed, required_parsed) {
-                        if version_satisfies(curr, req) {
-                            return RuntimeCompatibility::Compatible(current);
+                // Check current node version
+                if let Some(current_str) = get_current_node_version() {
+                    if let Some(current) = parse_version(&current_str) {
+                        if required.matches(&current) {
+                            return RuntimeCompatibility::Compatible(current_str);
                         }
                     }
                 }
@@ -407,34 +381,37 @@ mod tests {
 
     #[test]
     fn test_parse_version() {
-        assert_eq!(parse_version("18.20.8"), Some((18, 20, 8)));
-        assert_eq!(parse_version("v18.20.8"), Some((18, 20, 8)));
-        assert_eq!(parse_version("20.0.0"), Some((20, 0, 0)));
-        assert_eq!(parse_version("v20.0.0"), Some((20, 0, 0)));
-        assert_eq!(parse_version("3.8"), Some((3, 8, 0)));
-        assert_eq!(parse_version("invalid"), None);
+        assert!(parse_version("18.20.8").is_some());
+        assert!(parse_version("v18.20.8").is_some());
+        assert!(parse_version("20.0.0").is_some());
+        assert!(parse_version("v20.0.0").is_some());
+        assert_eq!(
+            parse_version("18.20.8").unwrap(),
+            Version::parse("18.20.8").unwrap()
+        );
+        assert!(parse_version("invalid").is_none());
     }
 
     #[test]
-    fn test_version_satisfies() {
-        // Exact match
-        assert!(version_satisfies((18, 20, 8), (18, 20, 8)));
+    fn test_version_requirements() {
+        let v18 = parse_version("18.20.8").unwrap();
+        let v20 = parse_version("20.0.0").unwrap();
+        let v22 = parse_version("22.20.0").unwrap();
 
-        // Higher major
-        assert!(version_satisfies((20, 0, 0), (18, 20, 8)));
-        assert!(!version_satisfies((18, 20, 8), (20, 0, 0)));
+        let req_18 = VersionReq::parse(">=18.0.0").unwrap();
+        let req_20 = VersionReq::parse(">=20.0.0").unwrap();
 
-        // Same major, higher minor
-        assert!(version_satisfies((18, 21, 0), (18, 20, 8)));
-        assert!(!version_satisfies((18, 19, 0), (18, 20, 8)));
+        // v18 satisfies >=18.0.0 but not >=20.0.0
+        assert!(req_18.matches(&v18));
+        assert!(!req_20.matches(&v18));
 
-        // Same major/minor, higher patch
-        assert!(version_satisfies((18, 20, 9), (18, 20, 8)));
-        assert!(!version_satisfies((18, 20, 7), (18, 20, 8)));
+        // v20 satisfies both
+        assert!(req_18.matches(&v20));
+        assert!(req_20.matches(&v20));
 
-        // Edge cases
-        assert!(version_satisfies((20, 0, 0), (20, 0, 0)));
-        assert!(version_satisfies((22, 20, 0), (20, 0, 0)));
+        // v22 satisfies both
+        assert!(req_18.matches(&v22));
+        assert!(req_20.matches(&v22));
     }
 
     #[test]
