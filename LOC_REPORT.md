@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:30
+**Last Updated**: 2025-10-23 23:34
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 10,207 | 5,281 | 15,488 |
-| **Comments** | 1,415 | - | 1,415 |
-| **Blank Lines** | 1,869 | - | 1,869 |
-| **Total Lines** | 13,491 | 5,281 | 18,772 |
+| **Lines** | 10,279 | 5,281 | 15,560 |
+| **Comments** | 1,426 | - | 1,426 |
+| **Blank Lines** | 1,885 | - | 1,885 |
+| **Total Lines** | 13,590 | 5,281 | 18,871 |
 | **Files** | 58 | 28 | 86 |
 
-**Documentation Ratio**: 0.52 lines of docs per line of code
+**Documentation Ratio**: 0.51 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            58           1869           1415          10207
+Rust                            58           1885           1426          10279
 -------------------------------------------------------------------------------
-SUM:                            58           1869           1415          10207
+SUM:                            58           1885           1426          10279
 -------------------------------------------------------------------------------
 ```
 
@@ -42,7 +42,7 @@ SUM:                            58           1869           1415          10207
 | `adapters/mod.rs` | 124 | 124 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 267 | 267 | 0 | 0.0% | ✅ (infra) |
-| `commands/astq.rs` | 82 | 82 | 0 | 0.0% | ✅ |
+| `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
@@ -50,7 +50,7 @@ SUM:                            58           1869           1415          10207
 | `commands/init.rs` | 167 | 72 | 95 | 56.9% | ✅ |
 | `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
 | `commands/mod.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
+| `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 398 | 16 | 382 | 96.0% | ✅ |
@@ -86,7 +86,7 @@ SUM:                            58           1869           1415          10207
 | `test_helpers/workflow.rs` | 296 | 296 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
-| `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
+| `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
 | `tui/tabs/events.rs` | 132 | 113 | 19 | 14.4% | ✅ |
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
 | `tui/tabs/mod.rs` | 9 | 9 | 0 | 0.0% | ✅ |
@@ -136,7 +136,7 @@ SUM:                            58           1869           1415          10207
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.51 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

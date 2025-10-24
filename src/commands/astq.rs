@@ -58,7 +58,12 @@ pub fn run_astq(args: &[String]) -> Result<()> {
 
 /// Build ast-grep from vendor directory if needed
 fn build_ast_grep() -> Result<std::path::PathBuf> {
-    let vendor_path = std::path::Path::new("vendor/ast-grep");
+    build_ast_grep_with_path("vendor/ast-grep")
+}
+
+/// Build ast-grep from a custom vendor path (exposed for testing)
+fn build_ast_grep_with_path(vendor_path: &str) -> Result<std::path::PathBuf> {
+    let vendor_path = std::path::Path::new(vendor_path);
     let target_bin = vendor_path.join("target/release/ast-grep");
 
     // Check if binary exists
@@ -79,4 +84,30 @@ fn build_ast_grep() -> Result<std::path::PathBuf> {
     }
 
     Ok(target_bin)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[test]
+    fn test_build_ast_grep_finds_existing_binary() {
+        let temp_dir = TempDir::new().unwrap();
+        let vendor_path = temp_dir.path().join("vendor-ast-grep");
+        let target_dir = vendor_path.join("target/release");
+        std::fs::create_dir_all(&target_dir).unwrap();
+
+        let binary_path = target_dir.join("ast-grep");
+        std::fs::write(&binary_path, "fake binary").unwrap();
+
+        let result = build_ast_grep_with_path(vendor_path.to_str().unwrap()).unwrap();
+        assert_eq!(result, binary_path);
+    }
+
+    #[test]
+    fn test_build_ast_grep_fails_when_vendor_missing() {
+        let result = build_ast_grep_with_path("/nonexistent/path");
+        assert!(result.is_err());
+    }
 }
