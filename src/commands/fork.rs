@@ -10,7 +10,6 @@ const KNOWN_AGENTS: &[(&str, &str, &[&str])] = &[
         &["~/.claude/local/claude", "~/.claude/claude"],
     ),
     ("aider", "AI pair programming (aider.chat)", &[]),
-    ("cursor", "Cursor IDE CLI", &[]),
     ("copilot", "GitHub Copilot CLI", &[]),
     ("codex", "OpenAI Codex CLI", &[]),
     ("gemini", "Google Gemini CLI", &[]),

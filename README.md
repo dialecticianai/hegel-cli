@@ -534,7 +534,6 @@ hegel fork
 **Detects:**
 - `claude` - Claude Code CLI (Anthropic)
 - `aider` - AI pair programming (aider.chat)
-- `cursor` - Cursor IDE CLI
 - `copilot` - GitHub Copilot CLI
 - `codex` - OpenAI Codex CLI
 - `gemini` - Google Gemini CLI

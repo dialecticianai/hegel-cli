@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 12:43
+**Last Updated**: 2025-10-24 12:47
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,513 | 6,227 | 17,740 |
+| **Lines** | 11,512 | 6,226 | 17,738 |
 | **Comments** | 1,574 | - | 1,574 |
 | **Blank Lines** | 2,128 | - | 2,128 |
-| **Total Lines** | 15,215 | 6,227 | 21,442 |
+| **Total Lines** | 15,214 | 6,226 | 21,440 |
 | **Files** | 66 | 30 | 96 |
 
 **Documentation Ratio**: 0.54 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            66           2128           1574          11513
+Rust                            66           2128           1574          11512
 -------------------------------------------------------------------------------
-SUM:                            66           2128           1574          11513
+SUM:                            66           2128           1574          11512
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                            66           2128           1574          11513
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/fork.rs` | 155 | 116 | 39 | 25.2% | ✅ |
+| `commands/fork.rs` | 154 | 115 | 39 | 25.3% | ✅ |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
@@ -138,7 +138,7 @@ SUM:                            66           2128           1574          11513
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
 | `LOC_REPORT.md` | 167 |
-| `README.md` | 557 |
+| `README.md` | 556 |
 | `ROADMAP.md` | 183 |
 | `TESTING.md` | 41 |
 
