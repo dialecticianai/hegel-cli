@@ -172,13 +172,29 @@ enum Commands {
         /// Config value (for set)
         value: Option<String>,
     },
-    /// Detect available agent CLIs for task delegation
+    /// Delegate task to external agent CLI
     ///
-    /// Auto-detects installed agent CLIs (claude, aider, cursor, copilot, etc.)
-    /// and displays which are available for use with `hegel fork`.
+    /// Without arguments, lists available agents and their compatibility status.
     ///
-    /// Future: `hegel fork --agent=<name> '<prompt>'` to delegate subtasks
-    Fork,
+    /// With --agent flag, delegates the task to the specified agent CLI.
+    ///
+    /// Examples:
+    ///   hegel fork                                    # List available agents
+    ///   hegel fork --agent=codex "Write hello world"
+    ///   hegel fork --agent=gemini -- -o json "Explain this code"
+    ///   hegel fork --agent=codex -- --full-auto "Implement feature X"
+    Fork {
+        /// Agent to use (e.g., codex, gemini, aider)
+        #[arg(long)]
+        agent: Option<String>,
+
+        /// Prompt for the agent (if not using positional args)
+        prompt: Option<String>,
+
+        /// Additional arguments to pass to the agent (use -- separator)
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -271,8 +287,12 @@ fn main() -> Result<()> {
                 &storage,
             )?;
         }
-        Commands::Fork => {
-            commands::handle_fork()?;
+        Commands::Fork {
+            agent,
+            prompt,
+            args,
+        } => {
+            commands::handle_fork(agent.as_deref(), prompt.as_deref(), &args)?;
         }
     }
 

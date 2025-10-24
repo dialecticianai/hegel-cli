@@ -327,10 +327,116 @@ pub fn display_agents(agents: &[Agent]) {
     }
 }
 
-/// Handle `hegel fork` command (no args - detection only)
-pub fn handle_fork() -> Result<()> {
+/// Execute an agent with the given prompt and arguments
+fn execute_agent(agent: &Agent, prompt: Option<&str>, args: &[String]) -> Result<String> {
+    // Determine command and arguments based on agent
+    let (cmd, cmd_args) = match agent.name.as_str() {
+        "codex" => {
+            // codex uses `codex exec "prompt"` for non-interactive mode
+            let mut exec_args = vec!["exec".to_string()];
+
+            // Add passthrough args first (before prompt)
+            exec_args.extend_from_slice(args);
+
+            // Add prompt if provided
+            if let Some(p) = prompt {
+                exec_args.push(p.to_string());
+            }
+
+            ("codex", exec_args)
+        }
+        "gemini" => {
+            // gemini uses positional argument for prompt
+            let mut gemini_args = Vec::new();
+
+            // Add passthrough args first
+            gemini_args.extend_from_slice(args);
+
+            // Add prompt if provided
+            if let Some(p) = prompt {
+                gemini_args.push(p.to_string());
+            }
+
+            ("gemini", gemini_args)
+        }
+        _ => {
+            // Default: just pass prompt and args
+            let mut default_args = Vec::new();
+            default_args.extend_from_slice(args);
+            if let Some(p) = prompt {
+                default_args.push(p.to_string());
+            }
+            (agent.name.as_str(), default_args)
+        }
+    };
+
+    // Check if we need to modify PATH for Node.js version compatibility
+    let mut command = Command::new(cmd);
+    command.args(&cmd_args);
+
+    // If this is a Node.js agent with version requirements, check compatibility
+    if let AgentRuntime::NodeJs { min_version } = &agent.runtime {
+        if min_version.is_some() {
+            match check_runtime_compatibility(&agent.runtime) {
+                RuntimeCompatibility::NvmAvailable(nvm_bin) => {
+                    // Prepend nvm bin directory to PATH
+                    let current_path = std::env::var("PATH").unwrap_or_default();
+                    let new_path = format!("{}:{}", nvm_bin.display(), current_path);
+                    command.env("PATH", new_path);
+                }
+                RuntimeCompatibility::Incompatible(msg) => {
+                    anyhow::bail!("Cannot execute {}: {}", agent.name, msg);
+                }
+                _ => {} // Compatible or Unknown - proceed normally
+            }
+        }
+    }
+
+    // Execute and capture output
+    let output = command.output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!(
+            "Agent '{}' failed with exit code {:?}\n{}",
+            agent.name,
+            output.status.code(),
+            stderr
+        );
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/// Handle `hegel fork` command
+pub fn handle_fork(agent_name: Option<&str>, prompt: Option<&str>, args: &[String]) -> Result<()> {
     let agents = detect_agents()?;
-    display_agents(&agents);
+
+    // If no agent specified, just list available agents
+    if agent_name.is_none() {
+        display_agents(&agents);
+        return Ok(());
+    }
+
+    let agent_name = agent_name.unwrap();
+
+    // Find the requested agent
+    let agent = agents
+        .iter()
+        .find(|a| a.name == agent_name && a.available)
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "Agent '{}' not found or not available. Run `hegel fork` to see available agents.",
+                agent_name
+            )
+        })?;
+
+    // Execute the agent
+    let output = execute_agent(agent, prompt, args)?;
+
+    // Print output to stdout for the calling agent to consume
+    print!("{}", output);
+
     Ok(())
 }
 
@@ -373,10 +479,21 @@ mod tests {
     }
 
     #[test]
-    fn test_handle_fork() {
-        // Verify handle_fork doesn't crash
-        let result = handle_fork();
+    fn test_handle_fork_list_agents() {
+        // Verify handle_fork lists agents when no agent specified
+        let result = handle_fork(None, None, &[]);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_handle_fork_agent_not_found() {
+        // Verify error when agent doesn't exist
+        let result = handle_fork(Some("nonexistent"), Some("test prompt"), &[]);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("not found or not available"));
     }
 
     #[test]

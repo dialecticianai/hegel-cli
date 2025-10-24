@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 13:03
+**Last Updated**: 2025-10-24 13:11
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,727 | 6,226 | 17,953 |
-| **Comments** | 1,612 | - | 1,612 |
-| **Blank Lines** | 2,156 | - | 2,156 |
-| **Total Lines** | 15,495 | 6,226 | 21,721 |
+| **Lines** | 11,817 | 6,226 | 18,043 |
+| **Comments** | 1,638 | - | 1,638 |
+| **Blank Lines** | 2,177 | - | 2,177 |
+| **Total Lines** | 15,632 | 6,226 | 21,858 |
 | **Files** | 66 | 30 | 96 |
 
 **Documentation Ratio**: 0.53 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            66           2156           1612          11727
+Rust                            66           2177           1638          11817
 -------------------------------------------------------------------------------
-SUM:                            66           2156           1612          11727
+SUM:                            66           2177           1638          11817
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                            66           2156           1612          11727
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/fork.rs` | 435 | 336 | 99 | 22.8% | ⚠️ Large |
+| `commands/fork.rs` | 552 | 442 | 110 | 19.9% | ⚠️ Large |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
@@ -71,7 +71,7 @@ SUM:                            66           2156           1612          11727
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
-| `main.rs` | 280 | 13 | 267 | 95.4% | ✅ |
+| `main.rs` | 300 | 13 | 287 | 95.7% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 372 | 224 | 148 | 39.8% | ✅ (infra) |
