@@ -28,10 +28,13 @@ impl AgentAdapter for ClaudeCodeAdapter {
     }
 
     fn detect(&self) -> bool {
-        // Claude Code sets CLAUDE_CODE_SESSION_ID environment variable
-        // Also check for transcript paths that match Claude Code patterns
+        // Claude Code sets various environment variables:
+        // - CLAUDE_CODE_SESSION_ID (session-specific)
+        // - CLAUDE_CODE_TRANSCRIPT_PATH (session-specific)
+        // - CLAUDECODE=1 (always set)
         std::env::var("CLAUDE_CODE_SESSION_ID").is_ok()
             || std::env::var("CLAUDE_CODE_TRANSCRIPT_PATH").is_ok()
+            || std::env::var("CLAUDECODE").is_ok()
             || {
                 // Fallback: check if we're in a Claude Code environment by looking for typical paths
                 let home = std::env::var("HOME").unwrap_or_default();

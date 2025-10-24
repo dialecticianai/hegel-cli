@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:43
+**Last Updated**: 2025-10-24 00:51
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 10,437 | 5,286 | 15,723 |
-| **Comments** | 1,430 | - | 1,430 |
+| **Lines** | 10,438 | 6,191 | 16,629 |
+| **Comments** | 1,432 | - | 1,432 |
 | **Blank Lines** | 1,912 | - | 1,912 |
-| **Total Lines** | 13,779 | 5,286 | 19,065 |
-| **Files** | 63 | 28 | 91 |
+| **Total Lines** | 13,782 | 6,191 | 19,973 |
+| **Files** | 63 | 30 | 93 |
 
-**Documentation Ratio**: 0.51 lines of docs per line of code
+**Documentation Ratio**: 0.59 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            63           1912           1430          10437
+Rust                            63           1912           1432          10438
 -------------------------------------------------------------------------------
-SUM:                            63           1912           1430          10437
+SUM:                            63           1912           1432          10438
 -------------------------------------------------------------------------------
 ```
 
@@ -36,7 +36,7 @@ SUM:                            63           1912           1430          10437
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
+| `adapters/claude_code.rs` | 258 | 129 | 129 | 50.0% | ✅ |
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
@@ -106,8 +106,10 @@ SUM:                            63           1912           1430          10437
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/log_retention/PLAN.md` | 535 |
+| `.ddd/feat/log_retention/SPEC.md` | 366 |
 | `CLAUDE.md` | 149 |
-| `CODE_MAP.md` | 204 |
+| `CODE_MAP.md` | 210 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 160 |
 | `DEP_REVIEW.md` | 678 |
@@ -130,7 +132,7 @@ SUM:                            63           1912           1430          10437
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 162 |
+| `LOC_REPORT.md` | 160 |
 | `README.md` | 535 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
@@ -141,7 +143,7 @@ SUM:                            63           1912           1430          10437
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.51 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.59 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

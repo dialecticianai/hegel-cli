@@ -1,20 +1,20 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 23:43
+**Last Updated**: 2025-10-24 00:51
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.41%** lines | **91.28%** regions | **90.28%** functions
+**Overall Coverage**: **92.29%** lines | **91.20%** regions | **90.14%** functions
 
 ## Summary
 
 ```
-TOTAL                                  12862              1121    91.28%         710                69    90.28%        7588               576    92.41%           0                 0         -
+TOTAL                                  12864              1132    91.20%         710                70    90.14%        7589               585    92.29%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `adapters/claude_code.rs` | 98.87% | 97.76% | 95.00% | 🟢 Excellent |
+| `adapters/claude_code.rs` | 93.82% | 94.29% | 90.00% | 🟢 Excellent |
 | `adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
@@ -70,7 +70,7 @@ TOTAL                                  12862              1121    91.28%        
 ## Coverage Tiers
 
 ### 🟢 Excellent (≥90% lines)
-- `adapters/claude_code.rs` - 98.87%
+- `adapters/claude_code.rs` - 93.82%
 - `adapters/codex.rs` - 94.43%
 - `adapters/cursor.rs` - 93.84%
 - `adapters/mod.rs` - 98.91%
@@ -133,7 +133,7 @@ TOTAL                                  12862              1121    91.28%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.41% | ✅ Met |
+| Overall | ≥80% | 92.29% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
