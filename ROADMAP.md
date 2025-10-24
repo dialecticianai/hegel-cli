@@ -113,9 +113,11 @@ rust:
 - Context: Current workflow phase + relevant guides + specialized libraries
 - Metrics: Log subagent spawns to hooks.jsonl
 
-### 2.2 External Agent Orchestration
+### 2.2 External Agent Orchestration - Task Delegation
 
-**Goal:** `hegel fork` command to delegate subtasks to other agent CLIs.
+**Status:** Detection implemented (`hegel fork`). Task delegation pending.
+
+**Goal:** Extend `hegel fork` to delegate subtasks to other agent CLIs.
 
 **Syntax:**
 ```bash
@@ -123,8 +125,7 @@ hegel fork --agent=codex 'Implement this specific function'
 hegel fork --agent=gemini 'Research this API and summarize'
 ```
 
-**Features:**
-- Wrap external agent CLIs (codex, gemini, cursor cli)
+**Features to implement:**
 - Pass subtask prompt to external agent
 - Capture output/results
 - Track forked work in metrics (duration, tokens if available)

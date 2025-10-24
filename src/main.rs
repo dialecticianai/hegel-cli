@@ -172,6 +172,13 @@ enum Commands {
         /// Config value (for set)
         value: Option<String>,
     },
+    /// Detect available agent CLIs for task delegation
+    ///
+    /// Auto-detects installed agent CLIs (claude, aider, cursor, copilot, etc.)
+    /// and displays which are available for use with `hegel fork`.
+    ///
+    /// Future: `hegel fork --agent=<name> '<prompt>'` to delegate subtasks
+    Fork,
 }
 
 fn main() -> Result<()> {
@@ -263,6 +270,9 @@ fn main() -> Result<()> {
                 value.as_deref(),
                 &storage,
             )?;
+        }
+        Commands::Fork => {
+            commands::handle_fork()?;
         }
     }
 

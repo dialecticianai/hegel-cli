@@ -522,6 +522,28 @@ hegel reflect SPEC.md --headless
 - Auto-exit on submit (like `git commit`)
 - Session ID passthrough via `HEGEL_SESSION_ID`
 
+### External Agent Orchestration
+
+Detect available agent CLIs for task delegation:
+
+```bash
+# List installed agent CLIs
+hegel fork
+```
+
+**Detects:**
+- `claude` - Claude Code CLI (Anthropic)
+- `aider` - AI pair programming (aider.chat)
+- `cursor` - Cursor IDE CLI
+- `copilot` - GitHub Copilot CLI
+- `codex` - OpenAI Codex CLI
+- `gemini` - Google Gemini CLI
+- `cody` - Sourcegraph Cody CLI
+
+**Output:** Shows which agents are installed and their paths, plus which are not available.
+
+**Roadmap:** Future versions will support `hegel fork --agent=<name> '<prompt>'` to delegate subtasks to external agents, enabling parallel work across multiple agents and agent comparison workflows.
+
 ## Contributing
 
 For AI agents or developers working **on** Hegel (not just using it), see **`CLAUDE.md`** for project structure, development guidelines, and contribution workflow.
