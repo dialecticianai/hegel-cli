@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:21
+**Last Updated**: 2025-10-23 23:27
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 10,043 | 5,283 | 15,326 |
-| **Comments** | 1,407 | - | 1,407 |
-| **Blank Lines** | 1,846 | - | 1,846 |
-| **Total Lines** | 13,296 | 5,283 | 18,579 |
+| **Lines** | 10,088 | 5,281 | 15,369 |
+| **Comments** | 1,411 | - | 1,411 |
+| **Blank Lines** | 1,853 | - | 1,853 |
+| **Total Lines** | 13,352 | 5,281 | 18,633 |
 | **Files** | 58 | 28 | 86 |
 
-**Documentation Ratio**: 0.53 lines of docs per line of code
+**Documentation Ratio**: 0.52 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            58           1846           1407          10043
+Rust                            58           1853           1411          10088
 -------------------------------------------------------------------------------
-SUM:                            58           1846           1407          10043
+SUM:                            58           1853           1411          10088
 -------------------------------------------------------------------------------
 ```
 
@@ -53,7 +53,7 @@ SUM:                            58           1846           1407          10043
 | `commands/reflect.rs` | 82 | 82 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 342 | 16 | 326 | 95.3% | ✅ |
+| `commands/workflow/mod.rs` | 398 | 16 | 382 | 96.0% | ✅ |
 | `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
@@ -125,7 +125,7 @@ SUM:                            58           1846           1407          10043
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 157 |
+| `LOC_REPORT.md` | 155 |
 | `README.md` | 535 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
@@ -136,7 +136,7 @@ SUM:                            58           1846           1407          10043
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

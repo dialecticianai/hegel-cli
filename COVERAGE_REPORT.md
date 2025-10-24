@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 23:18
+**Last Updated**: 2025-10-23 23:27
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.88%** lines | **90.93%** regions | **88.99%** functions
+**Overall Coverage**: **91.41%** lines | **90.37%** regions | **88.64%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13550              1229    90.93%         745                82    88.99%        7942               645    91.88%           0                 0         -
+TOTAL                                  13634              1313    90.37%         748                85    88.64%        7983               686    91.41%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -30,7 +30,7 @@ TOTAL                                  13550              1229    90.93%        
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `commands/workflow/mod.rs` | 53.36% | 52.23% | 47.62% | 🟠 Moderate |
+| `commands/workflow/mod.rs` | 45.08% | 43.24% | 41.67% | 🟠 Moderate |
 | `commands/workflow/tests.rs` | 92.26% | 92.02% | 92.31% | 🟢 Excellent |
 | `commands/workflow/transitions.rs` | 95.06% | 92.86% | 60.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
@@ -123,7 +123,7 @@ TOTAL                                  13550              1229    90.93%        
 
 ### 🟠 Moderate (40-69% lines)
 - `adapters/mod.rs` - 60.71%
-- `commands/workflow/mod.rs` - 53.36%
+- `commands/workflow/mod.rs` - 45.08%
 - `main.rs` - 45.83%
 
 ### 🔴 Needs Work (<40% lines)
@@ -135,7 +135,7 @@ TOTAL                                  13550              1229    90.93%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 91.88% | ✅ Met |
+| Overall | ≥80% | 91.41% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

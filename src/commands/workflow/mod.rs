@@ -267,7 +267,7 @@ pub fn list_workflows(storage: &FileStorage) -> Result<()> {
     let mut all_workflows: Vec<String> = embedded.union(&filesystem).cloned().collect();
     all_workflows.sort();
 
-    println!("Available workflows:");
+    println!("Available workflows:\n");
     for workflow in &all_workflows {
         let mut markers = Vec::new();
         if embedded.contains(workflow) {
@@ -277,14 +277,70 @@ pub fn list_workflows(storage: &FileStorage) -> Result<()> {
             markers.push("local");
         }
 
+        // Load workflow to extract node flow
+        let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
+        let flow = match load_workflow(&workflow_path) {
+            Ok(wf) => extract_node_flow(&wf),
+            Err(_) => "".to_string(),
+        };
+
         if markers.is_empty() {
-            println!("  {}", workflow);
+            if flow.is_empty() {
+                println!("  {}", workflow);
+            } else {
+                println!("  {}\n    {}", workflow, flow.dimmed());
+            }
         } else {
-            println!("  {} ({})", workflow, markers.join(", "));
+            if flow.is_empty() {
+                println!("  {} ({})", workflow, markers.join(", "));
+            } else {
+                println!(
+                    "  {} ({})\n    {}",
+                    workflow,
+                    markers.join(", "),
+                    flow.dimmed()
+                );
+            }
         }
     }
 
     Ok(())
+}
+
+/// Extract a simple node flow visualization from a workflow
+fn extract_node_flow(workflow: &crate::engine::Workflow) -> String {
+    use std::collections::{HashMap, HashSet};
+
+    let start = &workflow.start_node;
+    let mut visited = HashSet::new();
+    let mut flow = Vec::new();
+    let mut current = start.clone();
+
+    // Build a map of node -> next node (taking first transition)
+    let mut next_map: HashMap<String, Option<String>> = HashMap::new();
+    for (node_name, node) in &workflow.nodes {
+        let next = node
+            .transitions
+            .first()
+            .map(|t| t.to.clone())
+            .filter(|to| to != node_name); // Skip self-loops
+        next_map.insert(node_name.clone(), next);
+    }
+
+    // Follow the chain from start node
+    flow.push(current.clone());
+    visited.insert(current.clone());
+
+    while let Some(Some(next)) = next_map.get(&current) {
+        if visited.contains(next) {
+            break; // Prevent infinite loops
+        }
+        flow.push(next.clone());
+        visited.insert(next.clone());
+        current = next.clone();
+    }
+
+    flow.join(" → ")
 }
 
 /// List all available guides
