@@ -104,7 +104,7 @@ hegel-cli/
 │   │   └── mod.rs               # AgentAdapter trait, CanonicalHookEvent schema, AdapterRegistry
 │   │
 │   ├── commands/                # Layer 1: User-facing command implementations
-│   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics)
+│   │   ├── mod.rs               # Public exports (start_workflow, next_prompt, show_status, reset_workflow, handle_hook, analyze_metrics, handle_fork)
 │   │   ├── meta.rs              # Meta-mode commands (declare, status, auto-start initial workflow)
 │   │   ├── hook.rs              # Hook event capture (JSON stdin → adapter normalization → hooks.jsonl)
 │   │   ├── astq.rs              # AST-grep wrapper (builds from vendor/, LLM-friendly feedback on no matches)
@@ -113,6 +113,11 @@ hegel-cli/
 │   │   ├── wrapped.rs           # Generic command wrapper (guardrails evaluation, audit logging, exits on block)
 │   │   ├── init.rs              # Project initialization (greenfield vs retrofit workflow detection)
 │   │   ├── config.rs            # Configuration commands (get, set, list config values)
+│   │   ├── fork/                # External agent orchestration (Phase 2.2)
+│   │   │   ├── mod.rs           # Agent detection, version checking, execution (semver-based compatibility)
+│   │   │   ├── codex.rs         # Codex agent implementation (codex exec, passthrough args)
+│   │   │   ├── gemini.rs        # Gemini agent implementation (positional args, -o json support)
+│   │   │   └── generic.rs       # Generic fallback for unknown agents
 │   │   ├── workflow/            # Workflow orchestration
 │   │   │   ├── mod.rs           # Command handlers (start, next, status, reset, abort, repeat, restart)
 │   │   │   ├── claims.rs        # ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
