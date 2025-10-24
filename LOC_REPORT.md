@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 13:14
+**Last Updated**: 2025-10-24 13:30
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,881 | 6,232 | 18,113 |
+| **Lines** | 11,881 | 6,249 | 18,130 |
 | **Comments** | 1,652 | - | 1,652 |
 | **Blank Lines** | 2,195 | - | 2,195 |
-| **Total Lines** | 15,728 | 6,232 | 21,960 |
+| **Total Lines** | 15,728 | 6,249 | 21,977 |
 | **Files** | 69 | 30 | 99 |
 
-**Documentation Ratio**: 0.52 lines of docs per line of code
+**Documentation Ratio**: 0.53 lines of docs per line of code
 
 ---
 
@@ -117,7 +117,7 @@ SUM:                            69           2195           1652          11881
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
 | `CLAUDE.md` | 149 |
-| `CODE_MAP.md` | 210 |
+| `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 172 |
 | `DEP_REVIEW.md` | 678 |
@@ -140,9 +140,9 @@ SUM:                            69           2195           1652          11881
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 167 |
+| `LOC_REPORT.md` | 170 |
 | `README.md` | 556 |
-| `ROADMAP.md` | 183 |
+| `ROADMAP.md` | 192 |
 | `TESTING.md` | 41 |
 
 ---
@@ -151,7 +151,7 @@ SUM:                            69           2195           1652          11881
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

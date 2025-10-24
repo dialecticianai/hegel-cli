@@ -43,7 +43,7 @@ const KNOWN_AGENTS: &[AgentMetadata] = &[
         name: "codex",
         description: "OpenAI Codex CLI",
         fallback_paths: &[],
-        runtime: AgentRuntime::NodeJs { min_version: None },
+        runtime: AgentRuntime::Native,
     },
     AgentMetadata {
         name: "gemini",
