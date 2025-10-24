@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 12:51
+**Last Updated**: 2025-10-24 13:00
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,583 | 6,226 | 17,809 |
-| **Comments** | 1,589 | - | 1,589 |
-| **Blank Lines** | 2,131 | - | 2,131 |
-| **Total Lines** | 15,303 | 6,226 | 21,529 |
+| **Lines** | 11,744 | 6,226 | 17,970 |
+| **Comments** | 1,615 | - | 1,615 |
+| **Blank Lines** | 2,159 | - | 2,159 |
+| **Total Lines** | 15,518 | 6,226 | 21,744 |
 | **Files** | 66 | 30 | 96 |
 
-**Documentation Ratio**: 0.54 lines of docs per line of code
+**Documentation Ratio**: 0.53 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            66           2131           1589          11583
+Rust                            66           2159           1615          11744
 -------------------------------------------------------------------------------
-SUM:                            66           2131           1589          11583
+SUM:                            66           2159           1615          11744
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                            66           2131           1589          11583
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/fork.rs` | 243 | 198 | 45 | 18.5% | ✅ |
+| `commands/fork.rs` | 458 | 362 | 96 | 21.0% | ⚠️ Large |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
@@ -103,7 +103,7 @@ SUM:                            66           2131           1589          11583
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 3 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -148,7 +148,7 @@ SUM:                            66           2131           1589          11583
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.54 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 /// Agent metadata: (name, description, fallback_paths, runtime)
@@ -96,6 +96,146 @@ fn expand_tilde(path: &str) -> Option<String> {
     Some(path.to_string())
 }
 
+/// Parse version string (e.g., "v18.20.8" or "18.20.8") into (major, minor, patch)
+fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
+    let version = version.trim().trim_start_matches('v');
+    let parts: Vec<&str> = version.split('.').collect();
+    if parts.len() < 2 {
+        return None;
+    }
+
+    let major = parts[0].parse().ok()?;
+    let minor = parts[1].parse().ok()?;
+    let patch = if parts.len() > 2 {
+        parts[2].parse().ok()?
+    } else {
+        0
+    };
+
+    Some((major, minor, patch))
+}
+
+/// Compare two versions, returns true if actual >= required
+fn version_satisfies(actual: (u32, u32, u32), required: (u32, u32, u32)) -> bool {
+    if actual.0 != required.0 {
+        return actual.0 > required.0;
+    }
+    if actual.1 != required.1 {
+        return actual.1 > required.1;
+    }
+    actual.2 >= required.2
+}
+
+/// Get current node version by running `node --version`
+fn get_current_node_version() -> Option<String> {
+    let output = Command::new("node").arg("--version").output().ok()?;
+
+    if output.status.success() {
+        Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    } else {
+        None
+    }
+}
+
+/// Find compatible Node.js version in nvm directory
+fn find_nvm_compatible_version(min_version: &str) -> Option<PathBuf> {
+    let required = parse_version(min_version)?;
+
+    // Check if nvm directory exists
+    let nvm_dir = expand_tilde("~/.nvm/versions/node")?;
+    let nvm_path = Path::new(&nvm_dir);
+
+    if !nvm_path.exists() {
+        return None;
+    }
+
+    // Read all installed versions
+    let entries = std::fs::read_dir(nvm_path).ok()?;
+
+    let mut compatible_versions = Vec::new();
+    for entry in entries.flatten() {
+        let version_name = entry.file_name().to_string_lossy().to_string();
+        if let Some(actual) = parse_version(&version_name) {
+            if version_satisfies(actual, required) {
+                compatible_versions.push((actual, entry.path()));
+            }
+        }
+    }
+
+    // Sort by version (descending) and return the highest compatible version
+    compatible_versions.sort_by(|a, b| {
+        b.0 .0
+            .cmp(&a.0 .0)
+            .then_with(|| b.0 .1.cmp(&a.0 .1))
+            .then_with(|| b.0 .2.cmp(&a.0 .2))
+    });
+
+    compatible_versions
+        .first()
+        .map(|(_, path)| path.join("bin"))
+}
+
+/// Check if runtime requirements are satisfied
+fn check_runtime_compatibility(runtime: &AgentRuntime) -> RuntimeCompatibility {
+    match runtime {
+        AgentRuntime::NodeJs { min_version } => {
+            if let Some(min_ver) = min_version {
+                // Check current node version
+                if let Some(current) = get_current_node_version() {
+                    let current_parsed = parse_version(&current);
+                    let required_parsed = parse_version(min_ver);
+
+                    if let (Some(curr), Some(req)) = (current_parsed, required_parsed) {
+                        if version_satisfies(curr, req) {
+                            return RuntimeCompatibility::Compatible(current);
+                        }
+                    }
+                }
+
+                // Current version too low or not found, check nvm
+                if let Some(nvm_bin) = find_nvm_compatible_version(min_ver) {
+                    return RuntimeCompatibility::NvmAvailable(nvm_bin);
+                }
+
+                // No compatible version found
+                return RuntimeCompatibility::Incompatible(format!(
+                    "Node.js >= {} required",
+                    min_ver
+                ));
+            }
+
+            // No min version specified, just check if node exists
+            if get_current_node_version().is_some() {
+                RuntimeCompatibility::Compatible("available".to_string())
+            } else {
+                RuntimeCompatibility::Incompatible("Node.js required".to_string())
+            }
+        }
+        AgentRuntime::Python { min_version } => {
+            // TODO: Similar logic for Python
+            if min_version.is_some() {
+                RuntimeCompatibility::Unknown
+            } else {
+                RuntimeCompatibility::Unknown
+            }
+        }
+        AgentRuntime::Native => RuntimeCompatibility::Compatible("native".to_string()),
+    }
+}
+
+/// Runtime compatibility status
+#[derive(Debug)]
+enum RuntimeCompatibility {
+    /// Runtime requirements satisfied with current PATH
+    Compatible(String),
+    /// Compatible version available via nvm
+    NvmAvailable(PathBuf),
+    /// Requirements not satisfied
+    Incompatible(String),
+    /// Unable to determine
+    Unknown,
+}
+
 /// Detect installed agent CLIs using `which` command and fallback locations
 pub fn detect_agents() -> Result<Vec<Agent>> {
     let mut agents = Vec::new();
@@ -153,11 +293,35 @@ pub fn display_agents(agents: &[Agent]) {
             println!("  ✓ {} - {}", agent.name, agent.description);
             println!("    Path: {}", agent.path);
 
-            // Show runtime requirements
+            // Show runtime requirements and compatibility
             match &agent.runtime {
                 AgentRuntime::NodeJs { min_version } => {
                     if let Some(version) = min_version {
                         println!("    Runtime: Node.js >= {}", version);
+
+                        // Check compatibility
+                        match check_runtime_compatibility(&agent.runtime) {
+                            RuntimeCompatibility::Compatible(current) => {
+                                println!("    Status: ✓ Compatible (using {})", current);
+                            }
+                            RuntimeCompatibility::NvmAvailable(nvm_path) => {
+                                println!(
+                                    "    Status: ⚠ Current node version too low. Compatible version found at:"
+                                );
+                                println!("            {}", nvm_path.display());
+                                println!(
+                                    "            Run: export PATH={}:$PATH",
+                                    nvm_path.display()
+                                );
+                            }
+                            RuntimeCompatibility::Incompatible(msg) => {
+                                println!("    Status: ✗ {}", msg);
+                                println!("            Install Node.js {} or higher", version);
+                            }
+                            RuntimeCompatibility::Unknown => {
+                                println!("    Status: ? Unable to determine compatibility");
+                            }
+                        }
                     } else {
                         println!("    Runtime: Node.js");
                     }
@@ -239,5 +403,56 @@ mod tests {
         // Verify handle_fork doesn't crash
         let result = handle_fork();
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_parse_version() {
+        assert_eq!(parse_version("18.20.8"), Some((18, 20, 8)));
+        assert_eq!(parse_version("v18.20.8"), Some((18, 20, 8)));
+        assert_eq!(parse_version("20.0.0"), Some((20, 0, 0)));
+        assert_eq!(parse_version("v20.0.0"), Some((20, 0, 0)));
+        assert_eq!(parse_version("3.8"), Some((3, 8, 0)));
+        assert_eq!(parse_version("invalid"), None);
+    }
+
+    #[test]
+    fn test_version_satisfies() {
+        // Exact match
+        assert!(version_satisfies((18, 20, 8), (18, 20, 8)));
+
+        // Higher major
+        assert!(version_satisfies((20, 0, 0), (18, 20, 8)));
+        assert!(!version_satisfies((18, 20, 8), (20, 0, 0)));
+
+        // Same major, higher minor
+        assert!(version_satisfies((18, 21, 0), (18, 20, 8)));
+        assert!(!version_satisfies((18, 19, 0), (18, 20, 8)));
+
+        // Same major/minor, higher patch
+        assert!(version_satisfies((18, 20, 9), (18, 20, 8)));
+        assert!(!version_satisfies((18, 20, 7), (18, 20, 8)));
+
+        // Edge cases
+        assert!(version_satisfies((20, 0, 0), (20, 0, 0)));
+        assert!(version_satisfies((22, 20, 0), (20, 0, 0)));
+    }
+
+    #[test]
+    fn test_runtime_compatibility_check() {
+        // Test NodeJs with no min version
+        let runtime = AgentRuntime::NodeJs { min_version: None };
+        let compat = check_runtime_compatibility(&runtime);
+        match compat {
+            RuntimeCompatibility::Compatible(_) => {}
+            RuntimeCompatibility::Incompatible(_) => {}
+            _ => panic!("Expected Compatible or Incompatible"),
+        }
+
+        // Test Native runtime (always compatible)
+        let runtime = AgentRuntime::Native;
+        match check_runtime_compatibility(&runtime) {
+            RuntimeCompatibility::Compatible(s) => assert_eq!(s, "native"),
+            _ => panic!("Expected Native to be compatible"),
+        }
     }
 }

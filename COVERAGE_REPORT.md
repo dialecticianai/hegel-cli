@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-24 12:51
+**Last Updated**: 2025-10-24 13:00
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.51%** lines | **90.43%** regions | **88.87%** functions
+**Overall Coverage**: **91.37%** lines | **90.37%** regions | **88.92%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14089              1348    90.43%         764                85    88.87%        8454               718    91.51%           0                 0         -
+TOTAL                                  14333              1380    90.37%         776                86    88.92%        8594               742    91.37%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -23,7 +23,7 @@ TOTAL                                  14089              1348    90.43%        
 | `commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
 | `commands/astq.rs` | 38.57% | 35.71% | 60.00% | 🔴 Needs Work |
 | `commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
-| `commands/fork.rs` | 82.57% | 89.26% | 100.00% | 🟡 Good |
+| `commands/fork.rs` | 82.73% | 87.79% | 95.00% | 🟡 Good |
 | `commands/git.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
@@ -114,7 +114,7 @@ TOTAL                                  14089              1348    90.43%        
 - `tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `commands/fork.rs` - 82.57%
+- `commands/fork.rs` - 82.73%
 - `commands/hooks_setup.rs` - 86.11%
 - `commands/init.rs` - 86.21%
 - `commands/meta.rs` - 80.75%
@@ -139,7 +139,7 @@ TOTAL                                  14089              1348    90.43%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 91.51% | ✅ Met |
+| Overall | ≥80% | 91.37% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
