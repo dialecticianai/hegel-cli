@@ -49,6 +49,9 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
 
     let mut unified = UnifiedMetrics::default();
 
+    // Read archived workflows first
+    let archives = crate::storage::archive::read_archives(state_dir)?;
+
     // Parse hooks if available
     let mut transcript_path_opt: Option<String> = None;
     if hooks_path.exists() {
@@ -103,12 +106,62 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
         unified.state_transitions = parse_states_file(&states_path)?;
     }
 
-    // Build phase metrics from state transitions
-    unified.phase_metrics = build_phase_metrics(
+    // Build phase metrics from state transitions (live workflow)
+    let live_phase_metrics = build_phase_metrics(
         &unified.state_transitions,
         &unified.hook_metrics,
         transcript_path_opt.as_deref(),
     )?;
+
+    // Merge archived phase metrics with live phase metrics
+    let mut all_phase_metrics = Vec::new();
+
+    // Add archived phases first (chronologically older)
+    for archive in &archives {
+        for phase_archive in &archive.phases {
+            // Convert archive phase to PhaseMetrics
+            let phase = PhaseMetrics {
+                phase_name: phase_archive.phase_name.clone(),
+                start_time: phase_archive.start_time.clone(),
+                end_time: phase_archive.end_time.clone(),
+                duration_seconds: phase_archive.duration_seconds,
+                token_metrics: TokenMetrics {
+                    total_input_tokens: phase_archive.tokens.input,
+                    total_output_tokens: phase_archive.tokens.output,
+                    total_cache_creation_tokens: phase_archive.tokens.cache_creation,
+                    total_cache_read_tokens: phase_archive.tokens.cache_read,
+                    assistant_turns: phase_archive.tokens.assistant_turns,
+                },
+                bash_commands: vec![], // Archived as summaries, not individual commands
+                file_modifications: vec![], // Archived as summaries, not individual modifications
+            };
+            all_phase_metrics.push(phase);
+        }
+
+        // Add archived transitions
+        for transition_archive in &archive.transitions {
+            unified.state_transitions.push(StateTransitionEvent {
+                timestamp: transition_archive.timestamp.clone(),
+                workflow_id: Some(archive.workflow_id.clone()),
+                from_node: transition_archive.from_node.clone(),
+                to_node: transition_archive.to_node.clone(),
+                phase: transition_archive.to_node.clone(), // Phase is same as to_node
+                mode: archive.mode.clone(),
+            });
+        }
+
+        // Aggregate tokens from archive totals
+        unified.token_metrics.total_input_tokens += archive.totals.tokens.input;
+        unified.token_metrics.total_output_tokens += archive.totals.tokens.output;
+        unified.token_metrics.total_cache_creation_tokens += archive.totals.tokens.cache_creation;
+        unified.token_metrics.total_cache_read_tokens += archive.totals.tokens.cache_read;
+        unified.token_metrics.assistant_turns += archive.totals.tokens.assistant_turns;
+    }
+
+    // Add live phases
+    all_phase_metrics.extend(live_phase_metrics);
+
+    unified.phase_metrics = all_phase_metrics;
 
     Ok(unified)
 }
@@ -329,5 +382,224 @@ mod tests {
         assert_eq!(metrics.token_metrics.total_input_tokens, 500);
         assert_eq!(metrics.token_metrics.total_output_tokens, 250);
         assert_eq!(metrics.token_metrics.assistant_turns, 1);
+    }
+
+    #[test]
+    fn test_parse_metrics_with_archives() {
+        use crate::storage::archive::{
+            write_archive, PhaseArchive, TokenTotals, TransitionArchive, WorkflowArchive,
+            WorkflowTotals,
+        };
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create an archived workflow
+        let archive = WorkflowArchive {
+            workflow_id: "2025-10-24T10:00:00Z".to_string(),
+            mode: "discovery".to_string(),
+            completed_at: "2025-10-24T12:00:00Z".to_string(),
+            session_id: Some("archived-session".to_string()),
+            phases: vec![PhaseArchive {
+                phase_name: "spec".to_string(),
+                start_time: "2025-10-24T10:00:00Z".to_string(),
+                end_time: Some("2025-10-24T10:15:00Z".to_string()),
+                duration_seconds: 900,
+                tokens: TokenTotals {
+                    input: 1000,
+                    output: 500,
+                    cache_creation: 200,
+                    cache_read: 300,
+                    assistant_turns: 5,
+                },
+                bash_commands: vec![],
+                file_modifications: vec![],
+            }],
+            transitions: vec![TransitionArchive {
+                from_node: "START".to_string(),
+                to_node: "spec".to_string(),
+                timestamp: "2025-10-24T10:00:00Z".to_string(),
+            }],
+            totals: WorkflowTotals {
+                tokens: TokenTotals {
+                    input: 1000,
+                    output: 500,
+                    cache_creation: 200,
+                    cache_read: 300,
+                    assistant_turns: 5,
+                },
+                bash_commands: 0,
+                file_modifications: 0,
+                unique_files: 0,
+                unique_commands: 0,
+            },
+        };
+
+        write_archive(&archive, temp_dir.path()).unwrap();
+
+        // Parse metrics - should include archived workflow
+        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+
+        // Verify archived phase included
+        assert_eq!(metrics.phase_metrics.len(), 1);
+        assert_eq!(metrics.phase_metrics[0].phase_name, "spec");
+        assert_eq!(
+            metrics.phase_metrics[0].token_metrics.total_input_tokens,
+            1000
+        );
+
+        // Verify archived tokens aggregated
+        assert_eq!(metrics.token_metrics.total_input_tokens, 1000);
+        assert_eq!(metrics.token_metrics.total_output_tokens, 500);
+
+        // Verify archived transitions included
+        assert_eq!(metrics.state_transitions.len(), 1);
+        assert_eq!(metrics.state_transitions[0].from_node, "START");
+    }
+
+    #[test]
+    fn test_parse_metrics_with_multiple_archives() {
+        use crate::storage::archive::{
+            write_archive, PhaseArchive, TokenTotals, TransitionArchive, WorkflowArchive,
+            WorkflowTotals,
+        };
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create 2 archived workflows
+        for (i, workflow_id) in ["2025-10-24T10:00:00Z", "2025-10-24T14:00:00Z"]
+            .iter()
+            .enumerate()
+        {
+            let archive = WorkflowArchive {
+                workflow_id: workflow_id.to_string(),
+                mode: "discovery".to_string(),
+                completed_at: format!("2025-10-24T{}:00:00Z", 12 + i * 4),
+                session_id: None,
+                phases: vec![PhaseArchive {
+                    phase_name: "spec".to_string(),
+                    start_time: workflow_id.to_string(),
+                    end_time: Some(format!("2025-10-24T{}:15:00Z", 10 + i * 4)),
+                    duration_seconds: 900,
+                    tokens: TokenTotals {
+                        input: 1000,
+                        output: 500,
+                        cache_creation: 0,
+                        cache_read: 0,
+                        assistant_turns: 5,
+                    },
+                    bash_commands: vec![],
+                    file_modifications: vec![],
+                }],
+                transitions: vec![TransitionArchive {
+                    from_node: "START".to_string(),
+                    to_node: "spec".to_string(),
+                    timestamp: workflow_id.to_string(),
+                }],
+                totals: WorkflowTotals {
+                    tokens: TokenTotals {
+                        input: 1000,
+                        output: 500,
+                        cache_creation: 0,
+                        cache_read: 0,
+                        assistant_turns: 5,
+                    },
+                    bash_commands: 0,
+                    file_modifications: 0,
+                    unique_files: 0,
+                    unique_commands: 0,
+                },
+            };
+
+            write_archive(&archive, temp_dir.path()).unwrap();
+        }
+
+        // Parse metrics - should aggregate both archives
+        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+
+        // Verify both phases included
+        assert_eq!(metrics.phase_metrics.len(), 2);
+
+        // Verify tokens aggregated across both workflows
+        assert_eq!(metrics.token_metrics.total_input_tokens, 2000); // 1000 * 2
+        assert_eq!(metrics.token_metrics.total_output_tokens, 1000); // 500 * 2
+        assert_eq!(metrics.token_metrics.assistant_turns, 10); // 5 * 2
+
+        // Verify all transitions included
+        assert_eq!(metrics.state_transitions.len(), 2);
+    }
+
+    #[test]
+    fn test_parse_metrics_with_archive_and_live() {
+        use crate::storage::archive::{
+            write_archive, PhaseArchive, TokenTotals, TransitionArchive, WorkflowArchive,
+            WorkflowTotals,
+        };
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create archived workflow
+        let archive = WorkflowArchive {
+            workflow_id: "2025-10-24T10:00:00Z".to_string(),
+            mode: "discovery".to_string(),
+            completed_at: "2025-10-24T12:00:00Z".to_string(),
+            session_id: None,
+            phases: vec![PhaseArchive {
+                phase_name: "spec".to_string(),
+                start_time: "2025-10-24T10:00:00Z".to_string(),
+                end_time: Some("2025-10-24T10:15:00Z".to_string()),
+                duration_seconds: 900,
+                tokens: TokenTotals {
+                    input: 1000,
+                    output: 500,
+                    cache_creation: 0,
+                    cache_read: 0,
+                    assistant_turns: 5,
+                },
+                bash_commands: vec![],
+                file_modifications: vec![],
+            }],
+            transitions: vec![TransitionArchive {
+                from_node: "START".to_string(),
+                to_node: "spec".to_string(),
+                timestamp: "2025-10-24T10:00:00Z".to_string(),
+            }],
+            totals: WorkflowTotals {
+                tokens: TokenTotals {
+                    input: 1000,
+                    output: 500,
+                    cache_creation: 0,
+                    cache_read: 0,
+                    assistant_turns: 5,
+                },
+                bash_commands: 0,
+                file_modifications: 0,
+                unique_files: 0,
+                unique_commands: 0,
+            },
+        };
+
+        write_archive(&archive, temp_dir.path()).unwrap();
+
+        // Create live workflow state
+        let states = vec![
+            r#"{"timestamp":"2025-10-24T14:00:00Z","workflow_id":"2025-10-24T14:00:00Z","from_node":"START","to_node":"plan","phase":"plan","mode":"execution"}"#,
+        ];
+        let (_states_temp, states_path) = create_states_file(&states);
+        std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
+
+        // Parse metrics - should include archived + live
+        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+
+        // Verify both phases included (1 archived + 1 live)
+        assert_eq!(metrics.phase_metrics.len(), 2);
+        assert_eq!(metrics.phase_metrics[0].phase_name, "spec"); // Archived
+        assert_eq!(metrics.phase_metrics[1].phase_name, "plan"); // Live
+
+        // Verify archived tokens included in total
+        assert_eq!(metrics.token_metrics.total_input_tokens, 1000);
+        assert_eq!(metrics.token_metrics.assistant_turns, 5);
+
+        // Verify both transitions included
+        assert_eq!(metrics.state_transitions.len(), 2);
     }
 }

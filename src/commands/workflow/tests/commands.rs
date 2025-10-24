@@ -218,11 +218,21 @@ fn test_next_prompt_logs_state_transition() {
 
 #[test]
 fn test_next_prompt_logs_multiple_transitions() {
+    use crate::storage::archive::read_archives;
+
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next(&storage);
-    next(&storage);
-    assert_eq!(transition_count(&storage), 2);
+    next(&storage); // spec -> plan (transition 1)
+
+    // Before archiving, check 1 transition
+    assert_eq!(transition_count(&storage), 1);
+
+    next(&storage); // plan -> done (transition 2, triggers archiving)
+
+    // After archiving, transitions should be in archive, not live log
+    let archives = read_archives(storage.state_dir()).unwrap();
+    assert_eq!(archives.len(), 1);
+    assert_eq!(archives[0].transitions.len(), 2); // Both transitions archived
 }
 
 #[test]

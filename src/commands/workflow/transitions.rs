@@ -1,9 +1,12 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::collections::HashMap;
+use std::fs;
 
 use crate::engine::get_next_prompt;
 use crate::metamodes::evaluate_workflow_completion;
+use crate::metrics::parse_unified_metrics;
+use crate::storage::archive::{write_archive, WorkflowArchive};
 use crate::storage::{FileStorage, State};
 use crate::theme::Theme;
 
@@ -114,6 +117,52 @@ pub fn evaluate_transition(
     })
 }
 
+/// Archive completed workflow and delete raw logs
+fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
+    let state_dir = storage.state_dir();
+
+    // Parse current metrics
+    let metrics = parse_unified_metrics(state_dir)?;
+
+    // Get workflow_id from state
+    let state = storage.load()?;
+    let workflow_id = state
+        .workflow_state
+        .and_then(|ws| ws.workflow_id)
+        .context("No workflow_id for archiving")?;
+
+    // Get completed_at timestamp (current time)
+    let completed_at = chrono::Utc::now().to_rfc3339();
+
+    // Create archive from metrics
+    let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id)?;
+    archive.completed_at = completed_at;
+
+    // Write archive
+    write_archive(&archive, state_dir)?;
+
+    // Delete logs on success
+    let hooks_path = state_dir.join("hooks.jsonl");
+    let states_path = state_dir.join("states.jsonl");
+
+    if hooks_path.exists() {
+        fs::remove_file(&hooks_path)
+            .with_context(|| format!("Failed to delete hooks.jsonl: {:?}", hooks_path))?;
+    }
+
+    if states_path.exists() {
+        fs::remove_file(&states_path)
+            .with_context(|| format!("Failed to delete states.jsonl: {:?}", states_path))?;
+    }
+
+    println!(
+        "{}",
+        Theme::success("✓ Workflow archived and logs cleaned up")
+    );
+
+    Ok(())
+}
+
 /// Execute a transition outcome, performing all necessary side effects
 pub fn execute_transition(
     outcome: TransitionOutcome,
@@ -164,6 +213,14 @@ pub fn execute_transition(
                 &context.workflow_state.mode,
                 context.workflow_state.workflow_id.as_deref(),
             )?;
+
+            // Archive workflow if transitioning to done
+            if to_node == "done" {
+                if let Err(e) = archive_and_cleanup(storage) {
+                    eprintln!("{} {}", Theme::error("Warning: archiving failed:"), e);
+                    eprintln!("Workflow logs preserved for manual inspection.");
+                }
+            }
 
             // Display transition
             println!(

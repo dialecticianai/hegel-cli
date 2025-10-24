@@ -66,6 +66,8 @@ enum Commands {
     },
     /// Analyze captured metrics (hooks, transcripts, states)
     Analyze,
+    /// Archive workflow logs and metrics
+    Archive(commands::archive::ArchiveArgs),
     /// Interactive TUI dashboard (real-time metrics)
     Top,
     /// AST-based code search and transformation (wraps ast-grep)
@@ -227,6 +229,9 @@ fn main() -> Result<()> {
         }
         Commands::Analyze => {
             commands::analyze_metrics(&storage)?;
+        }
+        Commands::Archive(args) => {
+            commands::archive(args, &storage)?;
         }
         Commands::Top => {
             tui::run_tui(storage.state_dir())?;

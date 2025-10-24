@@ -1,3 +1,5 @@
+pub mod archive;
+
 use anyhow::{Context, Result};
 use fs2::FileExt;
 use serde::{Deserialize, Serialize};

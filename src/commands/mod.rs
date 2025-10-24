@@ -1,4 +1,5 @@
 mod analyze;
+pub mod archive;
 mod astq;
 mod config;
 mod git;
@@ -12,6 +13,7 @@ mod wrapped;
 
 // Re-export public functions
 pub use analyze::analyze_metrics;
+pub use archive::archive;
 pub use astq::run_astq;
 pub use config::handle_config;
 pub use hook::handle_hook;
