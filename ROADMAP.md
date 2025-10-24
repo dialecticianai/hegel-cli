@@ -45,13 +45,6 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 - `AdapterRegistry::get()` - Get adapter by name for explicit selection
 **Use case:** Route hook events to different adapters based on agent type
 
-### Resource Introspection
-**Files:** `src/embedded.rs`
-- `list_workflows()` - List embedded workflow definitions
-- `list_guides()` - List embedded guide documents
-**Use case:** Validation, debugging, and discovery of embedded resources
-
-
 ### Workflow Visualization
 **Files:** `src/metrics/graph.rs`
 - `WorkflowDAG::export_dot()` - Export workflow graphs as Graphviz DOT format

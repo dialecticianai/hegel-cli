@@ -41,6 +41,8 @@ enum Commands {
     },
     /// List available workflows
     Workflows,
+    /// List available guides
+    Guides,
     /// Advance to next phase (implicit: current_complete=true, or provide custom claims)
     Next {
         /// Optional claims as JSON string (e.g., '{"spec_complete": true}')
@@ -195,6 +197,9 @@ fn main() -> Result<()> {
         }
         Commands::Workflows => {
             commands::list_workflows(&storage)?;
+        }
+        Commands::Guides => {
+            commands::list_guides(&storage)?;
         }
         Commands::Next { claims } => {
             commands::next_prompt(claims.as_deref(), &storage)?;

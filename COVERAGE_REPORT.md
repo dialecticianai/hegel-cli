@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 22:22
+**Last Updated**: 2025-10-23 22:30
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.60%** lines | **91.75%** regions | **89.33%** functions
+**Overall Coverage**: **91.98%** lines | **91.05%** regions | **88.84%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13187              1088    91.75%         731                78    89.33%        7744               573    92.60%           0                 0         -
+TOTAL                                  13289              1190    91.05%         735                82    88.84%        7796               625    91.98%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -29,7 +29,7 @@ TOTAL                                  13187              1088    91.75%        
 | `commands/reflect.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `commands/workflow/mod.rs` | 69.19% | 69.18% | 58.82% | 🟠 Moderate |
+| `commands/workflow/mod.rs` | 53.36% | 52.23% | 47.62% | 🟠 Moderate |
 | `commands/workflow/tests.rs` | 92.26% | 92.02% | 92.31% | 🟢 Excellent |
 | `commands/workflow/transitions.rs` | 95.06% | 92.86% | 60.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
@@ -39,7 +39,7 @@ TOTAL                                  13187              1088    91.75%        
 | `engine/template.rs` | 97.25% | 96.87% | 97.56% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `main.rs` | 45.65% | 39.09% | 100.00% | 🟠 Moderate |
+| `main.rs` | 44.68% | 38.05% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
@@ -121,8 +121,8 @@ TOTAL                                  13187              1088    91.75%        
 
 ### 🟠 Moderate (40-69% lines)
 - `adapters/mod.rs` - 60.71%
-- `commands/workflow/mod.rs` - 69.19%
-- `main.rs` - 45.65%
+- `commands/workflow/mod.rs` - 53.36%
+- `main.rs` - 44.68%
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 0.00%
@@ -133,7 +133,7 @@ TOTAL                                  13187              1088    91.75%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.60% | ✅ Met |
+| Overall | ≥80% | 91.98% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

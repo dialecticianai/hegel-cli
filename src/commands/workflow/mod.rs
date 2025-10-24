@@ -239,28 +239,99 @@ pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
 
 /// List all available workflows
 pub fn list_workflows(storage: &FileStorage) -> Result<()> {
+    use std::collections::HashSet;
     use std::fs;
 
-    let workflows_dir = storage.workflows_dir();
-    let entries = fs::read_dir(&workflows_dir)
-        .with_context(|| format!("Failed to read workflows directory: {}", workflows_dir))?;
+    // Get embedded workflows
+    let embedded: HashSet<String> = crate::embedded::list_workflows()
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
 
-    let mut workflows = Vec::new();
-    for entry in entries {
-        let entry = entry?;
-        let path = entry.path();
-        if path.extension().and_then(|s| s.to_str()) == Some("yaml") {
-            if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
-                workflows.push(name.to_string());
+    // Get filesystem workflows
+    let workflows_dir = storage.workflows_dir();
+    let mut filesystem = HashSet::new();
+
+    if let Ok(entries) = fs::read_dir(&workflows_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|s| s.to_str()) == Some("yaml") {
+                if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
+                    filesystem.insert(name.to_string());
+                }
             }
         }
     }
 
-    workflows.sort();
+    // Combine and sort
+    let mut all_workflows: Vec<String> = embedded.union(&filesystem).cloned().collect();
+    all_workflows.sort();
 
     println!("Available workflows:");
-    for workflow in workflows {
-        println!("  {}", workflow);
+    for workflow in &all_workflows {
+        let mut markers = Vec::new();
+        if embedded.contains(workflow) {
+            markers.push("embedded");
+        }
+        if filesystem.contains(workflow) {
+            markers.push("local");
+        }
+
+        if markers.is_empty() {
+            println!("  {}", workflow);
+        } else {
+            println!("  {} ({})", workflow, markers.join(", "));
+        }
+    }
+
+    Ok(())
+}
+
+/// List all available guides
+pub fn list_guides(storage: &FileStorage) -> Result<()> {
+    use std::collections::HashSet;
+    use std::fs;
+
+    // Get embedded guides
+    let embedded: HashSet<String> = crate::embedded::list_guides()
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+
+    // Get filesystem guides
+    let guides_dir = storage.guides_dir();
+    let mut filesystem = HashSet::new();
+
+    if let Ok(entries) = fs::read_dir(&guides_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|s| s.to_str()) == Some("md") {
+                if let Some(name) = path.file_name().and_then(|s| s.to_str()) {
+                    filesystem.insert(name.to_string());
+                }
+            }
+        }
+    }
+
+    // Combine and sort
+    let mut all_guides: Vec<String> = embedded.union(&filesystem).cloned().collect();
+    all_guides.sort();
+
+    println!("Available guides:");
+    for guide in &all_guides {
+        let mut markers = Vec::new();
+        if embedded.contains(guide) {
+            markers.push("embedded");
+        }
+        if filesystem.contains(guide) {
+            markers.push("local");
+        }
+
+        if markers.is_empty() {
+            println!("  {}", guide);
+        } else {
+            println!("  {} ({})", guide, markers.join(", "));
+        }
     }
 
     Ok(())
