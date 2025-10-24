@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 22:30
+**Last Updated**: 2025-10-23 22:51
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **91.98%** lines | **91.05%** regions | **88.84%** functions
+**Overall Coverage**: **91.98%** lines | **91.05%** regions | **88.81%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13289              1190    91.05%         735                82    88.84%        7796               625    91.98%           0                 0         -
+TOTAL                                  13290              1190    91.05%         733                82    88.81%        7797               625    91.98%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -35,8 +35,8 @@ TOTAL                                  13289              1190    91.05%        
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `embedded.rs` | 79.22% | 63.64% | 50.00% | 🟡 Good |
-| `engine/mod.rs` | 99.82% | 99.60% | 97.22% | 🟢 Excellent |
-| `engine/template.rs` | 97.25% | 96.87% | 97.56% | 🟢 Excellent |
+| `engine/mod.rs` | 99.82% | 99.59% | 97.14% | 🟢 Excellent |
+| `engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `main.rs` | 44.68% | 38.05% | 100.00% | 🟠 Moderate |

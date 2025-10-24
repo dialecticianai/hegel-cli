@@ -54,23 +54,25 @@ pub fn load_workflow_from_str(content: &str) -> Result<Workflow> {
     Ok(workflow)
 }
 
-/// Load workflow definition from YAML file (tries embedded first, then filesystem)
+/// Load workflow definition from YAML file (tries filesystem first, then embedded fallback)
+/// This allows users to override embedded workflows with local versions
 pub fn load_workflow<P: AsRef<Path>>(yaml_path: P) -> Result<Workflow> {
     let path = yaml_path.as_ref();
 
     // Extract workflow name from path (e.g., "workflows/discovery.yaml" -> "discovery")
     let workflow_name = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
 
-    // Try embedded workflow first
+    // Try filesystem first (allows user overrides)
+    if let Ok(content) = fs::read_to_string(path) {
+        return load_workflow_from_str(&content);
+    }
+
+    // Fall back to embedded workflow
     if let Some(embedded_content) = crate::embedded::get_workflow(workflow_name) {
         return load_workflow_from_str(embedded_content);
     }
 
-    // Fall back to filesystem
-    let content = fs::read_to_string(path)
-        .with_context(|| format!("Failed to read workflow file: {:?}", path))?;
-
-    load_workflow_from_str(&content)
+    anyhow::bail!("Workflow not found: {}", workflow_name)
 }
 
 /// Initialize workflow state from workflow definition
@@ -271,7 +273,7 @@ mod tests {
         assert!(result
             .unwrap_err()
             .to_string()
-            .contains("Failed to read workflow file"));
+            .contains("Workflow not found"));
     }
 
     #[test]

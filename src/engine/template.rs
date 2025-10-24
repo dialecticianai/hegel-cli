@@ -144,14 +144,14 @@ fn expand_guides(text: &str, guides_dir: &Path) -> Result<String> {
 
         let guide_filename = format!("{}.md", guide_name);
 
-        // Try embedded guide first, then fall back to filesystem
-        let guide_content = if let Some(embedded) = crate::embedded::get_guide(&guide_filename) {
+        // Try filesystem first (allows user overrides), then fall back to embedded
+        let guide_path = guides_dir.join(&guide_filename);
+        let guide_content = if let Ok(content) = fs::read_to_string(&guide_path) {
+            content
+        } else if let Some(embedded) = crate::embedded::get_guide(&guide_filename) {
             embedded.to_string()
         } else {
-            // Fall back to guides_dir (for user overrides or local development)
-            let guide_path = guides_dir.join(&guide_filename);
-            fs::read_to_string(&guide_path)
-                .with_context(|| format!("Failed to load required guide: {}", guide_filename))?
+            anyhow::bail!("Failed to load required guide: {}", guide_filename)
         };
 
         result = result.replace(&format!("{{{{{}}}}}", guide_name), &guide_content);
@@ -294,10 +294,10 @@ mod tests {
             &HashMap::new(),
         )
         .unwrap();
-        // Check mechanism: guide loaded and placeholder replaced (content can change)
+        // Check mechanism: guide loaded and placeholder replaced
         assert!(result.starts_with("Follow this guide:\n\n"));
-        assert!(result.len() > 100); // Guide content was loaded (non-trivial length)
         assert!(!result.contains("{{SPEC_WRITING}}")); // Placeholder was replaced
+        assert!(result.contains("# SPEC Writing Guide")); // Filesystem guide content loaded
     }
 
     #[test]
@@ -323,9 +323,10 @@ mod tests {
         // Check mechanism: both guides loaded, placeholders replaced
         assert!(result.starts_with("Phase 1:\n"));
         assert!(result.contains("\n---\n"));
-        assert!(result.len() > 200); // Both guides loaded
         assert!(!result.contains("{{SPEC_WRITING}}"));
         assert!(!result.contains("{{PLAN_WRITING}}"));
+        assert!(result.contains("# SPEC Writing Guide"));
+        assert!(result.contains("# PLAN Writing Guide"));
     }
 
     // ========== Mixed Placeholder Tests ==========
