@@ -113,28 +113,37 @@ rust:
 - Context: Current workflow phase + relevant guides + specialized libraries
 - Metrics: Log subagent spawns to hooks.jsonl
 
-### 2.2 External Agent Orchestration - Task Delegation
+### 2.2 External Agent Orchestration
 
-**Status:** Detection implemented (`hegel fork`). Task delegation pending.
+**Status:** ✅ Core implementation complete (codex, gemini). Additional agents pending.
 
-**Goal:** Extend `hegel fork` to delegate subtasks to other agent CLIs.
-
-**Syntax:**
+**Implemented:**
 ```bash
-hegel fork --agent=codex 'Implement this specific function'
-hegel fork --agent=gemini 'Research this API and summarize'
+hegel fork                                    # List available agents with compatibility
+hegel fork --agent=codex "Implement X"        # Delegate to codex
+hegel fork --agent=gemini -- -o json "Query"  # Gemini with JSON output
+hegel fork --agent=codex -- --full-auto "Y"   # Codex with auto-approval
 ```
 
-**Features to implement:**
-- Pass subtask prompt to external agent
-- Capture output/results
-- Track forked work in metrics (duration, tokens if available)
-- Optionally merge results back to main workflow
+**Core features:**
+- ✅ Agent detection with version compatibility checking (Node.js, Python)
+- ✅ Automatic nvm integration for correct Node.js version selection
+- ✅ Blocking execution with captured output (agent-to-agent workflow)
+- ✅ Passthrough arguments via `--` separator
+- ✅ Modular agent implementations (codex, gemini, generic fallback)
+
+**Future additions:**
+- Add aider support (Python-based pair programming)
+- Add cody support (Sourcegraph CLI)
+- Add claude support (if non-interactive mode exists)
+- Track execution metrics (duration, tokens if API exposes them)
+- Optional result merging/formatting helpers
+- Parallel agent execution (multiple agents, same task)
 
 **Use cases:**
 - Delegate specific subtasks to specialized agents
-- Parallel work across multiple agents
-- Agent comparison (same task, different agents)
+- Compare agent outputs (same prompt, different agents)
+- Leverage agent-specific features (codex sandbox, gemini web search)
 
 ---
 
