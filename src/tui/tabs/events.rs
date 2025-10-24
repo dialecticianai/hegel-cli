@@ -1,5 +1,5 @@
 use crate::metrics::UnifiedMetrics;
-use crate::tui::utils::{build_timeline, visible_window, EventSource};
+use crate::tui::utils::{build_timeline, scroll_indicators, visible_window, EventSource};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
     text::{Line, Span},
@@ -7,7 +7,11 @@ use ratatui::{
 };
 
 /// Events tab: Recent hook events (scrollable)
-pub fn render_events_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'static> {
+pub fn render_events_tab(
+    metrics: &UnifiedMetrics,
+    scroll: usize,
+    max_scroll: usize,
+) -> List<'static> {
     // Build unified timeline using helper (merges all sources)
     let timeline = build_timeline(metrics);
 
@@ -58,6 +62,9 @@ pub fn render_events_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'stati
         })
         .collect();
 
+    let (up_indicator, down_indicator) = scroll_indicators(scroll, max_scroll);
+    let title = format!(" Event Stream {} {} ", up_indicator, down_indicator);
+
     if items.is_empty() {
         let empty_item = ListItem::new(Line::from(Span::styled(
             "  No events available",
@@ -67,14 +74,14 @@ pub fn render_events_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'stati
             Block::default()
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Cyan))
-                .title(" Event Stream "),
+                .title(title),
         )
     } else {
         List::new(items).block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Cyan))
-                .title(" Event Stream "),
+                .title(title),
         )
     }
 }
@@ -92,7 +99,7 @@ mod tests {
             .with_events(10, 5)
             .build();
 
-        let widget = render_events_tab(&metrics, 0);
+        let widget = render_events_tab(&metrics, 0, 0);
 
         // Verify widget renders
         assert!(format!("{:?}", widget).contains("List"));

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 22:02
+**Last Updated**: 2025-10-23 22:09
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.44%** lines | **91.69%** regions | **89.27%** functions
+**Overall Coverage**: **92.58%** lines | **91.78%** regions | **89.29%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13060              1085    91.69%         727                78    89.27%        7684               581    92.44%           0                 0         -
+TOTAL                                  13096              1076    91.78%         728                78    89.29%        7706               572    92.58%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -42,7 +42,7 @@ TOTAL                                  13060              1085    91.69%        
 | `main.rs` | 45.65% | 39.09% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
-| `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
+| `metrics/graph.rs` | 99.20% | 98.51% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `metrics/mod.rs` | 96.99% | 96.40% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -58,12 +58,12 @@ TOTAL                                  13060              1085    91.69%        
 | `test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `test_helpers/workflow.rs` | 86.11% | 81.55% | 87.50% | 🟡 Good |
 | `theme.rs` | 92.86% | 93.75% | 90.91% | 🟢 Excellent |
-| `tui/app.rs` | 83.83% | 84.44% | 87.50% | 🟡 Good |
+| `tui/app.rs` | 87.66% | 87.90% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `tui/tabs/events.rs` | 88.33% | 83.33% | 100.00% | 🟡 Good |
-| `tui/tabs/files.rs` | 81.63% | 78.72% | 100.00% | 🟡 Good |
+| `tui/tabs/events.rs` | 89.39% | 83.76% | 100.00% | 🟡 Good |
+| `tui/tabs/files.rs` | 83.93% | 80.37% | 100.00% | 🟡 Good |
 | `tui/tabs/overview.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `tui/tabs/phases.rs` | 95.18% | 95.04% | 100.00% | 🟢 Excellent |
+| `tui/tabs/phases.rs` | 95.51% | 95.30% | 100.00% | 🟢 Excellent |
 | `tui/ui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `tui/utils.rs` | 96.60% | 96.92% | 100.00% | 🟢 Excellent |
 
@@ -104,7 +104,7 @@ TOTAL                                  13060              1085    91.69%        
 - `test_helpers/tui.rs` - 100.00%
 - `theme.rs` - 92.86%
 - `tui/tabs/overview.rs` - 100.00%
-- `tui/tabs/phases.rs` - 95.18%
+- `tui/tabs/phases.rs` - 95.51%
 - `tui/ui.rs` - 100.00%
 - `tui/utils.rs` - 96.60%
 
@@ -115,9 +115,9 @@ TOTAL                                  13060              1085    91.69%        
 - `embedded.rs` - 79.22%
 - `test_helpers/fixtures.rs` - 80.00%
 - `test_helpers/workflow.rs` - 86.11%
-- `tui/app.rs` - 83.83%
-- `tui/tabs/events.rs` - 88.33%
-- `tui/tabs/files.rs` - 81.63%
+- `tui/app.rs` - 87.66%
+- `tui/tabs/events.rs` - 89.39%
+- `tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
 - `adapters/mod.rs` - 60.71%
@@ -133,7 +133,7 @@ TOTAL                                  13060              1085    91.69%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.44% | ✅ Met |
+| Overall | ≥80% | 92.58% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -1,4 +1,5 @@
 use crate::metrics::UnifiedMetrics;
+use crate::tui::utils::scroll_indicators;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
     text::{Line, Span},
@@ -6,7 +7,11 @@ use ratatui::{
 };
 
 /// Phases tab: per-phase breakdown with token counts
-pub fn render_phases_tab(metrics: &UnifiedMetrics, scroll: usize) -> Paragraph<'static> {
+pub fn render_phases_tab(
+    metrics: &UnifiedMetrics,
+    scroll: usize,
+    max_scroll: usize,
+) -> Paragraph<'static> {
     let mut lines = vec![];
 
     // Apply scroll to phase list
@@ -93,11 +98,14 @@ pub fn render_phases_tab(metrics: &UnifiedMetrics, scroll: usize) -> Paragraph<'
         )));
     }
 
+    let (up_indicator, down_indicator) = scroll_indicators(scroll, max_scroll);
+    let title = format!(" Phase Metrics {} {} ", up_indicator, down_indicator);
+
     Paragraph::new(lines).block(
         Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(Color::Cyan))
-            .title(" Phase Metrics "),
+            .title(title),
     )
 }
 
@@ -113,7 +121,7 @@ mod tests {
             .with_phases(3)
             .build();
 
-        let widget = render_phases_tab(&metrics, 0);
+        let widget = render_phases_tab(&metrics, 0, 0);
 
         // Verify widget renders
         assert!(format!("{:?}", widget).contains("Paragraph"));
@@ -127,7 +135,7 @@ mod tests {
             .build();
 
         // Render with scroll offset
-        let widget = render_phases_tab(&metrics, 5);
+        let widget = render_phases_tab(&metrics, 5, 10);
 
         // Verify widget renders with scroll applied
         assert!(format!("{:?}", widget).contains("Paragraph"));

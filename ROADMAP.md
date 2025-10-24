@@ -69,9 +69,8 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 
 ### TUI Enhancements
 **Files:** `src/tui/utils.rs`
-- `scroll_indicators()` - Show scroll direction indicators
 - `format_timestamp()` - Format ISO 8601 timestamps to HH:MM:SS
-**Use case:** Investigate why these weren't needed in current TUI implementation
+**Use case:** Timestamps not currently shown in TUI; may be YAGNI or future enhancement
 
 ---
 

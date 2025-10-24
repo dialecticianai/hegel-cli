@@ -67,8 +67,7 @@ pub fn max_scroll(content_height: usize, visible_height: usize) -> usize {
 /// let (top, bottom) = scroll_indicators(0, 10);
 /// assert_eq!((top, bottom), ("·", "↓")); // Can only scroll down
 /// ```
-/// TODO: Investigate why this wasn't used in TUI implementation
-#[allow(dead_code)]
+/// Return scroll direction indicators based on current scroll position
 pub fn scroll_indicators(scroll_offset: usize, max_scroll: usize) -> (&'static str, &'static str) {
     let can_scroll_up = scroll_offset > 0;
     let can_scroll_down = scroll_offset < max_scroll;

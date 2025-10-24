@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 
 /// Meta-mode transition option
 #[derive(Debug, Clone)]

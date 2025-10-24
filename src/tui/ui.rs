@@ -28,19 +28,21 @@ pub fn draw(frame: &mut Frame, app: &AppState) {
     frame.render_widget(render_header(app), header_area);
 
     // Render main content based on selected tab
+    let max_scroll = app.max_scroll();
     match app.selected_tab {
         Tab::Overview => frame.render_widget(render_overview_tab(&app.metrics), main_area),
         Tab::Phases => frame.render_widget(
-            render_phases_tab(&app.metrics, app.scroll_offset),
+            render_phases_tab(&app.metrics, app.scroll_offset, max_scroll),
             main_area,
         ),
         Tab::Events => frame.render_widget(
-            render_events_tab(&app.metrics, app.scroll_offset),
+            render_events_tab(&app.metrics, app.scroll_offset, max_scroll),
             main_area,
         ),
-        Tab::Files => {
-            frame.render_widget(render_files_tab(&app.metrics, app.scroll_offset), main_area)
-        }
+        Tab::Files => frame.render_widget(
+            render_files_tab(&app.metrics, app.scroll_offset, max_scroll),
+            main_area,
+        ),
     }
 
     frame.render_widget(render_footer(), footer_area);

@@ -1,4 +1,5 @@
 use crate::metrics::UnifiedMetrics;
+use crate::tui::utils::scroll_indicators;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
     text::{Line, Span},
@@ -6,10 +7,15 @@ use ratatui::{
 };
 
 /// Files tab: File modification frequency
-pub fn render_files_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'static> {
+pub fn render_files_tab(
+    metrics: &UnifiedMetrics,
+    scroll: usize,
+    max_scroll: usize,
+) -> List<'static> {
     let mut freq = metrics.hook_metrics.file_modification_frequency();
     let mut sorted: Vec<_> = freq.drain().collect();
-    sorted.sort_by(|a, b| b.1.cmp(&a.1)); // Most modified first
+    // Sort by count (desc), then by filename (asc) for stable ordering
+    sorted.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
 
     // Apply scroll
     let items: Vec<ListItem> = sorted
@@ -40,6 +46,9 @@ pub fn render_files_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'static
         })
         .collect();
 
+    let (up_indicator, down_indicator) = scroll_indicators(scroll, max_scroll);
+    let title = format!(" File Modifications {} {} ", up_indicator, down_indicator);
+
     if items.is_empty() {
         let empty_item = ListItem::new(Line::from(Span::styled(
             "  No file modifications",
@@ -49,14 +58,14 @@ pub fn render_files_tab(metrics: &UnifiedMetrics, scroll: usize) -> List<'static
             Block::default()
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Cyan))
-                .title(" File Modifications "),
+                .title(title),
         )
     } else {
         List::new(items).block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Cyan))
-                .title(" File Modifications "),
+                .title(title),
         )
     }
 }
@@ -73,7 +82,7 @@ mod tests {
             .with_events(0, 5)
             .build();
 
-        let widget = render_files_tab(&metrics, 0);
+        let widget = render_files_tab(&metrics, 0, 0);
 
         // Verify widget renders
         assert!(format!("{:?}", widget).contains("List"));
