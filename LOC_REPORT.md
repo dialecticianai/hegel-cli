@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:34
+**Last Updated**: 2025-10-23 23:36
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 10,279 | 5,281 | 15,560 |
-| **Comments** | 1,426 | - | 1,426 |
-| **Blank Lines** | 1,885 | - | 1,885 |
-| **Total Lines** | 13,590 | 5,281 | 18,871 |
+| **Lines** | 10,358 | 5,281 | 15,639 |
+| **Comments** | 1,428 | - | 1,428 |
+| **Blank Lines** | 1,903 | - | 1,903 |
+| **Total Lines** | 13,689 | 5,281 | 18,970 |
 | **Files** | 58 | 28 | 86 |
 
 **Documentation Ratio**: 0.51 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            58           1885           1426          10279
+Rust                            58           1903           1428          10358
 -------------------------------------------------------------------------------
-SUM:                            58           1885           1426          10279
+SUM:                            58           1903           1428          10358
 -------------------------------------------------------------------------------
 ```
 
@@ -39,7 +39,7 @@ SUM:                            58           1885           1426          10279
 | `adapters/claude_code.rs` | 255 | 126 | 129 | 50.6% | ✅ |
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
-| `adapters/mod.rs` | 124 | 124 | 0 | 0.0% | ✅ |
+| `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `commands/analyze/mod.rs` | 182 | 28 | 154 | 84.6% | ✅ |
 | `commands/analyze/sections.rs` | 267 | 267 | 0 | 0.0% | ✅ (infra) |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |

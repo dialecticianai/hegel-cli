@@ -1,23 +1,23 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-23 23:34
+**Last Updated**: 2025-10-23 23:36
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **92.21%** lines | **91.14%** regions | **89.47%** functions
+**Overall Coverage**: **92.50%** lines | **91.37%** regions | **90.48%** functions
 
 ## Summary
 
 ```
-TOTAL                                  13784              1221    91.14%         760                80    89.47%        8137               634    92.21%           0                 0         -
+TOTAL                                  13912              1200    91.37%         767                73    90.48%        8201               615    92.50%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `adapters/claude_code.rs` | 97.18% | 96.81% | 90.00% | 🟢 Excellent |
-| `adapters/codex.rs` | 93.44% | 93.92% | 88.24% | 🟢 Excellent |
-| `adapters/cursor.rs` | 92.42% | 92.55% | 89.47% | 🟢 Excellent |
-| `adapters/mod.rs` | 60.71% | 55.56% | 50.00% | 🟠 Moderate |
+| `adapters/claude_code.rs` | 98.87% | 97.76% | 95.00% | 🟢 Excellent |
+| `adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
+| `adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
+| `adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
 | `commands/analyze/mod.rs` | 100.00% | 99.51% | 100.00% | 🟢 Excellent |
 | `commands/analyze/sections.rs` | 97.56% | 95.62% | 100.00% | 🟢 Excellent |
 | `commands/astq.rs` | 38.57% | 35.71% | 60.00% | 🔴 Needs Work |
@@ -43,7 +43,7 @@ TOTAL                                  13784              1221    91.14%        
 | `main.rs` | 45.83% | 38.60% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
-| `metrics/graph.rs` | 99.20% | 98.51% | 100.00% | 🟢 Excellent |
+| `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `metrics/mod.rs` | 96.99% | 96.40% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -71,9 +71,10 @@ TOTAL                                  13784              1221    91.14%        
 ## Coverage Tiers
 
 ### 🟢 Excellent (≥90% lines)
-- `adapters/claude_code.rs` - 97.18%
-- `adapters/codex.rs` - 93.44%
-- `adapters/cursor.rs` - 92.42%
+- `adapters/claude_code.rs` - 98.87%
+- `adapters/codex.rs` - 94.43%
+- `adapters/cursor.rs` - 93.84%
+- `adapters/mod.rs` - 98.91%
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.56%
 - `commands/config.rs` - 91.95%
@@ -122,7 +123,6 @@ TOTAL                                  13784              1221    91.14%        
 - `tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
-- `adapters/mod.rs` - 60.71%
 - `commands/reflect.rs` - 52.70%
 - `commands/workflow/mod.rs` - 54.92%
 - `main.rs` - 45.83%
@@ -135,7 +135,7 @@ TOTAL                                  13784              1221    91.14%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 92.21% | ✅ Met |
+| Overall | ≥80% | 92.50% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

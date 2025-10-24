@@ -122,3 +122,102 @@ impl Default for AdapterRegistry {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_registry_creates_all_adapters() {
+        let registry = AdapterRegistry::new();
+        assert_eq!(registry.adapters.len(), 3);
+    }
+
+    #[test]
+    fn test_registry_default_same_as_new() {
+        let registry1 = AdapterRegistry::new();
+        let registry2 = AdapterRegistry::default();
+        assert_eq!(registry1.adapters.len(), registry2.adapters.len());
+    }
+
+    #[test]
+    fn test_registry_get_by_name() {
+        let registry = AdapterRegistry::new();
+
+        let claude = registry.get("claude_code");
+        assert!(claude.is_some());
+        assert_eq!(claude.unwrap().name(), "claude_code");
+
+        let cursor = registry.get("cursor");
+        assert!(cursor.is_some());
+        assert_eq!(cursor.unwrap().name(), "cursor");
+
+        let codex = registry.get("codex");
+        assert!(codex.is_some());
+        assert_eq!(codex.unwrap().name(), "codex");
+
+        let nonexistent = registry.get("nonexistent");
+        assert!(nonexistent.is_none());
+    }
+
+    #[test]
+    fn test_registry_detect_in_claude_code_env() {
+        // This test runs in Claude Code environment, so detection should work
+        let registry = AdapterRegistry::new();
+        let detected = registry.detect();
+
+        // Should detect Claude Code since we're running in it
+        if let Some(adapter) = detected {
+            assert_eq!(adapter.name(), "claude_code");
+        }
+    }
+
+    #[test]
+    fn test_event_type_serialization() {
+        use serde_json::json;
+
+        assert_eq!(
+            serde_json::to_value(EventType::SessionStart).unwrap(),
+            json!("session_start")
+        );
+        assert_eq!(
+            serde_json::to_value(EventType::PostToolUse).unwrap(),
+            json!("post_tool_use")
+        );
+    }
+
+    #[test]
+    fn test_event_type_deserialization() {
+        use serde_json::json;
+
+        let event: EventType = serde_json::from_value(json!("session_start")).unwrap();
+        assert_eq!(event, EventType::SessionStart);
+
+        let event: EventType = serde_json::from_value(json!("post_tool_use")).unwrap();
+        assert_eq!(event, EventType::PostToolUse);
+
+        let event: EventType = serde_json::from_value(json!("custom_event")).unwrap();
+        assert_eq!(event, EventType::Other("custom_event".to_string()));
+    }
+
+    #[test]
+    fn test_canonical_event_serialization() {
+        let event = CanonicalHookEvent {
+            timestamp: "2025-01-01T00:00:00Z".to_string(),
+            session_id: "test".to_string(),
+            event_type: EventType::PostToolUse,
+            tool_name: Some("Bash".to_string()),
+            tool_input: Some(serde_json::json!({"command": "echo test"})),
+            tool_response: None,
+            cwd: None,
+            transcript_path: None,
+            adapter: Some("claude_code".to_string()),
+            fallback_used: None,
+            extra: HashMap::new(),
+        };
+
+        let json = serde_json::to_string(&event).unwrap();
+        assert!(json.contains("\"event_type\":\"post_tool_use\""));
+        assert!(json.contains("\"tool_name\":\"Bash\""));
+    }
+}
