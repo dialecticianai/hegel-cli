@@ -113,12 +113,18 @@ hegel-cli/
 │   │   ├── wrapped.rs           # Generic command wrapper (guardrails evaluation, audit logging, exits on block)
 │   │   ├── init.rs              # Project initialization (greenfield vs retrofit workflow detection)
 │   │   ├── config.rs            # Configuration commands (get, set, list config values)
-│   │   ├── workflow/            # Workflow orchestration (252 impl + 740 test lines, refactored for SoC)
+│   │   ├── workflow/            # Workflow orchestration
 │   │   │   ├── mod.rs           # Command handlers (start, next, status, reset, abort, repeat, restart)
 │   │   │   ├── claims.rs        # ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
 │   │   │   ├── context.rs       # WorkflowContext (loading, prompt rendering with guide injection)
 │   │   │   ├── transitions.rs   # Transition evaluation and execution (Stay/IntraWorkflow/InterWorkflow/Ambiguous outcomes)
-│   │   │   └── tests.rs         # All workflow tests (49 tests covering orchestration, transitions, meta-modes)
+│   │   │   └── tests/           # Modular test structure
+│   │   │       ├── mod.rs       # Shared test helpers
+│   │   │       ├── commands.rs  # Command tests (start, next, repeat, reset, status, restart)
+│   │   │       ├── transitions.rs # Transition and state logging tests
+│   │   │       ├── integration.rs # End-to-end workflow tests
+│   │   │       ├── production.rs  # Production workflow validation
+│   │   │       └── node_flow.rs   # Node flow extraction tests
 │   │   └── analyze/             # Metrics analysis and display (hegel analyze)
 │   │       ├── mod.rs           # Main analyze command orchestrator
 │   │       └── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
