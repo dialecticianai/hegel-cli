@@ -13,12 +13,17 @@ EXCLUDE_PATHS=(-not -path "./target/*" -not -path "./.git/*" -not -path "./.webc
 # Files allowed to exceed 200 impl lines (infrastructure, shared utilities, etc.)
 ALLOWED_LARGE_FILES=(
     "test_helpers.rs"
-    "adapters/codex.rs"           # Single adapter: model extraction + cumulative→delta conversion
-    "commands/workflow.rs"        # Single concern: workflow command orchestration (6 commands)
-    "commands/analyze/sections.rs" # Single concern: terminal output rendering (7 sections)
-    "metrics/graph.rs"            # Single concern: DAG construction + visualization
-    "metrics/hooks.rs"            # Single concern: hooks.jsonl parsing + metrics extraction
-    "storage/mod.rs"              # Single concern: file-based state persistence (CRUD + JSONL)
+    "adapters/codex.rs"              # Single adapter: model extraction + cumulative→delta conversion
+    "commands/workflow.rs"           # Single concern: workflow command orchestration (6 commands)
+    "commands/workflow/tests.rs"     # Infrastructure: comprehensive workflow integration tests
+    "commands/workflow/transitions.rs" # Single concern: state transition logic
+    "commands/analyze/sections.rs"   # Single concern: terminal output rendering (7 sections)
+    "metrics/graph.rs"               # Single concern: DAG construction + visualization
+    "metrics/hooks.rs"               # Single concern: hooks.jsonl parsing + metrics extraction
+    "storage/mod.rs"                 # Single concern: file-based state persistence (CRUD + JSONL)
+    "test_helpers/metrics.rs"        # Infrastructure: metrics test builders and fixtures
+    "test_helpers/workflow.rs"       # Infrastructure: workflow test builders and fixtures
+    "tui/utils.rs"                   # Infrastructure: TUI formatting and helper utilities
 )
 
 # Check if cloc is available

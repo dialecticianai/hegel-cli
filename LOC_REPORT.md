@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 23:18
+**Last Updated**: 2025-10-23 23:21
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -54,8 +54,8 @@ SUM:                            58           1846           1407          10043
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 342 | 16 | 326 | 95.3% | ✅ |
-| `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ⚠️ Large |
-| `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ⚠️ Large |
+| `commands/workflow/tests.rs` | 740 | 740 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/transitions.rs` | 276 | 276 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 90 | 90 | 0 | 0.0% | ✅ |
@@ -79,11 +79,11 @@ SUM:                            58           1846           1407          10043
 | `storage/mod.rs` | 698 | 311 | 387 | 55.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 124 | 124 | 0 | 0.0% | ✅ |
-| `test_helpers/metrics.rs` | 272 | 272 | 0 | 0.0% | ⚠️ Large |
+| `test_helpers/metrics.rs` | 272 | 272 | 0 | 0.0% | ✅ (infra) |
 | `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 66 | 66 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 73 | 73 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 296 | 296 | 0 | 0.0% | ⚠️ Large |
+| `test_helpers/workflow.rs` | 296 | 296 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
@@ -93,9 +93,7 @@ SUM:                            58           1846           1407          10043
 | `tui/tabs/overview.rs` | 88 | 74 | 14 | 15.9% | ✅ |
 | `tui/tabs/phases.rs` | 143 | 111 | 32 | 22.4% | ✅ |
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
-| `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ⚠️ Large |
-
-**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
+| `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
 ---
 
