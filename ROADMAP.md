@@ -67,10 +67,6 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 - `RuleEvaluationContext.current_phase` - Current workflow phase field
 **Use case:** Enable rules that only trigger in specific phases
 
-### TUI Enhancements
-**Files:** `src/tui/utils.rs`
-- `format_timestamp()` - Format ISO 8601 timestamps to HH:MM:SS
-**Use case:** Timestamps not currently shown in TUI; may be YAGNI or future enhancement
 
 ---
 

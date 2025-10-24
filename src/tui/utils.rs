@@ -173,19 +173,40 @@ pub fn build_timeline(metrics: &UnifiedMetrics) -> Vec<TimelineEvent> {
 /// let formatted = format_timestamp("2025-01-01T10:30:45Z");
 /// assert_eq!(formatted, "10:30:45");
 /// ```
-/// TODO: Investigate why this wasn't used in TUI implementation
-#[allow(dead_code)]
+/// Format ISO 8601 timestamp to HH:MM:SS for display using chrono
+/// Gracefully returns original string if parsing fails
 pub fn format_timestamp(timestamp: &str) -> String {
-    // Extract time portion (HH:MM:SS) from ISO 8601
-    if let Some(time_start) = timestamp.find('T') {
-        let time_part = &timestamp[time_start + 1..];
-        if let Some(z_pos) = time_part.find('Z') {
-            return time_part[..z_pos].to_string();
-        }
-        time_part.to_string()
+    use chrono::DateTime;
+
+    // Try to parse as RFC3339/ISO8601
+    if let Ok(dt) = DateTime::parse_from_rfc3339(timestamp) {
+        dt.format("%H:%M:%S").to_string()
     } else {
+        // Graceful degradation
         timestamp.to_string()
     }
+}
+
+/// Get relative day label for a timestamp ("Today", "Yesterday", "2 days ago", etc.)
+pub fn relative_day_label(timestamp: &str) -> Option<String> {
+    use chrono::{DateTime, Local, Utc};
+
+    let dt = DateTime::parse_from_rfc3339(timestamp).ok()?;
+    let now = Local::now();
+    let event_date = dt.with_timezone(&Utc).date_naive();
+    let today = now.date_naive();
+
+    let days_ago = (today - event_date).num_days();
+
+    Some(match days_ago {
+        0 => "Today".to_string(),
+        1 => "Yesterday".to_string(),
+        2..=6 => format!("{} days ago", days_ago),
+        7..=13 => format!("{} week ago", days_ago / 7),
+        14..=29 => format!("{} weeks ago", days_ago / 7),
+        30..=59 => "1 month ago".to_string(),
+        _ => format!("{} months ago", days_ago / 30),
+    })
 }
 
 #[cfg(test)]
@@ -319,5 +340,25 @@ mod tests {
         assert_eq!(format_timestamp("2025-01-01T10:30:45Z"), "10:30:45");
         assert_eq!(format_timestamp("2025-01-01T00:00:00Z"), "00:00:00");
         assert_eq!(format_timestamp("10:30:45"), "10:30:45"); // Already formatted
+    }
+
+    #[test]
+    fn test_format_timestamp_with_timezone() {
+        assert_eq!(
+            format_timestamp("2025-10-18T01:16:10.703373+00:00"),
+            "01:16:10"
+        );
+    }
+
+    #[test]
+    fn test_format_timestamp_with_microseconds() {
+        assert_eq!(format_timestamp("2025-01-01T10:30:45.123456Z"), "10:30:45");
+    }
+
+    #[test]
+    fn test_format_timestamp_malformed() {
+        // Gracefully degrade - return original if can't parse
+        assert_eq!(format_timestamp("not-a-timestamp"), "not-a-timestamp");
+        assert_eq!(format_timestamp(""), "");
     }
 }

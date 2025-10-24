@@ -1,5 +1,8 @@
 use crate::metrics::UnifiedMetrics;
-use crate::tui::utils::{build_timeline, scroll_indicators, visible_window, EventSource};
+use crate::tui::utils::{
+    build_timeline, format_timestamp, relative_day_label, scroll_indicators, visible_window,
+    EventSource,
+};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
     text::{Line, Span},
@@ -18,49 +21,71 @@ pub fn render_events_tab(
     // Apply scroll using helper (20 rows visible)
     let visible = visible_window(&timeline, scroll, 20);
 
-    let items: Vec<ListItem<'static>> = visible
-        .iter()
-        .map(|event| {
-            let (source_icon, source_style) = if event.source == EventSource::Claude {
-                (
-                    "🤖",
-                    Style::default()
-                        .fg(Color::Magenta)
-                        .add_modifier(Modifier::BOLD),
-                )
-            } else {
-                (
-                    "⚙️ ",
-                    Style::default()
-                        .fg(Color::Green)
-                        .add_modifier(Modifier::BOLD),
-                )
-            };
+    let mut items: Vec<ListItem<'static>> = Vec::new();
+    let mut last_day_label: Option<String> = None;
 
-            let source_name = if event.source == EventSource::Claude {
-                "Claude"
-            } else {
-                "Hegel "
-            };
+    for event in visible.iter() {
+        // Check if we need a day separator
+        if let Some(day_label) = relative_day_label(&event.timestamp) {
+            if last_day_label.as_ref() != Some(&day_label) {
+                // Insert day separator
+                items.push(ListItem::new(Line::from(vec![
+                    Span::raw(" "),
+                    Span::styled(
+                        format!("─── {} ", day_label),
+                        Style::default()
+                            .fg(Color::Cyan)
+                            .add_modifier(Modifier::BOLD),
+                    ),
+                    Span::styled("─".repeat(60), Style::default().fg(Color::DarkGray)),
+                ])));
+                last_day_label = Some(day_label);
+            }
+        }
 
-            // Clone all data to make it 'static
-            let event_type = event.event_type.clone();
-            let detail = event.detail.clone();
+        // Render event
+        let (source_icon, source_style) = if event.source == EventSource::Claude {
+            (
+                "🤖",
+                Style::default()
+                    .fg(Color::Magenta)
+                    .add_modifier(Modifier::BOLD),
+            )
+        } else {
+            (
+                "⚙️ ",
+                Style::default()
+                    .fg(Color::Green)
+                    .add_modifier(Modifier::BOLD),
+            )
+        };
 
-            let line = Line::from(vec![
-                Span::raw(" "),
-                Span::raw(source_icon),
-                Span::raw(" "),
-                Span::styled(source_name, source_style),
-                Span::styled(" │ ", Style::default().fg(Color::Gray)),
-                Span::styled(event_type, Style::default().fg(Color::Yellow)),
-                Span::raw(" "),
-                Span::styled(detail, Style::default().fg(Color::White)),
-            ]);
+        let source_name = if event.source == EventSource::Claude {
+            "Claude"
+        } else {
+            "Hegel "
+        };
 
-            ListItem::new(line)
-        })
-        .collect();
+        // Clone all data to make it 'static
+        let event_type = event.event_type.clone();
+        let detail = event.detail.clone();
+        let time = format_timestamp(&event.timestamp);
+
+        let line = Line::from(vec![
+            Span::raw(" "),
+            Span::styled(format!("[{}]", time), Style::default().fg(Color::DarkGray)),
+            Span::raw(" "),
+            Span::raw(source_icon),
+            Span::raw(" "),
+            Span::styled(source_name, source_style),
+            Span::styled(" │ ", Style::default().fg(Color::Gray)),
+            Span::styled(event_type, Style::default().fg(Color::Yellow)),
+            Span::raw(" "),
+            Span::styled(detail, Style::default().fg(Color::White)),
+        ]);
+
+        items.push(ListItem::new(line));
+    }
 
     let (up_indicator, down_indicator) = scroll_indicators(scroll, max_scroll);
     let title = format!(" Event Stream {} {} ", up_indicator, down_indicator);

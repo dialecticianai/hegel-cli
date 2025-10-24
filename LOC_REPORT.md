@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-23 22:10
+**Last Updated**: 2025-10-23 22:22
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 9,746 | 5,207 | 14,953 |
-| **Comments** | 1,373 | - | 1,373 |
-| **Blank Lines** | 1,796 | - | 1,796 |
-| **Total Lines** | 12,915 | 5,207 | 18,122 |
+| **Lines** | 9,795 | 5,203 | 14,998 |
+| **Comments** | 1,380 | - | 1,380 |
+| **Blank Lines** | 1,806 | - | 1,806 |
+| **Total Lines** | 12,981 | 5,203 | 18,184 |
 | **Files** | 57 | 28 | 85 |
 
 **Documentation Ratio**: 0.53 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            57           1796           1373           9746
+Rust                            57           1806           1380           9795
 -------------------------------------------------------------------------------
-SUM:                            57           1796           1373           9746
+SUM:                            57           1806           1380           9795
 -------------------------------------------------------------------------------
 ```
 
@@ -86,15 +86,15 @@ SUM:                            57           1796           1373           9746
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 66 | 66 | 0 | 0.0% | ✅ |
-| `tui/tabs/events.rs` | 107 | 88 | 19 | 17.8% | ✅ |
+| `tui/tabs/events.rs` | 132 | 113 | 19 | 14.4% | ✅ |
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
 | `tui/tabs/mod.rs` | 9 | 9 | 0 | 0.0% | ✅ |
 | `tui/tabs/overview.rs` | 88 | 74 | 14 | 15.9% | ✅ |
 | `tui/tabs/phases.rs` | 143 | 111 | 32 | 22.4% | ✅ |
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
-| `tui/utils.rs` | 323 | 190 | 133 | 41.2% | ✅ |
+| `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ⚠️ Large |
 
-**⚠️ Warning:** 4 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -128,7 +128,7 @@ SUM:                            57           1796           1373           9746
 | `LEXICON.md` | 84 |
 | `LOC_REPORT.md` | 156 |
 | `README.md` | 451 |
-| `ROADMAP.md` | 193 |
+| `ROADMAP.md` | 189 |
 | `TESTING.md` | 41 |
 
 ---
