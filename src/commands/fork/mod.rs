@@ -1,4 +1,6 @@
+mod amp;
 mod codex;
+mod cody;
 mod gemini;
 mod generic;
 
@@ -57,7 +59,17 @@ const KNOWN_AGENTS: &[AgentMetadata] = &[
         name: "cody",
         description: "Sourcegraph Cody CLI",
         fallback_paths: &[],
-        runtime: AgentRuntime::NodeJs { min_version: None },
+        runtime: AgentRuntime::NodeJs {
+            min_version: Some("20.0.0"),
+        },
+    },
+    AgentMetadata {
+        name: "amp",
+        description: "Sourcegraph Amp (agentic coding)",
+        fallback_paths: &[],
+        runtime: AgentRuntime::NodeJs {
+            min_version: Some("20.0.0"),
+        },
     },
 ];
 
@@ -335,7 +347,9 @@ pub fn display_agents(agents: &[Agent]) {
 fn execute_agent(agent: &Agent, prompt: Option<&str>, args: &[String]) -> Result<String> {
     // Build command arguments based on agent type
     let cmd_args = match agent.name.as_str() {
+        "amp" => amp::build_args(prompt, args),
         "codex" => codex::build_args(prompt, args),
+        "cody" => cody::build_args(prompt, args),
         "gemini" => gemini::build_args(prompt, args),
         _ => generic::build_args(prompt, args),
     };

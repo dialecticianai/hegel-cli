@@ -535,9 +535,10 @@ hegel fork
 - `claude` - Claude Code CLI (Anthropic)
 - `aider` - AI pair programming (aider.chat)
 - `copilot` - GitHub Copilot CLI
-- `codex` - OpenAI Codex CLI
-- `gemini` - Google Gemini CLI
-- `cody` - Sourcegraph Cody CLI
+- `codex` - OpenAI Codex CLI (Rust binary)
+- `gemini` - Google Gemini CLI (Node 20+)
+- `cody` - Sourcegraph Cody CLI (Node 20+)
+- `amp` - Sourcegraph Amp agentic coding (Node 20+)
 
 **Output:** Shows which agents are installed and their paths, plus which are not available.
 
