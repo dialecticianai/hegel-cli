@@ -2,19 +2,79 @@ use anyhow::Result;
 use std::path::Path;
 use std::process::Command;
 
-/// Known agent CLIs to detect with common installation locations
-const KNOWN_AGENTS: &[(&str, &str, &[&str])] = &[
-    (
-        "claude",
-        "Claude Code CLI (Anthropic)",
-        &["~/.claude/local/claude", "~/.claude/claude"],
-    ),
-    ("aider", "AI pair programming (aider.chat)", &[]),
-    ("copilot", "GitHub Copilot CLI", &[]),
-    ("codex", "OpenAI Codex CLI", &[]),
-    ("gemini", "Google Gemini CLI", &[]),
-    ("cody", "Sourcegraph Cody CLI", &[]),
+/// Agent metadata: (name, description, fallback_paths, runtime)
+struct AgentMetadata {
+    name: &'static str,
+    description: &'static str,
+    fallback_paths: &'static [&'static str],
+    runtime: AgentRuntime,
+}
+
+/// Known agent CLIs to detect with common installation locations and runtime info
+const KNOWN_AGENTS: &[AgentMetadata] = &[
+    AgentMetadata {
+        name: "claude",
+        description: "Claude Code CLI (Anthropic)",
+        fallback_paths: &["~/.claude/local/claude", "~/.claude/claude"],
+        runtime: AgentRuntime::NodeJs {
+            min_version: Some("18.0.0"),
+        },
+    },
+    AgentMetadata {
+        name: "aider",
+        description: "AI pair programming (aider.chat)",
+        fallback_paths: &[],
+        runtime: AgentRuntime::Python {
+            min_version: Some("3.8.0"),
+        },
+    },
+    AgentMetadata {
+        name: "copilot",
+        description: "GitHub Copilot CLI",
+        fallback_paths: &[],
+        runtime: AgentRuntime::NodeJs { min_version: None },
+    },
+    AgentMetadata {
+        name: "codex",
+        description: "OpenAI Codex CLI",
+        fallback_paths: &[],
+        runtime: AgentRuntime::NodeJs { min_version: None },
+    },
+    AgentMetadata {
+        name: "gemini",
+        description: "Google Gemini CLI",
+        fallback_paths: &[],
+        runtime: AgentRuntime::NodeJs {
+            min_version: Some("20.0.0"),
+        },
+    },
+    AgentMetadata {
+        name: "cody",
+        description: "Sourcegraph Cody CLI",
+        fallback_paths: &[],
+        runtime: AgentRuntime::NodeJs { min_version: None },
+    },
 ];
+
+/// Agent runtime type
+///
+/// When executing agents (future implementation):
+/// - Node.js/Python CLIs: Execute through user's shell (bash/zsh) to preserve
+///   environment (nvm, volta, pyenv, etc.). This allows version managers to
+///   automatically select the correct runtime version.
+/// - Native binaries: Execute directly without shell wrapper.
+///
+/// The min_version field is informational only - version validation will be
+/// handled by the runtime itself or version managers.
+#[derive(Debug, Clone, PartialEq)]
+pub enum AgentRuntime {
+    /// Native binary (Rust, Go, etc.)
+    Native,
+    /// Node.js CLI (requires node in PATH)
+    NodeJs { min_version: Option<&'static str> },
+    /// Python CLI (requires python in PATH)
+    Python { min_version: Option<&'static str> },
+}
 
 /// Agent detection result
 #[derive(Debug)]
@@ -23,6 +83,7 @@ pub struct Agent {
     pub description: String,
     pub path: String,
     pub available: bool,
+    pub runtime: AgentRuntime,
 }
 
 /// Expand tilde in path to home directory
@@ -39,9 +100,9 @@ fn expand_tilde(path: &str) -> Option<String> {
 pub fn detect_agents() -> Result<Vec<Agent>> {
     let mut agents = Vec::new();
 
-    for (name, description, fallback_paths) in KNOWN_AGENTS {
+    for meta in KNOWN_AGENTS {
         // First try `which` command
-        let output = Command::new("which").arg(name).output();
+        let output = Command::new("which").arg(meta.name).output();
 
         let (available, path) = match output {
             Ok(result) if result.status.success() => {
@@ -53,7 +114,7 @@ pub fn detect_agents() -> Result<Vec<Agent>> {
                 let mut found = false;
                 let mut found_path = String::new();
 
-                for fallback in *fallback_paths {
+                for fallback in meta.fallback_paths {
                     if let Some(expanded) = expand_tilde(fallback) {
                         if Path::new(&expanded).exists() {
                             found = true;
@@ -68,10 +129,11 @@ pub fn detect_agents() -> Result<Vec<Agent>> {
         };
 
         agents.push(Agent {
-            name: name.to_string(),
-            description: description.to_string(),
+            name: meta.name.to_string(),
+            description: meta.description.to_string(),
             path,
             available,
+            runtime: meta.runtime.clone(),
         });
     }
 
@@ -90,6 +152,27 @@ pub fn display_agents(agents: &[Agent]) {
         for agent in &available {
             println!("  ✓ {} - {}", agent.name, agent.description);
             println!("    Path: {}", agent.path);
+
+            // Show runtime requirements
+            match &agent.runtime {
+                AgentRuntime::NodeJs { min_version } => {
+                    if let Some(version) = min_version {
+                        println!("    Runtime: Node.js >= {}", version);
+                    } else {
+                        println!("    Runtime: Node.js");
+                    }
+                }
+                AgentRuntime::Python { min_version } => {
+                    if let Some(version) = min_version {
+                        println!("    Runtime: Python >= {}", version);
+                    } else {
+                        println!("    Runtime: Python");
+                    }
+                }
+                AgentRuntime::Native => {
+                    println!("    Runtime: Native binary");
+                }
+            }
         }
         println!();
     }
@@ -132,12 +215,18 @@ mod tests {
                 description: "Claude Code CLI".to_string(),
                 path: "/usr/local/bin/claude".to_string(),
                 available: true,
+                runtime: AgentRuntime::NodeJs {
+                    min_version: Some("18.0.0"),
+                },
             },
             Agent {
                 name: "aider".to_string(),
                 description: "AI pair programming".to_string(),
                 path: String::new(),
                 available: false,
+                runtime: AgentRuntime::Python {
+                    min_version: Some("3.8.0"),
+                },
             },
         ];
 
