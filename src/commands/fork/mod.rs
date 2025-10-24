@@ -1,3 +1,7 @@
+mod codex;
+mod gemini;
+mod generic;
+
 use anyhow::Result;
 use semver::{Version, VersionReq};
 use std::path::{Path, PathBuf};
@@ -329,49 +333,15 @@ pub fn display_agents(agents: &[Agent]) {
 
 /// Execute an agent with the given prompt and arguments
 fn execute_agent(agent: &Agent, prompt: Option<&str>, args: &[String]) -> Result<String> {
-    // Determine command and arguments based on agent
-    let (cmd, cmd_args) = match agent.name.as_str() {
-        "codex" => {
-            // codex uses `codex exec "prompt"` for non-interactive mode
-            let mut exec_args = vec!["exec".to_string()];
-
-            // Add passthrough args first (before prompt)
-            exec_args.extend_from_slice(args);
-
-            // Add prompt if provided
-            if let Some(p) = prompt {
-                exec_args.push(p.to_string());
-            }
-
-            ("codex", exec_args)
-        }
-        "gemini" => {
-            // gemini uses positional argument for prompt
-            let mut gemini_args = Vec::new();
-
-            // Add passthrough args first
-            gemini_args.extend_from_slice(args);
-
-            // Add prompt if provided
-            if let Some(p) = prompt {
-                gemini_args.push(p.to_string());
-            }
-
-            ("gemini", gemini_args)
-        }
-        _ => {
-            // Default: just pass prompt and args
-            let mut default_args = Vec::new();
-            default_args.extend_from_slice(args);
-            if let Some(p) = prompt {
-                default_args.push(p.to_string());
-            }
-            (agent.name.as_str(), default_args)
-        }
+    // Build command arguments based on agent type
+    let cmd_args = match agent.name.as_str() {
+        "codex" => codex::build_args(prompt, args),
+        "gemini" => gemini::build_args(prompt, args),
+        _ => generic::build_args(prompt, args),
     };
 
-    // Check if we need to modify PATH for Node.js version compatibility
-    let mut command = Command::new(cmd);
+    // Create command with agent name
+    let mut command = Command::new(&agent.name);
     command.args(&cmd_args);
 
     // If this is a Node.js agent with version requirements, check compatibility

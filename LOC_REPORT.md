@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 13:11
+**Last Updated**: 2025-10-24 13:14
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,817 | 6,226 | 18,043 |
-| **Comments** | 1,638 | - | 1,638 |
-| **Blank Lines** | 2,177 | - | 2,177 |
-| **Total Lines** | 15,632 | 6,226 | 21,858 |
-| **Files** | 66 | 30 | 96 |
+| **Lines** | 11,881 | 6,232 | 18,113 |
+| **Comments** | 1,652 | - | 1,652 |
+| **Blank Lines** | 2,195 | - | 2,195 |
+| **Total Lines** | 15,728 | 6,232 | 21,960 |
+| **Files** | 69 | 30 | 99 |
 
-**Documentation Ratio**: 0.53 lines of docs per line of code
+**Documentation Ratio**: 0.52 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            66           2177           1638          11817
+Rust                            69           2195           1652          11881
 -------------------------------------------------------------------------------
-SUM:                            66           2177           1638          11817
+SUM:                            69           2195           1652          11881
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,10 @@ SUM:                            66           2177           1638          11817
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/fork.rs` | 552 | 442 | 110 | 19.9% | ⚠️ Large |
+| `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
+| `commands/fork/gemini.rs` | 43 | 20 | 23 | 53.5% | ✅ |
+| `commands/fork/generic.rs` | 37 | 20 | 17 | 45.9% | ✅ |
+| `commands/fork/mod.rs` | 522 | 412 | 110 | 21.1% | ⚠️ Large |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
@@ -116,7 +119,7 @@ SUM:                            66           2177           1638          11817
 | `CLAUDE.md` | 149 |
 | `CODE_MAP.md` | 210 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 166 |
+| `COVERAGE_REPORT.md` | 172 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -148,7 +151,7 @@ SUM:                            66           2177           1638          11817
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.53 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

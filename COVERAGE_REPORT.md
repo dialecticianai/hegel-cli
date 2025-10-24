@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-24 13:11
+**Last Updated**: 2025-10-24 13:14
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.81%** lines | **89.74%** regions | **88.93%** functions
+**Overall Coverage**: **91.05%** lines | **90.02%** regions | **89.09%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14439              1481    89.74%         777                86    88.93%        8648               795    90.81%           0                 0         -
+TOTAL                                  14540              1451    90.02%         788                86    89.09%        8691               778    91.05%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -23,7 +23,10 @@ TOTAL                                  14439              1481    89.74%        
 | `commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
 | `commands/astq.rs` | 38.57% | 35.71% | 60.00% | 🔴 Needs Work |
 | `commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
-| `commands/fork.rs` | 69.00% | 71.28% | 95.24% | 🟠 Moderate |
+| `commands/fork/codex.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `commands/fork/gemini.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `commands/fork/generic.rs` | 100.00% | 97.14% | 100.00% | 🟢 Excellent |
+| `commands/fork/mod.rs` | 73.14% | 76.09% | 95.24% | 🟡 Good |
 | `commands/git.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
@@ -80,6 +83,9 @@ TOTAL                                  14439              1481    89.74%        
 - `commands/analyze/mod.rs` - 100.00%
 - `commands/analyze/sections.rs` - 97.56%
 - `commands/config.rs` - 91.95%
+- `commands/fork/codex.rs` - 100.00%
+- `commands/fork/gemini.rs` - 100.00%
+- `commands/fork/generic.rs` - 100.00%
 - `commands/git.rs` - 100.00%
 - `commands/hook.rs` - 96.64%
 - `commands/workflow/claims.rs` - 100.00%
@@ -114,6 +120,7 @@ TOTAL                                  14439              1481    89.74%        
 - `tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
+- `commands/fork/mod.rs` - 73.14%
 - `commands/hooks_setup.rs` - 86.11%
 - `commands/init.rs` - 86.21%
 - `commands/meta.rs` - 80.75%
@@ -126,7 +133,6 @@ TOTAL                                  14439              1481    89.74%        
 
 ### 🟠 Moderate (40-69% lines)
 - `commands/archive.rs` - 59.30%
-- `commands/fork.rs` - 69.00%
 - `commands/reflect.rs` - 52.70%
 - `commands/workflow/mod.rs` - 54.92%
 - `main.rs` - 40.74%
@@ -139,7 +145,7 @@ TOTAL                                  14439              1481    89.74%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.81% | ✅ Met |
+| Overall | ≥80% | 91.05% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
