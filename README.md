@@ -95,17 +95,30 @@ This automatically starts the appropriate initial workflow for your meta-mode.
 hegel meta
 ```
 
-### Starting Additional Workflows
+### Starting Workflows
 
 After declaring your meta-mode, transition between workflows:
 
 ```bash
-# Transition to next workflow in your meta-mode
-hegel start discovery  # When in learning mode after research complete
-hegel start execution  # When transitioning to production
+# Start workflow at default beginning
+hegel start discovery  # Starts at 'spec' phase
+hegel start execution  # Starts at workflow's default start_node
+
+# Start workflow at specific phase (useful for resuming or testing)
+hegel start discovery plan     # Skip spec, start directly at plan
+hegel start execution code     # Start directly at code phase
+hegel start research study     # Start directly at study phase
 ```
 
+**Custom start nodes:**
+- Skips earlier phases in the workflow
+- Useful for resuming interrupted workflows or testing specific phases
+- History will only show nodes from the custom start point forward
+- Validates node exists and provides helpful error with available nodes
+
 Available workflows:
+- `init-greenfield` - Initialize new DDD project (CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_INIT)
+- `init-retrofit` - Add DDD to existing project (DETECT_EXISTING → CODE_MAP → CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_COMMIT)
 - `research` - External knowledge gathering (PLAN → STUDY → ASSESS → QUESTIONS)
 - `discovery` - Optimized for learning density (SPEC → PLAN → CODE → LEARNINGS → README)
 - `execution` - Optimized for production delivery

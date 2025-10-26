@@ -35,7 +35,7 @@ hegel config set <key> <value>
 hegel meta <learning|standard>  # Declare meta-mode (required first step)
 hegel meta                      # View current meta-mode
 
-hegel start <workflow>          # Load workflow (discovery, execution, research, minimal)
+hegel start <workflow> [node]   # Load workflow (optionally at specific node)
 hegel status                    # Show current state
 hegel next                      # Advance to next phase (auto-infers completion claim)
 hegel restart                   # Return to SPEC phase (restart cycle, keep same workflow)
@@ -49,13 +49,31 @@ hegel reset                     # Clear all state
 - `standard` - Discovery ↔ Execution (starts with discovery)
 
 **Workflows:**
+- `init-greenfield` - CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_INIT (new projects)
+- `init-retrofit` - DETECT_EXISTING → CODE_MAP → CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_COMMIT (existing projects)
 - `research` - PLAN → STUDY → ASSESS → QUESTIONS (external knowledge gathering)
 - `discovery` - SPEC → PLAN → CODE → LEARNINGS → README (toy experiments)
 - `execution` - Production-grade rigor with code review phase
 - `minimal` - Simplified for quick iterations
 
+**Starting at custom nodes:**
+```bash
+# Start at default beginning
+hegel start discovery           # Starts at 'spec' node
+
+# Start at specific node (skip earlier phases)
+hegel start discovery plan      # Start directly at plan phase
+hegel start execution code      # Start directly at code phase
+```
+
+**Custom start nodes are useful for:**
+- Resuming interrupted workflows
+- Testing specific workflow phases
+- Skipping phases you've already completed manually
+
 **What happens:**
 - `hegel start` prints the first phase prompt with embedded guidance
+- `hegel start <workflow> <node>` starts at specified node (validates node exists)
 - `hegel next` advances and prints the next phase prompt - **follow these instructions**
 - `hegel repeat` re-displays current prompt if you need to see it again
 - `hegel restart` returns to SPEC phase (same workflow, fresh cycle)
@@ -63,6 +81,7 @@ hegel reset                     # Clear all state
 
 **Guardrails:**
 - Cannot start new workflow while one is active → run `hegel abort` first
+- Invalid start node returns error with list of available nodes
 - Prevents accidental loss of workflow progress
 
 ### Code Operations
