@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-26 15:20
+**Last Updated**: 2025-10-26 18:44
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,986 | 6,256 | 18,242 |
-| **Comments** | 1,666 | - | 1,666 |
-| **Blank Lines** | 2,211 | - | 2,211 |
-| **Total Lines** | 15,863 | 6,256 | 22,119 |
+| **Lines** | 12,026 | 6,256 | 18,282 |
+| **Comments** | 1,669 | - | 1,669 |
+| **Blank Lines** | 2,214 | - | 2,214 |
+| **Total Lines** | 15,909 | 6,256 | 22,165 |
 | **Files** | 71 | 30 | 101 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            71           2211           1666          11986
+Rust                            71           2214           1669          12026
 -------------------------------------------------------------------------------
-SUM:                            71           2211           1666          11986
+SUM:                            71           2214           1669          12026
 -------------------------------------------------------------------------------
 ```
 
@@ -60,8 +60,8 @@ SUM:                            71           2211           1666          11986
 | `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
 | `commands/workflow/claims.rs` | 28 | 28 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 397 | 16 | 381 | 96.0% | ✅ |
-| `commands/workflow/tests/commands.rs` | 372 | 372 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/mod.rs` | 420 | 16 | 404 | 96.2% | ✅ |
+| `commands/workflow/tests/commands.rs` | 390 | 390 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/node_flow.rs` | 142 | 142 | 0 | 0.0% | ✅ |
@@ -76,7 +76,7 @@ SUM:                            71           2211           1666          11986
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
-| `main.rs` | 300 | 13 | 287 | 95.7% | ✅ |
+| `main.rs` | 305 | 13 | 292 | 95.7% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 372 | 224 | 148 | 39.8% | ✅ (infra) |

@@ -31,7 +31,7 @@ fn test_full_workflow_cycle() {
 fn test_next_at_research_done_auto_transitions_to_discovery() {
     let (_tmp, storage) = setup_meta_mode_workflows();
 
-    start_workflow("research", &storage).unwrap();
+    start_workflow("research", None, &storage).unwrap();
     set_meta_mode(&storage, "learning");
     set_node(&storage, "done");
 
@@ -52,7 +52,7 @@ fn test_next_at_research_done_auto_transitions_to_discovery() {
 fn test_next_at_discovery_done_shows_ambiguous_options() {
     let (_tmp, storage) = setup_meta_mode_workflows();
 
-    start_workflow("discovery", &storage).unwrap();
+    start_workflow("discovery", None, &storage).unwrap();
     set_meta_mode(&storage, "learning");
     set_node(&storage, "done");
 

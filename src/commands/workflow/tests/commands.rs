@@ -20,7 +20,7 @@ fn test_start_workflow_success() {
 #[test]
 fn test_start_workflow_missing_file() {
     let (_tmp, storage) = setup_workflow_env();
-    let result = start_workflow("nonexistent", &storage);
+    let result = start_workflow("nonexistent", None, &storage);
     assert!(
         result.is_err()
             && result
@@ -28,6 +28,24 @@ fn test_start_workflow_missing_file() {
                 .to_string()
                 .contains("Failed to load workflow")
     );
+}
+
+#[test]
+fn test_start_workflow_with_custom_start_node() {
+    let (_tmp, storage) = setup_workflow_env();
+    start_workflow("test_workflow", Some("plan"), &storage).unwrap();
+    assert_at(&storage, "plan", "test_mode", &["plan"]);
+}
+
+#[test]
+fn test_start_workflow_with_invalid_start_node() {
+    let (_tmp, storage) = setup_workflow_env();
+    let result = start_workflow("test_workflow", Some("nonexistent"), &storage);
+    assert!(result.is_err());
+    let err_msg = result.unwrap_err().to_string();
+    assert!(err_msg.contains("Invalid starting node"));
+    assert!(err_msg.contains("nonexistent"));
+    assert!(err_msg.contains("Available nodes"));
 }
 
 // ========== next_prompt Tests ==========

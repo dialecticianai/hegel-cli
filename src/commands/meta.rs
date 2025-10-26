@@ -69,7 +69,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
     println!();
 
     // Now start the initial workflow
-    crate::commands::start_workflow(&definition.initial_workflow, storage)?;
+    crate::commands::start_workflow(&definition.initial_workflow, None, storage)?;
 
     Ok(())
 }
@@ -231,7 +231,7 @@ mod tests {
         let (_temp_dir, storage) = setup_workflow_env();
 
         // Start workflow without explicitly declaring meta-mode (should default to standard)
-        crate::commands::start_workflow("discovery", &storage).unwrap();
+        crate::commands::start_workflow("discovery", None, &storage).unwrap();
 
         // Should succeed and show standard meta-mode
         let result = show_meta_mode_status(&storage);

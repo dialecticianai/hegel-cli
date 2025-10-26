@@ -103,7 +103,7 @@ fn test_evaluate_stay_at_current_node() {
 fn test_evaluate_inter_workflow_transition_research_to_discovery() {
     let (_tmp, storage) = setup_meta_mode_workflows();
 
-    start_workflow("research", &storage).unwrap();
+    start_workflow("research", None, &storage).unwrap();
     set_node(&storage, "done");
     set_meta_mode(&storage, "learning");
 
@@ -132,7 +132,7 @@ fn test_evaluate_inter_workflow_transition_research_to_discovery() {
 fn test_evaluate_ambiguous_discovery_done_in_learning_mode() {
     let (_tmp, storage) = setup_meta_mode_workflows();
 
-    start_workflow("discovery", &storage).unwrap();
+    start_workflow("discovery", None, &storage).unwrap();
     set_node(&storage, "done");
     set_meta_mode(&storage, "learning");
 
@@ -212,7 +212,7 @@ fn test_execute_stay_no_state_change() {
 fn test_execute_inter_workflow_transition() {
     let (_tmp, storage) = setup_meta_mode_workflows();
 
-    start_workflow("research", &storage).unwrap();
+    start_workflow("research", None, &storage).unwrap();
     set_meta_mode(&storage, "learning");
 
     let mut context = load_workflow_context(&storage).unwrap();

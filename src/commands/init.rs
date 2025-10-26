@@ -13,12 +13,12 @@ pub fn init_project(storage: &FileStorage) -> Result<()> {
         ProjectType::Greenfield => {
             println!("Detected greenfield project (no non-.md files found)");
             println!("Starting init-greenfield workflow...\n");
-            crate::commands::start_workflow("init-greenfield", storage)?;
+            crate::commands::start_workflow("init-greenfield", None, storage)?;
         }
         ProjectType::Retrofit => {
             println!("Detected existing project (non-.md files found)");
             println!("Starting init-retrofit workflow...\n");
-            crate::commands::start_workflow("init-retrofit", storage)?;
+            crate::commands::start_workflow("init-retrofit", None, storage)?;
         }
     }
 

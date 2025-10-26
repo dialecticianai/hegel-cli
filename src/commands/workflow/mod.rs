@@ -17,7 +17,11 @@ pub use transitions::{evaluate_transition, execute_transition};
 #[cfg(test)]
 pub use transitions::{TransitionOption, TransitionOutcome};
 
-pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> {
+pub fn start_workflow(
+    workflow_name: &str,
+    start_node: Option<&str>,
+    storage: &FileStorage,
+) -> Result<()> {
     use chrono::Utc;
 
     // Load current state to check for existing meta-mode
@@ -56,6 +60,25 @@ pub fn start_workflow(workflow_name: &str, storage: &FileStorage) -> Result<()> 
     // Initialize workflow state with workflow_id (ISO timestamp)
     let mut workflow_state = init_state(&workflow);
     workflow_state.workflow_id = Some(Utc::now().to_rfc3339());
+
+    // Override starting node if provided
+    if let Some(node_name) = start_node {
+        // Validate node exists
+        if !workflow.nodes.contains_key(node_name) {
+            anyhow::bail!(
+                "Invalid starting node '{}'. Available nodes: {}",
+                node_name,
+                workflow
+                    .nodes
+                    .keys()
+                    .map(|k| k.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+        }
+        workflow_state.current_node = node_name.to_string();
+        workflow_state.history = vec![node_name.to_string()];
+    }
 
     // Preserve meta-mode from existing state
     workflow_state.meta_mode = existing_meta_mode;

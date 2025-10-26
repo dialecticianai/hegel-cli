@@ -38,6 +38,8 @@ enum Commands {
     Start {
         /// Workflow name (e.g., discovery, execution)
         workflow: String,
+        /// Optional starting node (defaults to workflow's start_node)
+        start_node: Option<String>,
     },
     /// List available workflows
     Workflows,
@@ -220,8 +222,11 @@ fn main() -> Result<()> {
         Commands::Init => {
             commands::init_project(&storage)?;
         }
-        Commands::Start { workflow } => {
-            commands::start_workflow(&workflow, &storage)?;
+        Commands::Start {
+            workflow,
+            start_node,
+        } => {
+            commands::start_workflow(&workflow, start_node.as_deref(), &storage)?;
         }
         Commands::Workflows => {
             commands::list_workflows(&storage)?;

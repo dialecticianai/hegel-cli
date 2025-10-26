@@ -12,7 +12,7 @@ mod transitions;
 
 /// Start workflow and return storage (ergonomic wrapper)
 fn start(storage: &FileStorage) {
-    start_workflow("test_workflow", storage).unwrap();
+    start_workflow("test_workflow", None, storage).unwrap();
 }
 
 /// Advance workflow with next (None = implicit happy path)
