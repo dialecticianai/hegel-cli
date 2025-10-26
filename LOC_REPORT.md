@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-24 13:43
+**Last Updated**: 2025-10-26 15:20
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 11,956 | 6,254 | 18,210 |
+| **Lines** | 11,986 | 6,256 | 18,242 |
 | **Comments** | 1,666 | - | 1,666 |
 | **Blank Lines** | 2,211 | - | 2,211 |
-| **Total Lines** | 15,833 | 6,254 | 22,087 |
+| **Total Lines** | 15,863 | 6,256 | 22,119 |
 | **Files** | 71 | 30 | 101 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            71           2211           1666          11956
+Rust                            71           2211           1666          11986
 -------------------------------------------------------------------------------
-SUM:                            71           2211           1666          11956
+SUM:                            71           2211           1666          11986
 -------------------------------------------------------------------------------
 ```
 
@@ -70,7 +70,7 @@ SUM:                            71           2211           1666          11956
 | `commands/workflow/transitions.rs` | 333 | 333 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
-| `embedded.rs` | 90 | 90 | 0 | 0.0% | ✅ |
+| `embedded.rs` | 120 | 120 | 0 | 0.0% | ✅ |
 | `engine/mod.rs` | 819 | 169 | 650 | 79.4% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
@@ -142,7 +142,7 @@ SUM:                            71           2211           1666          11956
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 267 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 170 |
+| `LOC_REPORT.md` | 172 |
 | `README.md` | 557 |
 | `ROADMAP.md` | 192 |
 | `TESTING.md` | 41 |

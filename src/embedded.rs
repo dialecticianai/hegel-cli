@@ -10,6 +10,14 @@ pub fn get_workflow(name: &str) -> Option<&'static str> {
         ("execution", include_str!("../workflows/execution.yaml")),
         ("research", include_str!("../workflows/research.yaml")),
         ("minimal", include_str!("../workflows/minimal.yaml")),
+        (
+            "init-greenfield",
+            include_str!("../workflows/init-greenfield.yaml"),
+        ),
+        (
+            "init-retrofit",
+            include_str!("../workflows/init-retrofit.yaml"),
+        ),
     ]);
     workflows.get(name).copied()
 }
@@ -51,6 +59,18 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
             "QUESTION_TRACKING.md",
             include_str!("../guides/QUESTION_TRACKING.md"),
         ),
+        (
+            "CLAUDE_CUSTOMIZATION.md",
+            include_str!("../guides/CLAUDE_CUSTOMIZATION.md"),
+        ),
+        (
+            "VISION_WRITING.md",
+            include_str!("../guides/VISION_WRITING.md"),
+        ),
+        (
+            "ARCHITECTURE_WRITING.md",
+            include_str!("../guides/ARCHITECTURE_WRITING.md"),
+        ),
         // Templates
         (
             "templates/mirror_workflow.md",
@@ -70,7 +90,14 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
 
 /// List available embedded workflows
 pub fn list_workflows() -> Vec<&'static str> {
-    vec!["discovery", "execution", "research", "minimal"]
+    vec![
+        "discovery",
+        "execution",
+        "research",
+        "minimal",
+        "init-greenfield",
+        "init-retrofit",
+    ]
 }
 
 /// List available embedded guides
@@ -86,5 +113,8 @@ pub fn list_guides() -> Vec<&'static str> {
         "STUDY_PLANNING.md",
         "KNOWLEDGE_CAPTURE.md",
         "QUESTION_TRACKING.md",
+        "CLAUDE_CUSTOMIZATION.md",
+        "VISION_WRITING.md",
+        "ARCHITECTURE_WRITING.md",
     ]
 }

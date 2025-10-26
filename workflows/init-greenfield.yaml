@@ -31,7 +31,7 @@ nodes:
 
       Respond with your completed CLAUDE.md content.
     transitions:
-      - when: "claude_complete"
+      - when: customize_claude_complete
         to: vision
 
   vision:
@@ -60,7 +60,7 @@ nodes:
 
       Respond with your completed VISION.md content.
     transitions:
-      - when: "vision_complete"
+      - when: vision_complete
         to: architecture
 
   architecture:
@@ -88,7 +88,7 @@ nodes:
 
       Respond with your completed ARCHITECTURE.md content.
     transitions:
-      - when: "architecture_complete"
+      - when: architecture_complete
         to: git_init
 
   git_init:

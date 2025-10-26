@@ -31,7 +31,7 @@ nodes:
 
       Respond with analysis and await user guidance.
     transitions:
-      - when: "detection_complete"
+      - when: detect_existing_complete
         to: code_map
 
   code_map:
@@ -69,7 +69,7 @@ nodes:
 
       Respond when CODE_MAP files are created.
     transitions:
-      - when: "code_map_complete"
+      - when: code_map_complete
         to: customize_claude
 
   customize_claude:
@@ -104,7 +104,7 @@ nodes:
 
       Respond with your completed CLAUDE.md content.
     transitions:
-      - when: "claude_complete"
+      - when: customize_claude_complete
         to: vision
 
   vision:
@@ -137,7 +137,7 @@ nodes:
 
       Respond with your completed VISION.md content (or integration plan).
     transitions:
-      - when: "vision_complete"
+      - when: vision_complete
         to: architecture
 
   architecture:
@@ -171,7 +171,7 @@ nodes:
 
       Respond with your completed ARCHITECTURE.md content.
     transitions:
-      - when: "architecture_complete"
+      - when: architecture_complete
         to: git_commit
 
   git_commit:
