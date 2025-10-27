@@ -92,11 +92,12 @@ nodes:
       - Performance: Any obvious bottlenecks?
       - Maintainability: Is code clear and documented?
 
-      Respond with review findings. If issues found, list them clearly.
+      If review reveals issues requiring fixes, respond with 'hegel next {"needs_refactor": true}'.
+      If review passes, respond with 'hegel next' (implicit review_complete).
     transitions:
-      - when: "review_passed"
+      - when: review_complete
         to: done
-      - when: "review_failed"
+      - when: needs_refactor
         to: refactor
 
   refactor:
