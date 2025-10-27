@@ -24,6 +24,7 @@ pub fn analyze_metrics(storage: &FileStorage, export_dot: bool) -> Result<()> {
     render_tokens(&metrics);
     render_activity(&metrics);
     render_top_bash_commands(&metrics);
+    render_command_output_summary(&metrics);
     render_top_file_modifications(&metrics);
     render_state_transitions(&metrics);
     render_phase_breakdown(&metrics.phase_metrics);

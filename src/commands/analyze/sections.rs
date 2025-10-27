@@ -112,6 +112,47 @@ pub fn render_top_bash_commands(metrics: &UnifiedMetrics) {
     }
 }
 
+/// Render command output summary section
+pub fn render_command_output_summary(metrics: &UnifiedMetrics) {
+    if !metrics.hook_metrics.bash_commands.is_empty() {
+        let commands_with_output = metrics
+            .hook_metrics
+            .bash_commands
+            .iter()
+            .filter(|cmd| cmd.stdout.is_some() || cmd.stderr.is_some())
+            .count();
+
+        let commands_with_errors = metrics
+            .hook_metrics
+            .bash_commands
+            .iter()
+            .filter(|cmd| {
+                cmd.stderr
+                    .as_ref()
+                    .map(|s| !s.trim().is_empty())
+                    .unwrap_or(false)
+            })
+            .count();
+
+        if commands_with_output > 0 {
+            println!("{}", Theme::label("Command Output Summary"));
+            println!(
+                "  Commands with output: {}",
+                format_metric(commands_with_output)
+            );
+            println!(
+                "  Commands with stderr: {}",
+                if commands_with_errors > 0 {
+                    Theme::warning(commands_with_errors.to_string())
+                } else {
+                    Theme::success("0")
+                }
+            );
+            println!();
+        }
+    }
+}
+
 /// Render top file modifications section
 pub fn render_top_file_modifications(metrics: &UnifiedMetrics) {
     if !metrics.hook_metrics.file_modifications.is_empty() {

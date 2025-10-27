@@ -45,11 +45,6 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 - `AdapterRegistry::get()` - Get adapter by name for explicit selection
 **Use case:** Route hook events to different adapters based on agent type
 
-### Detailed Command Metrics
-**Files:** `src/metrics/hooks.rs`
-- `BashCommand.stdout/stderr` - Command output fields
-**Use case:** Analyze command output patterns for debugging/optimization
-
 ### Phase-Specific Rules
 **Files:** `src/rules/types.rs`
 - `RuleEvaluationContext.current_phase` - Current workflow phase field

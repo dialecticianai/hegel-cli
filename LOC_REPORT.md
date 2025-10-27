@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-26 23:10
+**Last Updated**: 2025-10-26 23:22
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,014 | 6,288 | 18,302 |
-| **Comments** | 1,671 | - | 1,671 |
-| **Blank Lines** | 2,215 | - | 2,215 |
-| **Total Lines** | 15,900 | 6,288 | 22,188 |
+| **Lines** | 12,050 | 6,282 | 18,332 |
+| **Comments** | 1,670 | - | 1,670 |
+| **Blank Lines** | 2,218 | - | 2,218 |
+| **Total Lines** | 15,938 | 6,282 | 22,220 |
 | **Files** | 71 | 30 | 101 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            71           2215           1671          12014
+Rust                            71           2218           1670          12050
 -------------------------------------------------------------------------------
-SUM:                            71           2215           1671          12014
+SUM:                            71           2218           1670          12050
 -------------------------------------------------------------------------------
 ```
 
@@ -40,8 +40,8 @@ SUM:                            71           2215           1671          12014
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
-| `commands/analyze/mod.rs` | 188 | 34 | 154 | 81.9% | ✅ |
-| `commands/analyze/sections.rs` | 279 | 279 | 0 | 0.0% | ✅ (infra) |
+| `commands/analyze/mod.rs` | 189 | 35 | 154 | 81.5% | ✅ |
+| `commands/analyze/sections.rs` | 320 | 320 | 0 | 0.0% | ✅ (infra) |
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
 | `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
@@ -80,7 +80,7 @@ SUM:                            71           2215           1671          12014
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |
-| `metrics/hooks.rs` | 330 | 220 | 110 | 33.3% | ✅ (infra) |
+| `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
 | `metrics/mod.rs` | 605 | 168 | 437 | 72.2% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
@@ -142,9 +142,9 @@ SUM:                            71           2215           1671          12014
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 173 |
+| `LOC_REPORT.md` | 172 |
 | `README.md` | 574 |
-| `ROADMAP.md` | 187 |
+| `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
 
 ---
