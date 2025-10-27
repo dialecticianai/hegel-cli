@@ -20,9 +20,9 @@ fn next(storage: &FileStorage) {
     next_prompt(None, storage).unwrap();
 }
 
-/// Advance workflow with custom claims JSON
-fn next_with(claims: &str, storage: &FileStorage) {
-    next_prompt(Some(claims), storage).unwrap();
+/// Advance workflow with custom claim
+fn next_with(claim: &str, storage: &FileStorage) {
+    next_prompt(Some(claim), storage).unwrap();
 }
 
 /// Load and assert current state

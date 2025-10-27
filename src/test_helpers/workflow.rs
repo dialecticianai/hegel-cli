@@ -2,7 +2,7 @@
 
 use crate::engine::{Node, Transition, Workflow};
 use crate::storage::FileStorage;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use tempfile::TempDir;
 
@@ -164,8 +164,8 @@ pub fn test_guides() -> (TempDir, PathBuf) {
 
 // ========== Claims Helpers ==========
 
-pub fn claim(key: &str, value: bool) -> HashMap<String, bool> {
-    HashMap::from([(key.to_string(), value)])
+pub fn claim(key: &str, _value: bool) -> HashSet<String> {
+    HashSet::from([key.to_string()])
 }
 
 // ========== Workflow Command Test Helpers ==========

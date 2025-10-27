@@ -54,7 +54,7 @@ fn test_start_workflow_with_invalid_start_node() {
 fn test_next_prompt_successful_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
 }
 
@@ -62,7 +62,7 @@ fn test_next_prompt_successful_transition() {
 fn test_next_prompt_no_matching_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"wrong_claim": true}"#, &storage);
+    next_with("wrong_claim", &storage);
     assert_at(&storage, "spec", "test_mode", &["spec"]);
 }
 
@@ -76,20 +76,6 @@ fn test_next_prompt_no_workflow_loaded() {
                 .unwrap_err()
                 .to_string()
                 .contains("No workflow loaded")
-    );
-}
-
-#[test]
-fn test_next_prompt_invalid_json() {
-    let (_tmp, storage) = setup_workflow_env();
-    start(&storage);
-    let result = next_prompt(Some("not valid json"), &storage);
-    assert!(
-        result.is_err()
-            && result
-                .unwrap_err()
-                .to_string()
-                .contains("Failed to parse claims JSON")
     );
 }
 
@@ -140,7 +126,7 @@ fn test_show_status_no_workflow() {
 fn test_show_status_after_transitions() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     assert!(show_status(&storage).is_ok());
     assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
 }
@@ -191,7 +177,7 @@ fn test_reset_workflow_preserves_session_metadata() {
 fn test_reset_then_start_new_workflow() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     reset_workflow(&storage).unwrap();
     start(&storage);
     assert_at(&storage, "spec", "test_mode", &["spec"]);
@@ -226,7 +212,7 @@ fn test_full_workflow_cycle() {
 fn test_next_prompt_logs_state_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     let event = first_transition(&storage);
     assert_eq!(event["from_node"], "spec");
     assert_eq!(event["to_node"], "plan");
@@ -257,7 +243,7 @@ fn test_next_prompt_logs_multiple_transitions() {
 fn test_next_prompt_no_log_when_no_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"wrong_claim": true}"#, &storage);
+    next_with("wrong_claim", &storage);
     assert_eq!(transition_count(&storage), 0);
 }
 
@@ -273,7 +259,7 @@ fn test_state_transition_includes_workflow_id() {
         .as_ref()
         .unwrap()
         .clone();
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     let event = first_transition(&storage);
     assert_eq!(event["workflow_id"], workflow_id.as_str());
 }

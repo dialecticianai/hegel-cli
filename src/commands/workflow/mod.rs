@@ -123,9 +123,9 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
     Ok(())
 }
 
-pub fn next_prompt(claims_str: Option<&str>, storage: &FileStorage) -> Result<()> {
-    let claim_alias = match claims_str {
-        Some(json) => ClaimAlias::Custom(json.to_string()),
+pub fn next_prompt(claim_str: Option<&str>, storage: &FileStorage) -> Result<()> {
+    let claim_alias = match claim_str {
+        Some(name) => ClaimAlias::Custom(name.to_string()),
         None => ClaimAlias::Next,
     };
     advance_workflow(claim_alias, storage)

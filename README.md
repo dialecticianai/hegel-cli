@@ -232,14 +232,14 @@ hegel abort
 
 **Advanced usage:**
 
-For custom transitions, provide explicit claims:
+For custom transitions, provide explicit claims. Claims are simple strings that trigger specific workflow transitions:
 
 ```bash
-hegel next '{"spec_complete": true}'
-hegel next '{"custom_claim": true}'
+hegel next spec_complete        # Explicit claim
+hegel next needs_refactor        # Custom transition (e.g., in execution workflow)
 ```
 
-The `next` command automatically infers the happy-path claim (`{"{current_phase}_complete": true}`) when no claim is provided
+The `next` command automatically infers the happy-path claim (`{current_phase}_complete`) when no claim is provided.
 
 ### Checking Status
 

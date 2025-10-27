@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
-use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 
 use crate::engine::get_next_prompt;
@@ -49,7 +49,7 @@ pub struct TransitionOption {
 /// Evaluate what type of transition should occur based on claims and context
 pub fn evaluate_transition(
     context: &WorkflowContext,
-    claims: &HashMap<String, bool>,
+    claims: &HashSet<String>,
     storage: &FileStorage,
 ) -> Result<TransitionOutcome> {
     let current_node = &context.workflow_state.current_node;

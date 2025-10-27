@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-26 18:44
+**Last Updated**: 2025-10-26 22:39
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.63%** lines | **89.63%** regions | **88.83%** functions
+**Overall Coverage**: **90.62%** lines | **89.60%** regions | **88.83%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14699              1525    89.63%         797                89    88.83%        8787               823    90.63%           0                 0         -
+TOTAL                                  14672              1526    89.60%         797                89    88.83%        8773               823    90.62%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -37,12 +37,12 @@ TOTAL                                  14699              1525    89.63%        
 | `commands/reflect.rs` | 52.70% | 52.94% | 100.00% | 🟠 Moderate |
 | `commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `commands/workflow/mod.rs` | 57.95% | 57.53% | 56.00% | 🟠 Moderate |
+| `commands/workflow/mod.rs` | 57.95% | 57.34% | 56.00% | 🟠 Moderate |
 | `commands/workflow/transitions.rs` | 92.39% | 88.24% | 50.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `embedded.rs` | 76.42% | 61.54% | 50.00% | 🟡 Good |
-| `engine/mod.rs` | 99.82% | 99.59% | 97.14% | 🟢 Excellent |
+| `engine/mod.rs` | 99.81% | 99.58% | 97.14% | 🟢 Excellent |
 | `engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -64,7 +64,7 @@ TOTAL                                  14699              1525    89.63%        
 | `test_helpers/metrics.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `test_helpers/storage.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `test_helpers/workflow.rs` | 86.11% | 81.55% | 87.50% | 🟡 Good |
+| `test_helpers/workflow.rs` | 86.11% | 81.44% | 87.50% | 🟡 Good |
 | `theme.rs` | 92.86% | 93.75% | 90.91% | 🟢 Excellent |
 | `tui/app.rs` | 87.66% | 87.90% | 87.50% | 🟡 Good |
 | `tui/mod.rs` | 11.36% | 13.70% | 16.67% | 🔴 Needs Work |
@@ -96,7 +96,7 @@ TOTAL                                  14699              1525    89.63%        
 - `commands/workflow/context.rs` - 100.00%
 - `commands/workflow/transitions.rs` - 92.39%
 - `config.rs` - 91.67%
-- `engine/mod.rs` - 99.82%
+- `engine/mod.rs` - 99.81%
 - `engine/template.rs` - 97.25%
 - `guardrails/parser.rs` - 97.78%
 - `guardrails/types.rs` - 94.38%
@@ -149,7 +149,7 @@ TOTAL                                  14699              1525    89.63%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.63% | ✅ Met |
+| Overall | ≥80% | 90.62% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -8,7 +8,7 @@ use crate::test_helpers::*;
 fn test_next_prompt_logs_state_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     let event = first_transition(&storage);
     assert_eq!(event["from_node"], "spec");
     assert_eq!(event["to_node"], "plan");
@@ -39,7 +39,7 @@ fn test_next_prompt_logs_multiple_transitions() {
 fn test_next_prompt_no_log_when_no_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    next_with(r#"{"wrong_claim": true}"#, &storage);
+    next_with("wrong_claim", &storage);
     assert_eq!(transition_count(&storage), 0);
 }
 
@@ -55,7 +55,7 @@ fn test_state_transition_includes_workflow_id() {
         .as_ref()
         .unwrap()
         .clone();
-    next_with(r#"{"spec_complete": true}"#, &storage);
+    next_with("spec_complete", &storage);
     let event = first_transition(&storage);
     assert_eq!(event["workflow_id"], workflow_id.as_str());
 }

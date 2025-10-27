@@ -105,7 +105,7 @@ fn test_next_no_workflow() {
     let temp_dir = TempDir::new().unwrap();
     let state_path = temp_dir.path().to_str().unwrap();
 
-    let output = run_hegel(&["next", r#"{"spec_complete": true}"#], Some(state_path));
+    let output = run_hegel(&["next", "spec_complete"], Some(state_path));
 
     assert!(!output.status.success());
     let err = stderr(&output);
@@ -121,7 +121,7 @@ fn test_next_successful_transition() {
     run_hegel(&["start", "discovery"], Some(state_path));
 
     // Transition to next node
-    let output = run_hegel(&["next", r#"{"spec_complete": true}"#], Some(state_path));
+    let output = run_hegel(&["next", "spec_complete"], Some(state_path));
 
     assert!(output.status.success());
     let out = stdout(&output);
@@ -139,28 +139,14 @@ fn test_next_no_matching_transition() {
     run_hegel(&["start", "discovery"], Some(state_path));
 
     // Try transition with wrong claim
-    let output = run_hegel(&["next", r#"{"wrong_claim": true}"#], Some(state_path));
+    let output = run_hegel(&["next", "wrong_claim"], Some(state_path));
 
     assert!(output.status.success());
     let out = stdout(&output);
     assert!(out.contains("Stayed at current node"));
 }
 
-#[test]
-fn test_next_invalid_json() {
-    let temp_dir = TempDir::new().unwrap();
-    let state_path = temp_dir.path().to_str().unwrap();
-
-    // Start workflow
-    run_hegel(&["start", "discovery"], Some(state_path));
-
-    // Try with invalid JSON
-    let output = run_hegel(&["next", "not valid json"], Some(state_path));
-
-    assert!(!output.status.success());
-    let err = stderr(&output);
-    assert!(err.contains("Failed to parse claims JSON"));
-}
+// Note: test_next_invalid_json removed - with simple string claims, any string is valid
 
 #[test]
 fn test_repeat_no_workflow() {
@@ -253,7 +239,7 @@ fn test_full_workflow_cycle() {
     assert!(stdout(&status1).contains("Mode: discovery"));
 
     // Transition to plan
-    let next1 = run_hegel(&["next", r#"{"spec_complete": true}"#], Some(state_path));
+    let next1 = run_hegel(&["next", "spec_complete"], Some(state_path));
     assert!(next1.status.success());
     assert!(stdout(&next1).contains("plan"));
 

@@ -97,7 +97,7 @@ nodes:
 
       **Advancing the workflow:**
       - Review complete, no issues found → `hegel next` (implicit review_complete claim)
-      - Review complete, issues need fixing → `hegel next '{"needs_refactor": true}'`
+      - Review complete, issues need fixing → `hegel next needs_refactor`
 
       Both paths complete the review task. The claim determines next routing:
       - `review_complete` → proceeds to done

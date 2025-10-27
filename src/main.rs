@@ -45,11 +45,11 @@ enum Commands {
     Workflows,
     /// List available guides
     Guides,
-    /// Advance to next phase (implicit: current_complete=true, or provide custom claims)
+    /// Advance to next phase (implicit: current_complete, or provide custom claim)
     Next {
-        /// Optional claims as JSON string (e.g., '{"spec_complete": true}')
-        /// If omitted, uses happy-path claim: {"{current}_complete": true}
-        claims: Option<String>,
+        /// Optional claim name (e.g., 'spec_complete', 'needs_refactor')
+        /// If omitted, uses happy-path claim: {current}_complete
+        claim: Option<String>,
     },
     /// Repeat current phase (claim: current_complete=false)
     Repeat,
@@ -234,8 +234,8 @@ fn main() -> Result<()> {
         Commands::Guides => {
             commands::list_guides(&storage)?;
         }
-        Commands::Next { claims } => {
-            commands::next_prompt(claims.as_deref(), &storage)?;
+        Commands::Next { claim } => {
+            commands::next_prompt(claim.as_deref(), &storage)?;
         }
         Commands::Repeat => {
             commands::repeat_prompt(&storage)?;

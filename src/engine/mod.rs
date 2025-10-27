@@ -2,7 +2,7 @@ mod template;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::Path;
 
@@ -92,7 +92,7 @@ pub fn init_state(workflow: &Workflow) -> WorkflowState {
 pub fn get_next_prompt(
     workflow: &Workflow,
     state: &WorkflowState,
-    claims: &HashMap<String, bool>,
+    claims: &HashSet<String>,
     state_dir: &Path,
 ) -> Result<(String, WorkflowState)> {
     let current = &state.current_node;
@@ -102,13 +102,13 @@ pub fn get_next_prompt(
         .with_context(|| format!("Node not found in workflow: {}", current))?;
 
     // Special handling for restart_cycle - always returns to start_node
-    let next_node = if claims.get("restart_cycle") == Some(&true) {
+    let next_node = if claims.contains("restart_cycle") {
         workflow.start_node.clone()
     } else {
         // Evaluate transitions - find first matching claim
         let mut next = current.clone();
         for transition in &node.transitions {
-            if claims.get(&transition.when) == Some(&true) {
+            if claims.contains(&transition.when) {
                 next = transition.to.clone();
                 break;
             }
@@ -393,8 +393,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let mut claims = HashMap::new();
-        claims.insert("spec_complete".to_string(), true);
+        let claims = HashSet::from(["spec_complete".to_string()]);
 
         let (prompt, new_state) =
             get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
@@ -416,8 +415,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let mut claims = HashMap::new();
-        claims.insert("wrong_claim".to_string(), true);
+        let claims = HashSet::from(["wrong_claim".to_string()]);
 
         let (prompt, new_state) =
             get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
@@ -455,7 +453,6 @@ nodes:
             .build();
 
         let mut state = init_state(&workflow);
-        let mut claims = HashMap::new();
 
         // SPEC -> PLAN -> CODE -> LEARNINGS -> DONE
         for (claim, expected_node) in [
@@ -464,8 +461,7 @@ nodes:
             ("code_complete", "learnings"),
             ("learnings_complete", "done"),
         ] {
-            claims.clear();
-            claims.insert(claim.to_string(), true);
+            let claims = HashSet::from([claim.to_string()]);
             let (_, new_state) =
                 get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
             state = new_state;
@@ -517,16 +513,13 @@ nodes:
             phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
         };
 
-        let mut claims = HashMap::new();
-
         // CODE -> REVIEW -> REFACTOR -> CODE (loop)
         for (claim, expected_node) in [
             ("code_complete", "review"),
             ("review_failed", "refactor"),
             ("refactor_complete", "code"),
         ] {
-            claims.clear();
-            claims.insert(claim.to_string(), true);
+            let claims = HashSet::from([claim.to_string()]);
             let (_, new_state) =
                 get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
             state = new_state;
@@ -559,9 +552,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let mut claims = HashMap::new();
-        claims.insert("option_b".to_string(), true);
-        claims.insert("option_c".to_string(), true);
+        let claims = HashSet::from(["option_b".to_string(), "option_c".to_string()]);
 
         let (_, new_state) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
         assert_eq!(new_state.current_node, "path_b");
@@ -580,8 +571,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let mut claims = HashMap::new();
-        claims.insert("go".to_string(), true);
+        let claims = HashSet::from(["go".to_string()]);
 
         let result = get_next_prompt(&workflow, &state, &claims, temp_dir.path());
         assert!(result.is_err());
@@ -700,7 +690,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let claims = HashMap::new();
+        let claims = HashSet::new();
 
         let (prompt, _) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
         assert_eq!(prompt, "Normal prompt");
@@ -719,7 +709,7 @@ nodes:
         let workflow = workflow("test", "start").with_node("start", node).build();
 
         let state = init_state(&workflow);
-        let claims = HashMap::new();
+        let claims = HashSet::new();
 
         let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
         assert_eq!(prompt, "Normal prompt");
@@ -756,7 +746,7 @@ nodes:
         let workflow = workflow("test", "start").with_node("start", node).build();
 
         let state = init_state(&workflow);
-        let claims = HashMap::new();
+        let claims = HashSet::new();
 
         let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
 
@@ -784,7 +774,7 @@ nodes:
         let workflow = workflow("test", "start").with_node("start", node).build();
 
         let state = init_state(&workflow);
-        let claims = HashMap::new();
+        let claims = HashSet::new();
 
         let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
 
@@ -808,8 +798,7 @@ nodes:
             .build();
 
         let state = init_state(&workflow);
-        let mut claims = HashMap::new();
-        claims.insert("spec_complete".to_string(), true);
+        let claims = HashSet::from(["spec_complete".to_string()]);
 
         let (prompt, new_state) =
             get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
