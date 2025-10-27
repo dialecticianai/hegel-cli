@@ -44,6 +44,14 @@ impl Workflow {
         }
         Ok(())
     }
+
+    /// Check if a node is terminal (has no outgoing transitions)
+    pub fn is_terminal_node(&self, node_name: &str) -> bool {
+        self.nodes
+            .get(node_name)
+            .map(|node| node.transitions.is_empty())
+            .unwrap_or(false)
+    }
 }
 
 /// Load workflow definition from YAML string
@@ -804,5 +812,21 @@ nodes:
             get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
         assert_eq!(new_state.current_node, "plan");
         assert_eq!(prompt, "Write PLAN.md");
+    }
+
+    #[test]
+    fn test_is_terminal_node() {
+        use crate::test_helpers::*;
+
+        let workflow = workflow("test", "start")
+            .with_node("start", node("Start", vec![transition("go", "middle")]))
+            .with_node("middle", node("Middle", vec![transition("done", "end")]))
+            .with_node("end", node("End", vec![]))
+            .build();
+
+        assert!(!workflow.is_terminal_node("start"));
+        assert!(!workflow.is_terminal_node("middle"));
+        assert!(workflow.is_terminal_node("end"));
+        assert!(!workflow.is_terminal_node("nonexistent"));
     }
 }

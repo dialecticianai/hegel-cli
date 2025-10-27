@@ -29,13 +29,21 @@ pub fn start_workflow(
 
     // Check if there's already an active workflow
     if let Some(existing_ws) = &existing_state.workflow_state {
-        if existing_state.workflow.is_some() {
-            anyhow::bail!(
-                "Cannot start new workflow: already in workflow '{}' at node '{}'.\n\
-                 Run 'hegel abort' to abandon the current workflow first.",
-                existing_ws.mode,
-                existing_ws.current_node
-            );
+        if let Some(existing_workflow_value) = &existing_state.workflow {
+            // Deserialize workflow to check if at terminal node
+            let existing_workflow: crate::engine::Workflow =
+                serde_yaml::from_value(existing_workflow_value.clone())
+                    .context("Failed to deserialize existing workflow")?;
+
+            // Allow starting new workflow if current is at a terminal node
+            if !existing_workflow.is_terminal_node(&existing_ws.current_node) {
+                anyhow::bail!(
+                    "Cannot start new workflow: already in workflow '{}' at node '{}'.\n\
+                     Run 'hegel abort' to abandon the current workflow first.",
+                    existing_ws.mode,
+                    existing_ws.current_node
+                );
+            }
         }
     }
 

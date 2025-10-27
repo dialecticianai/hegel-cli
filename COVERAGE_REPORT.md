@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-26 23:22
+**Last Updated**: 2025-10-26 23:26
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.42%** lines | **89.38%** regions | **88.65%** functions
+**Overall Coverage**: **90.39%** lines | **89.35%** regions | **88.70%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14742              1566    89.38%         802                91    88.65%        8824               845    90.42%           0                 0         -
+TOTAL                                  14802              1577    89.35%         805                91    88.70%        8847               850    90.39%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -37,12 +37,12 @@ TOTAL                                  14742              1566    89.38%        
 | `commands/reflect.rs` | 52.70% | 52.94% | 100.00% | 🟠 Moderate |
 | `commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `commands/workflow/mod.rs` | 57.95% | 57.34% | 56.00% | 🟠 Moderate |
+| `commands/workflow/mod.rs` | 56.94% | 56.05% | 56.00% | 🟠 Moderate |
 | `commands/workflow/transitions.rs` | 92.39% | 88.24% | 50.00% | 🟢 Excellent |
 | `commands/wrapped.rs` | 72.50% | 74.10% | 80.00% | 🟡 Good |
 | `config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `embedded.rs` | 76.42% | 61.54% | 50.00% | 🟡 Good |
-| `engine/mod.rs` | 99.81% | 99.58% | 97.14% | 🟢 Excellent |
+| `engine/mod.rs` | 99.82% | 99.60% | 97.37% | 🟢 Excellent |
 | `engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -96,7 +96,7 @@ TOTAL                                  14742              1566    89.38%        
 - `commands/workflow/context.rs` - 100.00%
 - `commands/workflow/transitions.rs` - 92.39%
 - `config.rs` - 91.67%
-- `engine/mod.rs` - 99.81%
+- `engine/mod.rs` - 99.82%
 - `engine/template.rs` - 97.25%
 - `guardrails/parser.rs` - 97.78%
 - `guardrails/types.rs` - 94.38%
@@ -138,7 +138,7 @@ TOTAL                                  14742              1566    89.38%        
 - `commands/archive.rs` - 59.30%
 - `commands/fork/mod.rs` - 60.70%
 - `commands/reflect.rs` - 52.70%
-- `commands/workflow/mod.rs` - 57.95%
+- `commands/workflow/mod.rs` - 56.94%
 - `main.rs` - 42.86%
 
 ### 🔴 Needs Work (<40% lines)
@@ -149,7 +149,7 @@ TOTAL                                  14742              1566    89.38%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.42% | ✅ Met |
+| Overall | ≥80% | 90.39% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
