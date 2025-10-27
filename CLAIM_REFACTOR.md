@@ -168,39 +168,27 @@ next_with("spec_complete", &storage);
 **4.3 Guide files**
 - [ ] Search `guides/` for any claim examples (unlikely but check)
 
-### Phase 5: Backward Compatibility (Optional)
+### Phase 5: Final Verification
 
-**Decision point:** Support both formats during transition?
+**End-to-end validation:**
+- [ ] Run full test suite (415 tests)
+- [ ] Manual testing of all 6 workflows
+- [ ] Verify CLI help text accuracy
+- [ ] Check error messages are clear
+- [ ] Build and install binary
+- [ ] Test in real usage scenarios
 
-**Option A: Hard cutover** (recommended)
-- Clean break, simpler implementation
-- Version bump (breaking change)
-- Clear migration path
-
-**Option B: Temporary dual support**
-```rust
-Self::Custom(input) => {
-    // Try parsing as JSON first (old format)
-    if let Ok(map) = serde_json::from_str::<HashMap<String, bool>>(input) {
-        Ok(map.keys().cloned().collect())
-    } else {
-        // Treat as simple string (new format)
-        Ok(HashSet::from([input.to_string()]))
-    }
-}
-```
-
-**Recommendation**: Option A (hard cutover). This is pre-1.0 software, clean breaks are acceptable.
+**Note:** No backward compatibility needed - this is pre-alpha software with no external users.
 
 ---
 
 ## Implementation Order
 
-1. **Core types** (`claims.rs`, `engine/mod.rs`, `transitions.rs`) - Foundation
-2. **CLI parsing** (`main.rs`, `commands/workflow/mod.rs`) - User interface
-3. **Tests** (all test files) - Validation
-4. **Documentation** (workflows, README, guides) - User-facing
-5. **Final verification** - End-to-end testing
+1. **Core types** (Phase 1) - Foundation changes
+2. **CLI parsing** (Phase 2) - User interface
+3. **Tests** (Phase 3) - Validation
+4. **Documentation** (Phase 4) - User-facing
+5. **Final verification** (Phase 5) - End-to-end testing
 
 ---
 
