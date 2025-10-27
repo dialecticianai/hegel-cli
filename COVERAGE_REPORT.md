@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-26 23:26
+**Last Updated**: 2025-10-27 00:46
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.39%** lines | **89.35%** regions | **88.70%** functions
+**Overall Coverage**: **90.36%** lines | **89.31%** regions | **88.70%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14802              1577    89.35%         805                91    88.70%        8847               850    90.39%           0                 0         -
+TOTAL                                  14810              1583    89.31%         805                91    88.70%        8851               853    90.36%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -46,7 +46,7 @@ TOTAL                                  14802              1577    89.35%        
 | `engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `main.rs` | 42.86% | 36.57% | 100.00% | 🟠 Moderate |
+| `main.rs` | 41.67% | 35.92% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
@@ -139,7 +139,7 @@ TOTAL                                  14802              1577    89.35%        
 - `commands/fork/mod.rs` - 60.70%
 - `commands/reflect.rs` - 52.70%
 - `commands/workflow/mod.rs` - 56.94%
-- `main.rs` - 42.86%
+- `main.rs` - 41.67%
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 38.57%
@@ -149,7 +149,7 @@ TOTAL                                  14802              1577    89.35%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.39% | ✅ Met |
+| Overall | ≥80% | 90.36% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

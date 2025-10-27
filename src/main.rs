@@ -215,7 +215,15 @@ fn main() -> Result<()> {
     }
 
     // Initialize storage with resolved state directory
-    let state_dir = FileStorage::resolve_state_dir(cli.state_dir)?;
+    // Special case: for `init` command, use cwd/.hegel if no .hegel found
+    let state_dir = if matches!(cli.command, Some(Commands::Init)) {
+        match cli.state_dir {
+            Some(path) => path,
+            None => std::env::current_dir()?.join(".hegel"),
+        }
+    } else {
+        FileStorage::resolve_state_dir(cli.state_dir)?
+    };
     let storage = FileStorage::new(state_dir)?;
 
     // Auto-install Claude Code hooks if needed (silently fails if not in Claude Code)
