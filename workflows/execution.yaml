@@ -92,8 +92,18 @@ nodes:
       - Performance: Any obvious bottlenecks?
       - Maintainability: Is code clear and documented?
 
-      If review reveals issues requiring fixes, respond with 'hegel next {"needs_refactor": true}'.
-      If review passes, respond with 'hegel next' (implicit review_complete).
+      **Claim semantics:**
+      Claims represent task completion, not outcomes. You've completed the review regardless of findings.
+
+      **Advancing the workflow:**
+      - Review complete, no issues found → `hegel next` (implicit review_complete claim)
+      - Review complete, issues need fixing → `hegel next '{"needs_refactor": true}'`
+
+      Both paths complete the review task. The claim determines next routing:
+      - `review_complete` → proceeds to done
+      - `needs_refactor` → routes to refactor phase
+
+      Perform your review and report findings clearly.
     transitions:
       - when: review_complete
         to: done
