@@ -67,7 +67,11 @@ enum Commands {
         event_name: String,
     },
     /// Analyze captured metrics (hooks, transcripts, states)
-    Analyze,
+    Analyze {
+        /// Export workflow graph as DOT format (for Graphviz visualization)
+        #[arg(long)]
+        export_dot: bool,
+    },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
     /// Interactive TUI dashboard (real-time metrics)
@@ -255,8 +259,8 @@ fn main() -> Result<()> {
         Commands::Hook { event_name } => {
             commands::handle_hook(&event_name, &storage)?;
         }
-        Commands::Analyze => {
-            commands::analyze_metrics(&storage)?;
+        Commands::Analyze { export_dot } => {
+            commands::analyze_metrics(&storage, export_dot)?;
         }
         Commands::Archive(args) => {
             commands::archive(args, &storage)?;

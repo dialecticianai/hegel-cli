@@ -399,7 +399,11 @@ Shows:
 - **Workflow graph** - ASCII visualization of phase transitions:
   - Node metrics (visits, tokens, duration, bash commands, file edits)
   - Cycle detection (identifies workflow loops)
-  - DOT export instructions for Graphviz diagrams
+  - Export to Graphviz DOT format:
+    ```bash
+    hegel analyze --export-dot > workflow.dot
+    dot -Tpng workflow.dot -o workflow.png
+    ```
 
 ### Interactive Dashboard
 

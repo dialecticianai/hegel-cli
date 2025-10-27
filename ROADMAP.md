@@ -45,11 +45,6 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 - `AdapterRegistry::get()` - Get adapter by name for explicit selection
 **Use case:** Route hook events to different adapters based on agent type
 
-### Workflow Visualization
-**Files:** `src/metrics/graph.rs`
-- `WorkflowDAG::export_dot()` - Export workflow graphs as Graphviz DOT format
-**Use case:** `hegel analyze --export-dot` to visualize workflow structure
-
 ### Detailed Command Metrics
 **Files:** `src/metrics/hooks.rs`
 - `BashCommand.stdout/stderr` - Command output fields

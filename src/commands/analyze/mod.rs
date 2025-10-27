@@ -7,13 +7,19 @@ use crate::storage::FileStorage;
 use crate::theme::Theme;
 use sections::*;
 
-pub fn analyze_metrics(storage: &FileStorage) -> Result<()> {
+pub fn analyze_metrics(storage: &FileStorage, export_dot: bool) -> Result<()> {
+    let metrics = parse_unified_metrics(storage.state_dir())?;
+
+    // Export DOT format if requested
+    if export_dot {
+        render_workflow_graph_dot(&metrics)?;
+        return Ok(());
+    }
+
+    // Otherwise, render full analysis
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
-    let metrics = parse_unified_metrics(storage.state_dir())?;
-
-    // Render all sections
     render_session(&metrics);
     render_tokens(&metrics);
     render_activity(&metrics);
@@ -36,7 +42,7 @@ mod tests {
         // Empty state directory - should not error
         let (_temp_dir, storage) = test_storage_with_files(None, None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -48,7 +54,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -62,7 +68,7 @@ mod tests {
         let hook = hook_with_transcript(&transcript_path, "test", "2025-01-01T10:00:00Z");
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook]), None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -76,7 +82,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -89,7 +95,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -102,7 +108,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -119,7 +125,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -131,7 +137,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -145,7 +151,7 @@ mod tests {
         );
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook_str]), None);
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 
@@ -176,7 +182,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage);
+        let result = analyze_metrics(&storage, false);
         assert!(result.is_ok());
     }
 }

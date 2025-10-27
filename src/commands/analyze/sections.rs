@@ -255,7 +255,7 @@ pub fn render_workflow_graph(metrics: &UnifiedMetrics) {
 
         println!("{}", Theme::secondary("Export Options:"));
         println!(
-            "  {} hegel graph --dot > workflow.dot",
+            "  {} hegel analyze --export-dot > workflow.dot",
             Theme::secondary("Run")
         );
         println!(
@@ -264,4 +264,16 @@ pub fn render_workflow_graph(metrics: &UnifiedMetrics) {
         );
         println!();
     }
+}
+
+/// Export workflow graph as DOT format
+pub fn render_workflow_graph_dot(metrics: &UnifiedMetrics) -> anyhow::Result<()> {
+    if metrics.state_transitions.is_empty() || metrics.phase_metrics.is_empty() {
+        eprintln!("No workflow data to export. Run a workflow first.");
+        return Ok(());
+    }
+
+    let graph = WorkflowDAG::from_transitions(&metrics.state_transitions, &metrics.phase_metrics);
+    println!("{}", graph.export_dot());
+    Ok(())
 }

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-10-26 22:39
+**Last Updated**: 2025-10-26 23:10
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.62%** lines | **89.60%** regions | **88.83%** functions
+**Overall Coverage**: **90.51%** lines | **89.46%** regions | **88.72%** functions
 
 ## Summary
 
 ```
-TOTAL                                  14672              1526    89.60%         797                89    88.83%        8773               823    90.62%           0                 0         -
+TOTAL                                  14699              1549    89.46%         798                90    88.72%        8787               834    90.51%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -18,8 +18,8 @@ TOTAL                                  14672              1526    89.60%        
 | `adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
-| `commands/analyze/mod.rs` | 100.00% | 99.51% | 100.00% | 🟢 Excellent |
-| `commands/analyze/sections.rs` | 97.56% | 95.62% | 100.00% | 🟢 Excellent |
+| `commands/analyze/mod.rs` | 98.02% | 97.63% | 100.00% | 🟢 Excellent |
+| `commands/analyze/sections.rs` | 93.46% | 89.87% | 92.31% | 🟢 Excellent |
 | `commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
 | `commands/astq.rs` | 38.57% | 35.71% | 60.00% | 🔴 Needs Work |
 | `commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
@@ -46,7 +46,7 @@ TOTAL                                  14672              1526    89.60%        
 | `engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `main.rs` | 41.82% | 35.61% | 100.00% | 🟠 Moderate |
+| `main.rs` | 42.86% | 36.57% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
 | `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
@@ -82,8 +82,8 @@ TOTAL                                  14672              1526    89.60%        
 - `adapters/codex.rs` - 94.43%
 - `adapters/cursor.rs` - 93.84%
 - `adapters/mod.rs` - 98.91%
-- `commands/analyze/mod.rs` - 100.00%
-- `commands/analyze/sections.rs` - 97.56%
+- `commands/analyze/mod.rs` - 98.02%
+- `commands/analyze/sections.rs` - 93.46%
 - `commands/config.rs` - 91.95%
 - `commands/fork/amp.rs` - 100.00%
 - `commands/fork/codex.rs` - 100.00%
@@ -139,7 +139,7 @@ TOTAL                                  14672              1526    89.60%        
 - `commands/fork/mod.rs` - 60.70%
 - `commands/reflect.rs` - 52.70%
 - `commands/workflow/mod.rs` - 57.95%
-- `main.rs` - 41.82%
+- `main.rs` - 42.86%
 
 ### 🔴 Needs Work (<40% lines)
 - `commands/astq.rs` - 38.57%
@@ -149,7 +149,7 @@ TOTAL                                  14672              1526    89.60%        
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.62% | ✅ Met |
+| Overall | ≥80% | 90.51% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
