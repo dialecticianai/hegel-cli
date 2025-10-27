@@ -102,7 +102,7 @@ nodes:
 
       **Adversarial check**: What existing conventions am I overlooking? What might break if we change operational patterns?
 
-      Respond with your completed CLAUDE.md content.
+      Respond with a concise summary of key conventions documented in CLAUDE.md.
     transitions:
       - when: customize_claude_complete
         to: vision
@@ -135,7 +135,7 @@ nodes:
 
       **Adversarial check**: Am I missing existing project context? Does my vision align with current direction?
 
-      Respond with your completed VISION.md content (or integration plan).
+      Respond with a concise summary of the project vision or integration plan.
     transitions:
       - when: vision_complete
         to: architecture
@@ -147,6 +147,16 @@ nodes:
       {{ARCHITECTURE_WRITING}}
 
       Your task: Document existing architecture or create ARCHITECTURE.md.
+
+      **First, review CODE_MAP.md files created earlier.** They contain:
+      - Project structure and file organization
+      - Key modules and their relationships
+      - Existing patterns in the codebase
+
+      Use CODE_MAPs as your starting point. Only inspect code directly for:
+      - Dependency analysis (imports, package.json, Cargo.toml, etc.)
+      - Integration point details (API contracts, database schemas)
+      - Specific technical constraints not visible from structure alone
 
       Since this is an existing project:
       - Document current tech stack (what's actually in use)
@@ -169,7 +179,14 @@ nodes:
 
       **Adversarial check**: What architectural constraints am I missing? What technical risks should we document?
 
-      Respond with your completed ARCHITECTURE.md content.
+      **After completing ARCHITECTURE.md:**
+      Review and refine CODE_MAP.md files based on your deeper architectural understanding:
+      - Add architectural context to file descriptions (e.g., "Mediator pattern coordinating X and Y")
+      - Clarify design patterns discovered during architecture analysis
+      - Note key dependencies between modules
+      - Update any descriptions that were incomplete or unclear
+
+      Respond with a concise executive summary of the architecture and confirmation that CODE_MAPs have been refined.
     transitions:
       - when: architecture_complete
         to: git_commit

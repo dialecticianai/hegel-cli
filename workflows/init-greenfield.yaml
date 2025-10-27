@@ -29,7 +29,7 @@ nodes:
 
       **Adversarial check**: What operational conventions am I missing? Common mistakes to avoid? Critical context for AI assistants?
 
-      Respond with your completed CLAUDE.md content.
+      Respond with a concise summary of key conventions documented in CLAUDE.md.
     transitions:
       - when: customize_claude_complete
         to: vision
@@ -58,7 +58,7 @@ nodes:
 
       **Adversarial check**: What assumptions about users or the problem am I making? What perspectives am I missing?
 
-      Respond with your completed VISION.md content.
+      Respond with a concise summary of the project vision.
     transitions:
       - when: vision_complete
         to: architecture
@@ -86,7 +86,7 @@ nodes:
 
       **Adversarial check**: What technical constraints or tradeoffs am I not considering? What alternatives should we evaluate?
 
-      Respond with your completed ARCHITECTURE.md content.
+      Respond with a concise executive summary of the architecture.
     transitions:
       - when: architecture_complete
         to: git_init
