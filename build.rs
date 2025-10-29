@@ -1,6 +1,8 @@
 fn main() {
-    // Tell Cargo to rerun this build script if the vendor directory changes
+    // Tell Cargo to ONLY rerun this build script if these paths change
+    // This prevents rebuilding ast-grep when just the version changes
     println!("cargo:rerun-if-changed=vendor/ast-grep");
+    println!("cargo:rerun-if-changed=build.rs");
 
     // Only build ast-grep if bundle-ast-grep feature is enabled
     #[cfg(feature = "bundle-ast-grep")]
