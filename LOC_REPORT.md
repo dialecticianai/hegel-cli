@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-27 00:46
+**Last Updated**: 2025-10-29 17:19
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,081 | 6,282 | 18,363 |
-| **Comments** | 1,674 | - | 1,674 |
-| **Blank Lines** | 2,223 | - | 2,223 |
-| **Total Lines** | 15,978 | 6,282 | 22,260 |
+| **Lines** | 12,107 | 6,282 | 18,389 |
+| **Comments** | 1,681 | - | 1,681 |
+| **Blank Lines** | 2,226 | - | 2,226 |
+| **Total Lines** | 16,014 | 6,282 | 22,296 |
 | **Files** | 71 | 30 | 101 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            71           2223           1674          12081
+Rust                            71           2226           1681          12107
 -------------------------------------------------------------------------------
-SUM:                            71           2223           1674          12081
+SUM:                            71           2226           1681          12107
 -------------------------------------------------------------------------------
 ```
 
@@ -43,7 +43,7 @@ SUM:                            71           2223           1674          12081
 | `commands/analyze/mod.rs` | 189 | 35 | 154 | 81.5% | ✅ |
 | `commands/analyze/sections.rs` | 320 | 320 | 0 | 0.0% | ✅ (infra) |
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
-| `commands/astq.rs` | 113 | 88 | 25 | 22.1% | ✅ |
+| `commands/astq.rs` | 89 | 74 | 15 | 16.9% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
@@ -54,7 +54,7 @@ SUM:                            71           2223           1674          12081
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
-| `commands/init.rs` | 167 | 72 | 95 | 56.9% | ✅ |
+| `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
 | `commands/mod.rs` | 30 | 30 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
@@ -76,7 +76,7 @@ SUM:                            71           2223           1674          12081
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
-| `main.rs` | 317 | 13 | 304 | 95.9% | ✅ |
+| `main.rs` | 321 | 13 | 308 | 96.0% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
 | `metrics/graph.rs` | 370 | 222 | 148 | 40.0% | ✅ (infra) |

@@ -33,7 +33,11 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Initialize project (auto-detects greenfield or retrofit)
-    Init,
+    Init {
+        /// Optional project type override (greenfield or retrofit)
+        #[arg(value_parser = ["greenfield", "retrofit"])]
+        project_type: Option<String>,
+    },
     /// Start a new workflow
     Start {
         /// Workflow name (e.g., discovery, execution)
@@ -216,7 +220,7 @@ fn main() -> Result<()> {
 
     // Initialize storage with resolved state directory
     // Special case: for `init` command, use cwd/.hegel if no .hegel found
-    let state_dir = if matches!(cli.command, Some(Commands::Init)) {
+    let state_dir = if matches!(cli.command, Some(Commands::Init { .. })) {
         match cli.state_dir {
             Some(path) => path,
             None => std::env::current_dir()?.join(".hegel"),
@@ -231,8 +235,8 @@ fn main() -> Result<()> {
 
     // Execute command
     match cli.command.unwrap() {
-        Commands::Init => {
-            commands::init_project(&storage)?;
+        Commands::Init { project_type } => {
+            commands::init_project(&storage, project_type.as_deref())?;
         }
         Commands::Start {
             workflow,
