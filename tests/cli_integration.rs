@@ -77,7 +77,7 @@ fn test_status_no_workflow() {
 
     assert!(output.status.success());
     let out = stdout(&output);
-    assert!(out.contains("No workflow loaded"));
+    assert!(out.contains("No active workflow"));
     assert!(out.contains("hegel start <workflow>"));
 }
 
@@ -195,7 +195,7 @@ fn test_reset_workflow() {
     // Verify it's cleared
     let status_output = run_hegel(&["status"], Some(state_path));
     let status_out = stdout(&status_output);
-    assert!(status_out.contains("No workflow loaded"));
+    assert!(status_out.contains("No active workflow"));
 }
 
 #[test]
@@ -253,5 +253,5 @@ fn test_full_workflow_cycle() {
 
     // Verify reset worked
     let status3 = run_hegel(&["status"], Some(state_path));
-    assert!(stdout(&status3).contains("No workflow loaded"));
+    assert!(stdout(&status3).contains("No active workflow"));
 }
