@@ -218,67 +218,20 @@ Before finalizing your CLAUDE.md customizations, ask yourself:
 
 ---
 
-## Mode-Specific Guidance
-
-### Greenfield Mode
-
-**Context**: New project, establishing conventions from scratch
-
-**Approach**:
-- Start with Hegel DDD methodology template
-- Build project-specific conventions additively
-- No need to integrate with existing patterns
-- Focus on forward-looking decisions
-
-**Key questions to ask**:
-1. "What's your primary language and framework?"
-2. "What testing approach do you want? Coverage expectations?"
-3. "Any critical code organization rules to establish?"
-4. "What git workflow and commit conventions?"
-5. "Project-specific tools or patterns to document?"
-
-**Adversarial check**: "What operational conventions am I missing? Common mistakes to avoid? Critical context for AI assistants?"
-
-### Retrofit Mode
-
-**Context**: Existing project with established conventions
-
-**Approach**:
-- Start with Hegel DDD methodology template
-- **Integrate** with existing conventions detected in project detection phase
-- Add project-specific patterns **already in use**
-- Document current testing approach (enhance, don't replace)
-- Preserve existing git workflow conventions
-
-**Key considerations**:
-- Respect existing patterns (don't impose new ones without user approval)
-- Document what's actually practiced, not what's aspirational
-- Identify conflicts between DDD and existing conventions
-- Provide migration path if conventions need evolution
-
-**Key questions to ask**:
-1. "Should I preserve existing testing conventions or establish new ones?"
-   - Reference what was detected (e.g., "You currently use inline #[cfg(test)] modules")
-2. "Are current code organization rules working? Any changes needed?"
-   - Reference detected patterns (e.g., "Files average 300 lines, many >500")
-3. "How should DDD commits integrate with existing git workflow?"
-   - Reference detected conventions (e.g., "I see conventional commits in recent history")
-4. "Any existing tools or patterns I should document?"
-   - Reference detected scripts (e.g., "I found scripts/build.sh and scripts/test.sh")
-
-**Adversarial check**: "What existing conventions am I overlooking? What might break if we change operational patterns?"
-
----
-
 ## Conversation Flow
 
 When `hegel init` reaches the CLAUDE.md customization step, the agent should:
 
 1. **Present the template**: "I've created CLAUDE.md starting with Hegel's DDD methodology. Now let's customize it for your project."
 
-2. **Ask mode-appropriate focused questions** (see Mode-Specific Guidance above)
+2. **Ask focused questions**:
+   - "What's your testing philosophy? Coverage targets? What should/shouldn't be tested?"
+   - "Any critical code organization rules? File size limits? Module structure patterns?"
+   - "What's your git workflow? Commit format? Branch strategy?"
+   - "Any project-specific tools or scripts I should document?"
+   - "Language/framework-specific conventions or patterns?"
 
-3. **Adversarial check** (mode-specific, see above)
+3. **Adversarial check**: "What operational conventions am I missing? Common mistakes to avoid? Critical tools or patterns?"
 
 4. **Append customizations**: Add project-specific sections to the template content
 
