@@ -74,10 +74,10 @@ nodes:
 
       Respond with your completed assessment document.
     transitions:
-      - when: "continue_research"
-        to: study
-      - when: "research_complete"
+      - when: "assess_complete"
         to: questions
+      - when: "assess_incomplete"
+        to: study
 
   questions:
     prompt: |
