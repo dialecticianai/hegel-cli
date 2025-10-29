@@ -74,6 +74,34 @@ The open questions document becomes a roadmap for practical work. Each question 
 
 ---
 
+## Toy-Oriented Question Formulation
+
+**CRITICAL**: Open questions should map to isolated toy experiments in Discovery mode.
+
+### Good Questions → Good Toys
+
+Each practice question should be formulated as:
+1. **Single technical capability to validate**
+2. **Concrete success criteria** (can measure/verify)
+3. **Minimal scope** (hours, not days)
+4. **Clear yes/no answer** or **specific measurement**
+
+### Anti-Pattern: Phase-Based Questions
+
+**Wrong**: "How do we build the data pipeline?"
+- Too broad, many questions bundled together
+- Becomes multi-step "phase" instead of isolated toys
+- No clear validation criteria
+
+**Right**: Break into atomic questions:
+- "Can we read data format X with library Y?"
+- "Can we transform data type A to type B?"
+- "Can we write output in format Z?"
+
+Each question = one toy.
+
+---
+
 ## Question Types
 
 ### Theory Questions (Answered During Study)
@@ -96,19 +124,26 @@ Examples:
 ### Practice Questions (Need Experimentation)
 **Require building/measuring to answer**
 
-Examples:
-- Q: How many memory writes fit in vsync budget?
-- Q: What's buffer copy actual performance?
-- Q: How to use debugger/profiler effectively?
+These become **toy experiments** in Discovery mode. Each question should map to ONE isolated toy.
 
-**Mark as open** with practice path:
-```markdown
-**Q1.4**: How to measure actual cycle usage?
-- Debugger's cycle counter?
-- Manual counting vs profiler?
-- Validate frame budget adherence?
-- **Answer via**: Profile test program routines (DMA, buffer copy, etc.)
-```
+**CRITICAL**: Frame as concrete, single-question toys with clear success criteria.
+
+**Bad** (too vague):
+- Q: How fast is the API?
+- Answer via: "Test performance"
+
+**Good** (specific toy):
+- Q: Can we process 1000 records/second with API X?
+- Answer via: **Toy 2** - Call API with batch of 1000 test records, measure time, validate throughput meets requirement
+
+**Bad** (bundled multi-step phase):
+- Answer via: "Build prototype with data loading, processing, validation, and output"
+
+**Good** (isolated single-question toys):
+- Q1: Can we parse input format X?
+  - Answer via: **Toy 1** - Load sample file, parse with library Y, verify fields extracted correctly
+- Q2: Can processing algorithm handle edge cases?
+  - Answer via: **Toy 2** - Implement core algorithm, test with edge cases, validate behavior
 
 ### Decision Questions (Context-Dependent)
 **Wait for more information**
@@ -170,9 +205,9 @@ Every question should link to:
 - **Theory**: `learnings/performance.md` - All operations documented with costs
 ```
 
-**2. Practice path** (how it will be answered):
+**2. Practice path** (which toy will answer it):
 ```markdown
-- **Answer via**: Profile operation usage in application, pre-compute tables where feasible
+- **Answer via**: **Toy 3** - Profile buffer copy operations, measure cycles for different sizes, identify performance threshold
 ```
 
 **3. Related questions** (dependencies or clusters):
