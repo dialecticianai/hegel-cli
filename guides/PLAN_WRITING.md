@@ -4,6 +4,14 @@ _Guide to planning development with TDD discipline._
 
 ---
 
+**🚨 CRITICAL: PLANS ARE PROSE ONLY 🚨**
+
+**DO NOT write code in PLAN.md files. NO code fences. NO implementation. NO test code.**
+
+Plans describe WHAT to build and WHY, not HOW (that's for the implementation phase).
+
+---
+
 ## When to Use This
 
 **Modes**: Both Discovery and Execution
@@ -16,19 +24,21 @@ _Guide to planning development with TDD discipline._
 
 ## What a PLAN.md Actually Is
 
-A **PLAN.md is a strategic roadmap** describing **what to build and how to build it step-by-step**. It enforces clarity, sequencing, and validation.
+A **PLAN.md is high-level prose** describing the development approach step-by-step.
 
-### ❌ NOT:
-- Implementation code
-- Literal test code
-- Copy-paste ready
-- Exhaustive details
+**CRITICAL**: Write in **PROSE ONLY**. NO code fences. NO implementation. NO test code.
 
-### ✅ IS:
-- Stepwise development roadmap
-- TDD methodology guide
-- Illustrative code patterns only
-- Success criteria with checkboxes
+### ❌ NEVER:
+- Code fences with implementation
+- Code fences with test code
+- Variable names, function signatures, exact syntax
+- Anything copy-pasteable
+
+### ✅ ALWAYS:
+- Plain English descriptions of what to build
+- What to test and why (no test code)
+- Step sequence and dependencies
+- Success criteria checkboxes
 
 ---
 
@@ -86,15 +96,12 @@ A **PLAN.md is a strategic roadmap** describing **what to build and how to build
 - ✅ Test: core features, errors, integration points
 - ❌ Skip: helpers, edge cases, perf, internals
 
-### Code Patterns
-Use examples as **patterns**, not literal code:
+### Implementation Description (Prose Only)
 
-    operation(input, params) {
-        if (!validate(params)) throw Error(`Invalid: ${params}`);
-        let result = process(input, params);
-        update_state(result);
-        return result;
-    }
+Describe what to build in plain English:
+- "Parse workflow YAML and validate required fields"
+- "Handle invalid input by returning validation errors"
+- "Update state after successful operation"
 
 ### Tasks
 Break implementation into minimal units:
@@ -115,9 +122,10 @@ Always check with concrete, objective boxes:
 ---
 
 ## Anti-Patterns
-- ❌ Full test code in Plan (use bullet outlines)
-- ❌ Full implementation code (use patterns only)
-- ❌ Over-detail (Plan guides, does not replace dev thinking)
+
+**❌ Writing code**: No code fences. Period.
+**❌ Writing tests**: Describe what to test, don't write test code.
+**❌ Over-detailing**: High-level only. Developer makes tactical decisions.
 
 ---
 
