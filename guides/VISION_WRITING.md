@@ -136,6 +136,76 @@ Before finalizing your VISION.md, ask yourself:
 
 ---
 
+## Mode-Specific Guidance
+
+### Greenfield Mode
+
+**Context**: New project, defining vision from scratch
+
+**Approach**:
+- Work with user to articulate the problem space
+- Define target users and success criteria collaboratively
+- No existing documentation to integrate with
+- Vision can be aspirational but must be concrete
+
+**Key questions to ask**:
+1. "What problem are we solving?" (get specific, real-world context)
+2. "Who is this for?" (primary and secondary users)
+3. "What does success look like?" (qualitative and quantitative)
+4. "What are we explicitly NOT building?" (scope boundaries)
+5. "What principles guide design tradeoffs?" (3-5 core principles)
+
+**Adversarial check**: "What assumptions about users or the problem am I making? What perspectives am I missing?"
+
+### Retrofit Mode
+
+**Context**: Existing project, may have implicit or explicit vision
+
+**Approach**:
+- **First, check for existing vision documentation**
+  - README.md often contains problem statement
+  - docs/ may have vision or goals documents
+  - Issue trackers or project boards may reveal priorities
+- **Extract and formalize** if documented elsewhere
+- **Collaborate with user to define** if missing or unclear
+- **Update if evolved** — projects change, vision should reflect current direction
+
+**Key considerations**:
+- Existing users have expectations (don't pivot without acknowledging)
+- Current feature set implies scope decisions
+- Technical debt reflects past tradeoffs
+- Team may have unwritten shared understanding
+
+**Key questions to ask**:
+1. "Does existing documentation capture project vision?"
+   - Check README.md, docs/, project homepage
+2. "If yes: Should I formalize it into VISION.md?"
+   - Extract and structure existing content
+3. "If no: [Ask standard vision questions from greenfield]"
+   - But frame in context of existing codebase
+4. "Has the project vision evolved? Any updates needed?"
+   - Original goals may have shifted
+   - New users or use cases may have emerged
+
+**Adversarial check**: "Am I missing existing project context? Does my vision align with current direction? Did I check issue trackers or roadmaps for stated goals?"
+
+**Example retrofit flow**:
+```
+Agent: "I found a README.md with this problem statement: [quote]
+and these goals: [quote]. Should I formalize these into VISION.md,
+or do they need updating?"
+
+User: "Those are outdated, we pivoted last year."
+
+Agent: "Understood. Let's define the current vision:
+1. What problem does the project solve now?
+2. Who uses it currently?
+3. What does success look like today?
+..."
+```
+
+---
+
 ## Common Pitfalls
 
 **Too broad**: "Improve developer productivity" → Be specific about which developers, which productivity bottleneck
@@ -145,6 +215,8 @@ Before finalizing your VISION.md, ask yourself:
 **No tradeoffs**: Every design has costs → Acknowledge what you're NOT optimizing for
 
 **Metrics-only**: Numbers without qualitative context → Balance quantitative and qualitative success
+
+**Ignoring existing context (retrofit)**: Don't write greenfield vision for mature project → Ground vision in current reality
 
 ---
 

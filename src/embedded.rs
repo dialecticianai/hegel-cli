@@ -71,6 +71,14 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
             "ARCHITECTURE_WRITING.md",
             include_str!("../guides/ARCHITECTURE_WRITING.md"),
         ),
+        (
+            "PROJECT_DETECTION.md",
+            include_str!("../guides/PROJECT_DETECTION.md"),
+        ),
+        (
+            "GIT_INITIALIZATION.md",
+            include_str!("../guides/GIT_INITIALIZATION.md"),
+        ),
         // Templates
         (
             "templates/mirror_workflow.md",

@@ -10,26 +10,7 @@ nodes:
       {{CLAUDE_CUSTOMIZATION}}
 
       Your task: Create CLAUDE.md with project-specific conventions.
-
-      This file starts with the Hegel DDD methodology template and adds your project's operational conventions.
-
-      Focus on:
-      - Testing philosophy and coverage targets
-      - Code organization rules and file size limits
-      - Git workflow and commit conventions
-      - Project-specific tools and scripts
-      - Language/framework-specific patterns
-
-      Ask the user focused questions to gather:
-      1. Primary language and framework
-      2. Testing approach and coverage expectations
-      3. Critical code organization rules
-      4. Git workflow conventions
-      5. Any project-specific tools or patterns
-
-      **Adversarial check**: What operational conventions am I missing? Common mistakes to avoid? Critical context for AI assistants?
-
-      Respond with a concise summary of key conventions documented in CLAUDE.md.
+      {{?context_note}}
     transitions:
       - when: customize_claude_complete
         to: vision
@@ -41,24 +22,7 @@ nodes:
       {{VISION_WRITING}}
 
       Your task: Create VISION.md defining product goals and success criteria.
-
-      Focus on:
-      - Clear problem statement with real-world context
-      - Defined target users and their constraints
-      - Concrete success metrics (qualitative and quantitative)
-      - Scope boundaries (what we're NOT building)
-      - Guiding principles for design decisions
-
-      Ask the user:
-      1. What problem are we solving?
-      2. Who is this for? (primary and secondary users)
-      3. What does success look like?
-      4. What are we explicitly NOT building?
-      5. What principles guide design tradeoffs?
-
-      **Adversarial check**: What assumptions about users or the problem am I making? What perspectives am I missing?
-
-      Respond with a concise summary of the project vision.
+      {{?context_note}}
     transitions:
       - when: vision_complete
         to: architecture
@@ -70,23 +34,7 @@ nodes:
       {{ARCHITECTURE_WRITING}}
 
       Your task: Create ARCHITECTURE.md defining tech stack and key decisions.
-
-      Focus on:
-      - Technology choices with rationale
-      - Core architectural patterns and tradeoffs
-      - Known constraints (performance, compatibility, security)
-      - System boundaries and integration points
-      - Open questions requiring Discovery phase investigation
-
-      Ask the user:
-      1. Language and key dependencies (with rationale)
-      2. Core architectural decisions and their tradeoffs
-      3. Known technical constraints
-      4. What needs investigation during Discovery?
-
-      **Adversarial check**: What technical constraints or tradeoffs am I not considering? What alternatives should we evaluate?
-
-      Respond with a concise executive summary of the architecture.
+      {{?context_note}}
     transitions:
       - when: architecture_complete
         to: git_init
@@ -95,24 +43,9 @@ nodes:
     prompt: |
       Project initialization nearly complete.
 
-      Final step: Initialize git repository and create initial commit.
+      {{GIT_INITIALIZATION}}
 
-      Tasks:
-      1. Run `git init` (if not already a git repo)
-      2. Create `.gitignore` with standard entries:
-         - `.hegel/state.json` (local state)
-         - `.hegel/hooks.jsonl` (local metrics)
-         - `.hegel/states.jsonl` (local history)
-         - Language-specific ignores (target/, node_modules/, etc.)
-      3. Stage CLAUDE.md, VISION.md, ARCHITECTURE.md, .gitignore
-      4. Create initial commit: "chore: initialize DDD project structure"
-
-      After completing these tasks, inform the user:
-      "Greenfield project initialized. Next steps:
-      - Review CLAUDE.md, VISION.md, ARCHITECTURE.md
-      - Run 'hegel start discovery' to begin first feature exploration"
-
-      Respond when git initialization is complete.
+      {{?context_note}}
     transitions:
       - when: git_init_complete
         to: done

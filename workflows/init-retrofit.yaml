@@ -7,29 +7,9 @@ nodes:
     prompt: |
       You are retrofitting Dialectic-Driven Development to an existing project.
 
-      First, analyze the existing project structure:
+      {{PROJECT_DETECTION}}
 
-      Tasks:
-      1. Check if git repository exists (`.git/` directory)
-      2. Identify primary language (check for `Cargo.toml`, `package.json`, `pyproject.toml`, etc.)
-      3. Look for existing documentation (`README.md`, `docs/`, etc.)
-      4. Check for existing test infrastructure
-      5. Identify project structure patterns
-
-      Report findings:
-      - Git status: [exists/missing, current branch if exists]
-      - Primary language: [detected language + version if available]
-      - Existing docs: [list key files]
-      - Test setup: [detected test framework/patterns]
-      - Project structure: [key directories and organization]
-
-      Then ask the user:
-      "I've detected an existing [language] project. Before proceeding:
-      1. Should I create a new branch for this retrofit? (recommended)
-      2. Are there any existing conventions I should preserve?
-      3. Any files or directories I should avoid modifying?"
-
-      Respond with analysis and await user guidance.
+      {{?context_note}}
     transitions:
       - when: detect_existing_complete
         to: code_map
@@ -41,33 +21,7 @@ nodes:
       {{CODE_MAP_WRITING}}
 
       Your task: Create CODE_MAP.md files to document existing codebase structure.
-
-      Since this is a retrofit, you need to understand the existing codebase before adding DDD methodology.
-
-      **First, assess project size:**
-      - Count source files (exclude tests, configs, generated code)
-      - If <50 files: Use monolithic structure (single root CODE_MAP.md)
-      - If >50 files: Use hierarchical structure (one CODE_MAP per directory)
-
-      **For monolithic structure:**
-      - Single CODE_MAP.md at project root
-      - Group files by category (Source Code, Tests, Configuration)
-      - Brief descriptions (1-3 sentences per file)
-
-      **For hierarchical structure:**
-      - Create CODE_MAP.md for main source directory
-      - Create CODE_MAP.md for each significant subdirectory
-      - Non-recursive (each CODE_MAP only describes its direct children)
-      - Reference subdirectory CODE_MAPs explicitly
-
-      Ask the user:
-      1. I detected [N] source files. Should I use [monolithic/hierarchical] structure?
-      2. Which directories should I map? (e.g., src/, lib/, app/)
-      3. Any directories to skip? (e.g., generated code, vendor deps)
-
-      **Adversarial check**: What directories or patterns am I missing? Any unusual project structure I should understand?
-
-      Respond when CODE_MAP files are created.
+      {{?context_note}}
     transitions:
       - when: code_map_complete
         to: customize_claude
@@ -79,30 +33,7 @@ nodes:
       {{CLAUDE_CUSTOMIZATION}}
 
       Your task: Create CLAUDE.md integrating with existing project conventions.
-
-      Since this is a retrofit, you should:
-      - Start with Hegel DDD methodology template
-      - Incorporate existing conventions you detected
-      - Add project-specific patterns already in use
-      - Document current testing approach
-      - Preserve existing git workflow conventions
-
-      Focus on:
-      - Current testing philosophy (enhance, don't replace)
-      - Existing code organization rules
-      - Current git workflow (integrate DDD commits)
-      - Existing tools and scripts
-      - Language/framework patterns already in use
-
-      Ask the user:
-      1. Should I preserve existing testing conventions or establish new ones?
-      2. Are current code organization rules working? Any changes needed?
-      3. How should DDD commits integrate with existing git workflow?
-      4. Any existing tools or patterns I should document?
-
-      **Adversarial check**: What existing conventions am I overlooking? What might break if we change operational patterns?
-
-      Respond with a concise summary of key conventions documented in CLAUDE.md.
+      {{?context_note}}
     transitions:
       - when: customize_claude_complete
         to: vision
@@ -114,28 +45,7 @@ nodes:
       {{VISION_WRITING}}
 
       Your task: Create VISION.md or integrate with existing documentation.
-
-      Since this is an existing project:
-      - Check if vision/goals already documented elsewhere (README.md, docs/, etc.)
-      - If documented: extract and formalize into VISION.md
-      - If missing: work with user to define vision
-
-      Focus on:
-      - Existing problem statement (if any)
-      - Current user base (who uses this now?)
-      - Success criteria (how do we measure impact?)
-      - Scope boundaries (what's in/out of scope?)
-      - Design principles (stated or implied?)
-
-      Ask the user:
-      1. Does existing documentation capture project vision?
-      2. If yes: Should I formalize it into VISION.md?
-      3. If no: [Ask standard vision questions from greenfield]
-      4. Has the project vision evolved? Any updates needed?
-
-      **Adversarial check**: Am I missing existing project context? Does my vision align with current direction?
-
-      Respond with a concise summary of the project vision or integration plan.
+      {{?context_note}}
     transitions:
       - when: vision_complete
         to: architecture
@@ -147,46 +57,7 @@ nodes:
       {{ARCHITECTURE_WRITING}}
 
       Your task: Document existing architecture or create ARCHITECTURE.md.
-
-      **First, review CODE_MAP.md files created earlier.** They contain:
-      - Project structure and file organization
-      - Key modules and their relationships
-      - Existing patterns in the codebase
-
-      Use CODE_MAPs as your starting point. Only inspect code directly for:
-      - Dependency analysis (imports, package.json, Cargo.toml, etc.)
-      - Integration point details (API contracts, database schemas)
-      - Specific technical constraints not visible from structure alone
-
-      Since this is an existing project:
-      - Document current tech stack (what's actually in use)
-      - Capture existing architectural patterns
-      - Note any technical debt or constraints
-      - Identify refactoring opportunities for Discovery
-
-      Focus on:
-      - Current technology stack (language, frameworks, key deps)
-      - Existing architectural patterns (what works, what doesn't)
-      - Known constraints (compatibility, performance, security)
-      - Integration points (APIs, databases, services)
-      - Open questions (what needs investigation/refactoring?)
-
-      Ask the user:
-      1. Any major architectural decisions to document?
-      2. Technical debt that should be addressed?
-      3. Dependencies that need evaluation/upgrade?
-      4. Areas needing refactoring (candidates for Discovery)?
-
-      **Adversarial check**: What architectural constraints am I missing? What technical risks should we document?
-
-      **After completing ARCHITECTURE.md:**
-      Review and refine CODE_MAP.md files based on your deeper architectural understanding:
-      - Add architectural context to file descriptions (e.g., "Mediator pattern coordinating X and Y")
-      - Clarify design patterns discovered during architecture analysis
-      - Note key dependencies between modules
-      - Update any descriptions that were incomplete or unclear
-
-      Respond with a concise executive summary of the architecture and confirmation that CODE_MAPs have been refined.
+      {{?context_note}}
     transitions:
       - when: architecture_complete
         to: git_commit
@@ -195,28 +66,9 @@ nodes:
     prompt: |
       Retrofit initialization nearly complete.
 
-      Final step: Commit DDD documentation to repository.
+      {{GIT_INITIALIZATION}}
 
-      Git workflow considerations (based on earlier detection):
-      - If new branch was created: commit there
-      - If on main/master: user approved direct commit
-
-      Tasks:
-      1. Create `.gitignore` entries for Hegel state (if not exists):
-         - `.hegel/state.json`
-         - `.hegel/hooks.jsonl`
-         - `.hegel/states.jsonl`
-      2. Stage CLAUDE.md, VISION.md, ARCHITECTURE.md
-      3. Stage .gitignore updates (if any)
-      4. Create commit: "docs: add DDD methodology documentation"
-
-      After committing, inform the user:
-      "DDD retrofit complete. Next steps:
-      - Review CLAUDE.md, VISION.md, ARCHITECTURE.md
-      - Run 'hegel start discovery' to explore first refactoring or feature
-      - If on feature branch: consider creating PR for team review"
-
-      Respond when git commit is complete.
+      {{?context_note}}
     transitions:
       - when: git_commit_complete
         to: done

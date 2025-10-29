@@ -211,17 +211,83 @@ Before finalizing your ARCHITECTURE.md, ask yourself:
 
 ### Greenfield Projects
 
+**Context**: New project, choosing tech stack from scratch
+
+**Approach**:
 - Start minimal (language + 2-3 core dependencies)
 - Emphasize exploration questions
 - Expect this document to evolve during Discovery
 - Don't over-commit to dependencies before validation
 
+**Key questions to ask**:
+1. "Language and key dependencies (with rationale)?"
+2. "Core architectural decisions and their tradeoffs?"
+3. "Known technical constraints?"
+4. "What needs investigation during Discovery?"
+
+**Adversarial check**: "What technical constraints or tradeoffs am I not considering? What alternatives should we evaluate?"
+
 ### Retrofit Projects
 
-- Document existing architecture first
-- Identify integration constraints
-- Note migration considerations
-- Highlight compatibility requirements with existing stack
+**Context**: Existing project with established architecture
+
+**Approach**:
+- **Document existing architecture** (what's actually in use)
+- Capture existing architectural patterns (what works, what doesn't)
+- Note any technical debt or constraints
+- Identify refactoring opportunities for Discovery phase
+
+**Critical workflow: Review CODE_MAP.md files first**
+
+Before diving into code inspection:
+1. **Read CODE_MAP.md files** created in previous phase
+   - They contain project structure and file organization
+   - Key modules and their relationships
+   - Existing patterns visible from structure
+2. **Use CODE_MAPs as starting point** for architecture analysis
+3. **Only inspect code directly for**:
+   - Dependency analysis (imports, package.json, Cargo.toml, etc.)
+   - Integration point details (API contracts, database schemas)
+   - Specific technical constraints not visible from structure alone
+
+**Key questions to ask**:
+1. "Any major architectural decisions to document?"
+   - What patterns are currently in use?
+2. "Technical debt that should be addressed?"
+   - What needs refactoring?
+3. "Dependencies that need evaluation/upgrade?"
+   - Outdated or risky dependencies?
+4. "Areas needing refactoring (candidates for Discovery)?"
+   - What should be explored in toy models?
+
+**Adversarial check**: "What architectural constraints am I missing? What technical risks should we document?"
+
+**After completing ARCHITECTURE.md: Refine CODE_MAPs**
+
+Once you have deeper architectural understanding, **go back and refine CODE_MAP.md files**:
+- Add architectural context to file descriptions
+  - Example: "Mediator pattern coordinating X and Y"
+- Clarify design patterns discovered during architecture analysis
+- Note key dependencies between modules
+- Update any descriptions that were incomplete or unclear
+
+This creates a virtuous cycle:
+- CODE_MAP → provides structure for architecture analysis
+- ARCHITECTURE → provides context to enrich CODE_MAP descriptions
+
+**Example refinement**:
+
+Before (structural only):
+```markdown
+### **engine.rs**
+Workflow state machine implementation.
+```
+
+After (with architectural context):
+```markdown
+### **engine.rs**
+Workflow state machine (finite state automaton pattern). Validates transitions via YAML-defined rules, persists state to .hegel/state.json after each transition. Core orchestration logic called by all commands.
+```
 
 ---
 

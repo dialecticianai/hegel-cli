@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-29 17:48
+**Last Updated**: 2025-10-29 18:39
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,132 | 6,282 | 18,414 |
+| **Lines** | 12,141 | 7,107 | 19,248 |
 | **Comments** | 1,684 | - | 1,684 |
 | **Blank Lines** | 2,230 | - | 2,230 |
-| **Total Lines** | 16,046 | 6,282 | 22,328 |
-| **Files** | 72 | 30 | 102 |
+| **Total Lines** | 16,055 | 7,107 | 23,162 |
+| **Files** | 72 | 32 | 104 |
 
-**Documentation Ratio**: 0.52 lines of docs per line of code
+**Documentation Ratio**: 0.59 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            72           2230           1684          12132
+Rust                            72           2230           1684          12141
 -------------------------------------------------------------------------------
-SUM:                            72           2230           1684          12132
+SUM:                            72           2230           1684          12141
 -------------------------------------------------------------------------------
 ```
 
@@ -62,7 +62,7 @@ SUM:                            72           2230           1684          12132
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 392 | 16 | 376 | 95.9% | ✅ |
-| `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests/commands.rs` | 377 | 377 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/node_flow.rs` | 142 | 142 | 0 | 0.0% | ✅ |
@@ -71,7 +71,7 @@ SUM:                            72           2230           1684          12132
 | `commands/workflow/transitions.rs` | 333 | 333 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
-| `embedded.rs` | 120 | 120 | 0 | 0.0% | ✅ |
+| `embedded.rs` | 128 | 128 | 0 | 0.0% | ✅ |
 | `engine/mod.rs` | 832 | 177 | 655 | 78.7% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
@@ -125,25 +125,27 @@ SUM:                            72           2230           1684          12132
 | `COVERAGE_REPORT.md` | 176 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
-| `guides/ARCHITECTURE_WRITING.md` | 258 |
-| `guides/CLAUDE_CUSTOMIZATION.md` | 312 |
-| `guides/CODE_MAP_WRITING.md` | 108 |
+| `guides/ARCHITECTURE_WRITING.md` | 324 |
+| `guides/CLAUDE_CUSTOMIZATION.md` | 359 |
+| `guides/CODE_MAP_WRITING.md` | 215 |
+| `guides/GIT_INITIALIZATION.md` | 287 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 96 |
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
-| `guides/PLAN_WRITING.md` | 149 |
-| `guides/QUESTION_TRACKING.md` | 362 |
+| `guides/PLAN_WRITING.md` | 157 |
+| `guides/PROJECT_DETECTION.md` | 202 |
+| `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 142 |
 | `guides/SPEC_WRITING.md` | 115 |
 | `guides/STUDY_PLANNING.md` | 209 |
 | `guides/templates/code_map_hierarchical.md` | 48 |
 | `guides/templates/code_map_monolithic.md` | 40 |
 | `guides/templates/mirror_workflow.md` | 11 |
-| `guides/VISION_WRITING.md` | 176 |
+| `guides/VISION_WRITING.md` | 248 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 172 |
+| `LOC_REPORT.md` | 173 |
 | `README.md` | 574 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
@@ -154,7 +156,7 @@ SUM:                            72           2230           1684          12132
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.59 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
