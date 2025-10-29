@@ -3,8 +3,8 @@
 
 set -e
 
-echo "🔨 Building hegel (release mode)..."
-cargo build --release
+echo "🔨 Building hegel (release mode with bundled ast-grep)..."
+cargo build --release --features bundle-ast-grep
 
 echo ""
 ./scripts/post-build.sh

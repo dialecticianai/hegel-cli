@@ -27,3 +27,8 @@ semver = "1.0"
 
 [dev-dependencies]
 tempfile = "3.8"
+
+[features]
+default = []
+# Bundle ast-grep binary at compile time (for production releases)
+bundle-ast-grep = []

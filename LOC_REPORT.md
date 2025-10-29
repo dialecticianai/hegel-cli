@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-29 18:41
+**Last Updated**: 2025-10-29 18:48
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,141 | 7,109 | 19,250 |
-| **Comments** | 1,684 | - | 1,684 |
-| **Blank Lines** | 2,230 | - | 2,230 |
-| **Total Lines** | 16,055 | 7,109 | 23,164 |
+| **Lines** | 12,156 | 7,111 | 19,267 |
+| **Comments** | 1,691 | - | 1,691 |
+| **Blank Lines** | 2,232 | - | 2,232 |
+| **Total Lines** | 16,079 | 7,111 | 23,190 |
 | **Files** | 72 | 32 | 104 |
 
-**Documentation Ratio**: 0.59 lines of docs per line of code
+**Documentation Ratio**: 0.58 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            72           2230           1684          12141
+Rust                            72           2232           1691          12156
 -------------------------------------------------------------------------------
-SUM:                            72           2230           1684          12141
+SUM:                            72           2232           1691          12156
 -------------------------------------------------------------------------------
 ```
 
@@ -43,7 +43,7 @@ SUM:                            72           2230           1684          12141
 | `commands/analyze/mod.rs` | 189 | 35 | 154 | 81.5% | ✅ |
 | `commands/analyze/sections.rs` | 320 | 320 | 0 | 0.0% | ✅ (infra) |
 | `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
-| `commands/astq.rs` | 89 | 74 | 15 | 16.9% | ✅ |
+| `commands/astq.rs` | 113 | 93 | 20 | 17.7% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
@@ -122,7 +122,7 @@ SUM:                            72           2230           1684          12141
 | `CLAUDE.md` | 149 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 176 |
+| `COVERAGE_REPORT.md` | 178 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 324 |
@@ -156,7 +156,7 @@ SUM:                            72           2230           1684          12141
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.59 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.58 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
