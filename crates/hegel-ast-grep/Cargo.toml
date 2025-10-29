@@ -1,0 +1,15 @@
+[package]
+name = "hegel-ast-grep"
+version = "0.1.0"
+edition = "2021"
+authors = ["Eric Adum <eric.adum@gmail.com>"]
+description = "AST-grep binary bundler for Hegel"
+license = "SSPL-1.0"
+
+[dependencies]
+anyhow = "1.0"
+
+[features]
+default = []
+# Bundle ast-grep binary at compile time (for production releases)
+bundle = []

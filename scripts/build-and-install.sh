@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Build hegel in release mode and install to ~/.cargo/bin
-# Usage: ./scripts/build-and-install.sh [--bump-version]
+# Usage: ./scripts/build-and-install.sh [--skip-bump]
 
 set -e
 
 # Parse arguments
-BUMP_VERSION=false
-if [[ "$1" == "--bump-version" ]]; then
-    BUMP_VERSION=true
+BUMP_VERSION=true
+if [[ "$1" == "--skip-bump" ]]; then
+    BUMP_VERSION=false
 fi
 
 # Read current version from Cargo.toml

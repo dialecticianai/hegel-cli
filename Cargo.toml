@@ -1,10 +1,14 @@
+[workspace]
+members = [".", "crates/hegel-ast-grep"]
+resolver = "2"
+
 [package]
 name = "hegel"
-version = "0.0.2"
+version = "0.0.4"
 edition = "2021"
 authors = ["Eric Adum <eric.adum@gmail.com>"]
 description = "Dialectic-Driven Development CLI"
-license = "MIT"
+license = "SSPL-1.0"
 repository = "https://github.com/dialecticianai/hegel-cli"
 
 [dependencies]
@@ -24,6 +28,7 @@ fs2 = "0.4"
 notify = "6.0"
 walkdir = "2.5"
 semver = "1.0"
+hegel-ast-grep = { path = "crates/hegel-ast-grep" }
 
 [dev-dependencies]
 tempfile = "3.8"
@@ -31,4 +36,4 @@ tempfile = "3.8"
 [features]
 default = []
 # Bundle ast-grep binary at compile time (for production releases)
-bundle-ast-grep = []
+bundle-ast-grep = ["hegel-ast-grep/bundle"]
