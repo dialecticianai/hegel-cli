@@ -7,7 +7,7 @@
 ## Summary
 
 ```
-TOTAL                                  14853              1578    89.38%         805                89    88.94%        8902               859    90.35%           0                 0         -
+TOTAL                                  14853              1577    89.38%         805                89    88.94%        8902               859    90.35%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -50,7 +50,7 @@ TOTAL                                  14853              1578    89.38%        
 | `main.rs` | 40.98% | 35.17% | 100.00% | 🟠 Moderate |
 | `metamodes/mod.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `metrics/aggregation.rs` | 97.18% | 95.50% | 100.00% | 🟢 Excellent |
-| `metrics/graph.rs` | 99.20% | 98.51% | 100.00% | 🟢 Excellent |
+| `metrics/graph.rs` | 99.20% | 98.76% | 100.00% | 🟢 Excellent |
 | `metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `metrics/mod.rs` | 98.63% | 97.60% | 100.00% | 🟢 Excellent |
 | `metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |

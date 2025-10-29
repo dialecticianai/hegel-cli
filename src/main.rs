@@ -21,6 +21,7 @@ use storage::FileStorage;
 #[derive(Parser)]
 #[command(name = "hegel")]
 #[command(about = "Dialectic-Driven Development CLI", long_about = None)]
+#[command(version)]
 struct Cli {
     /// Override state directory (default: .hegel)
     #[arg(long, global = true, value_name = "PATH")]
