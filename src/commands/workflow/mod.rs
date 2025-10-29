@@ -139,42 +139,6 @@ pub fn next_prompt(claim_str: Option<&str>, storage: &FileStorage) -> Result<()>
     advance_workflow(claim_alias, storage)
 }
 
-pub fn show_status(storage: &FileStorage) -> Result<()> {
-    let state = storage.load()?;
-
-    if state.workflow.is_none() || state.workflow_state.is_none() {
-        println!("{}", Theme::warning("No workflow loaded"));
-        println!();
-        println!(
-            "Start a workflow with: {}",
-            Theme::highlight("hegel start <workflow>")
-        );
-        return Ok(());
-    }
-
-    let workflow_state = state.workflow_state.as_ref().unwrap();
-
-    println!("{}", Theme::header("Workflow Status"));
-    println!();
-    println!("{}: {}", Theme::label("Mode"), workflow_state.mode);
-    println!(
-        "{}: {}",
-        Theme::label("Current node"),
-        workflow_state.current_node
-    );
-    println!();
-    println!("{}", Theme::label("History:"));
-    for (i, node) in workflow_state.history.iter().enumerate() {
-        if i == workflow_state.history.len() - 1 {
-            println!("  {} {}", Theme::highlight("→"), Theme::highlight(node));
-        } else {
-            println!("    {}", Theme::secondary(node));
-        }
-    }
-
-    Ok(())
-}
-
 pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     // Load current state to preserve session_metadata
     let state = storage.load()?;

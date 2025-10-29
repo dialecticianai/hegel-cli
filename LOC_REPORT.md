@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-10-29 17:20
+**Last Updated**: 2025-10-29 17:48
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,107 | 6,282 | 18,389 |
-| **Comments** | 1,681 | - | 1,681 |
-| **Blank Lines** | 2,226 | - | 2,226 |
-| **Total Lines** | 16,014 | 6,282 | 22,296 |
-| **Files** | 71 | 30 | 101 |
+| **Lines** | 12,132 | 6,282 | 18,414 |
+| **Comments** | 1,684 | - | 1,684 |
+| **Blank Lines** | 2,230 | - | 2,230 |
+| **Total Lines** | 16,046 | 6,282 | 22,328 |
+| **Files** | 72 | 30 | 102 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            71           2226           1681          12107
+Rust                            72           2230           1684          12132
 -------------------------------------------------------------------------------
-SUM:                            71           2226           1681          12107
+SUM:                            72           2230           1684          12132
 -------------------------------------------------------------------------------
 ```
 
@@ -56,11 +56,12 @@ SUM:                            71           2226           1681          12107
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
-| `commands/mod.rs` | 30 | 30 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
+| `commands/status.rs` | 66 | 66 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 428 | 16 | 412 | 96.3% | ✅ |
+| `commands/workflow/mod.rs` | 392 | 16 | 376 | 95.9% | ✅ |
 | `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
