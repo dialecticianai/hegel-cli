@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 17:22
+**Last Updated**: 2025-11-02 17:46
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,134 | 6,328 | 18,462 |
+| **Lines** | 12,136 | 6,329 | 18,465 |
 | **Comments** | 1,689 | - | 1,689 |
-| **Blank Lines** | 2,230 | - | 2,230 |
-| **Total Lines** | 16,053 | 6,328 | 22,381 |
+| **Blank Lines** | 2,231 | - | 2,231 |
+| **Total Lines** | 16,056 | 6,329 | 22,385 |
 | **Files** | 73 | 30 | 103 |
 
 **Documentation Ratio**: 0.52 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            73           2230           1689          12134
+Rust                            73           2231           1689          12136
 -------------------------------------------------------------------------------
-SUM:                            73           2230           1689          12134
+SUM:                            73           2231           1689          12136
 -------------------------------------------------------------------------------
 ```
 
@@ -77,7 +77,7 @@ SUM:                            73           2230           1689          12134
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
-| `lib.rs` | 11 | 11 | 0 | 0.0% | ✅ |
+| `lib.rs` | 14 | 12 | 2 | 14.3% | ✅ |
 | `main.rs` | 322 | 13 | 309 | 96.0% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 203 | 144 | 59 | 29.1% | ✅ |
@@ -144,7 +144,7 @@ SUM:                            73           2230           1689          12134
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 173 |
+| `LOC_REPORT.md` | 174 |
 | `README.md` | 574 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |

@@ -9,3 +9,6 @@ pub mod metrics;
 pub mod rules;
 pub mod storage;
 pub mod theme;
+
+#[cfg(test)]
+mod test_helpers;

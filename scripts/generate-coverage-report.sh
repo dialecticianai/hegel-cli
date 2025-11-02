@@ -19,6 +19,9 @@ echo "Generating coverage data..."
 # Run coverage (fast now that ast-grep build is behind feature flag)
 if ! cargo llvm-cov --summary-only -- --skip ignored > /tmp/coverage-raw.txt 2>&1; then
     echo "Error: Failed to generate coverage"
+    echo ""
+    echo "Details from cargo llvm-cov:"
+    cat /tmp/coverage-raw.txt
     exit 1
 fi
 
