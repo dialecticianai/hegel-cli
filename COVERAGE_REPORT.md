@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-03 16:18
+**Last Updated**: 2025-11-03 16:45
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **89.91%** lines | **88.91%** regions | **88.21%** functions
 
 ## Summary
 
 ```
-TOTAL                                      15664              1737    88.91%         848               100    88.21%        9413               950    89.91%           0                 0         -
+TOTAL                                      15666              1737    88.91%         848               100    88.21%        9418               950    89.91%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -55,7 +55,7 @@ TOTAL                                      15664              1737    88.91%    
 | `src/metrics/git.rs` | 91.34% | 90.95% | 95.45% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 99.21% | 98.77% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 95.99% | 94.85% | 84.21% | 🟢 Excellent |
+| `src/metrics/mod.rs` | 96.04% | 94.87% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 98.44% | 97.75% | 96.15% | 🟢 Excellent |
@@ -110,7 +110,7 @@ TOTAL                                      15664              1737    88.91%    
 - `src/metrics/git.rs` - 91.34%
 - `src/metrics/graph.rs` - 99.21%
 - `src/metrics/hooks.rs` - 94.22%
-- `src/metrics/mod.rs` - 95.99%
+- `src/metrics/mod.rs` - 96.04%
 - `src/metrics/states.rs` - 100.00%
 - `src/metrics/transcript.rs` - 100.00%
 - `src/rules/evaluator.rs` - 98.44%

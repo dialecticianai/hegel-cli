@@ -121,8 +121,8 @@ pub fn evaluate_transition(
 fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state_dir = storage.state_dir();
 
-    // Parse current metrics
-    let metrics = parse_unified_metrics(state_dir)?;
+    // Parse current metrics WITHOUT archives to prevent duplication bug
+    let metrics = parse_unified_metrics(state_dir, false)?;
 
     // Get workflow_id from state
     let state = storage.load()?;

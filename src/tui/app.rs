@@ -29,7 +29,8 @@ impl AppState {
     /// Create new AppState with file watching enabled
     pub fn new(state_dir: impl AsRef<Path>) -> anyhow::Result<Self> {
         let state_dir = state_dir.as_ref();
-        let metrics = parse_unified_metrics(state_dir)?;
+        // TUI shows full history including archives
+        let metrics = parse_unified_metrics(state_dir, true)?;
 
         // Setup file watcher
         let (tx, rx) = channel();
@@ -67,7 +68,7 @@ impl AppState {
 
         if updated {
             // Reload metrics
-            if let Ok(metrics) = parse_unified_metrics(&self.state_dir) {
+            if let Ok(metrics) = parse_unified_metrics(&self.state_dir, true) {
                 self.metrics = metrics;
             }
         }

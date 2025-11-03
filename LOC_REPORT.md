@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 16:18
+**Last Updated**: 2025-11-03 16:45
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,763 | 7,658 | 20,421 |
-| **Comments** | 1,774 | - | 1,774 |
+| **Lines** | 12,770 | 7,660 | 20,430 |
+| **Comments** | 1,779 | - | 1,779 |
 | **Blank Lines** | 2,349 | - | 2,349 |
-| **Total Lines** | 16,886 | 7,658 | 24,544 |
+| **Total Lines** | 16,898 | 7,660 | 24,558 |
 | **Files** | 76 | 35 | 111 |
 
 **Documentation Ratio**: 0.60 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2349           1774          12763
+Rust                            76           2349           1779          12770
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2380           1774          12851
+SUM:                            77           2380           1779          12858
 -------------------------------------------------------------------------------
 ```
 
@@ -41,7 +41,7 @@ SUM:                            77           2380           1774          12851
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
-| `commands/analyze/mod.rs` | 189 | 35 | 154 | 81.5% | ✅ |
+| `commands/analyze/mod.rs` | 190 | 36 | 154 | 81.1% | ✅ |
 | `commands/analyze/sections.rs` | 337 | 337 | 0 | 0.0% | ✅ (infra) |
 | `commands/archive.rs` | 301 | 212 | 89 | 29.6% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
@@ -87,7 +87,7 @@ SUM:                            77           2380           1774          12851
 | `metrics/git.rs` | 507 | 158 | 349 | 68.8% | ✅ |
 | `metrics/graph.rs` | 372 | 222 | 150 | 40.3% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 729 | 198 | 531 | 72.8% | ✅ |
+| `metrics/mod.rs` | 739 | 208 | 531 | 71.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
@@ -104,7 +104,7 @@ SUM:                            77           2380           1774          12851
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
 | `test_helpers/workflow.rs` | 298 | 298 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
-| `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
+| `tui/app.rs` | 403 | 166 | 237 | 58.8% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
 | `tui/tabs/events.rs` | 132 | 113 | 19 | 14.4% | ✅ |
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
@@ -114,7 +114,7 @@ SUM:                            77           2380           1774          12851
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 3 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 4 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -152,7 +152,7 @@ SUM:                            77           2380           1774          12851
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 181 |
+| `LOC_REPORT.md` | 183 |
 | `README.md` | 575 |
 | `ROADMAP.md` | 212 |
 | `src/test_helpers/README.md` | 119 |

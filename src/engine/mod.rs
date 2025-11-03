@@ -155,7 +155,7 @@ pub fn get_next_prompt(
         use crate::metrics::parse_unified_metrics;
         use crate::rules::{evaluate_rules, generate_interrupt_prompt, RuleEvaluationContext};
 
-        let metrics = parse_unified_metrics(state_dir)?;
+        let metrics = parse_unified_metrics(state_dir, false)?;
 
         // Find current phase metrics (active phase where end_time is None)
         let phase_metrics = metrics

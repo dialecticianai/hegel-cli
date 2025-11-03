@@ -48,15 +48,25 @@ pub struct UnifiedMetrics {
 }
 
 /// Parse all available metrics from .hegel directory
-pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetrics> {
+///
+/// By default, archived workflows are NOT loaded to prevent duplication bugs.
+/// Only pass `include_archives=true` when you specifically need historical data.
+pub fn parse_unified_metrics<P: AsRef<Path>>(
+    state_dir: P,
+    include_archives: bool,
+) -> Result<UnifiedMetrics> {
     let state_dir = state_dir.as_ref();
     let hooks_path = state_dir.join("hooks.jsonl");
     let states_path = state_dir.join("states.jsonl");
 
     let mut unified = UnifiedMetrics::default();
 
-    // Read archived workflows first
-    let archives = crate::storage::archive::read_archives(state_dir)?;
+    // Read archived workflows only if explicitly requested
+    let archives = if include_archives {
+        crate::storage::archive::read_archives(state_dir)?
+    } else {
+        Vec::new()
+    };
 
     // Parse hooks if available
     let mut transcript_path_opt: Option<String> = None;
@@ -206,7 +216,7 @@ mod tests {
     fn test_phase_metrics_empty_workflow() {
         // No states.jsonl = no phases
         let temp_dir = TempDir::new().unwrap();
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         assert!(metrics.phase_metrics.is_empty());
     }
@@ -222,7 +232,7 @@ mod tests {
         let (_states_temp, states_path) = create_states_file(&states);
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         assert_eq!(metrics.phase_metrics.len(), 1);
         assert_eq!(metrics.phase_metrics[0].phase_name, "spec");
@@ -243,7 +253,7 @@ mod tests {
         let (_states_temp, states_path) = create_states_file(&states);
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         assert_eq!(metrics.phase_metrics.len(), 3);
 
@@ -294,7 +304,7 @@ mod tests {
         let (_hooks_temp, hooks_path) = create_hooks_file(&hooks);
         std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         // spec phase should have 1 bash command, 1 file edit
         assert_eq!(metrics.phase_metrics[0].bash_commands.len(), 1);
@@ -356,7 +366,7 @@ mod tests {
         };
         storage.save(&state).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         // spec phase: 2 assistant turns (10:05, 10:10)
         assert_eq!(metrics.phase_metrics[0].token_metrics.assistant_turns, 2);
@@ -403,7 +413,7 @@ mod tests {
         std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
 
         // Parse metrics - should use fallback path
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
 
         // Verify session metadata was loaded from hooks.jsonl
         assert_eq!(metrics.session_id, Some("fallback-test".to_string()));
@@ -467,7 +477,7 @@ mod tests {
         write_archive(&archive, temp_dir.path()).unwrap();
 
         // Parse metrics - should include archived workflow
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
 
         // Verify archived phase included
         assert_eq!(metrics.phase_metrics.len(), 1);
@@ -544,7 +554,7 @@ mod tests {
         }
 
         // Parse metrics - should aggregate both archives
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
 
         // Verify both phases included
         assert_eq!(metrics.phase_metrics.len(), 2);
@@ -618,7 +628,7 @@ mod tests {
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
         // Parse metrics - should include archived + live
-        let metrics = parse_unified_metrics(temp_dir.path()).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
 
         // Verify both phases included (1 archived + 1 live)
         assert_eq!(metrics.phase_metrics.len(), 2);

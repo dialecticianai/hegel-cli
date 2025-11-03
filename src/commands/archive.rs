@@ -195,7 +195,7 @@ fn archive_single_workflow(storage: &FileStorage, workflow_id: &str) -> Result<(
     // This is a simplified approach - in reality, we'd need to filter events
     // For now, we'll use the current implementation which assumes one workflow
 
-    let metrics = parse_unified_metrics(state_dir)?;
+    let metrics = parse_unified_metrics(state_dir, false)?;
 
     // Filter metrics to only this workflow
     // NOTE: This is a limitation - the current metrics structure doesn't

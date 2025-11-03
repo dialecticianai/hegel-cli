@@ -8,7 +8,8 @@ use crate::theme::Theme;
 use sections::*;
 
 pub fn analyze_metrics(storage: &FileStorage, export_dot: bool) -> Result<()> {
-    let metrics = parse_unified_metrics(storage.state_dir())?;
+    // analyze command needs ALL metrics including archives
+    let metrics = parse_unified_metrics(storage.state_dir(), true)?;
 
     // Export DOT format if requested
     if export_dot {
