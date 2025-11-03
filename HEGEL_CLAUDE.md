@@ -32,7 +32,7 @@ hegel config set <key> <value>
 ### Meta-Modes & Workflows
 
 ```bash
-hegel meta <learning|standard>  # Declare meta-mode (required first step)
+hegel meta <learning|standard>  # Declare meta-mode (optional)
 hegel meta                      # View current meta-mode
 
 hegel start <workflow> [node]   # Load workflow (optionally at specific node)

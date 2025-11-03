@@ -120,7 +120,7 @@
 
 ## Workflow Execution
 
-**Commands**: `start <workflow>` → `next '{"claim":true}'` → `status` → `reset` → `analyze`
+**Commands**: `hegel start <workflow>` → `hegel next` → `hegel status` → `hegel restart|abort`
 
 **Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
 
