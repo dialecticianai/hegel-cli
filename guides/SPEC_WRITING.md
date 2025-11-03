@@ -24,16 +24,20 @@ It exists to make implementation falsifiable — to ensure tests and validation 
 
 ### ❌ Not
 - Implementation details (classes, functions, algorithms)
+- Code snippets or function signatures
 - Internal design notes (unless exposed in the contract)
 - Tutorials, manuals, or user guides
 - Vague aspirations ("the system should work well")
 
 ### ✅ Is
+- **High-level prose descriptions** of behavior
 - Precise input/output formats
 - Defined state transitions or invariants
 - Operation semantics (commands, APIs, behaviors)
 - Error and validation rules
 - Concrete test scenarios and acceptance criteria
+
+**Format**: Write in clear, structured prose. Use examples to illustrate behavior, not to show implementation.
 
 ---
 
@@ -101,12 +105,14 @@ High-quality SPECs are:
 - **Falsifiable** — every statement testable
 - **Contextual** — note integration points when they matter
 - **Mode-appropriate** — Discovery specs justify toy isolation; Execution specs integrate with production
+- **Prose-focused** — written in clear, descriptive language rather than code
 
 Low-quality SPECs are:
 - Vague ("system processes data")
 - Over-prescriptive (dictating implementation)
-- Bloated with internal details
+- Bloated with internal details or code snippets
 - Missing testable criteria
+- Implementation-heavy (showing how rather than what)
 
 ---
 
