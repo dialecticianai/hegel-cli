@@ -2,6 +2,8 @@
 
 use std::path::Path;
 
+use anyhow::Result;
+use chrono::{TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Git commit metadata with diff statistics
@@ -36,6 +38,73 @@ pub fn has_git_repository(state_dir: &Path) -> bool {
     };
 
     git2::Repository::open(project_root).is_ok()
+}
+
+/// Parse git commits from repository with optional timestamp filter
+///
+/// Returns commits from HEAD with metadata and diff statistics.
+/// Filters by `since` Unix timestamp if provided.
+pub fn parse_git_commits(project_root: &Path, since: Option<i64>) -> Result<Vec<GitCommit>> {
+    let repo = git2::Repository::open(project_root)?;
+    let mut revwalk = repo.revwalk()?;
+    revwalk.push_head()?;
+
+    let mut commits = Vec::new();
+
+    for oid in revwalk {
+        let oid = oid?;
+        let commit = repo.find_commit(oid)?;
+
+        // Filter by timestamp
+        let commit_time = commit.time().seconds();
+        if let Some(since_time) = since {
+            if commit_time < since_time {
+                continue;
+            }
+        }
+
+        // Get diff stats
+        let stats = get_commit_stats(&repo, &commit)?;
+
+        // Convert to GitCommit
+        let git_commit = GitCommit {
+            hash: format!("{:.7}", oid),
+            timestamp: timestamp_to_iso8601(commit_time),
+            message: commit
+                .message()
+                .unwrap_or("")
+                .lines()
+                .next()
+                .unwrap_or("")
+                .to_string(),
+            author: commit.author().name().unwrap_or("").to_string(),
+            files_changed: stats.files_changed(),
+            insertions: stats.insertions(),
+            deletions: stats.deletions(),
+        };
+
+        commits.push(git_commit);
+    }
+
+    Ok(commits)
+}
+
+/// Get diff statistics for a commit
+fn get_commit_stats(repo: &git2::Repository, commit: &git2::Commit) -> Result<git2::DiffStats> {
+    let old_tree = if commit.parent_count() > 0 {
+        Some(commit.parent(0)?.tree()?)
+    } else {
+        None
+    };
+
+    let diff = repo.diff_tree_to_tree(old_tree.as_ref(), Some(&commit.tree()?), None)?;
+
+    Ok(diff.stats()?)
+}
+
+/// Convert Unix timestamp to ISO 8601 string
+fn timestamp_to_iso8601(timestamp: i64) -> String {
+    Utc.timestamp_opt(timestamp, 0).unwrap().to_rfc3339()
 }
 
 #[cfg(test)]
@@ -85,6 +154,112 @@ mod tests {
         // Path with no parent
         let root_path = Path::new("/");
         assert!(!has_git_repository(root_path));
+    }
+
+    fn setup_test_repo_with_commits() -> TempDir {
+        let temp_dir = TempDir::new().unwrap();
+        let project_root = temp_dir.path();
+
+        // Initialize git repo
+        Command::new("git")
+            .args(&["init"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+
+        // Configure git
+        Command::new("git")
+            .args(&["config", "user.name", "Test User"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args(&["config", "user.email", "test@example.com"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+
+        // Create and commit a file
+        std::fs::write(project_root.join("test.txt"), "hello\nworld\n").unwrap();
+        Command::new("git")
+            .args(&["add", "test.txt"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args(&["commit", "-m", "initial commit"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+
+        temp_dir
+    }
+
+    #[test]
+    fn test_parse_git_commits_from_repo() {
+        let temp_dir = setup_test_repo_with_commits();
+        let project_root = temp_dir.path();
+
+        let commits = parse_git_commits(project_root, None).unwrap();
+
+        assert_eq!(commits.len(), 1);
+        assert_eq!(commits[0].message, "initial commit");
+        assert_eq!(commits[0].author, "Test User");
+        assert_eq!(commits[0].files_changed, 1);
+        assert_eq!(commits[0].insertions, 2);
+        assert_eq!(commits[0].deletions, 0);
+        assert_eq!(commits[0].hash.len(), 7);
+    }
+
+    #[test]
+    fn test_parse_git_commits_with_timestamp_filter() {
+        let temp_dir = setup_test_repo_with_commits();
+        let project_root = temp_dir.path();
+
+        // Get current time + 1 day (future)
+        let future_timestamp = Utc::now().timestamp() + 86400;
+
+        let commits = parse_git_commits(project_root, Some(future_timestamp)).unwrap();
+
+        // No commits should match (all are in the past)
+        assert_eq!(commits.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_git_commits_empty_repo() {
+        let temp_dir = TempDir::new().unwrap();
+        let project_root = temp_dir.path();
+
+        // Initialize empty git repo
+        Command::new("git")
+            .args(&["init"])
+            .current_dir(project_root)
+            .output()
+            .unwrap();
+
+        let result = parse_git_commits(project_root, None);
+
+        // Empty repo has no HEAD, should error
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_parse_git_commits_invalid_path() {
+        let invalid_path = Path::new("/non/existent/path");
+        let result = parse_git_commits(invalid_path, None);
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_timestamp_to_iso8601() {
+        let timestamp = 1730563200; // 2024-11-02T18:00:00Z
+        let iso = timestamp_to_iso8601(timestamp);
+
+        // Should be valid ISO 8601 format with date
+        assert!(iso.contains("2024-11-02"));
+        assert!(iso.contains("T"));
+        assert!(iso.contains("Z") || iso.contains("+") || iso.contains("-"));
     }
 
     #[test]
