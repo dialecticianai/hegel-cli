@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 21:12
+**Last Updated**: 2025-11-02 21:13
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,255 | 7,286 | 19,541 |
-| **Comments** | 1,704 | - | 1,704 |
-| **Blank Lines** | 2,251 | - | 2,251 |
-| **Total Lines** | 16,210 | 7,286 | 23,496 |
+| **Lines** | 12,296 | 7,287 | 19,583 |
+| **Comments** | 1,715 | - | 1,715 |
+| **Blank Lines** | 2,261 | - | 2,261 |
+| **Total Lines** | 16,272 | 7,287 | 23,559 |
 | **Files** | 74 | 32 | 106 |
 
 **Documentation Ratio**: 0.59 lines of docs per line of code
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2251           1704          12255
+Rust                            74           2261           1715          12296
 -------------------------------------------------------------------------------
-SUM:                            74           2251           1704          12255
+SUM:                            74           2261           1715          12296
 -------------------------------------------------------------------------------
 ```
 
@@ -81,7 +81,7 @@ SUM:                            74           2251           1704          12255
 | `main.rs` | 322 | 13 | 309 | 96.0% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 204 | 145 | 59 | 28.9% | ✅ |
-| `metrics/git.rs` | 81 | 23 | 58 | 71.6% | ✅ |
+| `metrics/git.rs` | 143 | 40 | 103 | 72.0% | ✅ |
 | `metrics/graph.rs` | 372 | 222 | 150 | 40.3% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
 | `metrics/mod.rs` | 669 | 175 | 494 | 73.8% | ✅ |
@@ -147,7 +147,7 @@ SUM:                            74           2251           1704          12255
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 176 |
+| `LOC_REPORT.md` | 177 |
 | `README.md` | 574 |
 | `ROADMAP.md` | 182 |
 | `TESTING.md` | 41 |
