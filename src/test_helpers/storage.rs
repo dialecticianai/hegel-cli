@@ -1,7 +1,6 @@
 //! Storage and state test helpers
 
 use crate::storage::{FileStorage, State, WorkflowState};
-use std::path::PathBuf;
 use tempfile::TempDir;
 
 /// Create a temporary directory and FileStorage instance for testing

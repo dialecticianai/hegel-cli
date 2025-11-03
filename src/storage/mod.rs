@@ -317,7 +317,9 @@ pub struct CommandLogEntry {
     pub command: String,
     pub args: Vec<String>,
     pub success: bool,
+    #[allow(dead_code)] // Used for deserialization
     pub blocked: bool,
+    #[allow(dead_code)] // Used for deserialization
     pub blocked_reason: Option<String>,
 }
 

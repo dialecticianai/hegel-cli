@@ -72,9 +72,9 @@ hegel config set use_reflect_gui false
 
 Configuration is persisted to `.hegel/config.toml`.
 
-### Declaring a Meta-Mode
+### Declaring a Meta-Mode (Optional)
 
-Before starting any workflow, declare which meta-mode pattern you're following:
+Optionally declare which meta-mode pattern you're following:
 
 ```bash
 # For greenfield learning projects
@@ -84,7 +84,7 @@ hegel meta learning
 hegel meta standard
 ```
 
-This automatically starts the appropriate initial workflow for your meta-mode.
+Meta-modes enable higher-level workflow orchestration patterns but are not required for basic workflow usage.
 
 **Available meta-modes:**
 - `learning` - Greenfield learning project (Research ↔ Discovery loop, starts with research)
@@ -97,7 +97,7 @@ hegel meta
 
 ### Starting Workflows
 
-After declaring your meta-mode, transition between workflows:
+Start and transition between workflows:
 
 ```bash
 # Start workflow at default beginning

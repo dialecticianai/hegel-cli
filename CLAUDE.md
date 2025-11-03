@@ -122,6 +122,12 @@
 
 **Commands**: `hegel start <workflow>` → `hegel next` → `hegel status` → `hegel restart|abort`
 
+**CRITICAL - Workflow Advancement Protocol**:
+- **NEVER run `hegel next` autonomously** - only the user decides when to advance
+- When phase work is complete, **suggest** advancing: "Ready to run `hegel next`?"
+- Wait for user approval (e.g., "SGTM", "yes", "go ahead")
+- User controls workflow pacing, not the agent
+
 **Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
 
 **State**: `.hegel/state.json` (workflow + current node + history)

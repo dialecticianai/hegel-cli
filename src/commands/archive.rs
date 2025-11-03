@@ -214,7 +214,6 @@ fn archive_single_workflow(storage: &FileStorage, workflow_id: &str) -> Result<(
 mod tests {
     use super::*;
     use crate::test_helpers::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_identify_workflows_single_completed() {

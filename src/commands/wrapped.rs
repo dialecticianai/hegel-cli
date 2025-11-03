@@ -91,7 +91,6 @@ mod tests {
     #[test]
     fn test_wrapped_command_respects_guardrails() {
         let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path().to_path_buf()).unwrap();
 
         // Create guardrails file
         let guardrails_yaml = r#"
@@ -112,7 +111,6 @@ git:
     #[test]
     fn test_wrapped_command_with_docker() {
         let temp_dir = TempDir::new().unwrap();
-        let storage = FileStorage::new(temp_dir.path().to_path_buf()).unwrap();
 
         // Create guardrails for docker
         let guardrails_yaml = r#"

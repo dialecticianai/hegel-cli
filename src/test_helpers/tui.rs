@@ -1,12 +1,17 @@
 //! TUI testing utilities for ratatui snapshot tests
+//!
+//! All exports reserved for future TUI testing (see test_helpers/README.md)
 
 use ratatui::backend::TestBackend;
 use ratatui::buffer::Buffer;
 use ratatui::Terminal;
 
 /// Standard terminal sizes for consistent testing
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub const SMALL_TERM: (u16, u16) = (40, 10);
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub const MEDIUM_TERM: (u16, u16) = (80, 24);
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub const LARGE_TERM: (u16, u16) = (120, 40);
 
 /// Create test terminal with specified size
@@ -20,6 +25,7 @@ pub const LARGE_TERM: (u16, u16) = (120, 40);
 /// let mut terminal = test_terminal(80, 24);
 /// terminal.draw(|f| { ... }).unwrap();
 /// ```
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub fn test_terminal(width: u16, height: u16) -> Terminal<TestBackend> {
     let backend = TestBackend::new(width, height);
     Terminal::new(backend).unwrap()
@@ -36,6 +42,7 @@ pub fn test_terminal(width: u16, height: u16) -> Terminal<TestBackend> {
 /// let output = buffer_to_string(buffer);
 /// assert_eq!(output, expected_snapshot);
 /// ```
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub fn buffer_to_string(buffer: &Buffer) -> String {
     let mut output = String::new();
     for y in 0..buffer.area.height {
@@ -59,6 +66,7 @@ pub fn buffer_to_string(buffer: &Buffer) -> String {
 /// let output = render_to_string(widget, 80, 24);
 /// assert!(output.contains("Hello"));
 /// ```
+#[allow(dead_code)] // Reserved for TUI tests (see test_helpers/README.md)
 pub fn render_to_string<W>(widget: W, width: u16, height: u16) -> String
 where
     W: ratatui::widgets::Widget,

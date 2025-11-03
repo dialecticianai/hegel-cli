@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 21:26
+**Last Updated**: 2025-11-02 21:48
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,608 | 7,287 | 19,895 |
-| **Comments** | 1,747 | - | 1,747 |
-| **Blank Lines** | 2,321 | - | 2,321 |
-| **Total Lines** | 16,676 | 7,287 | 23,963 |
-| **Files** | 74 | 32 | 106 |
+| **Lines** | 12,609 | 7,413 | 20,022 |
+| **Comments** | 1,748 | - | 1,748 |
+| **Blank Lines** | 2,323 | - | 2,323 |
+| **Total Lines** | 16,680 | 7,413 | 24,093 |
+| **Files** | 74 | 33 | 107 |
 
-**Documentation Ratio**: 0.58 lines of docs per line of code
+**Documentation Ratio**: 0.59 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2321           1747          12608
+Rust                            74           2323           1748          12609
+Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            74           2321           1747          12608
+SUM:                            75           2354           1748          12697
 -------------------------------------------------------------------------------
 ```
 
@@ -42,7 +43,7 @@ SUM:                            74           2321           1747          12608
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `commands/analyze/mod.rs` | 189 | 35 | 154 | 81.5% | ✅ |
 | `commands/analyze/sections.rs` | 337 | 337 | 0 | 0.0% | ✅ (infra) |
-| `commands/archive.rs` | 302 | 212 | 90 | 29.8% | ⚠️ Large |
+| `commands/archive.rs` | 301 | 212 | 89 | 29.6% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
@@ -55,21 +56,21 @@ SUM:                            74           2321           1747          12608
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/meta.rs` | 247 | 163 | 84 | 34.0% | ✅ |
+| `commands/meta.rs` | 251 | 163 | 88 | 35.1% | ✅ |
 | `commands/mod.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
 | `commands/status.rs` | 66 | 66 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 392 | 16 | 376 | 95.9% | ✅ |
-| `commands/workflow/tests/commands.rs` | 377 | 377 | 0 | 0.0% | ✅ (infra) |
-| `commands/workflow/tests/integration.rs` | 65 | 65 | 0 | 0.0% | ✅ |
+| `commands/workflow/mod.rs` | 386 | 16 | 370 | 95.9% | ✅ |
+| `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests/integration.rs` | 64 | 64 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/node_flow.rs` | 142 | 142 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/production.rs` | 67 | 67 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/transitions.rs` | 346 | 346 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests/node_flow.rs` | 138 | 138 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/production.rs` | 65 | 65 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/transitions.rs` | 345 | 345 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/transitions.rs` | 333 | 333 | 0 | 0.0% | ✅ (infra) |
-| `commands/wrapped.rs` | 131 | 68 | 63 | 48.1% | ✅ |
+| `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 120 | 120 | 0 | 0.0% | ✅ |
 | `engine/mod.rs` | 832 | 177 | 655 | 78.7% | ✅ |
@@ -92,14 +93,14 @@ SUM:                            74           2321           1747          12608
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
 | `storage/archive.rs` | 537 | 306 | 231 | 43.0% | ⚠️ Large |
-| `storage/mod.rs` | 700 | 313 | 387 | 55.3% | ✅ (infra) |
+| `storage/mod.rs` | 702 | 313 | 389 | 55.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
-| `test_helpers/jsonl.rs` | 124 | 124 | 0 | 0.0% | ✅ |
-| `test_helpers/metrics.rs` | 274 | 274 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
+| `test_helpers/metrics.rs` | 277 | 277 | 0 | 0.0% | ✅ (infra) |
 | `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
-| `test_helpers/storage.rs` | 66 | 66 | 0 | 0.0% | ✅ |
-| `test_helpers/tui.rs` | 73 | 73 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 296 | 296 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/storage.rs` | 65 | 65 | 0 | 0.0% | ✅ |
+| `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
+| `test_helpers/workflow.rs` | 301 | 301 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
@@ -123,7 +124,7 @@ SUM:                            74           2321           1747          12608
 | `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
-| `CLAUDE.md` | 149 |
+| `CLAUDE.md` | 155 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 180 |
@@ -148,8 +149,9 @@ SUM:                            74           2321           1747          12608
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
 | `LOC_REPORT.md` | 177 |
-| `README.md` | 574 |
+| `README.md` | 575 |
 | `ROADMAP.md` | 182 |
+| `src/test_helpers/README.md` | 119 |
 | `TESTING.md` | 41 |
 
 ---
@@ -158,7 +160,7 @@ SUM:                            74           2321           1747          12608
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.58 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.59 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

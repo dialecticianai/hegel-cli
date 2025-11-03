@@ -227,15 +227,19 @@ mod tests {
     }
 
     #[test]
-    fn test_show_meta_mode_status_defaults_to_standard() {
+    fn test_show_meta_mode_status_without_meta_mode() {
         let (_temp_dir, storage) = setup_workflow_env();
 
-        // Start workflow without explicitly declaring meta-mode (should default to standard)
+        // Start workflow without explicitly declaring meta-mode (meta-mode is optional)
         crate::commands::start_workflow("discovery", None, &storage).unwrap();
 
-        // Should succeed and show standard meta-mode
+        // Should show no meta-mode set
         let result = show_meta_mode_status(&storage);
-        assert!(result.is_ok());
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("No meta-mode declared"));
     }
 
     #[test]

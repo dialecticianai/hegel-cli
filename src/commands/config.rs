@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_config_list() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         // Should work even without config file (uses defaults)
         let result = handle_config(Some("list"), None, None, &storage);
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_config_get_default() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         let result = handle_config(Some("get"), Some("code_map_style"), None, &storage);
         assert!(result.is_ok());
@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn test_config_set_and_get() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         // Set value
         handle_config(
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn test_config_set_invalid_code_map_style() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         let result = handle_config(
             Some("set"),
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_config_get_unknown_key() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         let result = handle_config(Some("get"), Some("nonexistent"), None, &storage);
         assert!(result.is_err());
@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_config_set_boolean() {
-        let (temp_dir, storage) = test_storage();
+        let (_temp_dir, storage) = test_storage();
 
         handle_config(
             Some("set"),

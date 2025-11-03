@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use tempfile::TempDir;
 
 /// Test workflow YAML - simple 3-node workflow for testing
+#[allow(dead_code)] // Reserved for engine tests (see test_helpers/README.md)
 pub const TEST_WORKFLOW_YAML: &str = r#"
 mode: test_mode
 start_node: spec
@@ -164,6 +165,7 @@ pub fn test_guides() -> (TempDir, PathBuf) {
 
 // ========== Claims Helpers ==========
 
+#[allow(dead_code)] // Reserved for transition tests (see test_helpers/README.md)
 pub fn claim(key: &str, _value: bool) -> HashSet<String> {
     HashSet::from([key.to_string()])
 }
@@ -177,6 +179,7 @@ pub fn claim(key: &str, _value: bool) -> HashSet<String> {
 /// DOES NOT use env vars or change working directory.
 ///
 /// Returns (TempDir, FileStorage) for test isolation
+#[allow(dead_code)] // Reserved for command integration tests (see test_helpers/README.md)
 pub fn setup_workflow_env() -> (TempDir, FileStorage) {
     let temp_dir = TempDir::new().unwrap();
 
@@ -199,6 +202,7 @@ pub fn setup_workflow_env() -> (TempDir, FileStorage) {
 }
 
 /// Setup test environment with research + discovery workflows for meta-mode transitions
+#[allow(dead_code)] // Reserved for meta-mode tests (see test_helpers/README.md)
 pub fn setup_meta_mode_workflows() -> (TempDir, FileStorage) {
     let temp_dir = TempDir::new().unwrap();
 
@@ -269,6 +273,7 @@ nodes:
 /// DOES NOT use env vars or change working directory.
 ///
 /// Returns TempDir for cleanup
+#[allow(dead_code)] // Reserved for production workflow tests (see test_helpers/README.md)
 pub fn setup_production_workflows() -> TempDir {
     let temp_dir = TempDir::new().unwrap();
 

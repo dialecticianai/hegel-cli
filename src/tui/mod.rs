@@ -67,7 +67,7 @@ fn run_event_loop(terminal: &mut DefaultTerminal, state_dir: &Path) -> io::Resul
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
     use tempfile::TempDir;
 
     #[test]

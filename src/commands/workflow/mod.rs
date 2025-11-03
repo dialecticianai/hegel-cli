@@ -47,17 +47,11 @@ pub fn start_workflow(
         }
     }
 
+    // Preserve existing meta-mode if set (optional - only needed for inter-workflow transitions)
     let existing_meta_mode = existing_state
         .workflow_state
         .as_ref()
-        .and_then(|ws| ws.meta_mode.clone())
-        .or_else(|| {
-            // Default to "standard" meta-mode for backward compatibility with tests
-            // In production, users should run 'hegel meta <name>' first
-            Some(crate::storage::MetaMode {
-                name: "standard".to_string(),
-            })
-        });
+        .and_then(|ws| ws.meta_mode.clone());
 
     // Load workflow from YAML file
     let workflows_dir = storage.workflows_dir();

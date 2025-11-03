@@ -63,6 +63,7 @@ pub fn setup_state_dir_with_files(
 /// );
 /// let result = analyze_metrics(&storage);
 /// ```
+#[allow(dead_code)] // Reserved for metrics integration tests (see test_helpers/README.md)
 pub fn test_storage_with_files(
     hooks: Option<&[&str]>,
     states: Option<&[&str]>,
@@ -108,6 +109,7 @@ pub fn hook_with_transcript(transcript_path: &Path, session_id: &str, timestamp:
 ///     .with_events(10, 5)
 ///     .build();
 /// ```
+#[allow(dead_code)] // Reserved for comprehensive metrics analysis tests (see test_helpers/README.md)
 pub struct UnifiedMetricsBuilder {
     session_id: Option<String>,
     hook_metrics: HookMetrics,
@@ -265,6 +267,7 @@ impl UnifiedMetricsBuilder {
 /// let metrics = test_unified_metrics();
 /// let app = AppState::new(metrics);
 /// ```
+#[allow(dead_code)] // Reserved for metrics rendering/analysis tests (see test_helpers/README.md)
 pub fn test_unified_metrics() -> UnifiedMetrics {
     UnifiedMetricsBuilder::new()
         .with_session("test-session")

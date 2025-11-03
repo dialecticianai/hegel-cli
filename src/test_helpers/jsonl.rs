@@ -60,6 +60,7 @@ pub fn read_jsonl_all(path: &PathBuf) -> Vec<serde_json::Value> {
 /// let count = count_jsonl_lines(&states_file);
 /// assert_eq!(count, 2);
 /// ```
+#[allow(dead_code)] // Reserved for future metrics validation tests (see test_helpers/README.md)
 pub fn count_jsonl_lines(path: &PathBuf) -> usize {
     if !path.exists() {
         return 0;
