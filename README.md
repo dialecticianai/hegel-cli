@@ -395,6 +395,7 @@ Shows:
   - Duration (time spent in each phase)
   - Token usage (input/output tokens per phase)
   - Activity (bash commands and file edits per phase)
+  - Git commits (count, files changed, insertions/deletions) - automatically detected when `.git` directory exists
   - Status (active or completed)
 - **Workflow graph** - ASCII visualization of phase transitions:
   - Node metrics (visits, tokens, duration, bash commands, file edits)
