@@ -66,7 +66,7 @@ pub struct FileModification {
 }
 
 /// Aggregated metrics from hook events
-#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HookMetrics {
     pub total_events: usize,
     pub bash_commands: Vec<BashCommand>,

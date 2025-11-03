@@ -36,7 +36,7 @@ pub struct PhaseMetrics {
 }
 
 /// Unified metrics combining all data sources
-#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UnifiedMetrics {
     pub hook_metrics: HookMetrics,
     pub token_metrics: TokenMetrics,

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-03 00:17
+**Last Updated**: 2025-11-03 00:55
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **89.94%** lines | **89.01%** regions | **88.59%** functions
+**Overall Coverage**: **89.97%** lines | **89.05%** regions | **88.61%** functions
 
 ## Summary
 
 ```
-TOTAL                                      15574              1711    89.01%         841                96    88.59%        9363               942    89.94%           0                 0         -
+TOTAL                                      15621              1711    89.05%         843                96    88.61%        9390               942    89.97%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -53,7 +53,7 @@ TOTAL                                      15574              1711    89.01%    
 | `src/metrics/git.rs` | 91.34% | 90.95% | 95.45% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 99.21% | 98.77% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 95.73% | 94.47% | 82.35% | 🟢 Excellent |
+| `src/metrics/mod.rs` | 95.99% | 94.85% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 98.44% | 97.75% | 96.15% | 🟢 Excellent |
@@ -108,7 +108,7 @@ TOTAL                                      15574              1711    89.01%    
 - `src/metrics/git.rs` - 91.34%
 - `src/metrics/graph.rs` - 99.21%
 - `src/metrics/hooks.rs` - 94.22%
-- `src/metrics/mod.rs` - 95.73%
+- `src/metrics/mod.rs` - 95.99%
 - `src/metrics/states.rs` - 100.00%
 - `src/metrics/transcript.rs` - 100.00%
 - `src/rules/evaluator.rs` - 98.44%
@@ -153,7 +153,7 @@ TOTAL                                      15574              1711    89.01%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 89.94% | ✅ Met |
+| Overall | ≥80% | 89.97% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
