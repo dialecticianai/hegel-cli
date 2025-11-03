@@ -1,39 +1,48 @@
 ## Structure for Larger Projects (>50 files)
 
-For larger codebases, use **one CODE_MAP.md per directory** for maintainability.
+For larger codebases, use **one README.md per directory** with embedded code map.
 
 ### Format
 
+Use a tree structure (like `tree` command output) with inline descriptions:
+
 ```markdown
-# src/CODE_MAP.md
+# src/
 
 Brief description of this directory's purpose.
 
-## Core Functionality
+## Structure
 
-### **module1.ext**
-Brief description (1-3 sentences).
+```
+src/
+├── lib.rs              Library root exposing core modules
+├── main.rs             Binary entry point
+├── module1.rs          Brief description (1 sentence)
+├── module2.rs          Brief description (1 sentence)
+│
+├── commands/           CLI command implementations
+│   └── See commands/README.md
+│
+├── metrics/            Metrics parsing and analysis
+│   └── See metrics/README.md
+│
+└── test_helpers.rs     Shared test utilities
+```
 
-### **module2.ext**
-Brief description (1-3 sentences).
+## Key Patterns
 
-## Subdirectories
-
-### **commands/**
-Brief description of subdirectory purpose. See commands/CODE_MAP.md.
-
-### **metrics/**
-Brief description of subdirectory purpose. See metrics/CODE_MAP.md.
+**Pattern name**: Brief explanation of architectural patterns used
 ```
 
 ### Hierarchical Principles
 
-1. **Non-recursive**: Each CODE_MAP describes only its direct children
-2. **Scoped**: One directory's CODE_MAP = one file's responsibility
-3. **Linked**: Reference subdirectory CODE_MAPs explicitly
-4. **Grouped**: Organize files by logical functionality, not alphabetically
+1. **Non-recursive**: Each README describes only its direct children
+2. **Scoped**: One directory's README = one file's responsibility
+3. **Linked**: Reference subdirectory READMEs explicitly (see X/README.md)
+4. **Visual tree**: Use box-drawing characters (├──, └──, │) for structure
+5. **Concise**: 1 sentence per file, use alignment for readability
 
-### When to Use Hierarchical Structure
+### When to Use Hierarchical Mode
 
 - Total files >50
 - Deep directory nesting (>2 levels)
@@ -42,7 +51,7 @@ Brief description of subdirectory purpose. See metrics/CODE_MAP.md.
 
 ### Maintenance
 
-Update CODE_MAP.md in a directory whenever you:
+Update README.md in a directory whenever you:
 - Add/remove/rename files in that directory
 - Change file responsibilities
 - Reorganize subdirectories

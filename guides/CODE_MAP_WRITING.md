@@ -1,12 +1,12 @@
-# CODE_MAP_WRITING.md — Guide for Writing CODE_MAP.md Files
+# CODE_MAP_WRITING.md — Guide for Writing Code Maps in READMEs
 
-This guide explains how to create and maintain CODE_MAP.md files throughout the codebase.
+This guide explains how to create and maintain code maps within README files throughout the codebase.
 
 ---
 
 ## Purpose
 
-A **CODE_MAP.md** is a directory-level index that provides quick orientation:
+A **code map** is a directory-level index that provides quick orientation:
 - What files exist in this directory
 - What each file does (1-3 sentences)
 - How subdirectories are organized
@@ -14,18 +14,19 @@ A **CODE_MAP.md** is a directory-level index that provides quick orientation:
 **Key Properties**:
 - Brief descriptions only (not tutorials)
 - Single directory scope (not recursive)
+- Lives inside README files (monolithic or hierarchical)
 - Updated before structural changes
 
 ---
 
 ## When to Create
 
-CODE_MAP.md files help navigate codebases. The structure depends on project size:
+Code maps help navigate codebases. The structure depends on project size and configuration:
 
-**Small projects (<50 files)**: Single root-level CODE_MAP.md
-**Larger projects (>50 files)**: One CODE_MAP.md per directory
+**Monolithic mode (<50 files)**: Code map section in root README.md
+**Hierarchical mode (>50 files)**: Separate README.md per directory with code map
 
-Update CODE_MAP.md **before** commits that:
+Update code maps **before** commits that:
 - Add, remove, or rename files
 - Change file responsibilities
 - Reorganize directory structure
@@ -56,19 +57,51 @@ Group related files under section headers that reflect their role in the codebas
 
 ## Basic Structure
 
+Code maps use **tree format** (like the `tree` command) with inline descriptions.
+
+**Monolithic (code map section in root README.md):**
 ```markdown
-# directory_name/CODE_MAP.md
+# Project Name
 
-One-line description of directory purpose.
+Brief project description.
 
-## Section Name
+## Code Structure
 
-### **filename**
-Brief description of what this file does and why it exists.
-
-### **subdirectory/**
-Brief description of subdirectory purpose. See subdirectory/CODE_MAP.md.
 ```
+src/
+├── main.rs             Entry point for CLI application
+├── config.rs           Configuration loading and validation
+├── commands/
+│   ├── init.rs         Initialize new workflows
+│   └── start.rs        Start workflow execution
+└── test_helpers.rs     Shared test utilities
+```
+```
+
+**Hierarchical (directory README.md files):**
+```markdown
+# src/commands/
+
+CLI command implementations for workflow management.
+
+## Structure
+
+```
+commands/
+├── mod.rs              Module exports and command registry
+├── init.rs             Initialize workflows (greenfield/retrofit)
+├── start.rs            Start workflow execution
+├── next.rs             Advance to next workflow phase
+└── status.rs           Display current workflow state
+```
+```
+
+**Key formatting rules:**
+- Use box-drawing characters: `├──`, `└──`, `│`
+- Align descriptions at consistent column (usually after filename)
+- Keep descriptions to 1 sentence per file
+- Use blank lines with `│` to separate logical groups
+- Reference subdirectories with "See subdir/README.md"
 
 ---
 
@@ -98,11 +131,11 @@ Brief description of subdirectory purpose. See subdirectory/CODE_MAP.md.
 ## Update Workflow
 
 1. Make structural changes to codebase
-2. Update affected CODE_MAP.md files
-3. Commit changes and CODE_MAP updates together
+2. Update affected README files with code map changes
+3. Commit changes and README updates together
 
 ---
 
 ## Conclusion
 
-CODE_MAP.md files are living documentation that stay synchronized with code structure. They require judgment to organize logically and describe concisely. Keep them current to maintain their value as navigation aids.
+Code maps are living documentation that stay synchronized with code structure. They require judgment to organize logically and describe concisely. Keep them current to maintain their value as navigation aids.

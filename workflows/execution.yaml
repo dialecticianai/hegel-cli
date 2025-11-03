@@ -83,19 +83,21 @@ nodes:
 
       {{CODE_MAP_WRITING}}
 
-      Your task: Update CODE_MAP.md files for areas touched during implementation.
+      Your task: Update README code maps for areas touched during implementation.
       {{?context_note}}
 
       Focus on:
       - Identify which directories were modified during CODE phase
-      - Update or create CODE_MAP.md files for those directories
+      - Update README files with code map changes for those directories
+      - In monolithic mode: Update the Code Structure section in root README.md
+      - In hierarchical mode: Update or create README.md files for modified directories
       - Ensure descriptions accurately reflect current code structure
       - Keep descriptions concise (1-3 sentences per file)
       - Follow the code_map_style configured for this project
 
-      Respond when CODE_MAP updates are complete.
+      Respond when README code map updates are complete.
     transitions:
-      - when: "review_complete"
+      - when: "code_review_complete"
         to: readme
 
   readme:

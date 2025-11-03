@@ -1,34 +1,35 @@
 ## Structure for Small Projects (<50 files)
 
-For smaller codebases, a **single root-level CODE_MAP.md** often suffices.
+For smaller codebases, include the code map as a **section in root README.md**.
 
 ### Format
 
+Use a tree structure (like `tree` command output) with inline descriptions:
+
 ```markdown
-# CODE_MAP.md
+# Project Name
 
 One-line project description.
 
-## Source Code
+## Code Structure
 
-### **file1.ext**
-Brief description (1-3 sentences).
-
-### **file2.ext**
-Brief description (1-3 sentences).
-
-## Tests
-
-### **test_file.ext**
-Brief description of what's tested.
-
-## Configuration
-
-### **.config_file**
-Brief description of configuration purpose.
+```
+src/
+├── file1.ext              Brief description (1 sentence)
+├── file2.ext              Brief description (1 sentence)
+├── tests/
+│   └── test_file.ext      Brief description of what's tested
+└── config.ext             Brief description of configuration purpose
+```
 ```
 
-### When to Use Monolithic Structure
+**Key principles:**
+- Use actual tree formatting with box-drawing characters (├──, └──, │)
+- Keep descriptions to 1 sentence per file
+- Group related files under directories
+- Show the structure visually, not in sections
+
+### When to Use Monolithic Mode
 
 - Total files <50
 - Flat or shallow directory structure
@@ -37,4 +38,4 @@ Brief description of configuration purpose.
 
 ### When to Switch to Hierarchical
 
-If your monolithic CODE_MAP exceeds ~100 lines or you have >3 subdirectories with distinct purposes, switch to hierarchical structure (one CODE_MAP per directory).
+If your code map section exceeds ~100 lines or you have >3 subdirectories with distinct purposes, switch to hierarchical mode (separate README.md per directory).

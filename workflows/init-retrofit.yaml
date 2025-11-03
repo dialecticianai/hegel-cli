@@ -40,34 +40,34 @@ nodes:
 
       {{CODE_MAP_WRITING}}
 
-      Your task: Create CODE_MAP.md files to document existing codebase structure.
+      Your task: Create README code maps to document existing codebase structure.
 
       Since this is a retrofit, you need to understand the existing codebase before adding DDD methodology.
 
       **First, assess project size:**
       - Count source files (exclude tests, configs, generated code)
-      - If <50 files: Use monolithic structure (single root CODE_MAP.md)
-      - If >50 files: Use hierarchical structure (one CODE_MAP per directory)
+      - If <50 files: Use monolithic mode (code map section in root README.md)
+      - If >50 files: Use hierarchical mode (README.md per directory)
 
-      **For monolithic structure:**
-      - Single CODE_MAP.md at project root
+      **For monolithic mode:**
+      - Add "## Code Structure" section to root README.md
       - Group files by category (Source Code, Tests, Configuration)
       - Brief descriptions (1-3 sentences per file)
 
-      **For hierarchical structure:**
-      - Create CODE_MAP.md for main source directory
-      - Create CODE_MAP.md for each significant subdirectory
-      - Non-recursive (each CODE_MAP only describes its direct children)
-      - Reference subdirectory CODE_MAPs explicitly
+      **For hierarchical mode:**
+      - Create README.md for main source directory
+      - Create README.md for each significant subdirectory
+      - Non-recursive (each README only describes its direct children)
+      - Reference subdirectory READMEs explicitly
 
       Ask the user:
-      1. I detected [N] source files. Should I use [monolithic/hierarchical] structure?
+      1. I detected [N] source files. Should I use [monolithic/hierarchical] mode?
       2. Which directories should I map? (e.g., src/, lib/, app/)
       3. Any directories to skip? (e.g., generated code, vendor deps)
 
       **Adversarial check**: What directories or patterns am I missing? Any unusual project structure I should understand?
 
-      Respond when CODE_MAP files are created.
+      Respond when README code maps are created.
     transitions:
       - when: code_map_complete
         to: customize_claude
@@ -148,12 +148,12 @@ nodes:
 
       Your task: Document existing architecture or create ARCHITECTURE.md.
 
-      **First, review CODE_MAP.md files created earlier.** They contain:
+      **First, review README code maps created earlier.** They contain:
       - Project structure and file organization
       - Key modules and their relationships
       - Existing patterns in the codebase
 
-      Use CODE_MAPs as your starting point. Only inspect code directly for:
+      Use README code maps as your starting point. Only inspect code directly for:
       - Dependency analysis (imports, package.json, Cargo.toml, etc.)
       - Integration point details (API contracts, database schemas)
       - Specific technical constraints not visible from structure alone
@@ -180,13 +180,13 @@ nodes:
       **Adversarial check**: What architectural constraints am I missing? What technical risks should we document?
 
       **After completing ARCHITECTURE.md:**
-      Review and refine CODE_MAP.md files based on your deeper architectural understanding:
+      Review and refine README code maps based on your deeper architectural understanding:
       - Add architectural context to file descriptions (e.g., "Mediator pattern coordinating X and Y")
       - Clarify design patterns discovered during architecture analysis
       - Note key dependencies between modules
       - Update any descriptions that were incomplete or unclear
 
-      Respond with a concise executive summary of the architecture and confirmation that CODE_MAPs have been refined.
+      Respond with a concise executive summary of the architecture and confirmation that README code maps have been refined.
     transitions:
       - when: architecture_complete
         to: git_commit
