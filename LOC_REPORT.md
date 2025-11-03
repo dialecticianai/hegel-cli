@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 00:17
+**Last Updated**: 2025-11-03 00:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,677 | 7,879 | 20,556 |
-| **Comments** | 1,756 | - | 1,756 |
-| **Blank Lines** | 2,337 | - | 2,337 |
-| **Total Lines** | 16,770 | 7,879 | 24,649 |
-| **Files** | 74 | 36 | 110 |
+| **Lines** | 12,706 | 7,612 | 20,318 |
+| **Comments** | 1,758 | - | 1,758 |
+| **Blank Lines** | 2,343 | - | 2,343 |
+| **Total Lines** | 16,807 | 7,612 | 24,419 |
+| **Files** | 74 | 35 | 109 |
 
-**Documentation Ratio**: 0.62 lines of docs per line of code
+**Documentation Ratio**: 0.60 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2337           1756          12677
+Rust                            74           2343           1758          12706
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            75           2368           1756          12765
+SUM:                            75           2374           1758          12794
 -------------------------------------------------------------------------------
 ```
 
@@ -85,7 +85,7 @@ SUM:                            75           2368           1756          12765
 | `metrics/git.rs` | 507 | 158 | 349 | 68.8% | ✅ |
 | `metrics/graph.rs` | 372 | 222 | 150 | 40.3% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 692 | 198 | 494 | 71.4% | ✅ |
+| `metrics/mod.rs` | 729 | 198 | 531 | 72.8% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
@@ -155,7 +155,6 @@ SUM:                            75           2368           1756          12765
 | `ROADMAP.md` | 212 |
 | `src/test_helpers/README.md` | 119 |
 | `TESTING.md` | 41 |
-| `workflows/ANALYSIS.md` | 267 |
 
 ---
 
@@ -163,7 +162,7 @@ SUM:                            75           2368           1756          12765
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.62 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.60 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

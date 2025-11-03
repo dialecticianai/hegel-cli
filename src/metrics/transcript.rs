@@ -51,7 +51,7 @@ pub struct TranscriptEvent {
 }
 
 /// Aggregated token metrics from transcript
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TokenMetrics {
     pub total_input_tokens: u64,
     pub total_output_tokens: u64,

@@ -49,7 +49,7 @@ pub struct HookEvent {
 }
 
 /// Parsed bash command from tool_input
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BashCommand {
     pub command: String,
     pub timestamp: Option<String>,
@@ -58,7 +58,7 @@ pub struct BashCommand {
 }
 
 /// File modification from Edit/Write tools
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FileModification {
     pub file_path: String,
     pub tool: String, // "Edit" or "Write"
@@ -66,7 +66,7 @@ pub struct FileModification {
 }
 
 /// Aggregated metrics from hook events
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct HookMetrics {
     pub total_events: usize,
     pub bash_commands: Vec<BashCommand>,

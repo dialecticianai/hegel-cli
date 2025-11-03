@@ -22,7 +22,7 @@ use std::path::Path;
 use crate::storage::FileStorage;
 
 /// Metrics for a single workflow phase
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhaseMetrics {
     pub phase_name: String,
     pub start_time: String,
@@ -36,7 +36,7 @@ pub struct PhaseMetrics {
 }
 
 /// Unified metrics combining all data sources
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct UnifiedMetrics {
     pub hook_metrics: HookMetrics,
     pub token_metrics: TokenMetrics,
@@ -688,5 +688,42 @@ mod tests {
 
         assert_eq!(metrics.git_commits.len(), 1);
         assert_eq!(metrics.git_commits[0].hash, "def5678");
+    }
+
+    #[test]
+    fn test_unified_metrics_serialization() {
+        // Test that UnifiedMetrics can serialize to JSON
+        let mut metrics = UnifiedMetrics::default();
+        metrics.session_id = Some("test-session".to_string());
+        metrics.token_metrics.total_input_tokens = 1000;
+        metrics.token_metrics.total_output_tokens = 500;
+
+        let json = serde_json::to_string(&metrics).unwrap();
+        assert!(json.contains("test-session"));
+        assert!(json.contains("1000"));
+
+        // Test deserialization
+        let deserialized: UnifiedMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.session_id, Some("test-session".to_string()));
+        assert_eq!(deserialized.token_metrics.total_input_tokens, 1000);
+    }
+
+    #[test]
+    fn test_phase_metrics_serialization() {
+        let phase = PhaseMetrics {
+            phase_name: "spec".to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:15:00Z".to_string()),
+            duration_seconds: 900,
+            ..Default::default()
+        };
+
+        let json = serde_json::to_string(&phase).unwrap();
+        assert!(json.contains("spec"));
+        assert!(json.contains("900"));
+
+        let deserialized: PhaseMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.phase_name, "spec");
+        assert_eq!(deserialized.duration_seconds, 900);
     }
 }
