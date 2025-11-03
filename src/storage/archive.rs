@@ -406,7 +406,9 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             }],
+            git_commits: vec![],
         };
 
         let archive = WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z").unwrap();

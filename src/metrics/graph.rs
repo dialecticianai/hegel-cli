@@ -270,6 +270,7 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             },
             PhaseMetrics {
                 phase_name: "plan".to_string(),
@@ -285,6 +286,7 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             },
         ]
     }

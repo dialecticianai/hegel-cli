@@ -172,6 +172,7 @@ impl UnifiedMetricsBuilder {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             });
 
             // Add corresponding state transition
@@ -243,6 +244,7 @@ impl UnifiedMetricsBuilder {
             token_metrics,
             state_transitions: self.state_transitions,
             phase_metrics: self.phase_metrics,
+            git_commits: vec![],
         }
     }
 }

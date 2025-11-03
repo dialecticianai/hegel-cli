@@ -175,6 +175,7 @@ mod tests {
             },
             bash_commands: vec![],
             file_modifications: vec![],
+            git_commits: vec![],
         }
     }
 
@@ -710,6 +711,7 @@ mod tests {
             token_metrics: TokenMetrics::default(),
             bash_commands: vec![],
             file_modifications: vec![],
+            git_commits: vec![],
         }));
 
         let context = RuleEvaluationContext {

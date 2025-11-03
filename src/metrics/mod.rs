@@ -1,10 +1,12 @@
 mod aggregation;
+pub mod git;
 pub mod graph;
 mod hooks;
 mod states;
 mod transcript;
 
 // Re-export public types from submodules
+pub use git::GitCommit;
 pub use graph::WorkflowDAG;
 pub use hooks::{parse_hooks_file, BashCommand, FileModification, HookEvent, HookMetrics};
 pub use states::{parse_states_file, StateTransitionEvent};
@@ -29,6 +31,8 @@ pub struct PhaseMetrics {
     pub token_metrics: TokenMetrics,
     pub bash_commands: Vec<BashCommand>,
     pub file_modifications: Vec<FileModification>,
+    /// Git commits attributed to this phase
+    pub git_commits: Vec<GitCommit>,
 }
 
 /// Unified metrics combining all data sources
@@ -39,6 +43,8 @@ pub struct UnifiedMetrics {
     pub state_transitions: Vec<StateTransitionEvent>,
     pub session_id: Option<String>,
     pub phase_metrics: Vec<PhaseMetrics>,
+    /// All git commits in session scope (not phase-specific)
+    pub git_commits: Vec<GitCommit>,
 }
 
 /// Parse all available metrics from .hegel directory
@@ -134,6 +140,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
                 },
                 bash_commands: vec![], // Archived as summaries, not individual commands
                 file_modifications: vec![], // Archived as summaries, not individual modifications
+                git_commits: vec![],   // Git commits not archived
             };
             all_phase_metrics.push(phase);
         }
@@ -601,5 +608,62 @@ mod tests {
 
         // Verify both transitions included
         assert_eq!(metrics.state_transitions.len(), 2);
+    }
+
+    #[test]
+    fn test_phase_metrics_default_git_commits() {
+        // PhaseMetrics should have empty git_commits by default
+        let phase = PhaseMetrics::default();
+        assert!(phase.git_commits.is_empty());
+    }
+
+    #[test]
+    fn test_phase_metrics_with_git_commits() {
+        // PhaseMetrics can hold git commits
+        let mut phase = PhaseMetrics::default();
+        phase.phase_name = "spec".to_string();
+
+        let commit = GitCommit {
+            hash: "abc1234".to_string(),
+            timestamp: "2025-01-01T10:05:00Z".to_string(),
+            message: "test commit".to_string(),
+            author: "Test Author".to_string(),
+            files_changed: 2,
+            insertions: 10,
+            deletions: 5,
+        };
+
+        phase.git_commits.push(commit.clone());
+
+        assert_eq!(phase.git_commits.len(), 1);
+        assert_eq!(phase.git_commits[0].hash, "abc1234");
+    }
+
+    #[test]
+    fn test_unified_metrics_default_git_commits() {
+        // UnifiedMetrics should have empty git_commits by default
+        let metrics = UnifiedMetrics::default();
+        assert!(metrics.git_commits.is_empty());
+    }
+
+    #[test]
+    fn test_unified_metrics_with_git_commits() {
+        // UnifiedMetrics can hold git commits
+        let mut metrics = UnifiedMetrics::default();
+
+        let commit = GitCommit {
+            hash: "def5678".to_string(),
+            timestamp: "2025-01-01T10:10:00Z".to_string(),
+            message: "another commit".to_string(),
+            author: "Another Author".to_string(),
+            files_changed: 3,
+            insertions: 15,
+            deletions: 8,
+        };
+
+        metrics.git_commits.push(commit.clone());
+
+        assert_eq!(metrics.git_commits.len(), 1);
+        assert_eq!(metrics.git_commits[0].hash, "def5678");
     }
 }

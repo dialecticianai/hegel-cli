@@ -71,6 +71,7 @@ pub fn build_phase_metrics(
             token_metrics,
             bash_commands,
             file_modifications,
+            git_commits: vec![],
         });
     }
 
