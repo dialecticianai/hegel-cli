@@ -85,7 +85,7 @@
 - `generate-coverage-report.sh` - Update COVERAGE_REPORT.md (auto-run by pre-commit)
 - `generate-loc-report.sh` - Update LOC_REPORT.md (auto-run by pre-commit)
 - `test-stability.sh [N]` - Run tests N times (default 20) to detect flaky tests
-- `build-and-install.sh` - Build release binary and install to ~/.cargo/bin
+- `build.sh [--install] [--skip-bump]` - Build release binary (optionally install to ~/.cargo/bin)
 - `check-transcript-tokens.sh` - Validate conversation token usage
 - `analyze-hook-schema.sh` - Explore hook event schema
 - `check-hook-fields.sh` - Verify hook field availability

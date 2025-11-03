@@ -1,14 +1,32 @@
 #!/usr/bin/env bash
-# Build hegel in release mode and install to ~/.cargo/bin
-# Usage: ./scripts/build-and-install.sh [--skip-bump]
+# Build hegel in release mode (optionally install to ~/.cargo/bin)
+# Usage:
+#   ./scripts/build.sh                    # Just build
+#   ./scripts/build.sh --install          # Build, bump version, and install
+#   ./scripts/build.sh --install --skip-bump  # Build and install without version bump
 
 set -e
 
 # Parse arguments
-BUMP_VERSION=true
-if [[ "$1" == "--skip-bump" ]]; then
-    BUMP_VERSION=false
-fi
+INSTALL=false
+BUMP_VERSION=false
+
+for arg in "$@"; do
+    case $arg in
+        --install)
+            INSTALL=true
+            BUMP_VERSION=true  # Default to bumping when installing
+            ;;
+        --skip-bump)
+            BUMP_VERSION=false
+            ;;
+        *)
+            echo "Unknown argument: $arg"
+            echo "Usage: $0 [--install] [--skip-bump]"
+            exit 1
+            ;;
+    esac
+done
 
 # Read current version from Cargo.toml
 CURRENT_VERSION=$(grep '^version = ' Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
@@ -39,11 +57,16 @@ fi
 echo "🔨 Building hegel v$BUILD_VERSION (release mode with bundled ast-grep)..."
 cargo build --release --features bundle-ast-grep
 
-echo ""
-./scripts/post-build.sh
+if [ "$INSTALL" = true ]; then
+    echo ""
+    ./scripts/post-build.sh
+fi
 
 echo ""
-echo "✨ Done! Run 'hegel --version' to verify."
+echo "✨ Done! Binary: ./target/release/hegel"
 if [ "$BUMP_VERSION" = true ]; then
     echo "📝 Version updated: $CURRENT_VERSION → $NEW_VERSION"
+fi
+if [ "$INSTALL" = true ]; then
+    echo "✅ Installed to ~/.cargo/bin/hegel"
 fi
