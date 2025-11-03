@@ -55,6 +55,36 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 
 ## Phase 2: Safety and Orchestration
 
+### 2.0 Improve `hegel analyze` Output
+
+**Goal:** Make `hegel analyze` more useful by providing summary mode by default and detail flags for deeper inspection.
+
+**Current problem:**
+- 3000+ lines of output for projects with ~250 commits
+- Lists every workflow transition (379 transitions)
+- Lists every phase completion (252 phases)
+- Becomes unusable as project history grows
+- No way to see just a high-level summary
+
+**Proposed solution:**
+- **Default mode**: Concise summary (20-30 lines)
+  - Session overview (token usage, events, top commands)
+  - Current workflow status
+  - Aggregate phase metrics (total time per phase type)
+  - Recent transitions (last 10)
+- **Detail flags** for progressive disclosure:
+  - `--transitions` - Show all workflow transitions
+  - `--phases` - Show detailed per-phase breakdowns
+  - `--commands` - Show full bash command history
+  - `--files` - Show all file modification details
+  - `--full` - Enable all detail flags (current behavior)
+
+**Benefits:**
+- Quick glance at project health
+- Progressive detail as needed
+- Scalable to large projects
+- Still preserves all detailed metrics when requested
+
 ### 2.1 Mode-Specific Subagents
 
 **Goal:** Integration with platform subagent features (Claude Code Task tool, Cursor agent spawning, etc.)
