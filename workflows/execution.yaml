@@ -75,59 +75,28 @@ nodes:
         max_duration: 600
     transitions:
       - when: "code_complete"
-        to: review
+        to: code_review
 
-  review:
+  code_review:
     prompt: |
-      You are in the REVIEW phase of Document-Driven Development (Execution Mode).
+      You are in the CODE_REVIEW phase of Document-Driven Development (Execution Mode).
 
-      Perform adversarial code review.
+      {{CODE_MAP_WRITING}}
+
+      Your task: Update CODE_MAP.md files for areas touched during implementation.
       {{?context_note}}
 
-      Review checklist:
-      - Correctness: Does code match SPEC?
-      - Test coverage: Are all paths tested?
-      - Error handling: Are failures handled gracefully?
-      - Security: Any injection/traversal risks?
-      - Performance: Any obvious bottlenecks?
-      - Maintainability: Is code clear and documented?
+      Focus on:
+      - Identify which directories were modified during CODE phase
+      - Update or create CODE_MAP.md files for those directories
+      - Ensure descriptions accurately reflect current code structure
+      - Keep descriptions concise (1-3 sentences per file)
+      - Follow the code_map_style configured for this project
 
-      **Claim semantics:**
-      Claims represent task completion, not outcomes. You've completed the review regardless of findings.
-
-      **Advancing the workflow:**
-      - Review complete, no issues found → `hegel next` (implicit review_complete claim)
-      - Review complete, issues need fixing → `hegel next needs_refactor`
-
-      Both paths complete the review task. The claim determines next routing:
-      - `review_complete` → proceeds to readme
-      - `needs_refactor` → routes to refactor phase
-
-      Perform your review and report findings clearly.
+      Respond when CODE_MAP updates are complete.
     transitions:
-      - when: review_complete
+      - when: "review_complete"
         to: readme
-      - when: needs_refactor
-        to: refactor
-
-  refactor:
-    prompt: |
-      You are in the REFACTOR phase of Document-Driven Development (Execution Mode).
-
-      Address review feedback.
-      {{?context_note}}
-
-      Refactoring requirements:
-      - Fix all issues identified in review
-      - Maintain or improve test coverage
-      - Preserve existing functionality
-      - Update tests if behavior changes
-      - Document significant changes
-
-      Respond when refactoring is complete and tests pass.
-    transitions:
-      - when: "refactor_complete"
-        to: code
 
   readme:
     prompt: |

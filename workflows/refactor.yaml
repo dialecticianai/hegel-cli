@@ -1,0 +1,56 @@
+# Refactor workflow - focused code improvements
+mode: refactor
+start_node: review
+
+nodes:
+  review:
+    prompt: |
+      You are in the REVIEW phase of the Refactor workflow.
+
+      Perform adversarial code review.
+      {{?context_note}}
+
+      Review checklist:
+      - Correctness: Does code match intended behavior?
+      - Test coverage: Are all paths tested?
+      - Error handling: Are failures handled gracefully?
+      - Security: Any injection/traversal risks?
+      - Performance: Any obvious bottlenecks?
+      - Maintainability: Is code clear and documented?
+
+      Identify areas that need refactoring and report findings clearly.
+
+      Respond when review is complete.
+    transitions:
+      - when: "review_complete"
+        to: refactor
+
+  refactor:
+    prompt: |
+      You are in the REFACTOR phase.
+
+      Your task: Address issues identified in review.
+      {{?context_note}}
+
+      Refactoring requirements:
+      - Fix all issues identified in review
+      - Maintain or improve test coverage
+      - Preserve existing functionality (all tests must still pass)
+      - Update tests if behavior changes
+      - Document significant changes
+      - Keep commits atomic and well-described
+
+      Common refactoring patterns:
+      - Extract repeated code into helpers
+      - Simplify complex functions
+      - Improve naming clarity
+      - Reorganize file/module structure
+      - Optimize performance bottlenecks
+
+      Respond when refactoring is complete and all tests pass.
+    transitions:
+      - when: "refactor_complete"
+        to: done
+
+  done:
+    transitions: []

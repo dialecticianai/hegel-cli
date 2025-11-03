@@ -9,6 +9,7 @@ pub fn get_workflow(name: &str) -> Option<&'static str> {
         ("discovery", include_str!("../workflows/discovery.yaml")),
         ("execution", include_str!("../workflows/execution.yaml")),
         ("research", include_str!("../workflows/research.yaml")),
+        ("refactor", include_str!("../workflows/refactor.yaml")),
         ("minimal", include_str!("../workflows/minimal.yaml")),
         (
             "init-greenfield",
@@ -94,6 +95,7 @@ pub fn list_workflows() -> Vec<&'static str> {
         "discovery",
         "execution",
         "research",
+        "refactor",
         "minimal",
         "init-greenfield",
         "init-retrofit",
