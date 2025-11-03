@@ -267,6 +267,23 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
                     format_metric(phase.file_modifications.len())
                 }
             );
+
+            // Git commits
+            if !phase.git_commits.is_empty() {
+                let total_files: usize = phase.git_commits.iter().map(|c| c.files_changed).sum();
+                let total_insertions: usize = phase.git_commits.iter().map(|c| c.insertions).sum();
+                let total_deletions: usize = phase.git_commits.iter().map(|c| c.deletions).sum();
+
+                println!(
+                    "    Commits:           {} ({} files, +{} -{})",
+                    format_metric(phase.git_commits.len()),
+                    total_files,
+                    total_insertions,
+                    total_deletions
+                );
+            } else {
+                println!("    Commits:           {}", Theme::secondary("-"));
+            }
         }
         println!();
     }

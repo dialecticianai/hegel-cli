@@ -168,7 +168,30 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(state_dir: P) -> Result<UnifiedMetr
     // Add live phases
     all_phase_metrics.extend(live_phase_metrics);
 
+    // Git commit parsing and attribution
+    let git_commits = if git::has_git_repository(state_dir) {
+        let project_root = state_dir.parent().unwrap();
+
+        // Use first state transition timestamp as session start (if available)
+        let since_timestamp = unified
+            .state_transitions
+            .first()
+            .and_then(|t| chrono::DateTime::parse_from_rfc3339(&t.timestamp).ok())
+            .map(|dt| dt.timestamp());
+
+        git::parse_git_commits(project_root, since_timestamp).unwrap_or_else(|e| {
+            eprintln!("Warning: Failed to parse git commits: {}", e);
+            Vec::new()
+        })
+    } else {
+        Vec::new()
+    };
+
+    // Attribute commits to phases
+    git::attribute_commits_to_phases(git_commits.clone(), &mut all_phase_metrics);
+
     unified.phase_metrics = all_phase_metrics;
+    unified.git_commits = git_commits;
 
     Ok(unified)
 }
