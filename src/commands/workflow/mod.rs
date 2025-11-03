@@ -209,15 +209,20 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
         .get(current_node)
         .with_context(|| format!("Current node not found: {}", current_node))?;
 
-    // Render prompt with guides
-    let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
-
     // Display output
     println!("{}", Theme::warning("Re-displaying current prompt"));
     println!("{}: {}", Theme::label("Current node"), current_node);
     println!();
-    println!("{}", Theme::header("Prompt:"));
-    println!("{}", rendered_prompt);
+
+    // Check if node has a prompt
+    if node.prompt.is_empty() {
+        println!("{}", Theme::secondary("(No prompt at this node)"));
+    } else {
+        // Render prompt with guides
+        let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
+        println!("{}", Theme::header("Prompt:"));
+        println!("{}", rendered_prompt);
+    }
 
     Ok(())
 }
