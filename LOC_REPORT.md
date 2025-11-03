@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 22:25
+**Last Updated**: 2025-11-02 22:27
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,636 | 7,849 | 20,485 |
-| **Comments** | 1,750 | - | 1,750 |
-| **Blank Lines** | 2,330 | - | 2,330 |
-| **Total Lines** | 16,716 | 7,849 | 24,565 |
+| **Lines** | 12,652 | 7,849 | 20,501 |
+| **Comments** | 1,751 | - | 1,751 |
+| **Blank Lines** | 2,334 | - | 2,334 |
+| **Total Lines** | 16,737 | 7,849 | 24,586 |
 | **Files** | 74 | 36 | 110 |
 
 **Documentation Ratio**: 0.62 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2330           1750          12636
+Rust                            74           2334           1751          12652
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            75           2361           1750          12724
+SUM:                            75           2365           1751          12740
 -------------------------------------------------------------------------------
 ```
 
@@ -72,7 +72,7 @@ SUM:                            75           2361           1750          12724
 | `commands/workflow/transitions.rs` | 333 | 333 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
-| `embedded.rs` | 122 | 122 | 0 | 0.0% | ✅ |
+| `embedded.rs` | 143 | 123 | 20 | 14.0% | ✅ |
 | `engine/mod.rs` | 865 | 185 | 680 | 78.6% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |

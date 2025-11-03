@@ -120,3 +120,24 @@ pub fn list_guides() -> Vec<&'static str> {
         "ARCHITECTURE_WRITING.md",
     ]
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_all_embedded_workflows_are_valid() {
+        // Test that all embedded workflows can be parsed and validated
+        for workflow_name in list_workflows() {
+            let yaml_content = get_workflow(workflow_name)
+                .unwrap_or_else(|| panic!("Workflow '{}' not found", workflow_name));
+
+            let workflow: crate::engine::Workflow = serde_yaml::from_str(yaml_content)
+                .unwrap_or_else(|e| panic!("Failed to parse workflow '{}': {}", workflow_name, e));
+
+            workflow.validate().unwrap_or_else(|e| {
+                panic!("Workflow '{}' failed validation: {}", workflow_name, e)
+            });
+        }
+    }
+}
