@@ -49,7 +49,11 @@ enum Commands {
     /// List available workflows
     Workflows,
     /// List available guides
-    Guides,
+    Guides {
+        /// Show embedded guide content
+        #[arg(short = 's', long)]
+        show_embedded: Option<String>,
+    },
     /// Advance to next phase (implicit: current_complete, or provide custom claim)
     Next {
         /// Optional claim name (e.g., 'spec_complete', 'needs_refactor')
@@ -248,8 +252,8 @@ fn main() -> Result<()> {
         Commands::Workflows => {
             commands::list_workflows(&storage)?;
         }
-        Commands::Guides => {
-            commands::list_guides(&storage)?;
+        Commands::Guides { show_embedded } => {
+            commands::list_guides(show_embedded.as_deref(), &storage)?;
         }
         Commands::Next { claim } => {
             commands::next_prompt(claim.as_deref(), &storage)?;

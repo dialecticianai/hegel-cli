@@ -337,8 +337,13 @@ fn extract_node_flow(workflow: &crate::engine::Workflow) -> String {
     flow.join(" → ")
 }
 
-/// List all available guides
-pub fn list_guides(storage: &FileStorage) -> Result<()> {
+/// List all available guides or show embedded guide content
+pub fn list_guides(show_embedded: Option<&str>, storage: &FileStorage) -> Result<()> {
+    // If --show-embedded flag is provided, display that guide's content
+    if let Some(guide_name) = show_embedded {
+        return show_embedded_guide(guide_name);
+    }
+
     use std::collections::HashSet;
     use std::fs;
 
@@ -385,6 +390,30 @@ pub fn list_guides(storage: &FileStorage) -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Display the content of an embedded guide
+fn show_embedded_guide(guide_name: &str) -> Result<()> {
+    // Auto-add .md extension if missing
+    let normalized_name = if guide_name.ends_with(".md") {
+        guide_name.to_string()
+    } else {
+        format!("{}.md", guide_name)
+    };
+
+    // Try to get the embedded guide
+    match crate::embedded::get_guide(&normalized_name) {
+        Some(content) => {
+            println!("{}", content);
+            Ok(())
+        }
+        None => {
+            anyhow::bail!(
+                "Embedded guide '{}' not found. Run 'hegel guides' to see available guides.",
+                normalized_name
+            );
+        }
+    }
 }
 
 #[cfg(test)]
