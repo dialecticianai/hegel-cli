@@ -128,6 +128,23 @@ enum Commands {
         #[arg(long)]
         headless: bool,
     },
+    /// Launch project manager dashboard
+    ///
+    /// Provides web UI for managing multiple Hegel projects:
+    ///   - Auto-discover projects with .hegel/ directories
+    ///   - View workflow state and metrics across projects
+    ///   - Real-time updates and statistics
+    ///
+    /// Launch modes:
+    ///   hegel pm            Start dashboard (auto-opens browser)
+    ///   hegel pm discover   Run discovery and print projects
+    ///
+    /// All arguments are passed through to hegel-pm binary.
+    Pm {
+        /// Arguments to pass to hegel-pm
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
     /// Run git with guardrails and audit logging
     ///
     /// Guardrails configuration: .hegel/guardrails.yaml
@@ -295,6 +312,9 @@ fn main() -> Result<()> {
             headless,
         } => {
             commands::run_reflect(&files, out_dir.as_deref(), json, headless)?;
+        }
+        Commands::Pm { args } => {
+            commands::run_pm(&args)?;
         }
         Commands::Git { args } => {
             commands::run_wrapped_command("git", &args, &storage)?;

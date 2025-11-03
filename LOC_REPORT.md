@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 00:55
+**Last Updated**: 2025-11-03 16:18
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,706 | 7,611 | 20,317 |
-| **Comments** | 1,758 | - | 1,758 |
-| **Blank Lines** | 2,343 | - | 2,343 |
-| **Total Lines** | 16,807 | 7,611 | 24,418 |
-| **Files** | 74 | 35 | 109 |
+| **Lines** | 12,763 | 7,658 | 20,421 |
+| **Comments** | 1,774 | - | 1,774 |
+| **Blank Lines** | 2,349 | - | 2,349 |
+| **Total Lines** | 16,886 | 7,658 | 24,544 |
+| **Files** | 76 | 35 | 111 |
 
 **Documentation Ratio**: 0.60 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2343           1758          12706
+Rust                            76           2349           1774          12763
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            75           2374           1758          12794
+SUM:                            77           2380           1774          12851
 -------------------------------------------------------------------------------
 ```
 
@@ -46,6 +46,7 @@ SUM:                            75           2374           1758          12794
 | `commands/archive.rs` | 301 | 212 | 89 | 29.6% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
+| `commands/external_bin.rs` | 91 | 74 | 17 | 18.7% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
 | `commands/fork/cody.rs` | 48 | 21 | 27 | 56.2% | ✅ |
@@ -57,8 +58,9 @@ SUM:                            75           2374           1758          12794
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/meta.rs` | 251 | 163 | 88 | 35.1% | ✅ |
-| `commands/mod.rs` | 32 | 32 | 0 | 0.0% | ✅ |
-| `commands/reflect.rs` | 132 | 83 | 49 | 37.1% | ✅ |
+| `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
+| `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
+| `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
 | `commands/status.rs` | 66 | 66 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
@@ -79,7 +81,7 @@ SUM:                            75           2374           1758          12794
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 14 | 12 | 2 | 14.3% | ✅ |
-| `main.rs` | 326 | 13 | 313 | 96.0% | ✅ |
+| `main.rs` | 346 | 13 | 333 | 96.2% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 204 | 145 | 59 | 28.9% | ✅ |
 | `metrics/git.rs` | 507 | 158 | 349 | 68.8% | ✅ |
@@ -129,12 +131,12 @@ SUM:                            75           2374           1758          12794
 | `CLAUDE.md` | 155 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 180 |
+| `COVERAGE_REPORT.md` | 184 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
 | `guides/CLAUDE_CUSTOMIZATION.md` | 312 |
-| `guides/CODE_MAP_WRITING.md` | 108 |
+| `guides/CODE_MAP_WRITING.md` | 141 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 96 |
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
@@ -144,8 +146,8 @@ SUM:                            75           2374           1758          12794
 | `guides/README_WRITING.md` | 142 |
 | `guides/SPEC_WRITING.md` | 121 |
 | `guides/STUDY_PLANNING.md` | 209 |
-| `guides/templates/code_map_hierarchical.md` | 48 |
-| `guides/templates/code_map_monolithic.md` | 40 |
+| `guides/templates/code_map_hierarchical.md` | 57 |
+| `guides/templates/code_map_monolithic.md` | 41 |
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
