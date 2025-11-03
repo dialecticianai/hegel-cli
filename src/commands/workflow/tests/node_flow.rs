@@ -128,7 +128,6 @@ nodes:
       - when: "learn_complete"
         to: done
   done:
-    prompt: "Done"
     transitions: []
 "#;
 

@@ -118,12 +118,4 @@ nodes:
         to: done
 
   done:
-    prompt: |
-      Greenfield project initialized successfully.
-
-      Next steps:
-      - Review CLAUDE.md, VISION.md, ARCHITECTURE.md
-      - Run 'hegel start discovery' to begin first feature exploration
-
-      Project initialization complete.
     transitions: []

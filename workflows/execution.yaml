@@ -100,13 +100,13 @@ nodes:
       - Review complete, issues need fixing → `hegel next needs_refactor`
 
       Both paths complete the review task. The claim determines next routing:
-      - `review_complete` → proceeds to done
+      - `review_complete` → proceeds to readme
       - `needs_refactor` → routes to refactor phase
 
       Perform your review and report findings clearly.
     transitions:
       - when: review_complete
-        to: done
+        to: readme
       - when: needs_refactor
         to: refactor
 
@@ -129,13 +129,13 @@ nodes:
       - when: "refactor_complete"
         to: code
 
-  done:
+  readme:
     prompt: |
-      Execution workflow complete.
+      You are in the README phase of Document-Driven Development (Execution Mode).
 
       {{README_WRITING}}
 
-      Final task: Create production-ready README.md.
+      Your task: Create production-ready README.md.
 
       Include:
       - System overview and purpose
@@ -147,4 +147,9 @@ nodes:
       - Integration points
 
       Respond with your completed README.md content.
+    transitions:
+      - when: "readme_complete"
+        to: done
+
+  done:
     transitions: []

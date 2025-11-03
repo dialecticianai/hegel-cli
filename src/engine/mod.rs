@@ -19,6 +19,7 @@ pub struct Transition {
 /// Workflow node definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
+    #[serde(default)]
     pub prompt: String,
     pub transitions: Vec<Transition>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -37,6 +38,13 @@ impl Workflow {
     /// Validate all rules in all nodes
     pub fn validate(&self) -> Result<()> {
         for (node_name, node) in &self.nodes {
+            // Validate that 'done' nodes don't have prompts
+            if node_name == "done" && !node.prompt.is_empty() {
+                anyhow::bail!(
+                    "Workflow validation failed: 'done' node must not have a prompt field"
+                );
+            }
+
             for rule in &node.rules {
                 rule.validate()
                     .with_context(|| format!("Invalid rule in node '{}'", node_name))?;
@@ -207,7 +215,7 @@ mod tests {
                 "plan",
                 node("Write PLAN.md", vec![transition("plan_complete", "done")]),
             )
-            .with_node("done", node("Complete!", vec![]))
+            .with_node("done", node("", vec![]))
             .build();
 
         let workflow_path = create_test_workflow_file(
@@ -256,7 +264,7 @@ mod tests {
                     vec![transition("refactor_complete", "code")],
                 ),
             )
-            .with_node("done", node("Complete!", vec![]))
+            .with_node("done", node("", vec![]))
             .build();
 
         let workflow_path = create_test_workflow_file(
@@ -304,14 +312,13 @@ nodes:
     prompt: "Test"
     transitions:
       - when: done
-        to: done
+        to: end
     rules:
       - type: repeated_command
         pattern: "[invalid"
         threshold: 5
         window: 120
-  done:
-    prompt: "Done"
+  end:
     transitions: []
 "#;
         let result = load_workflow_from_str(yaml);
@@ -330,14 +337,13 @@ nodes:
     prompt: "Write code"
     transitions:
       - when: done
-        to: done
+        to: end
     rules:
       - type: repeated_file_edit
         path_pattern: "(unclosed"
         threshold: 8
         window: 180
-  done:
-    prompt: "Done"
+  end:
     transitions: []
 "#;
         let result = load_workflow_from_str(yaml);
@@ -457,7 +463,7 @@ nodes:
                     vec![transition("learnings_complete", "done")],
                 ),
             )
-            .with_node("done", node("Complete!", vec![]))
+            .with_node("done", node("", vec![]))
             .build();
 
         let mut state = init_state(&workflow);
@@ -509,7 +515,7 @@ nodes:
                     vec![transition("refactor_complete", "code")],
                 ),
             )
-            .with_node("done", node("Complete!", vec![]))
+            .with_node("done", node("", vec![]))
             .build();
 
         let mut state = WorkflowState {
@@ -828,5 +834,32 @@ nodes:
         assert!(!workflow.is_terminal_node("middle"));
         assert!(workflow.is_terminal_node("end"));
         assert!(!workflow.is_terminal_node("nonexistent"));
+    }
+
+    #[test]
+    fn test_validate_done_node_with_prompt() {
+        use crate::test_helpers::*;
+
+        let workflow = workflow("test", "start")
+            .with_node("start", node("Start", vec![transition("go", "done")]))
+            .with_node("done", node("Should not have prompt", vec![]))
+            .build();
+
+        let result = workflow.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("done"));
+    }
+
+    #[test]
+    fn test_validate_done_node_without_prompt() {
+        use crate::test_helpers::*;
+
+        let workflow = workflow("test", "start")
+            .with_node("start", node("Start", vec![transition("go", "done")]))
+            .with_node("done", node("", vec![]))
+            .build();
+
+        let result = workflow.validate();
+        assert!(result.is_ok());
     }
 }

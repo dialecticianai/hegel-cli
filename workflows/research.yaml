@@ -110,26 +110,4 @@ nodes:
         to: done
 
   done:
-    prompt: |
-      Research mode complete.
-
-      Your deliverables:
-      - Learning documents (learnings/*.md) - synthesized knowledge
-      - Meta-assessments (learnings/.ddd/*.md) - progress tracking
-      - Open questions (learnings/.ddd/*_open_questions.md) - Discovery roadmap
-      - Cached sources (.webcache/) - stable offline references
-
-      Final check:
-      - All priority areas studied?
-      - Key concepts documented?
-      - Questions catalogued?
-      - Ready for practical validation (Discovery mode)?
-
-      Your deliverables:
-      - Learning documents (learnings/*.md)
-      - Meta-assessments (learnings/.ddd/*.md)
-      - Open questions (learnings/.ddd/*_open_questions.md)
-      - Cached sources (.webcache/)
-
-      Run 'hegel next' to transition to Discovery mode.
     transitions: []

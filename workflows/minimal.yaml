@@ -11,4 +11,9 @@ nodes:
 
   plan:
     prompt: "Write a PLAN.md with testable steps."
+    transitions:
+      - when: "plan_complete"
+        to: done
+
+  done:
     transitions: []

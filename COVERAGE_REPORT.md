@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-02 21:48
+**Last Updated**: 2025-11-02 22:09
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **90.00%** lines | **89.07%** regions | **88.85%** functions
+**Overall Coverage**: **90.02%** lines | **89.11%** regions | **88.88%** functions
 
 ## Summary
 
 ```
-TOTAL                                      15464              1690    89.07%         834                93    88.85%        9312               931    90.00%           0                 0         -
+TOTAL                                      15523              1690    89.11%         836                93    88.88%        9331               931    90.02%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -43,7 +43,7 @@ TOTAL                                      15464              1690    89.07%    
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 76.42% | 61.54% | 50.00% | 🟡 Good |
-| `src/engine/mod.rs` | 99.82% | 99.60% | 97.37% | 🟢 Excellent |
+| `src/engine/mod.rs` | 99.83% | 99.63% | 97.50% | 🟢 Excellent |
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -99,7 +99,7 @@ TOTAL                                      15464              1690    89.07%    
 - `src/commands/workflow/context.rs` - 100.00%
 - `src/commands/workflow/transitions.rs` - 92.39%
 - `src/config.rs` - 91.67%
-- `src/engine/mod.rs` - 99.82%
+- `src/engine/mod.rs` - 99.83%
 - `src/engine/template.rs` - 97.25%
 - `src/guardrails/parser.rs` - 97.78%
 - `src/guardrails/types.rs` - 94.38%
@@ -153,7 +153,7 @@ TOTAL                                      15464              1690    89.07%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 90.00% | ✅ Met |
+| Overall | ≥80% | 90.02% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 21:48
+**Last Updated**: 2025-11-02 22:09
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,609 | 7,413 | 20,022 |
-| **Comments** | 1,748 | - | 1,748 |
-| **Blank Lines** | 2,323 | - | 2,323 |
-| **Total Lines** | 16,680 | 7,413 | 24,093 |
-| **Files** | 74 | 33 | 107 |
+| **Lines** | 12,630 | 7,846 | 20,476 |
+| **Comments** | 1,749 | - | 1,749 |
+| **Blank Lines** | 2,330 | - | 2,330 |
+| **Total Lines** | 16,709 | 7,846 | 24,555 |
+| **Files** | 74 | 36 | 110 |
 
-**Documentation Ratio**: 0.59 lines of docs per line of code
+**Documentation Ratio**: 0.62 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            74           2323           1748          12609
+Rust                            74           2330           1749          12630
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            75           2354           1748          12697
+SUM:                            75           2361           1749          12718
 -------------------------------------------------------------------------------
 ```
 
@@ -66,14 +66,14 @@ SUM:                            75           2354           1748          12697
 | `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 64 | 64 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/node_flow.rs` | 138 | 138 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/node_flow.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/production.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/transitions.rs` | 345 | 345 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/transitions.rs` | 333 | 333 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 120 | 120 | 0 | 0.0% | ✅ |
-| `engine/mod.rs` | 832 | 177 | 655 | 78.7% | ✅ |
+| `engine/mod.rs` | 865 | 185 | 680 | 78.6% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
@@ -100,7 +100,7 @@ SUM:                            75           2354           1748          12697
 | `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 301 | 301 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/workflow.rs` | 298 | 298 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 402 | 165 | 237 | 59.0% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
@@ -120,6 +120,8 @@ SUM:                            75           2354           1748          12697
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/done-node-refactor/PLAN.md` | 84 |
+| `.ddd/feat/done-node-refactor/SPEC.md` | 80 |
 | `.ddd/feat/git-commit-metrics/PLAN.md` | 402 |
 | `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
@@ -148,11 +150,12 @@ SUM:                            75           2354           1748          12697
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 286 |
 | `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 177 |
+| `LOC_REPORT.md` | 179 |
 | `README.md` | 575 |
 | `ROADMAP.md` | 182 |
 | `src/test_helpers/README.md` | 119 |
 | `TESTING.md` | 41 |
+| `workflows/ANALYSIS.md` | 267 |
 
 ---
 
@@ -160,7 +163,7 @@ SUM:                            75           2354           1748          12697
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.59 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.62 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

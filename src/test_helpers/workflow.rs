@@ -23,7 +23,6 @@ nodes:
       - when: plan_complete
         to: done
   done:
-    prompt: "Complete!"
     transitions: []
 "#;
 
@@ -230,7 +229,6 @@ nodes:
       - when: study_complete
         to: done
   done:
-    prompt: "Research complete"
     transitions: []
 "#,
     )
@@ -253,7 +251,6 @@ nodes:
       - when: plan_complete
         to: done
   done:
-    prompt: "Discovery complete"
     transitions: []
 "#,
     )

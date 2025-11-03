@@ -222,13 +222,4 @@ nodes:
         to: done
 
   done:
-    prompt: |
-      DDD retrofit complete.
-
-      Next steps:
-      - Review CLAUDE.md, VISION.md, ARCHITECTURE.md, CODE_MAP.md files
-      - Run 'hegel start discovery' to explore first refactoring or feature
-      - If on feature branch: consider creating PR for team review
-
-      Retrofit initialization finished successfully.
     transitions: []

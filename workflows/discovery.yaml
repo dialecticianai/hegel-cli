@@ -91,17 +91,17 @@ nodes:
       Respond with your completed LEARNINGS.md content.
     transitions:
       - when: "learnings_complete"
-        to: done
+        to: readme
       - when: "restart_cycle"
         to: spec
 
-  done:
+  readme:
     prompt: |
-      Discovery workflow complete.
+      You are in the README phase of Dialectic-Driven Development (Discovery Mode).
 
       {{README_WRITING}}
 
-      Final task: Create a README.md summarizing the toy model for future AI context refresh.
+      Your task: Create a README.md summarizing the toy model for future AI context refresh.
 
       Keep it concise (100-200 words):
       - What the system does
@@ -110,4 +110,9 @@ nodes:
       - Integration points
 
       Respond with your completed README.md content.
+    transitions:
+      - when: "readme_complete"
+        to: done
+
+  done:
     transitions: []
