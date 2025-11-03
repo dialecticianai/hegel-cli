@@ -28,6 +28,7 @@ fs2 = "0.4"
 notify = "6.0"
 walkdir = "2.5"
 semver = "1.0"
+git2 = "0.19"
 hegel-ast-grep = { path = "crates/hegel-ast-grep" }
 
 [dev-dependencies]

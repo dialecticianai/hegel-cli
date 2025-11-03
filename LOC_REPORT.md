@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 17:46
+**Last Updated**: 2025-11-02 21:08
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 12,136 | 6,329 | 18,465 |
+| **Lines** | 12,136 | 7,276 | 19,412 |
 | **Comments** | 1,689 | - | 1,689 |
 | **Blank Lines** | 2,231 | - | 2,231 |
-| **Total Lines** | 16,056 | 6,329 | 22,385 |
-| **Files** | 73 | 30 | 103 |
+| **Total Lines** | 16,056 | 7,276 | 23,332 |
+| **Files** | 73 | 32 | 105 |
 
-**Documentation Ratio**: 0.52 lines of docs per line of code
+**Documentation Ratio**: 0.60 lines of docs per line of code
 
 ---
 
@@ -118,6 +118,8 @@ SUM:                            73           2231           1689          12136
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/git-commit-metrics/PLAN.md` | 402 |
+| `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
 | `CLAUDE.md` | 149 |
@@ -155,7 +157,7 @@ SUM:                            73           2231           1689          12136
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.52 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.60 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
