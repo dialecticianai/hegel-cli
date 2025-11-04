@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-04 14:17
+**Last Updated**: 2025-11-04 16:45
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **87.64%** lines | **86.79%** regions | **86.06%** functions
+**Overall Coverage**: **87.53%** lines | **86.68%** regions | **86.06%** functions
 
 ## Summary
 
 ```
-TOTAL                                      16212              2141    86.79%         875               122    86.06%        9789              1210    87.64%           0                 0         -
+TOTAL                                      16218              2160    86.68%         875               122    86.06%        9778              1219    87.53%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -37,14 +37,14 @@ TOTAL                                      16212              2141    86.79%    
 | `src/commands/meta.rs` | 64.67% | 70.71% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
-| `src/commands/status.rs` | 59.57% | 48.32% | 50.00% | 🟠 Moderate |
+| `src/commands/status.rs` | 43.21% | 37.91% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/mod.rs` | 50.72% | 51.11% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/transitions.rs` | 87.15% | 82.37% | 46.15% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
-| `src/embedded.rs` | 83.33% | 76.14% | 50.00% | 🟡 Good |
+| `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
 | `src/engine/mod.rs` | 99.83% | 99.63% | 97.50% | 🟢 Excellent |
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
@@ -131,7 +131,7 @@ TOTAL                                      16212              2141    86.79%    
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 87.15%
 - `src/commands/wrapped.rs` - 71.79%
-- `src/embedded.rs` - 83.33%
+- `src/embedded.rs` - 82.79%
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 86.11%
 - `src/tui/app.rs` - 87.66%
@@ -144,7 +144,7 @@ TOTAL                                      16212              2141    86.79%    
 - `src/commands/meta.rs` - 64.67%
 - `src/commands/pm.rs` - 60.00%
 - `src/commands/reflect.rs` - 60.53%
-- `src/commands/status.rs` - 59.57%
+- `src/commands/status.rs` - 43.21%
 - `src/commands/workflow/mod.rs` - 50.72%
 - `src/main.rs` - 41.79%
 
@@ -157,7 +157,7 @@ TOTAL                                      16212              2141    86.79%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 87.64% | ✅ Met |
+| Overall | ≥80% | 87.53% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

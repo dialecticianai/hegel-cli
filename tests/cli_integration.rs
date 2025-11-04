@@ -95,9 +95,8 @@ fn test_status_with_workflow() {
 
     assert!(output.status.success());
     let out = stdout(&output);
-    assert!(out.contains("Workflow Status"));
-    assert!(out.contains("Mode: discovery"));
-    assert!(out.contains("Current node: spec"));
+    assert!(out.contains("Hegel: discovery"));
+    assert!(out.contains("[spec]")); // Current node in brackets
 }
 
 #[test]
@@ -231,12 +230,12 @@ fn test_full_workflow_cycle() {
     // Start workflow
     let start = run_hegel(&["start", "discovery"], Some(state_path));
     assert!(start.status.success());
-    assert!(stdout(&start).contains("Current node: spec"));
+    assert!(stdout(&start).contains("spec")); // Prompt contains node name
 
     // Verify status after start
     let status1 = run_hegel(&["status"], Some(state_path));
-    assert!(stdout(&status1).contains("Current node: spec"));
-    assert!(stdout(&status1).contains("Mode: discovery"));
+    assert!(stdout(&status1).contains("Hegel: discovery"));
+    assert!(stdout(&status1).contains("[spec]")); // Current node in brackets
 
     // Transition to plan
     let next1 = run_hegel(&["next", "spec_complete"], Some(state_path));
@@ -245,7 +244,7 @@ fn test_full_workflow_cycle() {
 
     // Verify status after transition
     let status2 = run_hegel(&["status"], Some(state_path));
-    assert!(stdout(&status2).contains("Current node: plan"));
+    assert!(stdout(&status2).contains("[plan]")); // Current node in brackets
 
     // Reset workflow
     let reset = run_hegel(&["reset"], Some(state_path));
