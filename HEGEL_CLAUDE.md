@@ -49,12 +49,13 @@ hegel reset                     # Clear all state
 - `standard` - Discovery ↔ Execution (starts with discovery)
 
 **Workflows:**
+- `cowboy` - **DEFAULT** - Minimal overhead for straightforward tasks (just LEXICON guidance)
 - `init-greenfield` - CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_INIT (new projects)
 - `init-retrofit` - DETECT_EXISTING → CODE_MAP → CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_COMMIT (existing projects)
 - `research` - PLAN → STUDY → ASSESS → QUESTIONS (external knowledge gathering)
 - `discovery` - SPEC → PLAN → CODE → LEARNINGS → README (toy experiments)
 - `execution` - Production-grade rigor with code review phase
-- `minimal` - Simplified for quick iterations
+- `refactor` - Focused refactoring workflow
 
 **Starting at custom nodes:**
 ```bash
@@ -122,19 +123,22 @@ Dashboard shortcuts: `q` (quit), `Tab` (switch tabs), `↑↓`/`j`/`k` (scroll),
 
 ---
 
-## When to Use Workflows
+## Workflow Selection Guide
 
-**Use DDD workflows for:**
+**Cowboy mode (default):** Use for most tasks. Just LEXICON guidance without ceremony - tongue-in-cheek acknowledgement that full DDD is overkill for straightforward work.
+
+**When to use full DDD workflows:**
 - Hard problems requiring novel solutions
 - Complex domains where mistakes are expensive
 - Learning-dense exploration
+- User explicitly requests structured methodology
 
-**Skip workflows for:**
-- Straightforward implementations agents handle autonomously
-- Simple CRUD or routine features
-- User hasn't requested structured methodology
+**Starting cowboy mode:**
+```bash
+hegel start cowboy
+```
 
-**When in doubt:** Check `hegel status` at session start. If no active workflow and user hasn't requested structure, proceed without Hegel orchestration.
+**When in doubt:** Start with cowboy. Escalate to discovery/execution only when complexity demands it.
 
 ---
 
@@ -263,7 +267,7 @@ hegel meta <learning|standard>
 hegel meta
 
 # Workflows
-hegel start <discovery|execution|research|minimal>
+hegel start <cowboy|discovery|execution|research|refactor>
 hegel next|restart|abort|repeat|status|reset
 
 # Commands
@@ -284,3 +288,19 @@ hegel analyze
 ---
 
 **For detailed command syntax, always use:** `hegel <command> --help`
+
+---
+
+## Session Start Protocol
+
+**At the beginning of every session:**
+
+1. Run `hegel status` to check current workflow state
+2. Report the status to the user
+3. Recommend next action:
+   - **No active workflow:** Suggest `hegel start cowboy` (default for most tasks)
+   - **Active workflow completed (at done node):** Workflow is finished, suggest `hegel start cowboy` for new work
+   - **Active workflow in progress:** Suggest `hegel repeat` to see current prompt, or `hegel abort` if starting fresh work
+   - **User explicitly requests structured methodology:** Suggest appropriate DDD workflow (discovery/execution/research)
+
+**Default recommendation:** `hegel start cowboy` unless context suggests otherwise.

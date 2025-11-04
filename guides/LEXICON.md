@@ -35,7 +35,7 @@ Natural language is the interface. Specs are source. Assembly is generated to sa
 Documentation is the deliverable. Code validates understanding. Meta-docs capture methodology.
 
 **Domain language over implementation details**
-Speak what it means, not how it works. `after_nmi(64)` not `at_frame(67)`.
+Speak what it means, not how it works. Name intent, not mechanism.
 
 **Infrastructure compounds**
 Each tool enables new workflows. Each abstraction saves future tokens. Build once, reuse forever.
@@ -44,7 +44,7 @@ Each tool enables new workflows. Each abstraction saves future tokens. Build onc
 Verbose tests compound as friction. Extract patterns early, compress aggressively, save context forever.
 
 **Refactor early, not late**
-Human wisdom says wait for pain. LLM coding says wait for pattern. 18x token overhead is immediate cost, not future debt. Line count thresholds are literal constraints, not suggestions. Structure for reading efficiency, not writing comfort.
+Human wisdom says wait for pain. LLM coding says wait for pattern. Token overhead is immediate cost, not future debt. Line count thresholds are literal constraints, not suggestions. Structure for reading efficiency, not writing comfort.
 
 **Housekeeping before heroics**
 Automate the pattern before repeating it. Infrastructure investment pays immediately.

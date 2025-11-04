@@ -6,11 +6,11 @@ use std::collections::HashMap;
 /// Get embedded workflow content by name
 pub fn get_workflow(name: &str) -> Option<&'static str> {
     let workflows: HashMap<&str, &str> = HashMap::from([
+        ("cowboy", include_str!("../workflows/cowboy.yaml")),
         ("discovery", include_str!("../workflows/discovery.yaml")),
         ("execution", include_str!("../workflows/execution.yaml")),
         ("research", include_str!("../workflows/research.yaml")),
         ("refactor", include_str!("../workflows/refactor.yaml")),
-        ("minimal", include_str!("../workflows/minimal.yaml")),
         (
             "init-greenfield",
             include_str!("../workflows/init-greenfield.yaml"),
@@ -26,6 +26,7 @@ pub fn get_workflow(name: &str) -> Option<&'static str> {
 /// Get embedded guide content by name
 pub fn get_guide(name: &str) -> Option<&'static str> {
     let guides: HashMap<&str, &str> = HashMap::from([
+        ("LEXICON.md", include_str!("../guides/LEXICON.md")),
         ("SPEC_WRITING.md", include_str!("../guides/SPEC_WRITING.md")),
         ("PLAN_WRITING.md", include_str!("../guides/PLAN_WRITING.md")),
         (
@@ -92,11 +93,11 @@ pub fn get_guide(name: &str) -> Option<&'static str> {
 /// List available embedded workflows
 pub fn list_workflows() -> Vec<&'static str> {
     vec![
+        "cowboy",
         "discovery",
         "execution",
         "research",
         "refactor",
-        "minimal",
         "init-greenfield",
         "init-retrofit",
     ]
@@ -105,6 +106,7 @@ pub fn list_workflows() -> Vec<&'static str> {
 /// List available embedded guides
 pub fn list_guides() -> Vec<&'static str> {
     vec![
+        "LEXICON.md",
         "SPEC_WRITING.md",
         "PLAN_WRITING.md",
         "LEARNINGS_WRITING.md",

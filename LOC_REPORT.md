@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 16:24
+**Last Updated**: 2025-11-04 16:43
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,209 | 7,866 | 21,075 |
+| **Lines** | 13,211 | 7,893 | 21,104 |
 | **Comments** | 1,840 | - | 1,840 |
 | **Blank Lines** | 2,435 | - | 2,435 |
-| **Total Lines** | 17,484 | 7,866 | 25,350 |
+| **Total Lines** | 17,486 | 7,893 | 25,379 |
 | **Files** | 76 | 36 | 112 |
 
 **Documentation Ratio**: 0.60 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2435           1840          13209
+Rust                            76           2435           1840          13211
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2466           1840          13297
+SUM:                            77           2466           1840          13299
 -------------------------------------------------------------------------------
 ```
 
@@ -74,7 +74,7 @@ SUM:                            77           2466           1840          13297
 | `commands/workflow/transitions.rs` | 405 | 405 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
-| `embedded.rs` | 143 | 123 | 20 | 14.0% | ✅ |
+| `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/mod.rs` | 865 | 185 | 680 | 78.6% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
@@ -142,6 +142,7 @@ SUM:                            77           2466           1840          13297
 | `guides/KICKOFF_WRITING.md` | 96 |
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
+| `guides/LEXICON.md` | 84 |
 | `guides/PLAN_WRITING.md` | 157 |
 | `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 142 |
@@ -151,10 +152,9 @@ SUM:                            77           2466           1840          13297
 | `guides/templates/code_map_monolithic.md` | 41 |
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
-| `HEGEL_CLAUDE.md` | 286 |
-| `LEXICON.md` | 84 |
-| `LOC_REPORT.md` | 183 |
-| `README.md` | 575 |
+| `HEGEL_CLAUDE.md` | 306 |
+| `LOC_REPORT.md` | 184 |
+| `README.md` | 581 |
 | `ROADMAP.md` | 212 |
 | `src/test_helpers/README.md` | 119 |
 | `TESTING.md` | 41 |

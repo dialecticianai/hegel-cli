@@ -1,0 +1,21 @@
+# Cowboy mode - minimal overhead for low-complexity tasks
+# Just LEXICON guidance without full DDD ceremony
+mode: execution
+start_node: ride
+
+nodes:
+  ride:
+    prompt: |
+      You are in COWBOY MODE - minimal process overhead for straightforward tasks.
+
+      {{LEXICON}}
+
+      Execute the user's request following the guidance vectors above.
+
+      When done, summarize what you accomplished.
+    transitions:
+      - when: task_complete
+        to: done
+
+  done:
+    transitions: []

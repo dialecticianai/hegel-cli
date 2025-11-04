@@ -117,12 +117,13 @@ hegel start research study     # Start directly at study phase
 - Validates node exists and provides helpful error with available nodes
 
 Available workflows:
+- `cowboy` - **DEFAULT** - Minimal overhead for straightforward tasks (just LEXICON guidance)
 - `init-greenfield` - Initialize new DDD project (CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_INIT)
 - `init-retrofit` - Add DDD to existing project (DETECT_EXISTING → CODE_MAP → CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_COMMIT)
 - `research` - External knowledge gathering (PLAN → STUDY → ASSESS → QUESTIONS)
 - `discovery` - Optimized for learning density (SPEC → PLAN → CODE → LEARNINGS → README)
 - `execution` - Optimized for production delivery
-- `minimal` - Simplified workflow for quick iterations
+- `refactor` - Focused refactoring workflow
 
 ### Listing Available Resources
 
@@ -302,18 +303,23 @@ This methodology treats artifacts as disposable fuel while preserving clarity an
 
 **Hegel is a general workflow orchestration tool.** The DDD-opinionated guides included in this project (SPEC_WRITING, PLAN_WRITING, etc.) are defaults, not requirements.
 
-**Use full DDD workflows for:**
+**Start with cowboy mode (default):** Minimal overhead with just LEXICON guidance - use for most straightforward tasks.
+
+**Escalate to full DDD workflows when:**
 - Hard problems requiring novel solutions
 - Projects needing extremely rigorous documentation
 - Complex domains where mistakes are expensive
 - Learning-dense exploration (discovery mode)
 
-**Skip DDD overhead for:**
-- Straightforward implementations agents can handle autonomously
-- Simple CRUD applications or routine features
-- Projects where the agent doesn't need structured guidance
+**Workflow selection:**
+```bash
+hegel start cowboy      # Default: minimal overhead
+hegel start discovery   # Toy experiments with learning focus
+hegel start execution   # Production-grade rigor
+hegel start research    # External knowledge gathering
+```
 
-The workflow steps and accompanying token usage are designed for problems that **need** that rigor. Many projects don't.
+The full DDD workflow steps and accompanying token usage are designed for problems that **need** that rigor. Most tasks don't.
 
 ## Project Structure
 
