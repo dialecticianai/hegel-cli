@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-04 12:55
+**Last Updated**: 2025-11-04 13:02
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **89.79%** lines | **88.75%** regions | **87.92%** functions
+**Overall Coverage**: **89.86%** lines | **88.84%** regions | **87.94%** functions
 
 ## Summary
 
 ```
-TOTAL                                      15738              1770    88.75%         853               103    87.92%        9467               967    89.79%           0                 0         -
+TOTAL                                      15776              1761    88.84%         854               103    87.94%        9493               963    89.86%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -34,14 +34,14 @@ TOTAL                                      15738              1770    88.75%    
 | `src/commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `src/commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
 | `src/commands/init.rs` | 93.44% | 93.56% | 100.00% | 🟢 Excellent |
-| `src/commands/meta.rs` | 64.24% | 70.46% | 83.33% | 🟠 Moderate |
+| `src/commands/meta.rs` | 64.46% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
 | `src/commands/status.rs` | 97.87% | 94.12% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `src/commands/workflow/mod.rs` | 48.53% | 48.88% | 50.00% | 🟠 Moderate |
-| `src/commands/workflow/transitions.rs` | 85.96% | 80.65% | 41.67% | 🟡 Good |
+| `src/commands/workflow/mod.rs` | 50.55% | 51.01% | 50.00% | 🟠 Moderate |
+| `src/commands/workflow/transitions.rs` | 87.04% | 81.99% | 46.15% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 83.33% | 76.14% | 50.00% | 🟡 Good |
@@ -53,9 +53,9 @@ TOTAL                                      15738              1770    88.75%    
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 97.20% | 95.52% | 100.00% | 🟢 Excellent |
 | `src/metrics/git.rs` | 91.34% | 90.95% | 95.45% | 🟢 Excellent |
-| `src/metrics/graph.rs` | 99.21% | 98.52% | 100.00% | 🟢 Excellent |
+| `src/metrics/graph.rs` | 99.21% | 98.77% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 96.15% | 94.95% | 84.21% | 🟢 Excellent |
+| `src/metrics/mod.rs` | 96.15% | 94.96% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 98.44% | 97.75% | 96.15% | 🟢 Excellent |
@@ -131,7 +131,7 @@ TOTAL                                      15738              1770    88.75%    
 ### 🟡 Good (70-89% lines)
 - `src/commands/analyze/sections.rs` - 88.08%
 - `src/commands/hooks_setup.rs` - 86.11%
-- `src/commands/workflow/transitions.rs` - 85.96%
+- `src/commands/workflow/transitions.rs` - 87.04%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/embedded.rs` - 83.33%
 - `src/test_helpers/fixtures.rs` - 80.00%
@@ -143,10 +143,10 @@ TOTAL                                      15738              1770    88.75%    
 - `src/commands/archive.rs` - 59.30%
 - `src/commands/external_bin.rs` - 53.19%
 - `src/commands/fork/mod.rs` - 60.70%
-- `src/commands/meta.rs` - 64.24%
+- `src/commands/meta.rs` - 64.46%
 - `src/commands/pm.rs` - 60.00%
 - `src/commands/reflect.rs` - 60.53%
-- `src/commands/workflow/mod.rs` - 48.53%
+- `src/commands/workflow/mod.rs` - 50.55%
 
 ### 🔴 Needs Work (<40% lines)
 - `src/commands/astq.rs` - 17.78%
@@ -157,7 +157,7 @@ TOTAL                                      15738              1770    88.75%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 89.79% | ✅ Met |
+| Overall | ≥80% | 89.86% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -46,6 +46,9 @@ pub struct State {
     pub workflow_state: Option<WorkflowState>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_metadata: Option<SessionMetadata>,
+    /// Cumulative totals across all archived workflows
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cumulative_totals: Option<archive::WorkflowTotals>,
 }
 
 /// File-based state storage
@@ -174,6 +177,7 @@ impl FileStorage {
                 workflow: None,
                 workflow_state: None,
                 session_metadata: None,
+                cumulative_totals: None,
             });
         }
 

@@ -343,3 +343,52 @@ fn test_archive_failure_preserves_logs() {
     let states_path = storage.state_dir().join("states.jsonl");
     assert!(states_path.exists());
 }
+
+#[test]
+fn test_cumulative_totals_persist_across_workflows() {
+    use crate::storage::archive::read_archives;
+
+    let (_tmp, storage) = setup_workflow_env();
+
+    // Start and complete first workflow
+    start(&storage);
+    next(&storage); // spec -> plan
+    next(&storage); // plan -> done (triggers archiving)
+
+    // Check that cumulative totals were stored in state
+    let state = get_state(&storage);
+    assert!(state.cumulative_totals.is_some());
+
+    // Verify archive was created
+    let archives = read_archives(storage.state_dir()).unwrap();
+    assert_eq!(archives.len(), 1);
+    let first_archive_totals = archives[0].totals.clone();
+
+    // Start and complete second workflow
+    start(&storage);
+    next(&storage); // spec -> plan
+    next(&storage); // plan -> done (triggers archiving)
+
+    // Check that cumulative totals were accumulated
+    let state2 = get_state(&storage);
+    assert!(state2.cumulative_totals.is_some());
+    let second_totals = state2.cumulative_totals.unwrap();
+
+    // Second totals should equal sum of both archives
+    let archives2 = read_archives(storage.state_dir()).unwrap();
+    assert_eq!(archives2.len(), 2);
+    let second_archive_totals = archives2[1].totals.clone();
+
+    assert_eq!(
+        second_totals.tokens.input,
+        first_archive_totals.tokens.input + second_archive_totals.tokens.input
+    );
+    assert_eq!(
+        second_totals.tokens.output,
+        first_archive_totals.tokens.output + second_archive_totals.tokens.output
+    );
+    assert_eq!(
+        second_totals.bash_commands,
+        first_archive_totals.bash_commands + second_archive_totals.bash_commands
+    );
+}

@@ -53,6 +53,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
             phase_start_time: None,
         }),
         session_metadata: state.session_metadata,
+        cumulative_totals: state.cumulative_totals,
     };
 
     // Save state with meta-mode

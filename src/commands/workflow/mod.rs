@@ -92,11 +92,12 @@ pub fn start_workflow(
         .get(current_node)
         .with_context(|| format!("Node not found: {}", current_node))?;
 
-    // Store state (preserve session_metadata from existing state)
+    // Store state (preserve session_metadata and cumulative_totals from existing state)
     let state = State {
         workflow: Some(serde_yaml::to_value(&workflow)?),
         workflow_state: Some(workflow_state.clone()),
         session_metadata: existing_state.session_metadata,
+        cumulative_totals: existing_state.cumulative_totals,
     };
     storage.save(&state)?;
 
@@ -137,11 +138,12 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     // Load current state to preserve session_metadata
     let state = storage.load()?;
 
-    // Clear workflow fields but keep session_metadata
+    // Clear workflow fields but keep session_metadata and cumulative_totals
     let cleared_state = State {
         workflow: None,
         workflow_state: None,
         session_metadata: state.session_metadata,
+        cumulative_totals: state.cumulative_totals,
     };
 
     storage.save(&cleared_state)?;
@@ -172,11 +174,12 @@ pub fn abort_workflow(storage: &FileStorage) -> Result<()> {
         ))
     );
 
-    // Clear workflow fields but keep session_metadata
+    // Clear workflow fields but keep session_metadata and cumulative_totals
     let cleared_state = State {
         workflow: None,
         workflow_state: None,
         session_metadata: state.session_metadata,
+        cumulative_totals: state.cumulative_totals,
     };
 
     storage.save(&cleared_state)?;

@@ -128,7 +128,8 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
     let workflow_id = state
         .workflow_state
-        .and_then(|ws| ws.workflow_id)
+        .as_ref()
+        .and_then(|ws| ws.workflow_id.clone())
         .context("No workflow_id for archiving")?;
 
     // Get completed_at timestamp (current time)
@@ -163,6 +164,29 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
 
     // Write archive
     write_archive(&archive, state_dir)?;
+
+    // Update cumulative totals in state
+    let mut updated_state = state.clone();
+    let cumulative = updated_state
+        .cumulative_totals
+        .get_or_insert_with(Default::default);
+
+    // Accumulate tokens
+    cumulative.tokens.input += archive.totals.tokens.input;
+    cumulative.tokens.output += archive.totals.tokens.output;
+    cumulative.tokens.cache_creation += archive.totals.tokens.cache_creation;
+    cumulative.tokens.cache_read += archive.totals.tokens.cache_read;
+    cumulative.tokens.assistant_turns += archive.totals.tokens.assistant_turns;
+
+    // Accumulate activity
+    cumulative.bash_commands += archive.totals.bash_commands;
+    cumulative.file_modifications += archive.totals.file_modifications;
+    cumulative.unique_files += archive.totals.unique_files;
+    cumulative.unique_commands += archive.totals.unique_commands;
+    cumulative.git_commits += archive.totals.git_commits;
+
+    // Save updated state
+    storage.save(&updated_state)?;
 
     // Delete logs on success
     let hooks_path = state_dir.join("hooks.jsonl");
@@ -247,6 +271,7 @@ pub fn execute_transition(
                 workflow: Some(serde_yaml::to_value(&context.workflow)?),
                 workflow_state: Some(context.workflow_state.clone()),
                 session_metadata: context.session_metadata.clone(),
+                cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
             };
             storage.save(&state)?;
 
@@ -309,6 +334,7 @@ pub fn execute_transition(
                 workflow: Some(serde_yaml::to_value(&new_workflow)?),
                 workflow_state: Some(new_state.clone()),
                 session_metadata: context.session_metadata.clone(),
+                cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
             };
             storage.save(&state)?;
 

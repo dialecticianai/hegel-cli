@@ -372,6 +372,7 @@ mod tests {
             workflow: None,
             workflow_state: None,
             session_metadata: Some(session),
+            cumulative_totals: None,
         };
         storage.save(&state).unwrap();
 
