@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-use crate::metrics::UnifiedMetrics;
+use crate::metrics::{git::GitCommit, UnifiedMetrics};
 
 /// Archived workflow with pre-computed aggregates
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -29,6 +29,7 @@ pub struct PhaseArchive {
     pub tokens: TokenTotals,
     pub bash_commands: Vec<BashCommandSummary>,
     pub file_modifications: Vec<FileModificationSummary>,
+    pub git_commits: Vec<GitCommit>,
 }
 
 /// State transition in archive
@@ -74,6 +75,7 @@ pub struct WorkflowTotals {
     pub file_modifications: usize,
     pub unique_files: usize,
     pub unique_commands: usize,
+    pub git_commits: usize,
 }
 
 impl WorkflowArchive {
@@ -149,6 +151,7 @@ impl WorkflowArchive {
                     },
                     bash_commands,
                     file_modifications,
+                    git_commits: phase.git_commits.clone(),
                 }
             })
             .collect();
@@ -233,6 +236,9 @@ fn compute_totals(
         .map(|f| &f.file_path)
         .collect();
     totals.unique_files = unique_files.len();
+
+    // Count git commits across all phases
+    totals.git_commits = phases.iter().map(|p| p.git_commits.len()).sum();
 
     totals
 }
@@ -347,6 +353,7 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             }],
             transitions: vec![TransitionArchive {
                 from_node: "START".to_string(),
@@ -365,6 +372,7 @@ mod tests {
                 file_modifications: 0,
                 unique_files: 0,
                 unique_commands: 0,
+                git_commits: 0,
             },
         };
 

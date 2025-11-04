@@ -121,8 +121,8 @@ pub fn evaluate_transition(
 fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state_dir = storage.state_dir();
 
-    // Parse current metrics WITHOUT archives to prevent duplication bug
-    let metrics = parse_unified_metrics(state_dir, false)?;
+    // Parse current metrics WITHOUT archives AND git to prevent duplication bug
+    let mut metrics = parse_unified_metrics(state_dir, false)?;
 
     // Get workflow_id from state
     let state = storage.load()?;
@@ -133,6 +133,29 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
 
     // Get completed_at timestamp (current time)
     let completed_at = chrono::Utc::now().to_rfc3339();
+
+    // Parse git commits and attribute to phases ONLY during archiving
+    use crate::metrics::git;
+    if git::has_git_repository(state_dir) {
+        let project_root = state_dir.parent().unwrap();
+
+        // Use first state transition timestamp as session start (if available)
+        let since_timestamp = metrics
+            .state_transitions
+            .first()
+            .and_then(|t| chrono::DateTime::parse_from_rfc3339(&t.timestamp).ok())
+            .map(|dt| dt.timestamp());
+
+        let git_commits =
+            git::parse_git_commits(project_root, since_timestamp).unwrap_or_else(|e| {
+                eprintln!("Warning: Failed to parse git commits: {}", e);
+                Vec::new()
+            });
+
+        // Attribute commits to phases
+        git::attribute_commits_to_phases(git_commits.clone(), &mut metrics.phase_metrics);
+        metrics.git_commits = git_commits;
+    }
 
     // Create archive from metrics
     let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id)?;
@@ -155,12 +178,33 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
             .with_context(|| format!("Failed to delete states.jsonl: {:?}", states_path))?;
     }
 
+    // Display success with archive totals
     println!(
         "{}",
         Theme::success("✓ Workflow archived and logs cleaned up")
     );
+    println!(
+        "  Phases: {}  |  Tokens: {} in, {} out ({} cache hits)",
+        archive.phases.len(),
+        format_token_count(archive.totals.tokens.input),
+        format_token_count(archive.totals.tokens.output),
+        format_token_count(archive.totals.tokens.cache_read)
+    );
+    println!(
+        "  Activity: {} bash, {} files, {} commits",
+        archive.totals.bash_commands, archive.totals.file_modifications, archive.totals.git_commits
+    );
 
     Ok(())
+}
+
+/// Format token count with K suffix for thousands
+fn format_token_count(count: u64) -> String {
+    if count >= 1000 {
+        format!("{:.1}K", count as f64 / 1000.0)
+    } else {
+        count.to_string()
+    }
 }
 
 /// Execute a transition outcome, performing all necessary side effects

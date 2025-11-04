@@ -150,9 +150,16 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 },
                 bash_commands: vec![], // Archived as summaries, not individual commands
                 file_modifications: vec![], // Archived as summaries, not individual modifications
-                git_commits: vec![],   // Git commits not archived
+                git_commits: phase_archive.git_commits.clone(),
             };
             all_phase_metrics.push(phase);
+        }
+
+        // Add archived git commits to unified total
+        for phase_archive in &archive.phases {
+            unified
+                .git_commits
+                .extend(phase_archive.git_commits.clone());
         }
 
         // Add archived transitions
@@ -178,30 +185,32 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
     // Add live phases
     all_phase_metrics.extend(live_phase_metrics);
 
-    // Git commit parsing and attribution
-    let git_commits = if git::has_git_repository(state_dir) {
-        let project_root = state_dir.parent().unwrap();
+    // Git commit parsing and attribution ONLY for live data (archives already have git data)
+    if !include_archives {
+        let git_commits = if git::has_git_repository(state_dir) {
+            let project_root = state_dir.parent().unwrap();
 
-        // Use first state transition timestamp as session start (if available)
-        let since_timestamp = unified
-            .state_transitions
-            .first()
-            .and_then(|t| chrono::DateTime::parse_from_rfc3339(&t.timestamp).ok())
-            .map(|dt| dt.timestamp());
+            // Use first state transition timestamp as session start (if available)
+            let since_timestamp = unified
+                .state_transitions
+                .first()
+                .and_then(|t| chrono::DateTime::parse_from_rfc3339(&t.timestamp).ok())
+                .map(|dt| dt.timestamp());
 
-        git::parse_git_commits(project_root, since_timestamp).unwrap_or_else(|e| {
-            eprintln!("Warning: Failed to parse git commits: {}", e);
+            git::parse_git_commits(project_root, since_timestamp).unwrap_or_else(|e| {
+                eprintln!("Warning: Failed to parse git commits: {}", e);
+                Vec::new()
+            })
+        } else {
             Vec::new()
-        })
-    } else {
-        Vec::new()
-    };
+        };
 
-    // Attribute commits to phases
-    git::attribute_commits_to_phases(git_commits.clone(), &mut all_phase_metrics);
+        // Attribute commits to phases
+        git::attribute_commits_to_phases(git_commits.clone(), &mut all_phase_metrics);
+        unified.git_commits = git_commits;
+    }
 
     unified.phase_metrics = all_phase_metrics;
-    unified.git_commits = git_commits;
 
     Ok(unified)
 }
@@ -453,6 +462,7 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             }],
             transitions: vec![TransitionArchive {
                 from_node: "START".to_string(),
@@ -471,6 +481,7 @@ mod tests {
                 file_modifications: 0,
                 unique_files: 0,
                 unique_commands: 0,
+                git_commits: 0,
             },
         };
 
@@ -529,6 +540,7 @@ mod tests {
                     },
                     bash_commands: vec![],
                     file_modifications: vec![],
+                    git_commits: vec![],
                 }],
                 transitions: vec![TransitionArchive {
                     from_node: "START".to_string(),
@@ -547,6 +559,7 @@ mod tests {
                     file_modifications: 0,
                     unique_files: 0,
                     unique_commands: 0,
+                    git_commits: 0,
                 },
             };
 
@@ -597,6 +610,7 @@ mod tests {
                 },
                 bash_commands: vec![],
                 file_modifications: vec![],
+                git_commits: vec![],
             }],
             transitions: vec![TransitionArchive {
                 from_node: "START".to_string(),
@@ -615,6 +629,7 @@ mod tests {
                 file_modifications: 0,
                 unique_files: 0,
                 unique_commands: 0,
+                git_commits: 0,
             },
         };
 
