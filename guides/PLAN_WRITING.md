@@ -70,8 +70,10 @@ A **PLAN.md is high-level prose** describing the development approach step-by-st
     - State and error handling guidance
 
     ### Success Criteria
-    - [ ] Clear, testable checkpoints
-    - [ ] Functional + quality standards met
+    - Clear, testable checkpoints
+    - Functional + quality standards met
+
+    **Note:** Use plain bullets, not checkboxes. PLANs are frozen artifacts, not tracking documents.
 
 ---
 
@@ -112,12 +114,14 @@ Break implementation into minimal units:
     4. Error handling
 
 ### Success Criteria
-Always check with concrete, objective boxes:
+Always check with concrete, objective bullets:
 
-- [ ] Module initializes cleanly
-- [ ] Operations produce expected output
-- [ ] Errors raised for invalid input
-- [ ] Test suite passes  
+- Module initializes cleanly
+- Operations produce expected output
+- Errors raised for invalid input
+- Test suite passes
+
+**Note:** Use plain bullets, not checkboxes `[ ]`. PLANs are frozen artifacts, not tracking documents.  
 
 ---
 

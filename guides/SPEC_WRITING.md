@@ -90,10 +90,12 @@ Document commands or APIs with a consistent pattern:
 Optionally, **Integration** — only if toy touches another system.
 
 ### 6. Success Criteria
-Checkboxes phrased as falsifiable conditions, e.g.:
-- [ ] Operation X preserves invariant Y
-- [ ] Error messages are structured JSON
-- [ ] Round-trip import/export retains labels
+Bullet points phrased as falsifiable conditions, e.g.:
+- Operation X preserves invariant Y
+- Error messages are structured JSON
+- Round-trip import/export retains labels
+
+**Note:** Use plain bullets, not checkboxes `[ ]`. SPECs are frozen artifacts, not tracking documents.
 
 ---
 
