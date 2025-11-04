@@ -98,6 +98,7 @@ pub fn start_workflow(
         workflow_state: Some(workflow_state.clone()),
         session_metadata: existing_state.session_metadata,
         cumulative_totals: existing_state.cumulative_totals,
+        git_info: existing_state.git_info,
     };
     storage.save(&state)?;
 
@@ -144,6 +145,7 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
         workflow_state: None,
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
+        git_info: state.git_info,
     };
 
     storage.save(&cleared_state)?;
@@ -180,6 +182,7 @@ pub fn abort_workflow(storage: &FileStorage) -> Result<()> {
         workflow_state: None,
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
+        git_info: state.git_info,
     };
 
     storage.save(&cleared_state)?;

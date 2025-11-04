@@ -16,6 +16,14 @@ pub struct SessionMetadata {
     pub started_at: String,
 }
 
+/// Git repository information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GitInfo {
+    pub has_repo: bool,
+    pub current_branch: Option<String>,
+    pub remote_url: Option<String>,
+}
+
 /// Meta-mode structure - defines workflow progression pattern
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MetaMode {
@@ -49,6 +57,9 @@ pub struct State {
     /// Cumulative totals across all archived workflows
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cumulative_totals: Option<archive::WorkflowTotals>,
+    /// Cached git repository information
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub git_info: Option<GitInfo>,
 }
 
 /// File-based state storage
@@ -109,6 +120,25 @@ impl FileStorage {
         } else {
             std::env::var("HEGEL_GUIDES_DIR").unwrap_or_else(|_| "guides".to_string())
         }
+    }
+
+    /// Detect git repository information and cache it in state
+    pub fn ensure_git_info_cached(&self) -> Result<()> {
+        let mut state = self.load()?;
+
+        // If git_info is already cached, nothing to do
+        if state.git_info.is_some() {
+            return Ok(());
+        }
+
+        // Detect git info
+        let git_info = detect_git_info(&self.state_dir);
+
+        // Cache it in state
+        state.git_info = Some(git_info);
+        self.save(&state)?;
+
+        Ok(())
     }
 
     /// Find .hegel directory by walking up from given starting path (like git)
@@ -178,6 +208,7 @@ impl FileStorage {
                 workflow_state: None,
                 session_metadata: None,
                 cumulative_totals: None,
+                git_info: None,
             });
         }
 
@@ -312,6 +343,57 @@ impl FileStorage {
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(entries)
+    }
+}
+
+/// Detect git repository information
+fn detect_git_info(state_dir: &Path) -> GitInfo {
+    let project_root = match state_dir.parent() {
+        Some(p) => p,
+        None => {
+            return GitInfo {
+                has_repo: false,
+                current_branch: None,
+                remote_url: None,
+            }
+        }
+    };
+
+    // Try to open git repository (searches upwards for monorepos)
+    let repo = match git2::Repository::open(project_root) {
+        Ok(r) => r,
+        Err(_) => {
+            return GitInfo {
+                has_repo: false,
+                current_branch: None,
+                remote_url: None,
+            }
+        }
+    };
+
+    // Get current branch
+    let current_branch = repo
+        .head()
+        .ok()
+        .and_then(|head| head.shorthand().map(|s| s.to_string()));
+
+    // Get remote URL (try "origin" first, then first available remote)
+    let remote_url = repo
+        .find_remote("origin")
+        .ok()
+        .and_then(|r| r.url().map(|s| s.to_string()))
+        .or_else(|| {
+            repo.remotes()
+                .ok()
+                .and_then(|remotes| remotes.get(0).map(|name| name.to_string()))
+                .and_then(|name| repo.find_remote(&name).ok())
+                .and_then(|r| r.url().map(|s| s.to_string()))
+        });
+
+    GitInfo {
+        has_repo: true,
+        current_branch,
+        remote_url,
     }
 }
 

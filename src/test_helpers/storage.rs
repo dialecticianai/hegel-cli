@@ -54,6 +54,7 @@ pub fn test_state(node: &str, mode: &str, history: &[&str]) -> State {
         workflow_state: Some(test_workflow_state(node, mode, history)),
         session_metadata: None,
         cumulative_totals: None,
+        git_info: None,
     }
 }
 

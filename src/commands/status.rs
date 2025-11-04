@@ -3,8 +3,59 @@ use anyhow::Result;
 use crate::storage::FileStorage;
 use crate::theme::Theme;
 
+/// Get uncommitted changes summary (files modified, lines changed)
+fn get_uncommitted_changes(storage: &FileStorage) -> Result<Option<String>> {
+    let project_root = match storage.state_dir().parent() {
+        Some(p) => p,
+        None => return Ok(None),
+    };
+
+    let repo = match git2::Repository::open(project_root) {
+        Ok(r) => r,
+        Err(_) => return Ok(None),
+    };
+
+    // Get diff between HEAD and working directory
+    let head = match repo.head() {
+        Ok(h) => h,
+        Err(_) => return Ok(None), // Detached HEAD or no commits
+    };
+
+    let head_tree = match head.peel_to_tree() {
+        Ok(t) => t,
+        Err(_) => return Ok(None),
+    };
+
+    let mut opts = git2::DiffOptions::new();
+    opts.include_untracked(true);
+
+    let diff = match repo.diff_tree_to_workdir_with_index(Some(&head_tree), Some(&mut opts)) {
+        Ok(d) => d,
+        Err(_) => return Ok(None),
+    };
+
+    let stats = match diff.stats() {
+        Ok(s) => s,
+        Err(_) => return Ok(None),
+    };
+
+    let files_changed = stats.files_changed();
+    let insertions = stats.insertions();
+    let deletions = stats.deletions();
+
+    if files_changed == 0 {
+        return Ok(None);
+    }
+
+    let total_lines = insertions + deletions;
+    Ok(Some(format!("{}f, {}l", files_changed, total_lines)))
+}
+
 /// Show overall project status (meta-mode, workflow, etc.)
 pub fn show_status(storage: &FileStorage) -> Result<()> {
+    // Ensure git info is cached
+    storage.ensure_git_info_cached()?;
+
     let state = storage.load()?;
 
     println!("{}", Theme::header("Project Status"));
@@ -27,6 +78,26 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
             Theme::label("Meta-mode"),
             Theme::secondary("none")
         );
+    }
+
+    // Show git information
+    if let Some(git_info) = &state.git_info {
+        if git_info.has_repo {
+            let branch = git_info.current_branch.as_deref().unwrap_or("(detached)");
+            print!("{}: {}", Theme::label("Git"), branch);
+
+            // Add uncommitted changes summary
+            if let Some(changes) = get_uncommitted_changes(storage)? {
+                print!(" {}", Theme::secondary(&format!("({})", changes)));
+            }
+            println!();
+        } else {
+            println!(
+                "{}: {}",
+                Theme::label("Git"),
+                Theme::secondary("not in git repo")
+            );
+        }
     }
 
     println!();

@@ -373,6 +373,7 @@ mod tests {
             workflow_state: None,
             session_metadata: Some(session),
             cumulative_totals: None,
+            git_info: None,
         };
         storage.save(&state).unwrap();
 

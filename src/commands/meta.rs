@@ -54,6 +54,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
         }),
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
+        git_info: state.git_info,
     };
 
     // Save state with meta-mode

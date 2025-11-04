@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 13:16
+**Last Updated**: 2025-11-04 14:17
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,102 | 7,660 | 20,762 |
-| **Comments** | 1,821 | - | 1,821 |
-| **Blank Lines** | 2,407 | - | 2,407 |
-| **Total Lines** | 17,330 | 7,660 | 24,990 |
+| **Lines** | 13,224 | 7,660 | 20,884 |
+| **Comments** | 1,836 | - | 1,836 |
+| **Blank Lines** | 2,431 | - | 2,431 |
+| **Total Lines** | 17,491 | 7,660 | 25,151 |
 | **Files** | 76 | 35 | 111 |
 
 **Documentation Ratio**: 0.58 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2407           1821          13102
+Rust                            76           2431           1836          13224
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2438           1821          13190
+SUM:                            77           2462           1836          13312
 -------------------------------------------------------------------------------
 ```
 
@@ -57,21 +57,21 @@ SUM:                            77           2438           1821          13190
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/meta.rs` | 252 | 164 | 88 | 34.9% | ✅ |
+| `commands/meta.rs` | 253 | 165 | 88 | 34.8% | ✅ |
 | `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
-| `commands/status.rs` | 66 | 66 | 0 | 0.0% | ✅ |
+| `commands/status.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 423 | 16 | 407 | 96.2% | ✅ |
+| `commands/workflow/mod.rs` | 426 | 16 | 410 | 96.2% | ✅ |
 | `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 64 | 64 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/node_flow.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/production.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/transitions.rs` | 394 | 394 | 0 | 0.0% | ✅ (infra) |
-| `commands/workflow/transitions.rs` | 403 | 403 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/transitions.rs` | 405 | 405 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 143 | 123 | 20 | 14.0% | ✅ |
@@ -87,7 +87,7 @@ SUM:                            77           2438           1821          13190
 | `metrics/git.rs` | 507 | 158 | 349 | 68.8% | ✅ |
 | `metrics/graph.rs` | 372 | 222 | 150 | 40.3% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 755 | 217 | 538 | 71.3% | ⚠️ Large |
+| `metrics/mod.rs` | 756 | 217 | 539 | 71.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
@@ -95,12 +95,12 @@ SUM:                            77           2438           1821          13190
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
 | `storage/archive.rs` | 547 | 314 | 233 | 42.6% | ⚠️ Large |
-| `storage/mod.rs` | 706 | 317 | 389 | 55.1% | ✅ (infra) |
+| `storage/mod.rs` | 788 | 399 | 389 | 49.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
 | `test_helpers/metrics.rs` | 277 | 277 | 0 | 0.0% | ✅ (infra) |
 | `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
-| `test_helpers/storage.rs` | 66 | 66 | 0 | 0.0% | ✅ |
+| `test_helpers/storage.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
 | `test_helpers/workflow.rs` | 298 | 298 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |

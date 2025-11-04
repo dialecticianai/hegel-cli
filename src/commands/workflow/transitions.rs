@@ -272,6 +272,7 @@ pub fn execute_transition(
                 workflow_state: Some(context.workflow_state.clone()),
                 session_metadata: context.session_metadata.clone(),
                 cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
+                git_info: storage.load().ok().and_then(|s| s.git_info),
             };
             storage.save(&state)?;
 
@@ -335,6 +336,7 @@ pub fn execute_transition(
                 workflow_state: Some(new_state.clone()),
                 session_metadata: context.session_metadata.clone(),
                 cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
+                git_info: storage.load().ok().and_then(|s| s.git_info),
             };
             storage.save(&state)?;
 
