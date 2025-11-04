@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-04 16:45
+**Last Updated**: 2025-11-04 18:09
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **87.53%** lines | **86.68%** regions | **86.06%** functions
+**Overall Coverage**: **87.53%** lines | **86.64%** regions | **86.06%** functions
 
 ## Summary
 
 ```
-TOTAL                                      16218              2160    86.68%         875               122    86.06%        9778              1219    87.53%           0                 0         -
+TOTAL                                      16226              2168    86.64%         875               122    86.06%        9778              1219    87.53%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -40,7 +40,7 @@ TOTAL                                      16218              2160    86.68%    
 | `src/commands/status.rs` | 43.21% | 37.91% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
-| `src/commands/workflow/mod.rs` | 50.72% | 51.11% | 50.00% | 🟠 Moderate |
+| `src/commands/workflow/mod.rs` | 50.72% | 50.30% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/transitions.rs` | 87.15% | 82.37% | 46.15% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |

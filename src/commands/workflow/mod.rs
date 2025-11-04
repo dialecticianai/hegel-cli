@@ -263,43 +263,47 @@ pub fn list_workflows(storage: &FileStorage) -> Result<()> {
         }
     }
 
-    // Combine and sort
-    let mut all_workflows: Vec<String> = embedded.union(&filesystem).cloned().collect();
-    all_workflows.sort();
+    // Separate into local-only and embedded (or both)
+    let mut local_only: Vec<String> = filesystem.difference(&embedded).cloned().collect();
+    local_only.sort();
 
-    println!("Available workflows:\n");
-    for workflow in &all_workflows {
-        let mut markers = Vec::new();
-        if embedded.contains(workflow) {
-            markers.push("embedded");
-        }
-        if filesystem.contains(workflow) {
-            markers.push("local");
-        }
+    let mut embedded_workflows: Vec<String> = embedded.iter().cloned().collect();
+    embedded_workflows.sort();
 
-        // Load workflow to extract node flow
-        let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
-        let flow = match load_workflow(&workflow_path) {
-            Ok(wf) => extract_node_flow(&wf),
-            Err(_) => "".to_string(),
-        };
+    // Display local-only workflows first
+    if !local_only.is_empty() {
+        println!("Local-only:\n");
+        for workflow in &local_only {
+            let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
+            let flow = match load_workflow(&workflow_path) {
+                Ok(wf) => extract_node_flow(&wf),
+                Err(_) => "".to_string(),
+            };
 
-        if markers.is_empty() {
             if flow.is_empty() {
                 println!("  {}", workflow);
             } else {
                 println!("  {}\n    {}", workflow, flow.dimmed());
             }
-        } else {
+        }
+        println!();
+    }
+
+    // Display embedded workflows
+    if !embedded_workflows.is_empty() {
+        println!("Embedded:\n");
+        for workflow in &embedded_workflows {
+            // Load workflow to extract node flow
+            let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
+            let flow = match load_workflow(&workflow_path) {
+                Ok(wf) => extract_node_flow(&wf),
+                Err(_) => "".to_string(),
+            };
+
             if flow.is_empty() {
-                println!("  {} ({})", workflow, markers.join(", "));
+                println!("  {}", workflow);
             } else {
-                println!(
-                    "  {} ({})\n    {}",
-                    workflow,
-                    markers.join(", "),
-                    flow.dimmed()
-                );
+                println!("  {}\n    {}", workflow, flow.dimmed());
             }
         }
     }

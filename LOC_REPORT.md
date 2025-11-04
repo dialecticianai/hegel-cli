@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 16:45
+**Last Updated**: 2025-11-04 18:09
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,211 | 7,893 | 21,104 |
-| **Comments** | 1,840 | - | 1,840 |
-| **Blank Lines** | 2,435 | - | 2,435 |
-| **Total Lines** | 17,486 | 7,893 | 25,379 |
-| **Files** | 76 | 36 | 112 |
+| **Lines** | 13,211 | 8,665 | 21,876 |
+| **Comments** | 1,842 | - | 1,842 |
+| **Blank Lines** | 2,437 | - | 2,437 |
+| **Total Lines** | 17,490 | 8,665 | 26,155 |
+| **Files** | 76 | 37 | 113 |
 
-**Documentation Ratio**: 0.60 lines of docs per line of code
+**Documentation Ratio**: 0.66 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2435           1840          13211
+Rust                            76           2437           1842          13211
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2466           1840          13299
+SUM:                            77           2468           1842          13299
 -------------------------------------------------------------------------------
 ```
 
@@ -64,7 +64,7 @@ SUM:                            77           2466           1840          13299
 | `commands/status.rs` | 130 | 130 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 426 | 16 | 410 | 96.2% | ✅ |
+| `commands/workflow/mod.rs` | 430 | 16 | 414 | 96.3% | ✅ |
 | `commands/workflow/tests/commands.rs` | 376 | 376 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 64 | 64 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/mod.rs` | 69 | 69 | 0 | 0.0% | ✅ |
@@ -128,7 +128,8 @@ SUM:                            77           2466           1840          13299
 | `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
-| `.ddd/feat/non-phase-commits/HANDOFF.md` | 206 |
+| `.ddd/feat/non-phase-commits/PLAN.md` | 446 |
+| `.ddd/feat/non-phase-commits/SPEC.md` | 526 |
 | `CLAUDE.md` | 155 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
@@ -143,10 +144,10 @@ SUM:                            77           2466           1840          13299
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
 | `guides/LEXICON.md` | 84 |
-| `guides/PLAN_WRITING.md` | 157 |
+| `guides/PLAN_WRITING.md` | 161 |
 | `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 142 |
-| `guides/SPEC_WRITING.md` | 121 |
+| `guides/SPEC_WRITING.md` | 123 |
 | `guides/STUDY_PLANNING.md` | 209 |
 | `guides/templates/code_map_hierarchical.md` | 57 |
 | `guides/templates/code_map_monolithic.md` | 41 |
@@ -165,7 +166,7 @@ SUM:                            77           2466           1840          13299
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.60 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.66 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
