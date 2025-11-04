@@ -80,6 +80,12 @@ enum Commands {
         /// Export workflow graph as DOT format (for Graphviz visualization)
         #[arg(long)]
         export_dot: bool,
+        /// Repair archives: backfill missing git metrics and rebuild cumulative totals
+        #[arg(long)]
+        fix_archives: bool,
+        /// Show what would be fixed without making changes (requires --fix-archives)
+        #[arg(long, requires = "fix_archives")]
+        dry_run: bool,
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
@@ -293,8 +299,12 @@ fn main() -> Result<()> {
         Commands::Hook { event_name } => {
             commands::handle_hook(&event_name, &storage)?;
         }
-        Commands::Analyze { export_dot } => {
-            commands::analyze_metrics(&storage, export_dot)?;
+        Commands::Analyze {
+            export_dot,
+            fix_archives,
+            dry_run,
+        } => {
+            commands::analyze_metrics(&storage, export_dot, fix_archives, dry_run)?;
         }
         Commands::Archive(args) => {
             commands::archive(args, &storage)?;

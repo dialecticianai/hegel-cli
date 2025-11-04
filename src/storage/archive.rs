@@ -29,6 +29,7 @@ pub struct PhaseArchive {
     pub tokens: TokenTotals,
     pub bash_commands: Vec<BashCommandSummary>,
     pub file_modifications: Vec<FileModificationSummary>,
+    #[serde(default)]
     pub git_commits: Vec<GitCommit>,
 }
 
@@ -75,6 +76,7 @@ pub struct WorkflowTotals {
     pub file_modifications: usize,
     pub unique_files: usize,
     pub unique_commands: usize,
+    #[serde(default)]
     pub git_commits: usize,
 }
 
