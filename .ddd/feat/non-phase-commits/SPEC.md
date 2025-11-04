@@ -449,8 +449,8 @@ After repair (detected activity at 10:30):
 ### Error Handling
 - Missing git repository handled gracefully
 - Invalid timestamps logged and skipped
-- Overlapping phases prefer explicit over synthetic
-- Empty commit lists return no cowboy sessions
+- Overlapping workflows prefer explicit over synthetic
+- Empty activity lists return no cowboy sessions
 
 ### Integration
 - `hegel analyze` displays cowboy sessions in Phase Breakdown
@@ -511,16 +511,16 @@ Merge commits with multiple parents are attributed based on commit timestamp, no
 ## Production-Ready Acceptance Criteria
 
 ### Deployment
-- [ ] Feature flag to disable cowboy attribution if needed
-- [ ] Metrics logged for cowboy session detection performance
-- [ ] Documentation updated with examples and screenshots
+- Feature flag to disable cowboy attribution if needed
+- Metrics logged for cowboy session detection performance
+- Documentation updated with examples and screenshots
 
 ### Observability
-- [ ] Log when cowboy sessions are created
-- [ ] Warn if unusually large number of cowboy sessions detected
-- [ ] Error tracking for commit attribution failures
+- Log when cowboy sessions are created
+- Warn if unusually large number of cowboy sessions detected
+- Error tracking for commit attribution failures
 
 ### User Experience
-- [ ] Clear visual distinction between cowboy and explicit phases
-- [ ] Tooltip/legend explaining diamond nodes in DOT exports
-- [ ] Help text in `hegel analyze --help` describes cowboy attribution
+- Clear visual distinction between cowboy and explicit phases
+- Tooltip/legend explaining diamond nodes in DOT exports
+- Help text in `hegel analyze --help` describes cowboy attribution
