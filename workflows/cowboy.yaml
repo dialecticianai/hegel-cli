@@ -1,6 +1,6 @@
 # Cowboy mode - minimal overhead for low-complexity tasks
 # Just LEXICON guidance without full DDD ceremony
-mode: execution
+mode: cowboy
 start_node: ride
 
 nodes:

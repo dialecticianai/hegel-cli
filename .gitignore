@@ -22,7 +22,7 @@ Thumbs.db
 .hegel/
 
 # Review artifacts (ephemeral)
-.ddd/
+*.review.*
 
 # cached external docs from web
 .webcache/
