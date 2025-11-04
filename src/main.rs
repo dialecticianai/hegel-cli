@@ -86,6 +86,9 @@ enum Commands {
         /// Show what would be fixed without making changes (requires --fix-archives)
         #[arg(long, requires = "fix_archives")]
         dry_run: bool,
+        /// Output repair results as JSON (implies --dry-run, requires --fix-archives)
+        #[arg(long, requires = "fix_archives")]
+        json: bool,
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
@@ -303,8 +306,9 @@ fn main() -> Result<()> {
             export_dot,
             fix_archives,
             dry_run,
+            json,
         } => {
-            commands::analyze_metrics(&storage, export_dot, fix_archives, dry_run)?;
+            commands::analyze_metrics(&storage, export_dot, fix_archives, dry_run, json)?;
         }
         Commands::Archive(args) => {
             commands::archive(args, &storage)?;

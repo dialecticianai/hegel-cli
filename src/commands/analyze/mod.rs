@@ -12,10 +12,11 @@ pub fn analyze_metrics(
     export_dot: bool,
     fix_archives: bool,
     dry_run: bool,
+    json: bool,
 ) -> Result<()> {
     // Handle archive repair if requested
     if fix_archives {
-        return repair_archives(storage, dry_run);
+        return repair_archives(storage, dry_run || json, json);
     }
 
     // analyze command needs ALL metrics including archives
@@ -45,43 +46,63 @@ pub fn analyze_metrics(
 }
 
 /// Repair archives: backfill missing git metrics and rebuild cumulative totals
-fn repair_archives(storage: &FileStorage, dry_run: bool) -> Result<()> {
+fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Result<()> {
     use crate::metrics::git;
     use crate::storage::archive::{read_archives, write_archive};
+    use serde::Serialize;
 
     let state_dir = storage.state_dir();
-
-    println!(
-        "{}",
-        Theme::header("=== Archive Repair (Backfilling Missing Data) ===")
-    );
-    println!();
-
-    if dry_run {
-        println!(
-            "{}",
-            Theme::warning("DRY RUN MODE - No changes will be made")
-        );
-        println!();
-    }
 
     // Read all existing archives
     let mut archives = read_archives(state_dir)?;
 
-    if archives.is_empty() {
-        println!("{}", Theme::warning("No archives found to repair"));
-        return Ok(());
+    if !json {
+        println!(
+            "{}",
+            Theme::header("=== Archive Repair (Backfilling Missing Data) ===")
+        );
+        println!();
+
+        if dry_run {
+            println!(
+                "{}",
+                Theme::warning("DRY RUN MODE - No changes will be made")
+            );
+            println!();
+        }
+
+        if archives.is_empty() {
+            println!("{}", Theme::warning("No archives found to repair"));
+            return Ok(());
+        }
+
+        println!("Found {} archive(s) to check", archives.len());
+        println!();
     }
 
-    println!("Found {} archive(s) to check", archives.len());
-    println!();
+    #[derive(Serialize)]
+    struct ArchiveIssue {
+        workflow_id: String,
+        needs_git_metrics: bool,
+        zero_token_phases: Vec<String>,
+    }
+
+    #[derive(Serialize)]
+    struct RepairReport {
+        total_archives: usize,
+        archives_need_repair: usize,
+        archives_missing_git: usize,
+        has_git_repository: bool,
+        issues: Vec<ArchiveIssue>,
+    }
 
     let mut repaired_count = 0;
     let mut needs_git_count = 0;
+    let mut issues = Vec::new();
 
     // Check if we have a git repository
     let has_git = git::has_git_repository(state_dir);
-    if !has_git {
+    if !json && !has_git {
         println!(
             "{}",
             Theme::warning("No git repository found - skipping git backfill")
@@ -103,25 +124,40 @@ fn repair_archives(storage: &FileStorage, dry_run: bool) -> Result<()> {
         }
 
         // Check for phases with zero token usage (warning only, no repair)
+        let mut zero_token_phases = Vec::new();
         for phase in &archive.phases {
             let has_no_tokens = phase.tokens.input == 0
                 && phase.tokens.output == 0
                 && phase.tokens.cache_creation == 0
                 && phase.tokens.cache_read == 0;
             if has_no_tokens {
-                eprintln!(
-                    "⚠️  Warning: Archive {} phase '{}' has no token usage recorded",
-                    archive.workflow_id, phase.phase_name
-                );
+                zero_token_phases.push(phase.phase_name.clone());
+                if !json {
+                    eprintln!(
+                        "⚠️  Warning: Archive {} phase '{}' has no token usage recorded",
+                        archive.workflow_id, phase.phase_name
+                    );
+                }
             }
         }
 
+        // Collect issue data for JSON output
+        if needs_repair || !zero_token_phases.is_empty() {
+            issues.push(ArchiveIssue {
+                workflow_id: archive.workflow_id.clone(),
+                needs_git_metrics: missing_git && has_git,
+                zero_token_phases,
+            });
+        }
+
         if needs_repair {
-            println!(
-                "{} {}",
-                Theme::highlight(&archive.workflow_id),
-                Theme::secondary(&format!("(needs: {})", repairs.join(", ")))
-            );
+            if !json {
+                println!(
+                    "{} {}",
+                    Theme::highlight(&archive.workflow_id),
+                    Theme::secondary(&format!("(needs: {})", repairs.join(", ")))
+                );
+            }
 
             if !dry_run {
                 // Backfill git metrics
@@ -136,8 +172,10 @@ fn repair_archives(storage: &FileStorage, dry_run: bool) -> Result<()> {
                 std::fs::remove_file(&archive_path)?;
                 write_archive(archive, state_dir)?;
 
-                println!("  {}", Theme::success("✓ Repaired"));
-            } else {
+                if !json {
+                    println!("  {}", Theme::success("✓ Repaired"));
+                }
+            } else if !json {
                 println!("  {}", Theme::secondary("Would repair"));
             }
 
@@ -145,25 +183,37 @@ fn repair_archives(storage: &FileStorage, dry_run: bool) -> Result<()> {
         }
     }
 
-    println!();
-    println!(
-        "{}",
-        Theme::success(&format!(
-            "Summary: {} archive(s) {} repair",
-            repaired_count,
-            if dry_run { "need" } else { "repaired" }
-        ))
-    );
-    if needs_git_count > 0 {
-        println!("  - {} missing git metrics", needs_git_count);
-    }
-
-    // Rebuild cumulative totals in state
-    if !dry_run && repaired_count > 0 {
+    // Output results
+    if json {
+        let report = RepairReport {
+            total_archives: archives.len(),
+            archives_need_repair: repaired_count,
+            archives_missing_git: needs_git_count,
+            has_git_repository: has_git,
+            issues,
+        };
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    } else {
         println!();
-        println!("{}", Theme::secondary("Rebuilding cumulative totals..."));
-        rebuild_cumulative_totals(storage, &archives)?;
-        println!("{}", Theme::success("✓ Cumulative totals updated"));
+        println!(
+            "{}",
+            Theme::success(&format!(
+                "Summary: {} archive(s) {} repair",
+                repaired_count,
+                if dry_run { "need" } else { "repaired" }
+            ))
+        );
+        if needs_git_count > 0 {
+            println!("  - {} missing git metrics", needs_git_count);
+        }
+
+        // Rebuild cumulative totals in state
+        if !dry_run && repaired_count > 0 {
+            println!();
+            println!("{}", Theme::secondary("Rebuilding cumulative totals..."));
+            rebuild_cumulative_totals(storage, &archives)?;
+            println!("{}", Theme::success("✓ Cumulative totals updated"));
+        }
     }
 
     Ok(())
@@ -258,7 +308,7 @@ mod tests {
         // Empty state directory - should not error
         let (_temp_dir, storage) = test_storage_with_files(None, None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -270,7 +320,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -284,7 +334,7 @@ mod tests {
         let hook = hook_with_transcript(&transcript_path, "test", "2025-01-01T10:00:00Z");
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook]), None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -298,7 +348,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -311,7 +361,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -324,7 +374,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -341,7 +391,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -353,7 +403,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -367,7 +417,7 @@ mod tests {
         );
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook_str]), None);
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 
@@ -398,7 +448,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false);
+        let result = analyze_metrics(&storage, false, false, false, false);
         assert!(result.is_ok());
     }
 }
