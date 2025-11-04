@@ -48,7 +48,12 @@ fn get_uncommitted_changes(storage: &FileStorage) -> Result<Option<String>> {
     }
 
     let total_lines = insertions + deletions;
-    Ok(Some(format!("{}f, {}l", files_changed, total_lines)))
+    let files_str = if files_changed == 1 { "file" } else { "files" };
+    let lines_str = if total_lines == 1 { "line" } else { "lines" };
+    Ok(Some(format!(
+        "uncommitted changes: {} {}, {} {}",
+        files_changed, files_str, total_lines, lines_str
+    )))
 }
 
 /// Show overall project status (meta-mode, workflow, etc.)
@@ -58,54 +63,23 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
 
     let state = storage.load()?;
 
-    println!("{}", Theme::header("Project Status"));
-    println!();
-
-    // Show meta-mode
-    if let Some(workflow_state) = &state.workflow_state {
-        if let Some(meta_mode) = &workflow_state.meta_mode {
-            println!("{}: {}", Theme::label("Meta-mode"), meta_mode.name);
-        } else {
-            println!(
-                "{}: {}",
-                Theme::label("Meta-mode"),
-                Theme::secondary("none")
-            );
-        }
-    } else {
-        println!(
-            "{}: {}",
-            Theme::label("Meta-mode"),
-            Theme::secondary("none")
-        );
-    }
-
     // Show git information
     if let Some(git_info) = &state.git_info {
         if git_info.has_repo {
             let branch = git_info.current_branch.as_deref().unwrap_or("(detached)");
-            print!("{}: {}", Theme::label("Git"), branch);
+            print!("{}: {}", Theme::label("Git"), Theme::highlight(branch));
 
             // Add uncommitted changes summary
             if let Some(changes) = get_uncommitted_changes(storage)? {
                 print!(" {}", Theme::secondary(&format!("({})", changes)));
             }
             println!();
-        } else {
-            println!(
-                "{}: {}",
-                Theme::label("Git"),
-                Theme::secondary("not in git repo")
-            );
         }
     }
-
-    println!();
 
     // Show workflow status if active
     if state.workflow.is_none() || state.workflow_state.is_none() {
         println!("{}", Theme::secondary("No active workflow"));
-        println!();
         println!(
             "Start a workflow with: {}",
             Theme::highlight("hegel start <workflow>")
@@ -115,23 +89,42 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
 
     let workflow_state = state.workflow_state.as_ref().unwrap();
 
-    println!("{}", Theme::header("Workflow Status"));
-    println!();
-    println!("{}: {}", Theme::label("Mode"), workflow_state.mode);
-    println!(
-        "{}: {}",
-        Theme::label("Current node"),
-        workflow_state.current_node
-    );
-    println!();
-    println!("{}", Theme::label("History:"));
+    // Build single-line status: <mode> (<meta_mode>) node1->node2->[current]->...
+    print!("{}: ", Theme::label("Hegel"));
+
+    // Workflow mode (highlighted)
+    print!("{}", Theme::highlight(&workflow_state.mode));
+
+    // Meta-mode (if active, highlighted)
+    if let Some(meta_mode) = &workflow_state.meta_mode {
+        print!(" {}", Theme::highlight(&format!("({})", meta_mode.name)));
+    }
+
+    print!(" ");
+
+    // Build node chain with colors
     for (i, node) in workflow_state.history.iter().enumerate() {
-        if i == workflow_state.history.len() - 1 {
-            println!("  {} {}", Theme::highlight("→"), Theme::highlight(node));
+        if i > 0 {
+            print!("{}", Theme::secondary("->"));
+        }
+
+        if node == &workflow_state.current_node {
+            print!("[{}]", Theme::highlight(node));
         } else {
-            println!("    {}", Theme::secondary(node));
+            print!("{}", Theme::secondary(node));
         }
     }
+
+    // Add current node if not in history
+    if !workflow_state
+        .history
+        .contains(&workflow_state.current_node)
+    {
+        print!("{}", Theme::secondary("->"));
+        print!("[{}]", Theme::highlight(&workflow_state.current_node));
+    }
+
+    println!();
 
     Ok(())
 }

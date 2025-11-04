@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 14:17
+**Last Updated**: 2025-11-04 16:24
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,224 | 7,660 | 20,884 |
-| **Comments** | 1,836 | - | 1,836 |
-| **Blank Lines** | 2,431 | - | 2,431 |
-| **Total Lines** | 17,491 | 7,660 | 25,151 |
-| **Files** | 76 | 35 | 111 |
+| **Lines** | 13,209 | 7,866 | 21,075 |
+| **Comments** | 1,840 | - | 1,840 |
+| **Blank Lines** | 2,435 | - | 2,435 |
+| **Total Lines** | 17,484 | 7,866 | 25,350 |
+| **Files** | 76 | 36 | 112 |
 
-**Documentation Ratio**: 0.58 lines of docs per line of code
+**Documentation Ratio**: 0.60 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2431           1836          13224
+Rust                            76           2435           1840          13209
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2462           1836          13312
+SUM:                            77           2466           1840          13297
 -------------------------------------------------------------------------------
 ```
 
@@ -61,7 +61,7 @@ SUM:                            77           2462           1836          13312
 | `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
-| `commands/status.rs` | 137 | 137 | 0 | 0.0% | ✅ |
+| `commands/status.rs` | 130 | 130 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 426 | 16 | 410 | 96.2% | ✅ |
@@ -128,6 +128,7 @@ SUM:                            77           2462           1836          13312
 | `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
+| `.ddd/feat/non-phase-commits/HANDOFF.md` | 206 |
 | `CLAUDE.md` | 155 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
@@ -164,7 +165,7 @@ SUM:                            77           2462           1836          13312
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.58 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.60 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
