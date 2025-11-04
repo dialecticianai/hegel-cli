@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 18:09
+**Last Updated**: 2025-11-04 18:58
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,211 | 8,665 | 21,876 |
-| **Comments** | 1,842 | - | 1,842 |
-| **Blank Lines** | 2,437 | - | 2,437 |
-| **Total Lines** | 17,490 | 8,665 | 26,155 |
-| **Files** | 76 | 37 | 113 |
+| **Lines** | 13,623 | 8,453 | 22,076 |
+| **Comments** | 1,884 | - | 1,884 |
+| **Blank Lines** | 2,510 | - | 2,510 |
+| **Total Lines** | 18,017 | 8,453 | 26,470 |
+| **Files** | 77 | 37 | 114 |
 
-**Documentation Ratio**: 0.66 lines of docs per line of code
+**Documentation Ratio**: 0.62 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            76           2437           1842          13211
+Rust                            77           2510           1884          13623
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            77           2468           1842          13299
+SUM:                            78           2541           1884          13711
 -------------------------------------------------------------------------------
 ```
 
@@ -43,7 +43,7 @@ SUM:                            77           2468           1842          13299
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `commands/analyze/mod.rs` | 454 | 300 | 154 | 33.9% | ⚠️ Large |
 | `commands/analyze/sections.rs` | 337 | 337 | 0 | 0.0% | ✅ (infra) |
-| `commands/archive.rs` | 301 | 212 | 89 | 29.6% | ⚠️ Large |
+| `commands/archive.rs` | 302 | 213 | 89 | 29.5% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/external_bin.rs` | 91 | 74 | 17 | 18.7% | ✅ |
@@ -84,17 +84,18 @@ SUM:                            77           2468           1842          13299
 | `main.rs` | 360 | 13 | 347 | 96.4% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 204 | 145 | 59 | 28.9% | ✅ |
+| `metrics/cowboy.rs` | 469 | 288 | 181 | 38.6% | ⚠️ Large |
 | `metrics/git.rs` | 507 | 158 | 349 | 68.8% | ✅ |
 | `metrics/graph.rs` | 372 | 222 | 150 | 40.3% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 756 | 217 | 539 | 71.3% | ⚠️ Large |
+| `metrics/mod.rs` | 760 | 218 | 542 | 71.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
-| `storage/archive.rs` | 547 | 314 | 233 | 42.6% | ⚠️ Large |
+| `storage/archive.rs` | 600 | 322 | 278 | 46.3% | ⚠️ Large |
 | `storage/mod.rs` | 788 | 399 | 389 | 49.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -114,7 +115,7 @@ SUM:                            77           2468           1842          13299
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -128,12 +129,12 @@ SUM:                            77           2468           1842          13299
 | `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
 | `.ddd/feat/log_retention/PLAN.md` | 535 |
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
-| `.ddd/feat/non-phase-commits/PLAN.md` | 446 |
-| `.ddd/feat/non-phase-commits/SPEC.md` | 526 |
+| `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
+| `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
 | `CLAUDE.md` | 155 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 184 |
+| `COVERAGE_REPORT.md` | 186 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -154,7 +155,7 @@ SUM:                            77           2468           1842          13299
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 184 |
+| `LOC_REPORT.md` | 185 |
 | `README.md` | 581 |
 | `ROADMAP.md` | 212 |
 | `src/test_helpers/README.md` | 119 |
@@ -166,7 +167,7 @@ SUM:                            77           2468           1842          13299
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.66 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.62 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

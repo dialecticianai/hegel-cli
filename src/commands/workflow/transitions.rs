@@ -158,8 +158,8 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
         metrics.git_commits = git_commits;
     }
 
-    // Create archive from metrics
-    let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id)?;
+    // Create archive from metrics (explicit workflow, not synthetic)
+    let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id, false)?;
     archive.completed_at = completed_at;
 
     // Write archive

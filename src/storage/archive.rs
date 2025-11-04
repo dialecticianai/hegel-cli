@@ -17,6 +17,9 @@ pub struct WorkflowArchive {
     pub totals: WorkflowTotals,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
+    /// Whether this archive was auto-detected from inter-workflow activity
+    #[serde(default)]
+    pub is_synthetic: bool,
 }
 
 /// Per-phase metrics in archive
@@ -82,7 +85,11 @@ pub struct WorkflowTotals {
 
 impl WorkflowArchive {
     /// Create archive from unified metrics
-    pub fn from_metrics(metrics: &UnifiedMetrics, workflow_id: &str) -> Result<Self> {
+    pub fn from_metrics(
+        metrics: &UnifiedMetrics,
+        workflow_id: &str,
+        is_synthetic: bool,
+    ) -> Result<Self> {
         validate_workflow_id(workflow_id)?;
 
         // Extract mode from first transition
@@ -180,6 +187,7 @@ impl WorkflowArchive {
             phases,
             transitions,
             totals,
+            is_synthetic,
         })
     }
 }
@@ -319,6 +327,20 @@ mod tests {
 
     use tempfile::TempDir;
 
+    /// Helper to create test archive with default values
+    fn test_archive() -> WorkflowArchive {
+        WorkflowArchive {
+            workflow_id: "2025-10-24T10:00:00Z".to_string(),
+            mode: "discovery".to_string(),
+            completed_at: "2025-10-24T12:00:00Z".to_string(),
+            session_id: None,
+            is_synthetic: false,
+            phases: vec![],
+            transitions: vec![],
+            totals: WorkflowTotals::default(),
+        }
+    }
+
     #[test]
     fn test_validate_workflow_id() {
         // Valid ISO 8601 timestamp
@@ -337,9 +359,6 @@ mod tests {
     #[test]
     fn test_archive_serialization() {
         let archive = WorkflowArchive {
-            workflow_id: "2025-10-24T10:00:00Z".to_string(),
-            mode: "discovery".to_string(),
-            completed_at: "2025-10-24T12:00:00Z".to_string(),
             session_id: Some("test-session".to_string()),
             phases: vec![PhaseArchive {
                 phase_name: "spec".to_string(),
@@ -376,6 +395,7 @@ mod tests {
                 unique_commands: 0,
                 git_commits: 0,
             },
+            ..test_archive()
         };
 
         // Serialize
@@ -421,7 +441,8 @@ mod tests {
             git_commits: vec![],
         };
 
-        let archive = WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z").unwrap();
+        let archive =
+            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", false).unwrap();
 
         assert_eq!(archive.workflow_id, "2025-10-24T10:00:00Z");
         assert_eq!(archive.mode, "discovery");
@@ -433,15 +454,7 @@ mod tests {
     #[test]
     fn test_write_archive() {
         let temp_dir = TempDir::new().unwrap();
-        let archive = WorkflowArchive {
-            workflow_id: "2025-10-24T10:00:00Z".to_string(),
-            mode: "discovery".to_string(),
-            completed_at: "2025-10-24T12:00:00Z".to_string(),
-            session_id: None,
-            phases: vec![],
-            transitions: vec![],
-            totals: WorkflowTotals::default(),
-        };
+        let archive = test_archive();
 
         write_archive(&archive, temp_dir.path()).unwrap();
 
@@ -460,15 +473,7 @@ mod tests {
     #[test]
     fn test_write_archive_duplicate() {
         let temp_dir = TempDir::new().unwrap();
-        let archive = WorkflowArchive {
-            workflow_id: "2025-10-24T10:00:00Z".to_string(),
-            mode: "discovery".to_string(),
-            completed_at: "2025-10-24T12:00:00Z".to_string(),
-            session_id: None,
-            phases: vec![],
-            transitions: vec![],
-            totals: WorkflowTotals::default(),
-        };
+        let archive = test_archive();
 
         // First write succeeds
         write_archive(&archive, temp_dir.path()).unwrap();
@@ -484,25 +489,14 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
 
         // Write 2 archives
-        let archive1 = WorkflowArchive {
-            workflow_id: "2025-10-24T10:00:00Z".to_string(),
-            mode: "discovery".to_string(),
-            completed_at: "2025-10-24T12:00:00Z".to_string(),
-            session_id: None,
-            phases: vec![],
-            transitions: vec![],
-            totals: WorkflowTotals::default(),
-        };
+        let archive1 = test_archive();
         write_archive(&archive1, temp_dir.path()).unwrap();
 
         let archive2 = WorkflowArchive {
             workflow_id: "2025-10-24T14:00:00Z".to_string(),
             mode: "execution".to_string(),
             completed_at: "2025-10-24T16:00:00Z".to_string(),
-            session_id: None,
-            phases: vec![],
-            transitions: vec![],
-            totals: WorkflowTotals::default(),
+            ..test_archive()
         };
         write_archive(&archive2, temp_dir.path()).unwrap();
 
@@ -525,15 +519,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
 
         // Create valid archive
-        let archive = WorkflowArchive {
-            workflow_id: "2025-10-24T10:00:00Z".to_string(),
-            mode: "discovery".to_string(),
-            completed_at: "2025-10-24T12:00:00Z".to_string(),
-            session_id: None,
-            phases: vec![],
-            transitions: vec![],
-            totals: WorkflowTotals::default(),
-        };
+        let archive = test_archive();
         write_archive(&archive, temp_dir.path()).unwrap();
 
         // Create corrupted archive
@@ -543,5 +529,72 @@ mod tests {
         // Should read 1 valid archive, skip corrupted
         let archives = read_archives(temp_dir.path()).unwrap();
         assert_eq!(archives.len(), 1);
+    }
+
+    #[test]
+    fn test_is_synthetic_default_false() {
+        // Test backward compatibility: archives without is_synthetic load as is_synthetic=false
+        let json = r#"{
+            "workflow_id": "2025-10-24T10:00:00Z",
+            "mode": "discovery",
+            "completed_at": "2025-10-24T12:00:00Z",
+            "phases": [],
+            "transitions": [],
+            "totals": {
+                "tokens": {"input": 0, "output": 0, "cache_creation": 0, "cache_read": 0, "assistant_turns": 0},
+                "bash_commands": 0,
+                "file_modifications": 0,
+                "unique_files": 0,
+                "unique_commands": 0,
+                "git_commits": 0
+            }
+        }"#;
+
+        let archive: WorkflowArchive = serde_json::from_str(json).unwrap();
+        assert_eq!(archive.is_synthetic, false);
+    }
+
+    #[test]
+    fn test_is_synthetic_serialization() {
+        // Test is_synthetic=true serializes and deserializes correctly
+        let archive = WorkflowArchive {
+            is_synthetic: true,
+            ..test_archive()
+        };
+
+        let json = serde_json::to_string(&archive).unwrap();
+        let deserialized: WorkflowArchive = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(deserialized.is_synthetic, true);
+    }
+
+    #[test]
+    fn test_from_metrics_with_is_synthetic() {
+        let metrics = UnifiedMetrics {
+            hook_metrics: HookMetrics::default(),
+            token_metrics: TokenMetrics::default(),
+            state_transitions: vec![StateTransitionEvent {
+                timestamp: "2025-10-24T10:00:00Z".to_string(),
+                workflow_id: Some("2025-10-24T10:00:00Z".to_string()),
+                from_node: "START".to_string(),
+                to_node: "ride".to_string(),
+                phase: "ride".to_string(),
+                mode: "cowboy".to_string(),
+            }],
+            session_id: None,
+            phase_metrics: vec![],
+            git_commits: vec![],
+        };
+
+        // Test explicit workflow (is_synthetic=false)
+        let explicit_archive =
+            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", false).unwrap();
+        assert_eq!(explicit_archive.is_synthetic, false);
+
+        // Test synthetic workflow (is_synthetic=true)
+        let synthetic_archive =
+            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", true).unwrap();
+        assert_eq!(synthetic_archive.is_synthetic, true);
+        assert_eq!(synthetic_archive.mode, "cowboy");
     }
 }

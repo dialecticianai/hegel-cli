@@ -202,7 +202,8 @@ fn archive_single_workflow(storage: &FileStorage, workflow_id: &str) -> Result<(
     // easily support filtering by workflow_id. For migration, we'll archive
     // whatever metrics we have and trust that we're migrating one at a time.
 
-    let archive = WorkflowArchive::from_metrics(&metrics, workflow_id)?;
+    // Explicit workflow archive (not synthetic)
+    let archive = WorkflowArchive::from_metrics(&metrics, workflow_id, false)?;
 
     // Write archive
     write_archive(&archive, state_dir)?;

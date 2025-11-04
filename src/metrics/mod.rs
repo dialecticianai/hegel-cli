@@ -1,4 +1,5 @@
 mod aggregation;
+pub mod cowboy;
 pub mod git;
 pub mod graph;
 mod hooks;
@@ -450,6 +451,7 @@ mod tests {
             mode: "discovery".to_string(),
             completed_at: "2025-10-24T12:00:00Z".to_string(),
             session_id: Some("archived-session".to_string()),
+            is_synthetic: false,
             phases: vec![PhaseArchive {
                 phase_name: "spec".to_string(),
                 start_time: "2025-10-24T10:00:00Z".to_string(),
@@ -528,6 +530,7 @@ mod tests {
                 mode: "discovery".to_string(),
                 completed_at: format!("2025-10-24T{}:00:00Z", 12 + i * 4),
                 session_id: None,
+                is_synthetic: false,
                 phases: vec![PhaseArchive {
                     phase_name: "spec".to_string(),
                     start_time: workflow_id.to_string(),
@@ -598,6 +601,7 @@ mod tests {
             mode: "discovery".to_string(),
             completed_at: "2025-10-24T12:00:00Z".to_string(),
             session_id: None,
+            is_synthetic: false,
             phases: vec![PhaseArchive {
                 phase_name: "spec".to_string(),
                 start_time: "2025-10-24T10:00:00Z".to_string(),
