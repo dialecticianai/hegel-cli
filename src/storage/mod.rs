@@ -557,6 +557,7 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_resolve_state_dir_with_env_var() {
         // When HEGEL_STATE_DIR is set, should use it
         let temp_dir = TempDir::new().unwrap();
@@ -579,6 +580,7 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_resolve_state_dir_precedence() {
         // CLI flag should override env var
         let env_dir = TempDir::new().unwrap();

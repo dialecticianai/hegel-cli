@@ -1,12 +1,12 @@
 use anyhow::Result;
 use serde::Serialize;
+use std::collections::HashMap;
 
-use crate::metrics::git;
 use crate::storage::archive::{read_archives, write_archive};
 use crate::storage::FileStorage;
 use crate::theme::Theme;
 
-use super::backfill::backfill_git_metrics;
+use super::cleanup::all_cleanups;
 use super::gap_detection::detect_and_create_cowboy_archives;
 use super::totals::rebuild_cumulative_totals;
 
@@ -44,7 +44,7 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
     #[derive(Serialize)]
     struct ArchiveIssue {
         workflow_id: String,
-        needs_git_metrics: bool,
+        repairs_needed: Vec<String>,
         zero_token_phases: Vec<String>,
     }
 
@@ -52,37 +52,30 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
     struct RepairReport {
         total_archives: usize,
         archives_need_repair: usize,
-        archives_missing_git: usize,
+        repairs_by_type: HashMap<String, usize>,
         synthetic_cowboy_created: usize,
-        has_git_repository: bool,
         issues: Vec<ArchiveIssue>,
     }
 
     let mut repaired_count = 0;
-    let mut needs_git_count = 0;
+    let mut repairs_by_type: HashMap<String, usize> = HashMap::new();
     let mut issues = Vec::new();
 
-    // Check if we have a git repository
-    let has_git = git::has_git_repository(state_dir);
-    if !json && !has_git {
-        println!(
-            "{}",
-            Theme::warning("No git repository found - skipping git backfill")
-        );
-        println!();
-    }
+    // Get all cleanup strategies
+    let cleanups = all_cleanups();
 
     // Process each archive
     for archive in &mut archives {
-        let mut needs_repair = false;
-        let mut repairs = Vec::new();
+        let mut repairs_needed = Vec::new();
 
-        // Check if git commits are missing
-        let missing_git = archive.phases.iter().all(|p| p.git_commits.is_empty());
-        if missing_git && has_git {
-            needs_repair = true;
-            needs_git_count += 1;
-            repairs.push("git metrics");
+        // Check which cleanups are needed for this archive
+        for cleanup in &cleanups {
+            if cleanup.needs_repair(archive) {
+                repairs_needed.push(cleanup.name().to_string());
+                *repairs_by_type
+                    .entry(cleanup.name().to_string())
+                    .or_insert(0) += 1;
+            }
         }
 
         // Check for phases with zero token usage (warning only, no repair)
@@ -104,29 +97,33 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
         }
 
         // Collect issue data for JSON output
-        if needs_repair || !zero_token_phases.is_empty() {
+        if !repairs_needed.is_empty() || !zero_token_phases.is_empty() {
             issues.push(ArchiveIssue {
                 workflow_id: archive.workflow_id.clone(),
-                needs_git_metrics: missing_git && has_git,
+                repairs_needed: repairs_needed.clone(),
                 zero_token_phases,
             });
         }
 
-        if needs_repair {
+        if !repairs_needed.is_empty() {
             if !json {
                 println!(
                     "{} {}",
                     Theme::highlight(&archive.workflow_id),
-                    Theme::secondary(&format!("(needs: {})", repairs.join(", ")))
+                    Theme::secondary(&format!("(needs: {})", repairs_needed.join(", ")))
                 );
             }
 
-            if !dry_run {
-                // Backfill git metrics
-                if missing_git && has_git {
-                    backfill_git_metrics(archive, state_dir)?;
+            // Apply all repairs
+            let mut archive_modified = false;
+            for cleanup in &cleanups {
+                let repaired = cleanup.repair(archive, state_dir, dry_run)?;
+                if repaired {
+                    archive_modified = true;
                 }
+            }
 
+            if archive_modified && !dry_run {
                 // Rewrite archive
                 let archive_path = state_dir
                     .join("archive")
@@ -137,7 +134,7 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
                 if !json {
                     println!("  {}", Theme::success("✓ Repaired"));
                 }
-            } else if !json {
+            } else if !json && dry_run {
                 println!("  {}", Theme::secondary("Would repair"));
             }
 
@@ -153,9 +150,8 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
         let report = RepairReport {
             total_archives: archives.len(),
             archives_need_repair: repaired_count,
-            archives_missing_git: needs_git_count,
+            repairs_by_type,
             synthetic_cowboy_created: synthetic_count,
-            has_git_repository: has_git,
             issues,
         };
         println!("{}", serde_json::to_string_pretty(&report)?);
@@ -175,8 +171,8 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
                 }
             ))
         );
-        if needs_git_count > 0 {
-            println!("  - {} missing git metrics", needs_git_count);
+        for (repair_type, count) in &repairs_by_type {
+            println!("  - {}: {} archive(s)", repair_type, count);
         }
 
         // Rebuild cumulative totals in state

@@ -193,7 +193,7 @@ fn detect_and_archive_cowboy_activity(
 }
 
 /// Archive completed workflow and delete raw logs
-fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
+pub(crate) fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state_dir = storage.state_dir();
 
     // Parse current metrics WITHOUT archives AND git to prevent duplication bug

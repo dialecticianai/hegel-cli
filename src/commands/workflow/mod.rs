@@ -176,17 +176,18 @@ pub fn abort_workflow(storage: &FileStorage) -> Result<()> {
         ))
     );
 
-    // Clear workflow fields but keep session_metadata and cumulative_totals
-    let cleared_state = State {
-        workflow: None,
-        workflow_state: None,
-        session_metadata: state.session_metadata,
-        cumulative_totals: state.cumulative_totals,
-        git_info: state.git_info,
-    };
+    // Log synthetic transition to aborted terminal node
+    storage.log_state_transition(
+        &workflow_state.current_node,
+        "aborted",
+        &workflow_state.mode,
+        workflow_state.workflow_id.as_deref(),
+    )?;
 
-    storage.save(&cleared_state)?;
-    println!("{}", Theme::success("Workflow aborted"));
+    // Archive the aborted workflow (now that it has a terminal ABORTED node)
+    transitions::archive_and_cleanup(storage)?;
+
+    println!("{}", Theme::success("Workflow aborted and archived"));
     Ok(())
 }
 

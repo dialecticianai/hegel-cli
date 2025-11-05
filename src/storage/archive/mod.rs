@@ -10,7 +10,6 @@ use std::path::Path;
 use crate::metrics::git::GitCommit;
 
 // Re-export for backwards compatibility
-pub use validation::validate_workflow_id;
 
 /// Archived workflow with pre-computed aggregates
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

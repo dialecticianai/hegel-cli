@@ -149,7 +149,7 @@ pub fn check_runtime_compatibility(runtime: &AgentRuntime) -> RuntimeCompatibili
 /// Execute an agent with the given prompt and arguments
 pub fn execute_agent(
     agent_name: &str,
-    agent_path: &str,
+    _agent_path: &str,
     runtime: &AgentRuntime,
     cmd_args: &[String],
 ) -> Result<String> {

@@ -1,6 +1,5 @@
 use crate::metrics::{PhaseMetrics, UnifiedMetrics, WorkflowDAG};
 use crate::theme::Theme;
-use colored::Colorize;
 use std::fmt::Display;
 
 /// Format a numeric metric with right alignment and theme styling
@@ -209,8 +208,8 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
     if !phase_metrics.is_empty() {
         println!("{}", Theme::label("Phase Breakdown"));
         for phase in phase_metrics {
-            let is_done_node = phase.phase_name.to_lowercase() == "done";
-            let status = if phase.end_time.is_none() && !is_done_node {
+            let is_terminal_node = phase.phase_name == "done" || phase.phase_name == "aborted";
+            let status = if phase.end_time.is_none() && !is_terminal_node {
                 Theme::success("active")
             } else if phase.is_synthetic {
                 Theme::secondary("completed, synthetic")

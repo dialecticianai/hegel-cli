@@ -33,6 +33,7 @@ hegel-ast-grep = { path = "crates/hegel-ast-grep" }
 
 [dev-dependencies]
 tempfile = "3.8"
+serial_test = "3.2"
 
 [features]
 default = []

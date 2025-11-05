@@ -68,7 +68,8 @@ impl WorkflowDAG {
                 }
             }
 
-            // Determine if workflow is synthetic
+            // Determine if workflow is synthetic (gap-detected implicit workflow)
+            // Note: Explicit workflows (e.g., `hegel start cowboy`) are NOT synthetic
             let is_synthetic = trans.iter().any(|t| {
                 if let Some(metrics) = phase_data_map.get(&t.phase) {
                     metrics.iter().any(|m| m.is_synthetic)
@@ -142,7 +143,10 @@ impl WorkflowDAG {
             for (phase_idx, phase_name) in workflow.phases.iter().enumerate() {
                 let arrow = if phase_idx == 0 { "│ " } else { "│ → " };
 
-                if let Some(metrics) = workflow.phase_data.get(phase_name) {
+                // Special rendering for aborted terminal nodes
+                if phase_name == "aborted" {
+                    output.push_str(&format!("{}aborted (workflow terminated)\n", arrow));
+                } else if let Some(metrics) = workflow.phase_data.get(phase_name) {
                     let total_tokens = metrics.token_metrics.total_input_tokens
                         + metrics.token_metrics.total_output_tokens;
                     let duration = metrics.duration_seconds;
@@ -213,7 +217,13 @@ impl WorkflowDAG {
             for phase_name in &workflow.phases {
                 let node_id = format!("{}_{}", workflow.workflow_id, phase_name);
 
-                if let Some(metrics) = workflow.phase_data.get(phase_name) {
+                // Special styling for aborted terminal nodes
+                if phase_name == "aborted" {
+                    dot.push_str(&format!(
+                        "    \"{}\" [label=\"aborted\", style=filled, fillcolor=lightcoral];\n",
+                        node_id
+                    ));
+                } else if let Some(metrics) = workflow.phase_data.get(phase_name) {
                     let total_tokens = metrics.token_metrics.total_input_tokens
                         + metrics.token_metrics.total_output_tokens;
                     let duration = metrics.duration_seconds;

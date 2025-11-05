@@ -63,29 +63,56 @@ fn migrate_logs(storage: &FileStorage, dry_run: bool) -> Result<()> {
         ))
     );
 
-    // For each completed workflow, create archive
+    // For each workflow, add ABORTED node if incomplete, then create archive
     let mut archived_count = 0;
     for (workflow_id, is_completed) in &workflows {
         if !is_completed {
-            println!(
-                "{} {} (incomplete, skipping)",
-                Theme::secondary("  •"),
-                workflow_id
-            );
-            continue;
-        }
-
-        if dry_run {
-            println!("{} {} (would archive)", Theme::success("  ✓"), workflow_id);
-        } else {
-            // Archive this workflow
-            match archive_single_workflow(storage, workflow_id) {
-                Ok(()) => {
-                    println!("{} {} (archived)", Theme::success("  ✓"), workflow_id);
-                    archived_count += 1;
+            if dry_run {
+                println!(
+                    "{} {} (incomplete, would add ABORTED node and archive)",
+                    Theme::warning("  ⚠"),
+                    workflow_id
+                );
+            } else {
+                // Add synthetic ABORTED transition for incomplete workflow
+                println!(
+                    "{} {} (incomplete, adding ABORTED node)",
+                    Theme::warning("  ⚠"),
+                    workflow_id
+                );
+                if let Err(e) = add_aborted_transition(storage, workflow_id) {
+                    eprintln!(
+                        "{} {} (failed to add ABORTED: {})",
+                        Theme::error("  ✗"),
+                        workflow_id,
+                        e
+                    );
+                    continue;
                 }
-                Err(e) => {
-                    eprintln!("{} {} (failed: {})", Theme::error("  ✗"), workflow_id, e);
+                // Now archive it
+                match archive_single_workflow(storage, workflow_id) {
+                    Ok(()) => {
+                        println!("{} {} (archived)", Theme::success("  ✓"), workflow_id);
+                        archived_count += 1;
+                    }
+                    Err(e) => {
+                        eprintln!("{} {} (failed: {})", Theme::error("  ✗"), workflow_id, e);
+                    }
+                }
+            }
+        } else {
+            if dry_run {
+                println!("{} {} (would archive)", Theme::success("  ✓"), workflow_id);
+            } else {
+                // Archive this workflow
+                match archive_single_workflow(storage, workflow_id) {
+                    Ok(()) => {
+                        println!("{} {} (archived)", Theme::success("  ✓"), workflow_id);
+                        archived_count += 1;
+                    }
+                    Err(e) => {
+                        eprintln!("{} {} (failed: {})", Theme::error("  ✗"), workflow_id, e);
+                    }
                 }
             }
         }
@@ -173,8 +200,8 @@ fn identify_workflows(states_path: &std::path::Path) -> Result<HashMap<String, b
         if let Some(workflow_id) = event.get("workflow_id").and_then(|v| v.as_str()) {
             let to_node = event.get("to_node").and_then(|v| v.as_str()).unwrap_or("");
 
-            // Mark workflow as completed if it transitioned to "done"
-            if to_node == "done" {
+            // Mark workflow as completed if it transitioned to a terminal node
+            if to_node == "done" || to_node == "aborted" {
                 workflows.insert(workflow_id.to_string(), true);
             } else {
                 // Mark as incomplete unless already marked as completed
@@ -184,6 +211,61 @@ fn identify_workflows(states_path: &std::path::Path) -> Result<HashMap<String, b
     }
 
     Ok(workflows)
+}
+
+/// Add synthetic ABORTED transition for an incomplete workflow
+fn add_aborted_transition(storage: &FileStorage, workflow_id: &str) -> Result<()> {
+    let state_dir = storage.state_dir();
+    let states_path = state_dir.join("states.jsonl");
+
+    if !states_path.exists() {
+        bail!("states.jsonl not found");
+    }
+
+    // Read all states and find the last transition for this workflow
+    let content = fs::read_to_string(&states_path)?;
+    let mut last_transition: Option<serde_json::Value> = None;
+
+    for line in content.lines() {
+        if line.trim().is_empty() {
+            continue;
+        }
+
+        let event: serde_json::Value = serde_json::from_str(line)?;
+        if event.get("workflow_id").and_then(|v| v.as_str()) == Some(workflow_id) {
+            last_transition = Some(event);
+        }
+    }
+
+    let last_trans = last_transition.context("No transitions found for workflow")?;
+    let to_node = last_trans
+        .get("to_node")
+        .and_then(|v| v.as_str())
+        .context("Missing to_node in last transition")?;
+    let mode = last_trans
+        .get("mode")
+        .and_then(|v| v.as_str())
+        .context("Missing mode in last transition")?;
+
+    // Create aborted transition
+    let aborted_event = serde_json::json!({
+        "from_node": to_node,
+        "to_node": "aborted",
+        "mode": mode,
+        "phase": "aborted",
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+        "workflow_id": workflow_id,
+    });
+
+    // Append to states.jsonl
+    use std::io::Write;
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&states_path)?;
+    writeln!(file, "{}", serde_json::to_string(&aborted_event)?)?;
+
+    Ok(())
 }
 
 /// Archive a single workflow by workflow_id
