@@ -108,6 +108,9 @@ enum Commands {
         /// Display workflow graph section
         #[arg(long)]
         workflow_graph: bool,
+        /// Display all sections in full detail
+        #[arg(long)]
+        full: bool,
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
@@ -334,6 +337,7 @@ fn main() -> Result<()> {
             workflow_transitions,
             phase_breakdown,
             workflow_graph,
+            full,
         } => {
             let options = commands::AnalyzeOptions {
                 export_dot,
@@ -345,6 +349,7 @@ fn main() -> Result<()> {
                 workflow_transitions,
                 phase_breakdown,
                 workflow_graph,
+                full,
             };
             commands::analyze_metrics(&storage, options)?;
         }

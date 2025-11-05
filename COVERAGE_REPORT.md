@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 14:30
+**Last Updated**: 2025-11-05 14:31
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **86.67%** lines | **85.58%** regions | **86.01%** functions
+**Overall Coverage**: **86.69%** lines | **85.58%** regions | **86.02%** functions
 
 ## Summary
 
 ```
-TOTAL                                      17525              2527    85.58%         929               130    86.01%       10655              1420    86.67%           0                 0         -
+TOTAL                                      17547              2531    85.58%         930               130    86.02%       10665              1420    86.69%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -25,7 +25,7 @@ TOTAL                                      17525              2527    85.58%    
 | `src/analyze/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/sections.rs` | 90.62% | 85.40% | 88.89% | 🟢 Excellent |
 | `src/analyze/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/commands/analyze/mod.rs` | 98.01% | 93.79% | 100.00% | 🟢 Excellent |
+| `src/commands/analyze/mod.rs` | 98.11% | 92.90% | 100.00% | 🟢 Excellent |
 | `src/commands/archive.rs` | 43.35% | 47.65% | 50.00% | 🟠 Moderate |
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
 | `src/commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
@@ -56,7 +56,7 @@ TOTAL                                      17525              2527    85.58%    
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `src/main.rs` | 52.38% | 39.53% | 100.00% | 🟠 Moderate |
+| `src/main.rs` | 53.49% | 40.23% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 97.22% | 95.52% | 100.00% | 🟢 Excellent |
 | `src/metrics/cowboy.rs` | 93.69% | 89.18% | 100.00% | 🟢 Excellent |
@@ -99,7 +99,7 @@ TOTAL                                      17525              2527    85.58%    
 - `src/adapters/mod.rs` - 98.91%
 - `src/analyze/cleanup/aborted.rs` - 97.30%
 - `src/analyze/sections.rs` - 90.62%
-- `src/commands/analyze/mod.rs` - 98.01%
+- `src/commands/analyze/mod.rs` - 98.11%
 - `src/commands/config.rs` - 91.95%
 - `src/commands/fork/amp.rs` - 100.00%
 - `src/commands/fork/codex.rs` - 100.00%
@@ -143,6 +143,8 @@ TOTAL                                      17525              2527    85.58%    
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
+- `src/image_manager.rs` - 80.53%
+- `src/rendering/text_builder.rs` - 73.81%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 83.89%
@@ -156,6 +158,7 @@ TOTAL                                      17525              2527    85.58%    
 - `src/tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
+- `src/rendering/viewport.rs` - 57.89%
 - `src/commands/archive.rs` - 43.35%
 - `src/commands/external_bin.rs` - 53.19%
 - `src/commands/fork/runtime.rs` - 44.20%
@@ -164,9 +167,23 @@ TOTAL                                      17525              2527    85.58%    
 - `src/commands/reflect.rs` - 60.53%
 - `src/commands/status.rs` - 43.21%
 - `src/commands/workflow/mod.rs` - 58.18%
-- `src/main.rs` - 52.38%
+- `src/main.rs` - 53.49%
 
 ### 🔴 Needs Work (<40% lines)
+- `src/app.rs` - 0.00%
+- `src/main.rs` - 0.00%
+- `src/models/document.rs` - 0.00%
+- `src/models/review_mode.rs` - 0.00%
+- `src/rendering/chunk.rs` - 0.00%
+- `src/rendering/chunk_renderer.rs` - 0.00%
+- `src/rendering/code.rs` - 0.00%
+- `src/rendering/comments.rs` - 0.00%
+- `src/rendering/image.rs` - 0.00%
+- `src/rendering/selection_manager.rs` - 0.00%
+- `src/rendering/table.rs` - 0.00%
+- `src/rendering/text.rs` - 0.00%
+- `src/rendering/ui.rs` - 0.00%
+- `src/storage.rs` - 0.00%
 - `src/analyze/cleanup/git.rs` - 0.00%
 - `src/analyze/cleanup/mod.rs` - 0.00%
 - `src/analyze/gap_detection.rs` - 0.00%
@@ -179,7 +196,7 @@ TOTAL                                      17525              2527    85.58%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 86.67% | ✅ Met |
+| Overall | ≥80% | 86.69% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

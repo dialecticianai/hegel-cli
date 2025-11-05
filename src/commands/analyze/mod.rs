@@ -20,6 +20,7 @@ pub struct AnalyzeOptions {
     pub workflow_transitions: bool,
     pub phase_breakdown: bool,
     pub workflow_graph: bool,
+    pub full: bool,
 }
 
 pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result<()> {
@@ -43,10 +44,10 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
         && !options.workflow_transitions
         && !options.phase_breakdown
         && !options.workflow_graph;
-    let show_activity = show_all || options.activity;
-    let show_workflow_transitions = show_all || options.workflow_transitions;
-    let show_phase_breakdown = show_all || options.phase_breakdown;
-    let show_workflow_graph = show_all || options.workflow_graph;
+    let show_activity = show_all || options.full || options.activity;
+    let show_workflow_transitions = show_all || options.full || options.workflow_transitions;
+    let show_phase_breakdown = show_all || options.full || options.phase_breakdown;
+    let show_workflow_graph = show_all || options.full || options.workflow_graph;
 
     // Render selected sections
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
@@ -96,6 +97,7 @@ mod tests {
             workflow_transitions: false,
             phase_breakdown: false,
             workflow_graph: false,
+            full: false,
         }
     }
 
@@ -272,5 +274,19 @@ mod tests {
 
         let result = analyze_metrics(&storage, options);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_analyze_full_flag() {
+        // Test that --full enables all sections
+        let (_temp_dir, storage) = test_storage_with_files(None, None);
+
+        let mut options = default_options();
+        options.full = true;
+
+        let result = analyze_metrics(&storage, options);
+        assert!(result.is_ok());
+        // With --full, all sections should be displayed
+        // (This test just verifies it runs without error)
     }
 }
