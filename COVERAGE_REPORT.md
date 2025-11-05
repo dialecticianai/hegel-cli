@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-04 19:17
+**Last Updated**: 2025-11-04 19:21
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **87.86%** lines | **86.76%** regions | **86.71%** functions
+**Overall Coverage**: **87.23%** lines | **86.24%** regions | **86.62%** functions
 
 ## Summary
 
 ```
-TOTAL                                      16831              2229    86.76%         903               120    86.71%       10170              1235    87.86%           0                 0         -
+TOTAL                                      16932              2330    86.24%         904               121    86.62%       10243              1308    87.23%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -18,7 +18,7 @@ TOTAL                                      16831              2229    86.76%    
 | `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
-| `src/commands/analyze/mod.rs` | 38.03% | 44.59% | 57.89% | 🔴 Needs Work |
+| `src/commands/analyze/mod.rs` | 30.25% | 36.71% | 55.00% | 🔴 Needs Work |
 | `src/commands/analyze/sections.rs` | 87.79% | 81.68% | 88.24% | 🟡 Good |
 | `src/commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
@@ -151,7 +151,7 @@ TOTAL                                      16831              2229    86.76%    
 - `src/main.rs` - 41.79%
 
 ### 🔴 Needs Work (<40% lines)
-- `src/commands/analyze/mod.rs` - 38.03%
+- `src/commands/analyze/mod.rs` - 30.25%
 - `src/commands/astq.rs` - 17.78%
 - `src/tui/mod.rs` - 11.36%
 
@@ -159,7 +159,7 @@ TOTAL                                      16831              2229    86.76%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 87.86% | ✅ Met |
+| Overall | ≥80% | 87.23% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
