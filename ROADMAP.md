@@ -35,6 +35,58 @@
 
 ---
 
+## Phase 1.0: Template System Improvements
+
+### Handlebar Templates for Guides and YAML Prompts
+
+**Goal:** Replace custom placeholder syntax with proper Handlebars templating for better expressiveness and tooling support.
+
+**Current state:**
+- Custom syntax: `{{GUIDE_NAME}}`, `{{?optional}}`, `{{variable}}`
+- Limited to simple substitution
+- No conditionals, loops, or helpers
+
+**Proposed:**
+- **Handlebars templates** for guides and workflow prompts
+- **Built-in helpers** for common patterns
+- **Conditional rendering** based on context
+- **Loops** for repeating sections
+- **Partials** for reusable prompt fragments
+
+**Benefits:**
+- Standard syntax (familiar to web devs)
+- Editor support (syntax highlighting, validation)
+- More expressive templates (if/else, each, with)
+- Better error messages
+- Composable prompt fragments
+
+**Example workflow node with Handlebars:**
+```yaml
+nodes:
+  spec:
+    prompt: |
+      You are in the SPEC phase.
+
+      {{> guides/SPEC_WRITING }}
+
+      {{#if context_note}}
+      Context: {{context_note}}
+      {{/if}}
+
+      {{#each recent_files}}
+      - Modified: {{this.path}} ({{this.changes}} lines)
+      {{/each}}
+```
+
+**Implementation:**
+- Replace `engine::template` module with Handlebars
+- Migrate existing guides to .hbs format
+- Add custom helpers (guide loading, file inclusion)
+- Update workflow YAML parser to use Handlebars
+- Maintain backward compatibility during transition
+
+---
+
 ## Phase 1.5: Incomplete Features (TODO Backlog)
 
 These features have partial implementations marked with `#[allow(dead_code)]` + TODO comments.
