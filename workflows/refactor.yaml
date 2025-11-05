@@ -7,20 +7,57 @@ nodes:
     prompt: |
       You are in the REVIEW phase of the Refactor workflow.
 
-      Perform adversarial code review.
+      **CRITICAL: Start with discussion, not assumptions.**
+
+      Your task: Collaborate with the user to identify what needs refactoring.
       {{?context_note}}
 
-      Review checklist:
-      - Correctness: Does code match intended behavior?
-      - Test coverage: Are all paths tested?
-      - Error handling: Are failures handled gracefully?
-      - Security: Any injection/traversal risks?
-      - Performance: Any obvious bottlenecks?
-      - Maintainability: Is code clear and documented?
+      **Step 1 - Ask the user:**
+      - What specific areas of the codebase need refactoring?
+      - What problems are they experiencing? (hard to navigate, repeated code, unclear structure)
+      - What's the scope? (specific files/modules, or broader architectural concerns)
+      - What's the goal? (token efficiency, clearer boundaries, extraction, splitting)
 
-      Identify areas that need refactoring and report findings clearly.
+      **Step 2 - After understanding scope, analyze using these principles:**
 
-      Respond when review is complete.
+      Refactoring purpose: Maximize token efficiency through DRY and SoC principles.
+
+      **Primary focus areas:**
+
+      1. **DRY (Don't Repeat Yourself) violations:**
+         - Duplicated code blocks that could be extracted to helpers
+         - Repeated patterns across multiple files/modules
+         - Copy-pasted logic that increases token overhead
+         - Similar implementations that could share abstractions
+
+      2. **SoC (Separation of Concerns) violations:**
+         - Mixed responsibilities in single files/functions
+         - Files exceeding 200 lines that should be split into submodules
+         - Business logic mixed with infrastructure code
+         - Unclear module boundaries and responsibilities
+         - God objects or modules doing too many things
+
+      **Analysis approach:**
+      - Identify high-token-cost patterns in the target area
+      - Look for natural split points and extraction opportunities
+      - Note which concerns are entangled and should be separated
+      - Prioritize changes that maximize token efficiency
+
+      **Out of scope (unless explicitly requested):**
+      - Adding test coverage
+      - Improving error handling
+      - Performance optimization
+      - Security hardening
+      - Functionality changes
+
+      **Step 3 - Discuss findings with user:**
+      - Present specific violations with file paths and line ranges
+      - Propose refactoring approach and confirm before proceeding
+      - Clarify priorities and scope boundaries
+
+      Do not proceed to refactoring until the user confirms the plan.
+
+      Respond when review discussion is complete and user approves proceeding.
     transitions:
       - when: "review_complete"
         to: refactor
@@ -29,27 +66,75 @@ nodes:
     prompt: |
       You are in the REFACTOR phase.
 
-      Your task: Address issues identified in review.
+      **CRITICAL: Discuss changes before implementing.**
+
+      Your task: Execute refactorings to maximize token-efficient legibility.
       {{?context_note}}
 
-      Refactoring requirements:
-      - Fix all issues identified in review
-      - Maintain or improve test coverage
+      **Before making changes:**
+      - Review the approved plan from the REVIEW phase
+      - Discuss specific implementation approach with the user
+      - Confirm naming, module structure, and splitting strategy
+      - Get approval before executing each major refactoring step
+
+      **Refactoring requirements:**
+      - Apply DRY: Extract duplicated code into helpers/abstractions
+      - Apply SoC: Split large files (>200 lines) into focused submodules
       - Preserve existing functionality (all tests must still pass)
-      - Update tests if behavior changes
-      - Document significant changes
-      - Keep commits atomic and well-described
+      - Keep commits atomic with clear descriptions
+      - Update imports/re-exports for backwards compatibility
 
-      Common refactoring patterns:
-      - Extract repeated code into helpers
-      - Simplify complex functions
-      - Improve naming clarity
-      - Reorganize file/module structure
-      - Optimize performance bottlenecks
+      **Common refactoring patterns:**
+      - Extract repeated code into helper functions/modules
+      - Split large files into submodules (one concern per module)
+      - Factor out shared abstractions across similar implementations
+      - Reorganize module structure for clearer boundaries
+      - Create focused modules with single responsibilities
 
-      Respond when refactoring is complete and all tests pass.
+      **Critical constraints:**
+      - DO NOT change functionality or behavior
+      - DO NOT add new features or test coverage
+      - DO NOT modify error handling or validation logic
+      - DO maintain backwards compatibility through re-exports
+
+      **Execution approach:**
+      - Propose each refactoring step before executing
+      - Show proposed module names, file structure, and responsibilities
+      - Wait for user confirmation before proceeding
+      - Execute incrementally, testing after each step
+
+      **Success criteria:**
+      - All existing tests pass without modification
+      - Token overhead reduced through DRY/SoC
+      - Code structure more navigable and context-efficient
+      - User approves final structure
+
+      Respond when refactoring is complete, all tests pass, and user approves.
     transitions:
       - when: "refactor_complete"
+        to: code_review
+
+  code_review:
+    prompt: |
+      You are in the CODE_REVIEW phase of the Refactor workflow.
+
+      {{CODE_MAP_WRITING}}
+
+      Your task: Update README code maps for areas touched during refactoring.
+      {{?context_note}}
+
+      Focus on:
+      - Identify which directories were modified during REFACTOR phase
+      - Update README files with code map changes for those directories
+      - In monolithic mode: Update the Code Structure section in root README.md
+      - In hierarchical mode: Update or create README.md files for modified directories
+      - Ensure descriptions accurately reflect current code structure
+      - Keep descriptions concise (1-3 sentences per file)
+      - Follow the code_map_style configured for this project
+
+      Respond when README code map updates are complete.
+    transitions:
+      - when: "code_review_complete"
         to: done
 
   done:
