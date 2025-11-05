@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 14:28
+**Last Updated**: 2025-11-05 14:30
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,310 | 9,591 | 23,901 |
-| **Comments** | 1,981 | - | 1,981 |
-| **Blank Lines** | 2,644 | - | 2,644 |
-| **Total Lines** | 18,935 | 9,591 | 28,526 |
+| **Lines** | 14,372 | 9,593 | 23,965 |
+| **Comments** | 1,988 | - | 1,988 |
+| **Blank Lines** | 2,656 | - | 2,656 |
+| **Total Lines** | 19,016 | 9,593 | 28,609 |
 | **Files** | 88 | 54 | 142 |
 
 **Documentation Ratio**: 0.67 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            88           2644           1981          14310
+Rust                            88           2656           1988          14372
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           103           2785           1981          14720
+SUM:                           103           2797           1988          14782
 -------------------------------------------------------------------------------
 ```
 
@@ -47,9 +47,9 @@ SUM:                           103           2785           1981          14720
 | `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `analyze/repair.rs` | 188 | 188 | 0 | 0.0% | ✅ |
-| `analyze/sections.rs` | 329 | 329 | 0 | 0.0% | ⚠️ Large |
+| `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
-| `commands/analyze/mod.rs` | 240 | 73 | 167 | 69.6% | ✅ |
+| `commands/analyze/mod.rs` | 276 | 82 | 194 | 70.3% | ✅ |
 | `commands/archive.rs` | 384 | 295 | 89 | 23.2% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
@@ -89,7 +89,7 @@ SUM:                           103           2785           1981          14720
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 393 | 14 | 379 | 96.4% | ✅ |
+| `main.rs` | 398 | 14 | 384 | 96.5% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 205 | 146 | 59 | 28.8% | ✅ |
 | `metrics/cowboy.rs` | 470 | 289 | 181 | 38.5% | ⚠️ Large |
@@ -169,7 +169,7 @@ SUM:                           103           2785           1981          14720
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 212 |
+| `LOC_REPORT.md` | 214 |
 | `README.md` | 584 |
 | `ROADMAP.md` | 202 |
 | `src/adapters/README.md` | 25 |

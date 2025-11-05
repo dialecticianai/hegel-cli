@@ -93,6 +93,9 @@ enum Commands {
         /// Output repair results as JSON (implies --dry-run, requires --fix-archives)
         #[arg(long, requires = "fix_archives")]
         json: bool,
+        /// Display brief cross-section summary
+        #[arg(long)]
+        brief: bool,
         /// Display activity section (session, tokens, activity)
         #[arg(long)]
         activity: bool,
@@ -326,6 +329,7 @@ fn main() -> Result<()> {
             fix_archives,
             dry_run,
             json,
+            brief,
             activity,
             workflow_transitions,
             phase_breakdown,
@@ -336,6 +340,7 @@ fn main() -> Result<()> {
                 fix_archives,
                 dry_run,
                 json,
+                brief,
                 activity,
                 workflow_transitions,
                 phase_breakdown,

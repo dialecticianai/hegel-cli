@@ -1,7 +1,11 @@
 use anyhow::Result;
 
 use crate::analyze::repair::repair_archives;
-use crate::analyze::sections::*;
+use crate::analyze::sections::{
+    render_activity, render_brief, render_command_output_summary, render_phase_breakdown,
+    render_session, render_state_transitions, render_tokens, render_top_bash_commands,
+    render_top_file_modifications, render_workflow_graph, render_workflow_graph_dot,
+};
 use crate::metrics::parse_unified_metrics;
 use crate::storage::FileStorage;
 use crate::theme::Theme;
@@ -11,6 +15,7 @@ pub struct AnalyzeOptions {
     pub fix_archives: bool,
     pub dry_run: bool,
     pub json: bool,
+    pub brief: bool,
     pub activity: bool,
     pub workflow_transitions: bool,
     pub phase_breakdown: bool,
@@ -47,6 +52,10 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
+    if options.brief {
+        render_brief(&metrics);
+    }
+
     if show_activity {
         render_session(&metrics);
         render_tokens(&metrics);
@@ -82,6 +91,7 @@ mod tests {
             fix_archives: false,
             dry_run: false,
             json: false,
+            brief: false,
             activity: false,
             workflow_transitions: false,
             phase_breakdown: false,
@@ -235,6 +245,32 @@ mod tests {
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
         let result = analyze_metrics(&storage, default_options());
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_analyze_brief_flag() {
+        // Test brief rendering with sample data
+        let transcript_events = vec![
+            r#"{"type":"assistant","timestamp":"2025-01-01T10:05:00Z","message":{"usage":{"input_tokens":100,"output_tokens":50}}}"#,
+        ];
+        let (_transcript_temp, transcript_path) = create_transcript_file(&transcript_events);
+
+        let states = vec![
+            r#"{"timestamp":"2025-01-01T10:00:00Z","workflow_id":"2025-01-01T10:00:00Z","from_node":"START","to_node":"spec","phase":"spec","mode":"discovery"}"#,
+        ];
+
+        let hook = hook_with_transcript(&transcript_path, "test-brief", "2025-01-01T10:00:00Z");
+        let hooks = vec![
+            hook.as_str(),
+            r#"{"session_id":"test-brief","hook_event_name":"PostToolUse","tool_name":"Bash","timestamp":"2025-01-01T10:05:00Z","tool_input":{"command":"cargo build"}}"#,
+        ];
+        let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
+
+        let mut options = default_options();
+        options.brief = true;
+
+        let result = analyze_metrics(&storage, options);
         assert!(result.is_ok());
     }
 }

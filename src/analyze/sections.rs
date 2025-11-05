@@ -12,6 +12,46 @@ fn format_total(value: impl Display) -> String {
     Theme::metric_total(format!("{:>10}", value)).to_string()
 }
 
+/// Render brief cross-section summary
+pub fn render_brief(metrics: &UnifiedMetrics) {
+    println!("{}", Theme::header("Brief Summary"));
+    println!();
+
+    // Session
+    if let Some(session_id) = &metrics.session_id {
+        println!("  Session: {}", Theme::secondary(session_id));
+    }
+
+    // Tokens
+    if metrics.token_metrics.assistant_turns > 0 {
+        println!(
+            "  Tokens: {} in, {} out ({} cache)",
+            Theme::highlight(&metrics.token_metrics.total_input_tokens.to_string()),
+            Theme::highlight(&metrics.token_metrics.total_output_tokens.to_string()),
+            Theme::secondary(&metrics.token_metrics.total_cache_read_tokens.to_string())
+        );
+    }
+
+    // Activity
+    println!(
+        "  Activity: {} commands, {} files, {} commits",
+        Theme::highlight(&metrics.hook_metrics.bash_commands.len().to_string()),
+        Theme::highlight(&metrics.hook_metrics.file_modifications.len().to_string()),
+        Theme::highlight(&metrics.git_commits.len().to_string())
+    );
+
+    // Workflows
+    let transition_count = metrics.state_transitions.len();
+    let phase_count = metrics.phase_metrics.len();
+    println!(
+        "  Workflows: {} transitions, {} phases",
+        Theme::highlight(&transition_count.to_string()),
+        Theme::highlight(&phase_count.to_string())
+    );
+
+    println!();
+}
+
 /// Render session information section
 pub fn render_session(metrics: &UnifiedMetrics) {
     println!("{}", Theme::header("Session"));
