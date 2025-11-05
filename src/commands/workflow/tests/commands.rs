@@ -107,6 +107,90 @@ fn test_next_prompt_multiple_transitions() {
     );
 }
 
+// ========== prev_prompt Tests ==========
+
+#[test]
+fn test_prev_prompt_successful_transition() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    next(&storage); // spec -> plan
+    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+
+    prev_prompt(&storage).unwrap();
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+}
+
+#[test]
+fn test_prev_prompt_at_start_fails() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+
+    let result = prev_prompt(&storage);
+    assert!(result.is_err());
+    let err_msg = result.unwrap_err().to_string();
+    assert!(err_msg.contains("Cannot go back"));
+    assert!(err_msg.contains("already at the start"));
+}
+
+#[test]
+fn test_prev_prompt_no_workflow_loaded() {
+    let (_tmp, storage) = setup_workflow_env();
+    let result = prev_prompt(&storage);
+    assert!(
+        result.is_err()
+            && result
+                .unwrap_err()
+                .to_string()
+                .contains("No workflow loaded")
+    );
+}
+
+#[test]
+fn test_prev_prompt_multiple_transitions() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    next(&storage); // spec -> plan
+    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+
+    prev_prompt(&storage).unwrap(); // plan -> spec
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+
+    // Go forward again and back again to test it multiple times
+    next(&storage); // spec -> plan
+    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+
+    prev_prompt(&storage).unwrap(); // plan -> spec
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+}
+
+#[test]
+fn test_prev_then_next() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    next(&storage); // spec -> plan
+    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+
+    prev_prompt(&storage).unwrap(); // plan -> spec
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+
+    next(&storage); // spec -> plan (should work again)
+    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+}
+
+#[test]
+fn test_prev_prompt_logs_transition() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    next(&storage); // spec -> plan
+
+    let count_before = transition_count(&storage);
+    prev_prompt(&storage).unwrap(); // plan -> spec
+    let count_after = transition_count(&storage);
+
+    assert_eq!(count_after, count_before + 1);
+}
+
 // ========== show_status Tests ==========
 
 #[test]

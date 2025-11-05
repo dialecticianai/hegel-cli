@@ -217,6 +217,9 @@ Hegel provides ergonomic commands for common workflow transitions:
 # Happy path: advance to next phase
 hegel next
 
+# Go back to previous phase (undo accidental advancement)
+hegel prev
+
 # Repeat current phase (e.g., after addressing feedback)
 hegel repeat
 

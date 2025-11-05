@@ -30,7 +30,7 @@ pub use pm::run_pm;
 pub use reflect::run_reflect;
 pub use status::show_status;
 pub use workflow::{
-    abort_workflow, list_guides, list_workflows, next_prompt, repeat_prompt, reset_workflow,
-    restart_workflow, start_workflow,
+    abort_workflow, list_guides, list_workflows, next_prompt, prev_prompt, repeat_prompt,
+    reset_workflow, restart_workflow, start_workflow,
 };
 pub use wrapped::run_wrapped_command;

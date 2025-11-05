@@ -60,6 +60,9 @@ enum Commands {
         /// If omitted, uses happy-path claim: {current}_complete
         claim: Option<String>,
     },
+    /// Go back to previous phase
+    #[command(visible_alias = "previous")]
+    Prev,
     /// Repeat current phase (claim: current_complete=false)
     Repeat,
     /// Restart workflow cycle (claim: restart_cycle=true)
@@ -283,6 +286,9 @@ fn main() -> Result<()> {
         }
         Commands::Next { claim } => {
             commands::next_prompt(claim.as_deref(), &storage)?;
+        }
+        Commands::Prev => {
+            commands::prev_prompt(&storage)?;
         }
         Commands::Repeat => {
             commands::repeat_prompt(&storage)?;

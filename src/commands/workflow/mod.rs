@@ -237,6 +237,89 @@ pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
     advance_workflow(ClaimAlias::Restart, storage)
 }
 
+pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
+    use chrono::Utc;
+
+    // Load current state
+    let state = storage.load()?;
+
+    let workflow_yaml = state
+        .workflow
+        .as_ref()
+        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
+
+    let mut workflow_state = state
+        .workflow_state
+        .clone()
+        .context("No workflow state found")?;
+
+    // Parse workflow from stored YAML value
+    let workflow: crate::engine::Workflow =
+        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+
+    // Validate we can go back
+    if workflow_state.history.len() <= 1 {
+        anyhow::bail!(
+            "Cannot go back: already at the start of the workflow (node: {})",
+            workflow_state.current_node
+        );
+    }
+
+    // Get previous node from history
+    let from_node = workflow_state.current_node.clone();
+
+    // Pop current node from history
+    workflow_state.history.pop();
+
+    // Get the new current node (last item in history)
+    let to_node = workflow_state
+        .history
+        .last()
+        .context("History should not be empty after pop")?
+        .clone();
+
+    // Update current node
+    workflow_state.current_node = to_node.clone();
+    workflow_state.phase_start_time = Some(Utc::now().to_rfc3339());
+
+    // Get node for display
+    let node = workflow
+        .nodes
+        .get(&to_node)
+        .with_context(|| format!("Node not found: {}", to_node))?;
+
+    // Persist state
+    let updated_state = State {
+        workflow: Some(serde_yaml::to_value(&workflow)?),
+        workflow_state: Some(workflow_state.clone()),
+        session_metadata: state.session_metadata,
+        cumulative_totals: state.cumulative_totals,
+        git_info: state.git_info,
+    };
+    storage.save(&updated_state)?;
+
+    // Log transition (backward)
+    storage.log_state_transition(
+        &from_node,
+        &to_node,
+        &workflow_state.mode,
+        workflow_state.workflow_id.as_deref(),
+    )?;
+
+    // Display transition
+    println!(
+        "{} {} {} {}",
+        Theme::success("Went back:").bold(),
+        Theme::secondary(&from_node),
+        Theme::secondary("←"),
+        Theme::highlight(&to_node)
+    );
+    println!();
+    display_workflow_prompt(&to_node, &workflow_state.mode, &node.prompt, storage)?;
+
+    Ok(())
+}
+
 /// List all available workflows
 pub fn list_workflows(storage: &FileStorage) -> Result<()> {
     use std::collections::HashSet;
