@@ -55,27 +55,7 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 
 ## Phase 2: Safety and Orchestration
 
-### 2.0 Improve `hegel analyze` Output - Summary Default
-
-**Goal:** Make `hegel analyze` more useful by providing summary mode by default and detail flags for deeper inspection.
-
-**Current state:**
-- ✅ Section flags implemented: `--summary`, `--workflow-transitions`, `--phase-breakdown`, `--workflow-graph`
-- ❌ Default behavior shows ALL sections (3000+ lines for projects with ~250 commits)
-- ❌ No `--full` flag to explicitly request all sections
-
-**Remaining work:**
-- **Flip default behavior**: Show only `--summary` section when no flags provided
-- **Add `--full` flag**: Enable all sections (current default behavior)
-- This makes the command scalable as project history grows
-
-**Benefits:**
-- Quick glance at project health (default)
-- Progressive detail as needed (via section flags)
-- Scalable to large projects
-- Still preserves all detailed metrics when requested (via `--full`)
-
-### 2.1 Mode-Specific Subagents
+### 2.0 Mode-Specific Subagents
 
 **Goal:** Integration with platform subagent features (Claude Code Task tool, Cursor agent spawning, etc.)
 
