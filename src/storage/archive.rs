@@ -323,7 +323,7 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::metrics::{HookMetrics, PhaseMetrics, StateTransitionEvent, TokenMetrics};
+    use crate::metrics::{HookMetrics, StateTransitionEvent, TokenMetrics};
     use crate::test_helpers::test_phase_metrics;
 
     use tempfile::TempDir;

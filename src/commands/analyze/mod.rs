@@ -251,6 +251,7 @@ fn backfill_git_metrics(
             bash_commands: vec![],
             file_modifications: vec![],
             git_commits: vec![],
+            is_synthetic: archive.is_synthetic,
         })
         .collect();
 

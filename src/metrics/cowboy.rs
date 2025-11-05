@@ -7,7 +7,7 @@ use chrono::{DateTime, Duration, Utc};
 use crate::metrics::{
     git::GitCommit,
     hooks::{BashCommand, FileModification, HookMetrics},
-    transcript::{TokenUsage, TranscriptEvent},
+    transcript::TranscriptEvent,
     PhaseMetrics, StateTransitionEvent, TokenMetrics, UnifiedMetrics,
 };
 use crate::storage::archive::WorkflowArchive;
@@ -321,7 +321,7 @@ mod tests {
     }
 
     fn test_transcript(timestamp: &str) -> TranscriptEvent {
-        use crate::metrics::transcript::MessageWrapper;
+        use crate::metrics::transcript::{MessageWrapper, TokenUsage};
         use std::collections::HashMap;
 
         TranscriptEvent {
