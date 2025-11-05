@@ -106,7 +106,26 @@
 ## Session Continuity Vectors
 
 **Coverage target**: ≥80% lines (current: ~85%)
-**Commit format**: Conventional commits (`type(scope): subject`). Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`. Always include footer with Claude Code attribution.
+
+**Commit format**: Conventional commits (`type(scope): subject`).
+
+**Types**: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+**Message guidelines**:
+- **Keep concise** - Short subject + body to minimize token usage in pre-commit hooks
+- **Extended messages** - Only for extremely large/complex commits (subjective judgment)
+- **Always include** - Claude Code attribution footer (required for all commits)
+- **Format**:
+  ```
+  type(scope): brief subject line
+
+  Optional brief body (1-3 sentences for larger commits)
+
+  🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
+
 **Pre-commit hooks**: Auto-format, update coverage/LOC reports, auto-stage
 **Tests**: TDD discipline. `cargo test` before commits.
 
