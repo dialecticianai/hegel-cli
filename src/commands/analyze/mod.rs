@@ -39,21 +39,25 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
     }
 
     // Determine which sections to display
-    // If no flags provided, show all sections
-    let show_all = !options.activity
+    // If no section flags provided, show brief only
+    let no_section_flags = !options.brief
+        && !options.activity
         && !options.workflow_transitions
         && !options.phase_breakdown
-        && !options.workflow_graph;
-    let show_activity = show_all || options.full || options.activity;
-    let show_workflow_transitions = show_all || options.full || options.workflow_transitions;
-    let show_phase_breakdown = show_all || options.full || options.phase_breakdown;
-    let show_workflow_graph = show_all || options.full || options.workflow_graph;
+        && !options.workflow_graph
+        && !options.full;
+
+    let show_brief = options.brief || no_section_flags;
+    let show_activity = options.full || options.activity;
+    let show_workflow_transitions = options.full || options.workflow_transitions;
+    let show_phase_breakdown = options.full || options.phase_breakdown;
+    let show_workflow_graph = options.full || options.workflow_graph;
 
     // Render selected sections
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
-    if options.brief {
+    if show_brief {
         render_brief(&metrics);
     }
 
@@ -287,6 +291,19 @@ mod tests {
         let result = analyze_metrics(&storage, options);
         assert!(result.is_ok());
         // With --full, all sections should be displayed
+        // (This test just verifies it runs without error)
+    }
+
+    #[test]
+    fn test_analyze_default_shows_brief_only() {
+        // Test that default (no flags) shows only brief
+        let (_temp_dir, storage) = test_storage_with_files(None, None);
+
+        let options = default_options();
+
+        let result = analyze_metrics(&storage, options);
+        assert!(result.is_ok());
+        // With no flags, should show brief only (not all sections)
         // (This test just verifies it runs without error)
     }
 }
