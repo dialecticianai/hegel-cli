@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 14:32
+**Last Updated**: 2025-11-05 14:33
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,396 | 9,610 | 24,006 |
-| **Comments** | 1,995 | - | 1,995 |
-| **Blank Lines** | 2,663 | - | 2,663 |
-| **Total Lines** | 19,054 | 9,610 | 28,664 |
+| **Lines** | 14,414 | 9,610 | 24,024 |
+| **Comments** | 1,999 | - | 1,999 |
+| **Blank Lines** | 2,669 | - | 2,669 |
+| **Total Lines** | 19,082 | 9,610 | 28,692 |
 | **Files** | 88 | 54 | 142 |
 
 **Documentation Ratio**: 0.67 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            88           2663           1995          14396
+Rust                            88           2669           1999          14414
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           103           2804           1995          14806
+SUM:                           103           2810           1999          14824
 -------------------------------------------------------------------------------
 ```
 
@@ -49,7 +49,7 @@ SUM:                           103           2804           1995          14806
 | `analyze/repair.rs` | 188 | 188 | 0 | 0.0% | ✅ |
 | `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
-| `commands/analyze/mod.rs` | 309 | 87 | 222 | 71.8% | ✅ |
+| `commands/analyze/mod.rs` | 337 | 87 | 250 | 74.2% | ✅ |
 | `commands/archive.rs` | 384 | 295 | 89 | 23.2% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |

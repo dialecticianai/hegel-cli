@@ -306,4 +306,32 @@ mod tests {
         // With no flags, should show brief only (not all sections)
         // (This test just verifies it runs without error)
     }
+
+    #[test]
+    fn test_analyze_brief_plus_activity() {
+        // Test that --brief can combine with other sections
+        let (_temp_dir, storage) = test_storage_with_files(None, None);
+
+        let mut options = default_options();
+        options.brief = true;
+        options.activity = true;
+
+        let result = analyze_metrics(&storage, options);
+        assert!(result.is_ok());
+        // Should show both brief and activity sections
+    }
+
+    #[test]
+    fn test_analyze_individual_sections() {
+        // Test that individual section flags work without --brief or --full
+        let (_temp_dir, storage) = test_storage_with_files(None, None);
+
+        let mut options = default_options();
+        options.workflow_transitions = true;
+        options.phase_breakdown = true;
+
+        let result = analyze_metrics(&storage, options);
+        assert!(result.is_ok());
+        // Should show only the requested sections (not brief, not full)
+    }
 }
