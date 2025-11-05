@@ -394,26 +394,39 @@ View captured development activity and metrics:
 hegel analyze
 ```
 
-Shows:
-- Session ID and workflow summary
-- Token usage (input/output/cache metrics from transcripts)
-- Activity summary (bash commands, file modifications)
-- Top commands and most-edited files
-- Workflow state transitions
-- **Phase breakdown** - Per-phase metrics including:
-  - Duration (time spent in each phase)
-  - Token usage (input/output tokens per phase)
-  - Activity (bash commands and file edits per phase)
-  - Git commits (count, files changed, insertions/deletions) - automatically detected when `.git` directory exists
-  - Status (active or completed)
-- **Workflow graph** - ASCII visualization of phase transitions:
-  - Node metrics (visits, tokens, duration, bash commands, file edits)
-  - Cycle detection (identifies workflow loops)
-  - Export to Graphviz DOT format:
-    ```bash
-    hegel analyze --export-dot > workflow.dot
-    dot -Tpng workflow.dot -o workflow.png
-    ```
+**Default output** (brief summary):
+- Session ID
+- Token totals (input/output/cache)
+- Activity counts (commands, files, commits)
+- Workflow/phase counts
+- Recent transitions
+
+**Progressive disclosure** via flags:
+```bash
+# Show specific sections
+hegel analyze --activity           # Session, tokens, commands, files
+hegel analyze --workflow-transitions  # State transition history
+hegel analyze --phase-breakdown      # Per-phase metrics
+hegel analyze --workflow-graph       # ASCII visualization
+
+# Show all sections (old default behavior)
+hegel analyze --full
+
+# Combine sections
+hegel analyze --brief --phase-breakdown  # Brief + phases
+
+# Export workflow graph to DOT format
+hegel analyze --export-dot > workflow.dot
+dot -Tpng workflow.dot -o workflow.png
+```
+
+**Section details:**
+
+- **Brief** (default): Cross-section summary of key metrics
+- **Activity** (`--activity`): Session, tokens, top bash commands, top file modifications
+- **Workflow Transitions** (`--workflow-transitions`): Complete state transition history
+- **Phase Breakdown** (`--phase-breakdown`): Per-phase metrics (duration, tokens, activity, git commits)
+- **Workflow Graph** (`--workflow-graph`): ASCII visualization with node metrics and cycle detection
 
 ### Interactive Dashboard
 
