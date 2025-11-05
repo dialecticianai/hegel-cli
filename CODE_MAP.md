@@ -114,9 +114,12 @@ hegel-cli/
 │   │   ├── init.rs              # Project initialization (greenfield vs retrofit workflow detection)
 │   │   ├── config.rs            # Configuration commands (get, set, list config values)
 │   │   ├── fork/                # External agent orchestration (Phase 2.2)
-│   │   │   ├── mod.rs           # Agent detection, version checking, execution (semver-based compatibility)
-│   │   │   ├── codex.rs         # Codex agent implementation (codex exec, passthrough args)
-│   │   │   ├── gemini.rs        # Gemini agent implementation (positional args, -o json support)
+│   │   │   ├── mod.rs           # Agent detection and display (detect_agents, display_agents, handle_fork)
+│   │   │   ├── runtime.rs       # Runtime version management (Node.js/Python version checking, nvm compatibility, execute_agent)
+│   │   │   ├── amp.rs           # Amp agent adapter (build_args for Sourcegraph Amp)
+│   │   │   ├── codex.rs         # Codex agent adapter (codex exec, passthrough args)
+│   │   │   ├── cody.rs          # Cody agent adapter (stdin support, passthrough args)
+│   │   │   ├── gemini.rs        # Gemini agent adapter (positional args, -o json support)
 │   │   │   └── generic.rs       # Generic fallback for unknown agents
 │   │   ├── workflow/            # Workflow orchestration
 │   │   │   ├── mod.rs           # Command handlers (start, next, status, reset, abort, repeat, restart)
@@ -130,9 +133,15 @@ hegel-cli/
 │   │   │       ├── integration.rs # End-to-end workflow tests
 │   │   │       ├── production.rs  # Production workflow validation
 │   │   │       └── node_flow.rs   # Node flow extraction tests
-│   │   └── analyze/             # Metrics analysis and display (hegel analyze)
-│   │       ├── mod.rs           # Main analyze command orchestrator
-│   │       └── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
+│   │   ├── analyze/             # Metrics analysis and display (hegel analyze)
+│   │   │   └── mod.rs           # Main analyze orchestrator (routing to sections or repair, ~50 lines)
+│   │   └── analyze_impl/        # Analyze implementation modules (refactored from analyze/mod.rs)
+│   │       ├── mod.rs           # Module exports
+│   │       ├── sections.rs      # Rendering sections (session, tokens, activity, top commands/files, transitions, phases, graph)
+│   │       ├── repair.rs        # Archive repair orchestration (backfill, cowboy detection, reporting)
+│   │       ├── backfill.rs      # Git metrics backfill (re-parse git history, attribute to phases)
+│   │       ├── gap_detection.rs # Workflow gap detection (identify and create synthetic cowboy archives)
+│   │       └── totals.rs        # Cumulative totals rebuilding (sum archive totals, update state)
 │   │
 │   ├── engine/                  # Layer 2: State machine and template rendering
 │   │   ├── mod.rs               # Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt (integrates rules)
@@ -152,7 +161,12 @@ hegel-cli/
 │   │   └── interrupt.rs         # Interrupt protocol (rule violation → prompt injection)
 │   │
 │   ├── storage/                 # Layer 4: Atomic persistence and event logging
-│   │   └── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, parent dir discovery, file locking)
+│   │   ├── mod.rs               # FileStorage (load/save/clear state.json, log_state_transition → states.jsonl, parent dir discovery, file locking)
+│   │   └── archive/             # Workflow archive storage with pre-computed aggregates
+│   │       ├── mod.rs           # Core types (WorkflowArchive, PhaseArchive, TokenTotals) + I/O (read/write_archive)
+│   │       ├── builder.rs       # Archive construction (WorkflowArchive::from_metrics)
+│   │       ├── aggregation.rs   # Aggregation utilities with DRY helpers (aggregate_bash_commands, aggregate_file_modifications, compute_totals)
+│   │       └── validation.rs    # Input validation (validate_workflow_id for path safety)
 │   │
 │   ├── metrics/                 # Layer 5: Event stream parsing, aggregation, and visualization
 │   │   ├── mod.rs               # Unified metrics orchestrator, parse_unified_metrics entry point
