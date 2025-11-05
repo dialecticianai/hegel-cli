@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 13:41
+**Last Updated**: 2025-11-05 14:28
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,310 | 9,210 | 23,520 |
+| **Lines** | 14,310 | 9,591 | 23,901 |
 | **Comments** | 1,981 | - | 1,981 |
 | **Blank Lines** | 2,644 | - | 2,644 |
-| **Total Lines** | 18,935 | 9,210 | 28,145 |
-| **Files** | 88 | 52 | 140 |
+| **Total Lines** | 18,935 | 9,591 | 28,526 |
+| **Files** | 88 | 54 | 142 |
 
-**Documentation Ratio**: 0.64 lines of docs per line of code
+**Documentation Ratio**: 0.67 lines of docs per line of code
 
 ---
 
@@ -134,6 +134,8 @@ SUM:                           103           2785           1981          14720
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/analyze_summary_default_PLAN.md` | 175 |
+| `.ddd/feat/analyze_summary_default.md` | 215 |
 | `.ddd/feat/done-node-refactor/PLAN.md` | 84 |
 | `.ddd/feat/done-node-refactor/SPEC.md` | 80 |
 | `.ddd/feat/git-commit-metrics/PLAN.md` | 402 |
@@ -167,9 +169,9 @@ SUM:                           103           2785           1981          14720
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 211 |
+| `LOC_REPORT.md` | 212 |
 | `README.md` | 584 |
-| `ROADMAP.md` | 212 |
+| `ROADMAP.md` | 202 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 26 |
@@ -193,7 +195,7 @@ SUM:                           103           2785           1981          14720
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.64 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.67 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

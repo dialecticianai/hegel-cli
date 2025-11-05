@@ -11,7 +11,7 @@ pub struct AnalyzeOptions {
     pub fix_archives: bool,
     pub dry_run: bool,
     pub json: bool,
-    pub summary: bool,
+    pub activity: bool,
     pub workflow_transitions: bool,
     pub phase_breakdown: bool,
     pub workflow_graph: bool,
@@ -34,11 +34,11 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
 
     // Determine which sections to display
     // If no flags provided, show all sections
-    let show_all = !options.summary
+    let show_all = !options.activity
         && !options.workflow_transitions
         && !options.phase_breakdown
         && !options.workflow_graph;
-    let show_summary = show_all || options.summary;
+    let show_activity = show_all || options.activity;
     let show_workflow_transitions = show_all || options.workflow_transitions;
     let show_phase_breakdown = show_all || options.phase_breakdown;
     let show_workflow_graph = show_all || options.workflow_graph;
@@ -47,7 +47,7 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
-    if show_summary {
+    if show_activity {
         render_session(&metrics);
         render_tokens(&metrics);
         render_activity(&metrics);
@@ -82,7 +82,7 @@ mod tests {
             fix_archives: false,
             dry_run: false,
             json: false,
-            summary: false,
+            activity: false,
             workflow_transitions: false,
             phase_breakdown: false,
             workflow_graph: false,
