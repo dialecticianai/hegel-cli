@@ -51,9 +51,9 @@ nodes:
       - Functionality changes
 
       **Step 3 - Document analysis:**
-      - Write refactor analysis to `.ddd/refactor/<date>_<description>.md`
+      - Write refactor analysis to `.ddd/refactor/<date>-<description>.md`
       - Include: files targeted, SoC/DRY violations identified, proposed splits, rationale, token savings
-      - Use format: YYYY-MM-DD for date, kebab-case for description
+      - Use format: YYYYMMDD for date, snake_case for description
       - Run `hegel reflect .ddd/refactor/<filename>.md` to launch review GUI
 
       **Step 4 - Discuss findings with user:**
