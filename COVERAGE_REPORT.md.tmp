@@ -1,0 +1,59 @@
+# Test Coverage Report
+
+**Last Updated**: 2025-11-04 21:03
+**Tool**: cargo-llvm-cov
+**Overall Coverage**: **87.21%** lines | **86.25%** regions | **86.69%** functions
+
+## Summary
+
+```
+TOTAL                                      16947              2331    86.25%         909               121    86.69%       10264              1313    87.21%           0                 0         -
+```
+
+## Coverage by Module
+
+| Module | Line Coverage | Region Coverage | Functions | Status |
+|--------|--------------|-----------------|-----------|--------|
+| `src/adapters/claude_code.rs` | 93.82% | 94.29% | 90.00% | 🟢 Excellent |
+| `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
+| `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
+| `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
+| `src/commands/analyze/mod.rs` | 30.25% | 36.71% | 55.00% | 🔴 Needs Work |
+| `src/commands/analyze/sections.rs` | 87.79% | 81.68% | 88.24% | 🟡 Good |
+| `src/commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
+| `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
+| `src/commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
+| `src/commands/external_bin.rs` | 53.19% | 48.68% | 50.00% | 🟠 Moderate |
+| `src/commands/fork/amp.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `src/commands/fork/codex.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `src/commands/fork/cody.rs` | 100.00% | 98.41% | 100.00% | 🟢 Excellent |
+| `src/commands/fork/gemini.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `src/commands/fork/generic.rs` | 100.00% | 97.14% | 100.00% | 🟢 Excellent |
+| `src/commands/fork/mod.rs` | 73.68% | 73.06% | 100.00% | 🟡 Good |
+| `src/commands/fork/runtime.rs` | 44.20% | 52.80% | 63.64% | 🟠 Moderate |
+| `src/commands/git.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `src/commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
+| `src/commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
+| `src/commands/init.rs` | 93.44% | 93.56% | 100.00% | 🟢 Excellent |
+| `src/commands/meta.rs` | 64.67% | 70.71% | 83.33% | 🟠 Moderate |
+| `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
+| `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
+| `src/commands/status.rs` | 43.21% | 37.91% | 50.00% | 🟠 Moderate |
+| `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
+| `src/commands/workflow/context.rs` | 100.00% | 93.06% | 100.00% | 🟢 Excellent |
+| `src/commands/workflow/mod.rs` | 50.72% | 50.30% | 50.00% | 🟠 Moderate |
+| `src/commands/workflow/transitions.rs` | 83.89% | 77.83% | 56.25% | 🟡 Good |
+| `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
+| `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
+| `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
+| `src/engine/mod.rs` | 99.83% | 99.63% | 97.50% | 🟢 Excellent |
+| `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
+| `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
+| `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
+| `src/main.rs` | 41.79% | 36.08% | 100.00% | 🟠 Moderate |
+| `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
+| `src/metrics/aggregation.rs` | 97.22% | 95.52% | 100.00% | 🟢 Excellent |
+| `src/metrics/cowboy.rs` | 93.69% | 89.18% | 100.00% | 🟢 Excellent |
+| `src/metrics/git.rs` | 92.43% | 91.65% | 95.45% | 🟢 Excellent |
+| `src/metrics/graph.rs` | 98.34% | 98.28% | 100.00% | 🟢 Excellent |
+| `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |

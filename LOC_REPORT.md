@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 20:58
+**Last Updated**: 2025-11-04 21:04
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,814 | 8,831 | 22,645 |
-| **Comments** | 1,913 | - | 1,913 |
-| **Blank Lines** | 2,555 | - | 2,555 |
-| **Total Lines** | 18,282 | 8,831 | 27,113 |
-| **Files** | 80 | 38 | 118 |
+| **Lines** | 13,830 | 8,837 | 22,667 |
+| **Comments** | 1,914 | - | 1,914 |
+| **Blank Lines** | 2,557 | - | 2,557 |
+| **Total Lines** | 18,301 | 8,837 | 27,138 |
+| **Files** | 81 | 38 | 119 |
 
 **Documentation Ratio**: 0.64 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            80           2555           1913          13814
+Rust                            81           2557           1914          13830
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            81           2586           1913          13902
+SUM:                            82           2588           1914          13918
 -------------------------------------------------------------------------------
 ```
 
@@ -52,7 +52,8 @@ SUM:                            81           2586           1913          13902
 | `commands/fork/cody.rs` | 48 | 21 | 27 | 56.2% | ✅ |
 | `commands/fork/gemini.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/generic.rs` | 37 | 20 | 17 | 45.9% | ✅ |
-| `commands/fork/mod.rs` | 536 | 426 | 110 | 20.5% | ⚠️ Large |
+| `commands/fork/mod.rs` | 304 | 248 | 56 | 18.4% | ⚠️ Large |
+| `commands/fork/runtime.rs` | 251 | 193 | 58 | 23.1% | ✅ |
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
@@ -138,7 +139,7 @@ SUM:                            81           2586           1913          13902
 | `CLAUDE.md` | 174 |
 | `CODE_MAP.md` | 216 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 192 |
+| `COVERAGE_REPORT.md` | 194 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -159,7 +160,7 @@ SUM:                            81           2586           1913          13902
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 186 |
+| `LOC_REPORT.md` | 190 |
 | `README.md` | 581 |
 | `ROADMAP.md` | 212 |
 | `src/test_helpers/README.md` | 119 |
