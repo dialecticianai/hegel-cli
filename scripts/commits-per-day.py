@@ -18,32 +18,59 @@ def get_commits_per_day():
     return Counter(dates)
 
 def print_bars(sorted_days):
-    """Print ASCII bar graph with up to 10 X's per day"""
+    """Print ASCII bar graph with up to 10 X's per day, wrapping on month boundaries"""
     if not sorted_days:
         return
 
-    max_count = max(count for _, count in sorted_days)
-
-    # Print bars vertically (10 rows tall)
-    for row in range(10, 0, -1):
-        threshold = (row / 10) * max_count
-        line = ""
-        for _, count in sorted_days:
-            if count >= threshold:
-                line += "X "
-            else:
-                line += "  "
-        print(line)
-
-    # Print separator and dates
-    width = len(sorted_days) * 2
-    print("─" * width)
-
-    # Print first and last date aligned to ends
+    # Get first commit day to determine wrap boundaries
     first_date = sorted_days[0][0]
-    last_date = sorted_days[-1][0]
-    spacing = " " * (width - len(first_date) - len(last_date))
-    print(f"{first_date}{spacing}{last_date}")
+    first_day = int(first_date.split('-')[2])
+
+    # Split into month chunks (wrapping on the anniversary day)
+    chunks = []
+    current_chunk = []
+
+    for date, count in sorted_days:
+        day = int(date.split('-')[2])
+
+        # Start new chunk if we've reached the wrap day and we have data
+        if current_chunk and day == first_day:
+            chunks.append(current_chunk)
+            current_chunk = []
+
+        current_chunk.append((date, count))
+
+    # Add final chunk
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    # Print each chunk
+    for i, chunk in enumerate(chunks):
+        if i > 0:
+            print()  # Blank line between chunks
+
+        max_count = max(count for _, count in chunk)
+
+        # Print bars vertically (10 rows tall)
+        for row in range(10, 0, -1):
+            threshold = (row / 10) * max_count
+            line = ""
+            for _, count in chunk:
+                if count >= threshold:
+                    line += "X "
+                else:
+                    line += "  "
+            print(line)
+
+        # Print separator and dates
+        width = len(chunk) * 2
+        print("─" * width)
+
+        # Print first and last date aligned to ends
+        chunk_first = chunk[0][0]
+        chunk_last = chunk[-1][0]
+        spacing = " " * (width - len(chunk_first) - len(chunk_last))
+        print(f"{chunk_first}{spacing}{chunk_last}")
 
 def main():
     parser = argparse.ArgumentParser(description='Count commits per day from git history')
