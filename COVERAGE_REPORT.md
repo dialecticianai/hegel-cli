@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-04 21:43
+**Last Updated**: 2025-11-05 10:54
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **87.25%** lines | **86.24%** regions | **86.61%** functions
 
 ## Summary
 
 ```
-TOTAL                                            17036              2345    86.24%         911               122    86.61%       10318              1316    87.25%           0                 0         -
+TOTAL                                            17036              2344    86.24%         911               122    86.61%       10318              1316    87.25%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -59,7 +59,7 @@ TOTAL                                            17036              2345    86.2
 | `src/metrics/aggregation.rs` | 97.22% | 95.52% | 100.00% | 🟢 Excellent |
 | `src/metrics/cowboy.rs` | 93.69% | 89.18% | 100.00% | 🟢 Excellent |
 | `src/metrics/git.rs` | 92.43% | 91.65% | 95.45% | 🟢 Excellent |
-| `src/metrics/graph.rs` | 98.34% | 98.03% | 100.00% | 🟢 Excellent |
+| `src/metrics/graph.rs` | 98.34% | 98.28% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `src/metrics/mod.rs` | 96.19% | 94.97% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |

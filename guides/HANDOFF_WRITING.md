@@ -45,7 +45,7 @@ Write HANDOFF.md when:
 #### Phase 2: Planning Docs
 4. Read `SPEC.md` - understand the what and why
 5. Read `PLAN.md` - step-by-step implementation plan
-6. Read `CODE_MAP.md` - architecture overview and integration points
+6. Read code maps in `README.md` files - architecture overview and integration points
 
 #### Phase 3: Source Code (Complete Files)
 7. **Read ENTIRE files** relevant to your next steps
@@ -166,7 +166,7 @@ rm HANDOFF.md
 ```bash
 cat SPEC.md      # Feature specification
 cat PLAN.md      # Step 3 acceptance criteria
-cat CODE_MAP.md  # Architecture overview
+# Read code maps in README.md files for architecture overview
 ```
 
 ### Phase 3: Source Code (Complete Files - Don't Save Context)

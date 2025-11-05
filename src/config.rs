@@ -13,7 +13,7 @@ pub struct HegelConfig {
     /// Whether to automatically open GUI for document review after writing docs
     pub use_reflect_gui: bool,
 
-    /// CODE_MAP.md structure style: "monolithic" (single file) or "hierarchical" (per-directory)
+    /// Code map structure style: "monolithic" (single README section) or "hierarchical" (per-directory READMEs)
     pub code_map_style: String,
 }
 

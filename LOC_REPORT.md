@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 21:43
+**Last Updated**: 2025-11-05 10:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,975 | 8,869 | 22,844 |
+| **Lines** | 13,975 | 9,060 | 23,035 |
 | **Comments** | 1,928 | - | 1,928 |
 | **Blank Lines** | 2,588 | - | 2,588 |
-| **Total Lines** | 18,491 | 8,869 | 27,360 |
-| **Files** | 86 | 38 | 124 |
+| **Total Lines** | 18,491 | 9,060 | 27,551 |
+| **Files** | 86 | 50 | 136 |
 
-**Documentation Ratio**: 0.63 lines of docs per line of code
+**Documentation Ratio**: 0.65 lines of docs per line of code
 
 ---
 
@@ -25,9 +25,9 @@
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 Rust                            86           2588           1928          13975
-Markdown                         1             31              0             88
+Markdown                        14            134              0            395
 -------------------------------------------------------------------------------
-SUM:                            87           2619           1928          14063
+SUM:                           100           2722           1928          14370
 -------------------------------------------------------------------------------
 ```
 
@@ -142,14 +142,13 @@ SUM:                            87           2619           1928          14063
 | `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
 | `CLAUDE.md` | 174 |
-| `CODE_MAP.md` | 230 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 202 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
 | `guides/CLAUDE_CUSTOMIZATION.md` | 312 |
-| `guides/CODE_MAP_WRITING.md` | 141 |
+| `guides/CODE_MAP_WRITING.md` | 152 |
 | `guides/HANDOFF_WRITING.md` | 207 |
 | `guides/KICKOFF_WRITING.md` | 96 |
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
@@ -168,7 +167,20 @@ SUM:                            87           2619           1928          14063
 | `LOC_REPORT.md` | 196 |
 | `README.md` | 584 |
 | `ROADMAP.md` | 212 |
+| `src/adapters/README.md` | 25 |
+| `src/commands/analyze_impl/README.md` | 26 |
+| `src/commands/fork/README.md` | 30 |
+| `src/commands/README.md` | 44 |
+| `src/commands/workflow/README.md` | 32 |
+| `src/engine/README.md` | 29 |
+| `src/guardrails/README.md` | 34 |
+| `src/metamodes/README.md` | 25 |
+| `src/metrics/README.md` | 34 |
+| `src/README.md` | 34 |
+| `src/rules/README.md` | 30 |
+| `src/storage/README.md` | 35 |
 | `src/test_helpers/README.md` | 119 |
+| `src/tui/README.md` | 32 |
 | `TESTING.md` | 41 |
 
 ---
@@ -177,7 +189,7 @@ SUM:                            87           2619           1928          14063
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.63 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.65 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

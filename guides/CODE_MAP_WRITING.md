@@ -26,6 +26,17 @@ Code maps help navigate codebases. The structure depends on project size and con
 **Monolithic mode (<50 files)**: Code map section in root README.md
 **Hierarchical mode (>50 files)**: Separate README.md per directory with code map
 
+**Depth Guidelines (Hierarchical Mode)**:
+
+Use judgment to determine how deep to nest README.md files:
+
+- **<10 files in subdirectory**: Document inline in parent's code map (no separate README)
+- **10+ files in subdirectory**: Consider creating separate README.md
+- **Complex subsystems**: Create separate README even if <10 files (e.g., contains tests, multiple concerns)
+- **Maximum depth**: Generally stop at 2-3 levels deep; beyond that, document in parent README
+
+**Example**: If `src/commands/` has 15 files plus 3 subdirectories with 5-7 files each, you might document the small subdirectories inline rather than creating 3 separate READMEs. But if one subdirectory has 10+ files or is conceptually complex, give it its own README.
+
 Update code maps **before** commits that:
 - Add, remove, or rename files
 - Change file responsibilities
@@ -45,7 +56,7 @@ Update code maps **before** commits that:
 Describe only files and folders in the current directory. Do not describe subdirectory contents.
 
 ### 2. Non-Recursive
-Subdirectories get brief descriptions with references to their own CODE_MAP.md files.
+Subdirectories get brief descriptions with references to their own README.md files.
 
 ### 3. Concise Descriptions
 Each entry: 1-3 sentences maximum. State purpose and key responsibilities.

@@ -31,7 +31,7 @@ hegel init
 **What it does:**
 - Automatically detects project type (greenfield vs retrofit)
 - **Greenfield** (no non-.md files): Guides you through creating CLAUDE.md, VISION.md, and ARCHITECTURE.md
-- **Retrofit** (existing code): Analyzes project structure and creates CODE_MAP.md files
+- **Retrofit** (existing code): Analyzes project structure and creates code maps in README.md files
 - Walks through initialization workflow with prompts for each phase
 
 **Greenfield workflow phases:**
@@ -42,7 +42,7 @@ hegel init
 
 **Retrofit workflow phases:**
 1. `detect_existing` - Analyze current project structure
-2. `code_map` - Create CODE_MAP.md (monolithic or hierarchical based on size)
+2. `code_map` - Create code maps in README.md files (monolithic or hierarchical based on size)
 3. `integrate_conventions` - Adapt DDD to existing patterns
 4. `git_strategy` - Discuss branching strategy for retrofit
 
@@ -57,7 +57,7 @@ hegel config list
 # Get specific setting
 hegel config get code_map_style
 
-# Set CODE_MAP style (monolithic or hierarchical)
+# Set code map style (monolithic or hierarchical)
 hegel config set code_map_style hierarchical
 hegel config set code_map_style monolithic
 
@@ -67,7 +67,7 @@ hegel config set use_reflect_gui false
 ```
 
 **Available config keys:**
-- `code_map_style` - CODE_MAP structure: `monolithic` (single file) or `hierarchical` (per-directory). Default: `hierarchical`
+- `code_map_style` - Code map structure: `monolithic` (single README section) or `hierarchical` (per-directory READMEs). Default: `hierarchical`
 - `use_reflect_gui` - Auto-launch GUI for document review after writing docs. Default: `true`
 
 Configuration is persisted to `.hegel/config.toml`.
