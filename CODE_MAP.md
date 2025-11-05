@@ -160,6 +160,7 @@ hegel-cli/
 │   │   ├── hooks.rs             # Parses Claude Code hook events, extracts bash commands and file modifications (silent error handling)
 │   │   ├── states.rs            # Parses workflow state transition events
 │   │   ├── transcript.rs        # Parses Claude Code transcripts for token usage (handles old and new format, includes timestamp)
+│   │   ├── cowboy.rs            # Cowboy mode activity attribution (detects inter-workflow gaps, creates synthetic cowboy sessions)
 │   │   └── graph.rs             # Workflow DAG reconstruction (build from transitions, cycle detection, ASCII/DOT rendering)
 │   │
 │   └── tui/                     # Layer 6: Terminal User Interface (hegel top command)
