@@ -11,6 +11,7 @@ use crate::theme::Theme;
 
 pub use claims::ClaimAlias;
 pub use context::{display_workflow_prompt, load_workflow_context, render_node_prompt};
+use transitions::detect_and_archive_cowboy_activity;
 pub use transitions::{evaluate_transition, execute_transition};
 
 // Re-export for tests
@@ -52,6 +53,10 @@ pub fn start_workflow(
         .workflow_state
         .as_ref()
         .and_then(|ws| ws.meta_mode.clone());
+
+    // Detect and archive any cowboy activity between last workflow and now
+    let now_timestamp = chrono::Utc::now().to_rfc3339();
+    detect_and_archive_cowboy_activity(storage.state_dir(), &now_timestamp)?;
 
     // Load workflow from YAML file
     let workflows_dir = storage.workflows_dir();

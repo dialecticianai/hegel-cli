@@ -1,4 +1,5 @@
 pub mod archive;
+pub mod log_cleanup;
 
 use anyhow::{Context, Result};
 use fs2::FileExt;

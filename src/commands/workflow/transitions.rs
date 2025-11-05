@@ -1,13 +1,13 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::collections::HashSet;
-use std::fs;
 
 use crate::engine::get_next_prompt;
 use crate::metamodes::evaluate_workflow_completion;
 use crate::metrics::cowboy::{build_synthetic_cowboy_archive, identify_cowboy_workflows};
 use crate::metrics::parse_unified_metrics;
 use crate::storage::archive::{read_archives, write_archive, WorkflowArchive};
+use crate::storage::log_cleanup::cleanup_logs;
 use crate::storage::{FileStorage, State};
 use crate::theme::Theme;
 
@@ -118,26 +118,36 @@ pub fn evaluate_transition(
     })
 }
 
-/// Detect cowboy activity between the most recent previous workflow and the current one
-fn detect_and_archive_cowboy_activity(
+/// Detect cowboy activity between the most recent archived workflow and the given timestamp
+pub(super) fn detect_and_archive_cowboy_activity(
     state_dir: &std::path::Path,
-    current_archive: &WorkflowArchive,
+    current_timestamp: &str,
 ) -> Result<()> {
-    // Load all existing archives (excluding the current one we just wrote)
+    // Load all existing archives
     let all_archives = read_archives(state_dir)?;
 
-    // Find the most recent archive before the current workflow
+    // Find the most recent real (non-synthetic) archive before the current timestamp
     let previous_archive = all_archives
         .iter()
-        .filter(|a| a.workflow_id < current_archive.workflow_id && !a.is_synthetic)
+        .filter(|a| a.workflow_id.as_str() < current_timestamp && !a.is_synthetic)
         .max_by_key(|a| a.workflow_id.as_str());
 
-    // If no previous workflow, check for pre-workflow activity
+    // Create a minimal archive-like struct for the current timestamp to use as boundary
+    let current_boundary = WorkflowArchive {
+        workflow_id: current_timestamp.to_string(),
+        completed_at: current_timestamp.to_string(),
+        mode: "cowboy".to_string(),
+        phases: vec![],
+        transitions: vec![],
+        totals: Default::default(),
+        session_id: None,
+        is_synthetic: false,
+    };
+
     let archives_to_check = if let Some(prev) = previous_archive {
-        vec![prev.clone(), current_archive.clone()]
+        vec![prev.clone(), current_boundary]
     } else {
-        // Only current workflow - check for activity before it
-        vec![current_archive.clone()]
+        vec![current_boundary]
     };
 
     // Parse current metrics from hooks/transcripts/git (these haven't been deleted yet)
@@ -188,6 +198,9 @@ fn detect_and_archive_cowboy_activity(
             );
         }
     }
+
+    // Delete logs after creating cowboy archives to prevent re-detection
+    cleanup_logs(state_dir)?;
 
     Ok(())
 }
@@ -240,9 +253,6 @@ pub(crate) fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     // Write archive
     write_archive(&archive, state_dir)?;
 
-    // Check for cowboy activity between previous workflow and this one
-    detect_and_archive_cowboy_activity(state_dir, &archive)?;
-
     // Update cumulative totals in state
     let mut updated_state = state.clone();
     let cumulative = updated_state
@@ -267,18 +277,7 @@ pub(crate) fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     storage.save(&updated_state)?;
 
     // Delete logs on success
-    let hooks_path = state_dir.join("hooks.jsonl");
-    let states_path = state_dir.join("states.jsonl");
-
-    if hooks_path.exists() {
-        fs::remove_file(&hooks_path)
-            .with_context(|| format!("Failed to delete hooks.jsonl: {:?}", hooks_path))?;
-    }
-
-    if states_path.exists() {
-        fs::remove_file(&states_path)
-            .with_context(|| format!("Failed to delete states.jsonl: {:?}", states_path))?;
-    }
+    cleanup_logs(state_dir)?;
 
     // Display success with archive totals
     println!(
