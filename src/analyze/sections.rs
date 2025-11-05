@@ -209,7 +209,8 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
     if !phase_metrics.is_empty() {
         println!("{}", Theme::label("Phase Breakdown"));
         for phase in phase_metrics {
-            let status = if phase.end_time.is_none() {
+            let is_done_node = phase.phase_name.to_lowercase() == "done";
+            let status = if phase.end_time.is_none() && !is_done_node {
                 Theme::success("active")
             } else if phase.is_synthetic {
                 Theme::secondary("completed, synthetic")

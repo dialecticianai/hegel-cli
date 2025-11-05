@@ -81,6 +81,11 @@
 
 **Scripts over inline commands**: NEVER write multi-line inline shell scripts. Always write to `scripts/` and execute. Check `scripts/` before writing - tool may already exist. Reusable scripts are infrastructure.
 
+**Build protocol**:
+- **Testing fixes**: `./scripts/build.sh --install --skip-bump` (ALWAYS skip version bump when testing)
+- **Final commit**: `./scripts/build.sh --install` (version bump only for commits)
+- NEVER bump version for intermediate testing - only for final commits
+
 **Available scripts** (`scripts/`):
 - `generate-coverage-report.sh` - Update COVERAGE_REPORT.md (auto-run by pre-commit)
 - `generate-loc-report.sh` - Update LOC_REPORT.md (auto-run by pre-commit)

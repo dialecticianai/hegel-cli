@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 11:42
+**Last Updated**: 2025-11-05 11:51
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **87.29%** lines | **86.22%** regions | **86.62%** functions
+**Overall Coverage**: **87.29%** lines | **86.23%** regions | **86.62%** functions
 
 ## Summary
 
 ```
-TOTAL                                      17079              2353    86.22%         912               122    86.62%       10354              1316    87.29%           0                 0         -
+TOTAL                                      17082              2353    86.23%         912               122    86.62%       10355              1316    87.29%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -21,7 +21,7 @@ TOTAL                                      17079              2353    86.22%    
 | `src/analyze/backfill.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/gap_detection.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/analyze/sections.rs` | 87.79% | 81.68% | 88.24% | 🟡 Good |
+| `src/analyze/sections.rs` | 87.83% | 81.82% | 88.24% | 🟡 Good |
 | `src/analyze/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/commands/analyze/mod.rs` | 97.74% | 92.91% | 100.00% | 🟢 Excellent |
 | `src/commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
@@ -141,7 +141,7 @@ TOTAL                                      17079              2353    86.22%    
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/analyze/sections.rs` - 87.79%
+- `src/analyze/sections.rs` - 87.83%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 83.89%

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 11:42
+**Last Updated**: 2025-11-05 11:51
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,030 | 9,072 | 23,102 |
+| **Lines** | 14,031 | 9,077 | 23,108 |
 | **Comments** | 1,934 | - | 1,934 |
 | **Blank Lines** | 2,594 | - | 2,594 |
-| **Total Lines** | 18,558 | 9,072 | 27,630 |
+| **Total Lines** | 18,559 | 9,077 | 27,636 |
 | **Files** | 86 | 50 | 136 |
 
 **Documentation Ratio**: 0.65 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            86           2594           1934          14030
+Rust                            86           2594           1934          14031
 Markdown                        14            134              0            395
 -------------------------------------------------------------------------------
-SUM:                           100           2728           1934          14425
+SUM:                           100           2728           1934          14426
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                           100           2728           1934          14425
 | `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `analyze/repair.rs` | 192 | 192 | 0 | 0.0% | ✅ |
-| `analyze/sections.rs` | 339 | 339 | 0 | 0.0% | ⚠️ Large |
+| `analyze/sections.rs` | 340 | 340 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 240 | 73 | 167 | 69.6% | ✅ |
 | `commands/archive.rs` | 302 | 213 | 89 | 29.5% | ⚠️ Large |
@@ -141,7 +141,7 @@ SUM:                           100           2728           1934          14425
 | `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
 | `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
-| `CLAUDE.md` | 174 |
+| `CLAUDE.md` | 179 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 202 |
 | `DEP_REVIEW.md` | 678 |
