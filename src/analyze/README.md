@@ -1,4 +1,4 @@
-# src/commands/analyze_impl/
+# src/analyze/
 
 Implementation modules for `hegel analyze` command. Separated from `commands/analyze/` for modularity after refactoring from a large monolithic file.
 
@@ -9,11 +9,11 @@ Provides the implementation for metrics analysis, repair operations, and display
 ## Structure
 
 ```
-analyze_impl/
+analyze/
 ├── mod.rs               Module exports
 ├── sections.rs          Rendering sections (session, tokens, activity, commands/files, transitions, phases, graph)
-├── repair.rs            Archive repair orchestration (backfill, cowboy detection, reporting)
-├── backfill.rs          Git metrics backfill (re-parse git history, attribute to phases)
+├── repair.rs            Archive repair orchestration (cleanup trait integration, reporting)
+├── cleanup/             Trait-based archive cleanup system (See cleanup/README.md)
 ├── gap_detection.rs     Workflow gap detection (identify and create synthetic cowboy archives)
 └── totals.rs            Cumulative totals rebuilding (sum archive totals, update state)
 ```
@@ -21,6 +21,6 @@ analyze_impl/
 ## Key Features
 
 **Section Rendering**: Formats metrics output (tokens, activity, phase breakdown, workflow graphs)
-**Archive Repair**: Detects gaps in workflow coverage and creates synthetic cowboy archives for untracked work
-**Git Backfill**: Retrospectively attributes git commits to workflow phases based on timestamps
+**Archive Repair**: Detects gaps in workflow coverage and repairs archives via cleanup trait implementations
+**Cleanup System**: Pluggable repair operations (git backfill, aborted node addition) via ArchiveCleanup trait
 **Totals Computation**: Aggregates metrics across all archived workflows
