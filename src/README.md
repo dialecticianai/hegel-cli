@@ -22,6 +22,7 @@ src/
 ├── theme.rs             Terminal color theme (semantic styling for success/error/warning, metrics)
 │
 ├── adapters/            Multi-agent support (See adapters/README.md)
+├── analyze/             Metrics analysis and visualization library (See analyze/README.md)
 ├── commands/            Layer 1: User-facing command implementations (See commands/README.md)
 ├── engine/              Layer 2: State machine and template rendering (See engine/README.md)
 ├── guardrails/          Command safety layer (See guardrails/README.md)

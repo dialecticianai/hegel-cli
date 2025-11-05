@@ -2,6 +2,7 @@
 // Exposes storage, metrics, and other modules for use by hegel-pm and other tools
 
 pub mod adapters;
+pub mod analyze;
 pub mod config;
 pub mod embedded;
 pub mod engine;

@@ -1,4 +1,5 @@
 mod adapters;
+mod analyze;
 mod commands;
 mod config;
 mod embedded;

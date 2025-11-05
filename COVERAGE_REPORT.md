@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 10:54
+**Last Updated**: 2025-11-05 11:29
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **87.25%** lines | **86.24%** regions | **86.61%** functions
 
 ## Summary
 
 ```
-TOTAL                                            17036              2344    86.24%         911               122    86.61%       10318              1316    87.25%           0                 0         -
+TOTAL                                      17036              2344    86.24%         911               122    86.61%       10318              1316    87.25%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -18,11 +18,11 @@ TOTAL                                            17036              2344    86.2
 | `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
-| `src/commands/analyze_impl/backfill.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/commands/analyze_impl/gap_detection.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/commands/analyze_impl/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/commands/analyze_impl/sections.rs` | 87.79% | 81.68% | 88.24% | 🟡 Good |
-| `src/commands/analyze_impl/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/analyze/backfill.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/analyze/gap_detection.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/analyze/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/analyze/sections.rs` | 87.79% | 81.68% | 88.24% | 🟡 Good |
+| `src/analyze/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/commands/analyze/mod.rs` | 97.30% | 95.45% | 100.00% | 🟢 Excellent |
 | `src/commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
@@ -141,7 +141,7 @@ TOTAL                                            17036              2344    86.2
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/commands/analyze_impl/sections.rs` - 87.79%
+- `src/analyze/sections.rs` - 87.79%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 83.89%
@@ -164,10 +164,10 @@ TOTAL                                            17036              2344    86.2
 - `src/main.rs` - 41.18%
 
 ### 🔴 Needs Work (<40% lines)
-- `src/commands/analyze_impl/backfill.rs` - 0.00%
-- `src/commands/analyze_impl/gap_detection.rs` - 0.00%
-- `src/commands/analyze_impl/repair.rs` - 0.00%
-- `src/commands/analyze_impl/totals.rs` - 0.00%
+- `src/analyze/backfill.rs` - 0.00%
+- `src/analyze/gap_detection.rs` - 0.00%
+- `src/analyze/repair.rs` - 0.00%
+- `src/analyze/totals.rs` - 0.00%
 - `src/commands/astq.rs` - 17.78%
 - `src/tui/mod.rs` - 11.36%
 

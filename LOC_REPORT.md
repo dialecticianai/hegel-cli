@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 10:54
+**Last Updated**: 2025-11-05 11:29
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,975 | 9,060 | 23,035 |
+| **Lines** | 13,976 | 9,072 | 23,048 |
 | **Comments** | 1,928 | - | 1,928 |
 | **Blank Lines** | 2,588 | - | 2,588 |
-| **Total Lines** | 18,491 | 9,060 | 27,551 |
+| **Total Lines** | 18,492 | 9,072 | 27,564 |
 | **Files** | 86 | 50 | 136 |
 
 **Documentation Ratio**: 0.65 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            86           2588           1928          13975
+Rust                            86           2588           1928          13976
 Markdown                        14            134              0            395
 -------------------------------------------------------------------------------
-SUM:                           100           2722           1928          14370
+SUM:                           100           2722           1928          14371
 -------------------------------------------------------------------------------
 ```
 
@@ -41,12 +41,12 @@ SUM:                           100           2722           1928          14370
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
-| `commands/analyze_impl/backfill.rs` | 51 | 51 | 0 | 0.0% | ✅ |
-| `commands/analyze_impl/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
-| `commands/analyze_impl/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
-| `commands/analyze_impl/repair.rs` | 192 | 192 | 0 | 0.0% | ✅ |
-| `commands/analyze_impl/sections.rs` | 339 | 339 | 0 | 0.0% | ⚠️ Large |
-| `commands/analyze_impl/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
+| `analyze/backfill.rs` | 51 | 51 | 0 | 0.0% | ✅ |
+| `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
+| `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
+| `analyze/repair.rs` | 192 | 192 | 0 | 0.0% | ✅ |
+| `analyze/sections.rs` | 339 | 339 | 0 | 0.0% | ⚠️ Large |
+| `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 200 | 46 | 154 | 77.0% | ✅ |
 | `commands/archive.rs` | 302 | 213 | 89 | 29.5% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
@@ -64,7 +64,7 @@ SUM:                           100           2722           1928          14370
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/meta.rs` | 253 | 165 | 88 | 34.8% | ✅ |
-| `commands/mod.rs` | 36 | 36 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
 | `commands/status.rs` | 130 | 130 | 0 | 0.0% | ✅ |
@@ -86,8 +86,8 @@ SUM:                           100           2722           1928          14370
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
-| `lib.rs` | 14 | 12 | 2 | 14.3% | ✅ |
-| `main.rs` | 366 | 13 | 353 | 96.4% | ✅ |
+| `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
+| `main.rs` | 367 | 14 | 353 | 96.2% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 205 | 146 | 59 | 28.8% | ✅ |
 | `metrics/cowboy.rs` | 470 | 289 | 181 | 38.5% | ⚠️ Large |
@@ -164,19 +164,19 @@ SUM:                           100           2722           1928          14370
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 196 |
+| `LOC_REPORT.md` | 208 |
 | `README.md` | 584 |
 | `ROADMAP.md` | 212 |
 | `src/adapters/README.md` | 25 |
-| `src/commands/analyze_impl/README.md` | 26 |
+| `src/analyze/README.md` | 26 |
 | `src/commands/fork/README.md` | 30 |
-| `src/commands/README.md` | 44 |
+| `src/commands/README.md` | 43 |
 | `src/commands/workflow/README.md` | 32 |
 | `src/engine/README.md` | 29 |
 | `src/guardrails/README.md` | 34 |
 | `src/metamodes/README.md` | 25 |
 | `src/metrics/README.md` | 34 |
-| `src/README.md` | 34 |
+| `src/README.md` | 35 |
 | `src/rules/README.md` | 30 |
 | `src/storage/README.md` | 35 |
 | `src/test_helpers/README.md` | 119 |

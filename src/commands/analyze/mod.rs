@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::commands::analyze_impl::repair::repair_archives;
-use crate::commands::analyze_impl::sections::*;
+use crate::analyze::repair::repair_archives;
+use crate::analyze::sections::*;
 use crate::metrics::parse_unified_metrics;
 use crate::storage::FileStorage;
 use crate::theme::Theme;

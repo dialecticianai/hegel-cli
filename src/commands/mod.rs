@@ -1,5 +1,4 @@
 mod analyze;
-mod analyze_impl;
 pub mod archive;
 mod astq;
 mod config;

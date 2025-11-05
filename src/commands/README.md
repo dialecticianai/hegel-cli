@@ -14,8 +14,7 @@ commands/
 │
 ├── workflow/            Workflow orchestration commands (See workflow/README.md)
 ├── fork/                External agent orchestration (See fork/README.md)
-├── analyze/             Metrics analysis routing (analyze command entry point)
-├── analyze_impl/        Metrics analysis implementation (See analyze_impl/README.md)
+├── analyze/             Metrics analysis command entry point (delegates to src/analyze)
 │
 ├── init.rs              Project initialization (greenfield vs retrofit workflow detection)
 ├── meta.rs              Meta-mode commands (declare, status, auto-start initial workflow)
@@ -38,7 +37,7 @@ commands/
 
 **Workflow Management**: `workflow/` (start, next, prev, repeat, restart, abort)
 **Meta-Mode**: `meta.rs` (declare learning/standard patterns)
-**Metrics**: `analyze/`, `analyze_impl/` (analyze captured activity)
+**Metrics**: `analyze/` (command entry - implementation lives in src/analyze)
 **External Tools**: `astq.rs`, `reflect.rs`, `pm.rs`, `fork/` (AST search, doc review, PM dashboard, agent delegation)
 **Safety**: `wrapped.rs`, `git.rs` (command guardrails and audit logging)
 **Setup**: `init.rs`, `hooks_setup.rs` (project initialization, hook configuration)
