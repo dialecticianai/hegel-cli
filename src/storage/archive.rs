@@ -324,6 +324,7 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
 mod tests {
     use super::*;
     use crate::metrics::{HookMetrics, PhaseMetrics, StateTransitionEvent, TokenMetrics};
+    use crate::test_helpers::test_phase_metrics;
 
     use tempfile::TempDir;
 
@@ -422,22 +423,7 @@ mod tests {
                 mode: "discovery".to_string(),
             }],
             session_id: Some("test-session".to_string()),
-            phase_metrics: vec![PhaseMetrics {
-                phase_name: "spec".to_string(),
-                start_time: "2025-10-24T10:00:00Z".to_string(),
-                end_time: Some("2025-10-24T10:15:00Z".to_string()),
-                duration_seconds: 900,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 1000,
-                    total_output_tokens: 500,
-                    total_cache_creation_tokens: 200,
-                    total_cache_read_tokens: 300,
-                    assistant_turns: 5,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-            }],
+            phase_metrics: vec![test_phase_metrics()],
             git_commits: vec![],
         };
 

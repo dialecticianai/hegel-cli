@@ -211,6 +211,8 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
         for phase in phase_metrics {
             let status = if phase.end_time.is_none() {
                 Theme::success("active")
+            } else if phase.is_synthetic {
+                Theme::secondary("completed, synthetic")
             } else {
                 Theme::secondary("completed")
             };

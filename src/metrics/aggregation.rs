@@ -72,6 +72,7 @@ pub fn build_phase_metrics(
             bash_commands,
             file_modifications,
             git_commits: vec![],
+            is_synthetic: false, // Live phases are never synthetic
         });
     }
 

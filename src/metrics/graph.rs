@@ -14,6 +14,7 @@ pub struct DAGNode {
     pub total_duration_secs: u64,
     pub file_modifications: usize,
     pub bash_commands: usize,
+    pub is_synthetic: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -49,6 +50,7 @@ impl WorkflowDAG {
                     total_duration_secs: 0,
                     file_modifications: 0,
                     bash_commands: 0,
+                    is_synthetic: phase.is_synthetic,
                 });
 
             entry.visits += 1;
@@ -57,6 +59,8 @@ impl WorkflowDAG {
             entry.total_duration_secs += phase.duration_seconds;
             entry.file_modifications += phase.file_modifications.len();
             entry.bash_commands += phase.bash_commands.len();
+            // If any phase for this node is synthetic, mark the whole node as synthetic
+            entry.is_synthetic = entry.is_synthetic || phase.is_synthetic;
         }
 
         // Build edges from transitions
@@ -193,11 +197,25 @@ impl WorkflowDAG {
 
         // Nodes
         for (name, node) in &self.nodes {
+            let synthetic_label = if node.is_synthetic {
+                " (synthetic)"
+            } else {
+                ""
+            };
             let label = format!(
-                "{}\\n{} tokens\\n{}s\\n{} visits",
-                name, node.total_tokens, node.total_duration_secs, node.visits
+                "{}{}\\n{} tokens\\n{}s\\n{} visits",
+                name, synthetic_label, node.total_tokens, node.total_duration_secs, node.visits
             );
-            dot.push_str(&format!("  \"{}\" [label=\"{}\"];\n", name, label));
+
+            // Synthetic nodes: diamond shape + dashed border
+            // Explicit nodes: rounded box (default)
+            let style = if node.is_synthetic {
+                " [shape=diamond, style=dashed]"
+            } else {
+                ""
+            };
+
+            dot.push_str(&format!("  \"{}\" [label=\"{}\"]{};\n", name, label, style));
         }
 
         dot.push('\n');
@@ -255,23 +273,10 @@ mod tests {
     }
 
     fn test_phase_metrics() -> Vec<PhaseMetrics> {
+        use crate::test_helpers::test_phase_metrics;
+
         vec![
-            PhaseMetrics {
-                phase_name: "spec".to_string(),
-                start_time: "2025-01-01T10:00:00Z".to_string(),
-                end_time: Some("2025-01-01T10:15:00Z".to_string()),
-                duration_seconds: 900,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 1000,
-                    total_output_tokens: 500,
-                    total_cache_creation_tokens: 0,
-                    total_cache_read_tokens: 0,
-                    assistant_turns: 5,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-            },
+            test_phase_metrics(),
             PhaseMetrics {
                 phase_name: "plan".to_string(),
                 start_time: "2025-01-01T10:15:00Z".to_string(),
@@ -284,9 +289,7 @@ mod tests {
                     total_cache_read_tokens: 0,
                     assistant_turns: 8,
                 },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
+                ..test_phase_metrics()
             },
         ]
     }

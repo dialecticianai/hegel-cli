@@ -34,6 +34,9 @@ pub struct PhaseMetrics {
     pub file_modifications: Vec<FileModification>,
     /// Git commits attributed to this phase
     pub git_commits: Vec<GitCommit>,
+    /// Whether this phase is from a synthetic cowboy workflow
+    #[serde(default)]
+    pub is_synthetic: bool,
 }
 
 /// Unified metrics combining all data sources
@@ -152,6 +155,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 bash_commands: vec![], // Archived as summaries, not individual commands
                 file_modifications: vec![], // Archived as summaries, not individual modifications
                 git_commits: phase_archive.git_commits.clone(),
+                is_synthetic: archive.is_synthetic,
             };
             all_phase_metrics.push(phase);
         }

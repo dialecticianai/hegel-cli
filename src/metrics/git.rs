@@ -159,6 +159,7 @@ pub fn attribute_commits_to_phases(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::metrics::PhaseMetrics;
     use std::process::Command;
     use tempfile::TempDir;
 
@@ -324,15 +325,12 @@ mod tests {
             deletions: 2,
         }];
 
-        let mut phases = vec![crate::metrics::PhaseMetrics {
-            phase_name: "spec".to_string(),
+        use crate::test_helpers::test_phase_metrics_with;
+
+        let mut phases = vec![PhaseMetrics {
             start_time: "2025-01-01T10:00:00Z".to_string(),
             end_time: Some("2025-01-01T10:15:00Z".to_string()),
-            duration_seconds: 900,
-            token_metrics: Default::default(),
-            bash_commands: vec![],
-            file_modifications: vec![],
-            git_commits: vec![],
+            ..test_phase_metrics_with(true)
         }];
 
         attribute_commits_to_phases(commits, &mut phases);
@@ -364,26 +362,19 @@ mod tests {
             },
         ];
 
+        use crate::test_helpers::test_phase_metrics_with;
+
         let mut phases = vec![
-            crate::metrics::PhaseMetrics {
-                phase_name: "spec".to_string(),
+            PhaseMetrics {
                 start_time: "2025-01-01T10:00:00Z".to_string(),
                 end_time: Some("2025-01-01T10:15:00Z".to_string()),
-                duration_seconds: 900,
-                token_metrics: Default::default(),
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
+                ..test_phase_metrics_with(true)
             },
-            crate::metrics::PhaseMetrics {
+            PhaseMetrics {
                 phase_name: "plan".to_string(),
                 start_time: "2025-01-01T10:15:00Z".to_string(),
                 end_time: Some("2025-01-01T10:30:00Z".to_string()),
-                duration_seconds: 900,
-                token_metrics: Default::default(),
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
+                ..test_phase_metrics_with(true)
             },
         ];
 
@@ -407,15 +398,12 @@ mod tests {
             deletions: 2,
         }];
 
-        let mut phases = vec![crate::metrics::PhaseMetrics {
-            phase_name: "spec".to_string(),
+        use crate::test_helpers::test_phase_metrics_with;
+
+        let mut phases = vec![PhaseMetrics {
             start_time: "2025-01-01T10:00:00Z".to_string(),
             end_time: Some("2025-01-01T10:15:00Z".to_string()),
-            duration_seconds: 900,
-            token_metrics: Default::default(),
-            bash_commands: vec![],
-            file_modifications: vec![],
-            git_commits: vec![],
+            ..test_phase_metrics_with(true)
         }];
 
         attribute_commits_to_phases(commits, &mut phases);
@@ -444,6 +432,7 @@ mod tests {
             bash_commands: vec![],
             file_modifications: vec![],
             git_commits: vec![],
+            is_synthetic: false,
         }];
 
         attribute_commits_to_phases(commits, &mut phases);

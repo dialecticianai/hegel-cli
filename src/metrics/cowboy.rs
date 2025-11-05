@@ -235,6 +235,7 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
         bash_commands: group.bash_commands.clone(),
         file_modifications: group.file_modifications.clone(),
         git_commits: group.git_commits.clone(),
+        is_synthetic: true, // Cowboy workflows are always synthetic
     }];
 
     // Create minimal state transitions

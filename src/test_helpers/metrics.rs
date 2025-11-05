@@ -10,6 +10,51 @@ use tempfile::TempDir;
 
 use super::jsonl::{create_hooks_file, create_states_file};
 
+/// Create a test PhaseMetrics with default values
+///
+/// # Arguments
+/// * `minimal` - If true, returns minimal defaults for fields that are typically overridden
+pub fn test_phase_metrics_with(minimal: bool) -> PhaseMetrics {
+    if minimal {
+        // Minimal version: just the required fields with sensible defaults
+        PhaseMetrics {
+            phase_name: "spec".to_string(),
+            start_time: "2025-10-24T10:00:00Z".to_string(),
+            end_time: Some("2025-10-24T10:15:00Z".to_string()),
+            duration_seconds: 900,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+            git_commits: vec![],
+            is_synthetic: false,
+        }
+    } else {
+        // Full version: realistic test data
+        PhaseMetrics {
+            phase_name: "spec".to_string(),
+            start_time: "2025-10-24T10:00:00Z".to_string(),
+            end_time: Some("2025-10-24T10:15:00Z".to_string()),
+            duration_seconds: 900,
+            token_metrics: TokenMetrics {
+                total_input_tokens: 1000,
+                total_output_tokens: 500,
+                total_cache_creation_tokens: 200,
+                total_cache_read_tokens: 300,
+                assistant_turns: 5,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+            git_commits: vec![],
+            is_synthetic: false,
+        }
+    }
+}
+
+/// Create a test PhaseMetrics with default values (non-minimal)
+pub fn test_phase_metrics() -> PhaseMetrics {
+    test_phase_metrics_with(false)
+}
+
 /// Create a state directory with JSONL files already in place
 ///
 /// # Arguments
@@ -175,6 +220,7 @@ impl UnifiedMetricsBuilder {
                 bash_commands: vec![],
                 file_modifications: vec![],
                 git_commits: vec![],
+                is_synthetic: false,
             });
 
             // Add corresponding state transition

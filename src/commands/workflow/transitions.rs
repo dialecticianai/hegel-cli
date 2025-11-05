@@ -5,8 +5,9 @@ use std::fs;
 
 use crate::engine::get_next_prompt;
 use crate::metamodes::evaluate_workflow_completion;
+use crate::metrics::cowboy::{build_synthetic_cowboy_archive, identify_cowboy_workflows};
 use crate::metrics::parse_unified_metrics;
-use crate::storage::archive::{write_archive, WorkflowArchive};
+use crate::storage::archive::{read_archives, write_archive, WorkflowArchive};
 use crate::storage::{FileStorage, State};
 use crate::theme::Theme;
 
@@ -117,6 +118,80 @@ pub fn evaluate_transition(
     })
 }
 
+/// Detect cowboy activity between the most recent previous workflow and the current one
+fn detect_and_archive_cowboy_activity(
+    state_dir: &std::path::Path,
+    current_archive: &WorkflowArchive,
+) -> Result<()> {
+    // Load all existing archives (excluding the current one we just wrote)
+    let all_archives = read_archives(state_dir)?;
+
+    // Find the most recent archive before the current workflow
+    let previous_archive = all_archives
+        .iter()
+        .filter(|a| a.workflow_id < current_archive.workflow_id && !a.is_synthetic)
+        .max_by_key(|a| a.workflow_id.as_str());
+
+    // If no previous workflow, check for pre-workflow activity
+    let archives_to_check = if let Some(prev) = previous_archive {
+        vec![prev.clone(), current_archive.clone()]
+    } else {
+        // Only current workflow - check for activity before it
+        vec![current_archive.clone()]
+    };
+
+    // Parse current metrics from hooks/transcripts/git (these haven't been deleted yet)
+    let hooks_path = state_dir.join("hooks.jsonl");
+    let mut bash_commands = vec![];
+    let mut file_modifications = vec![];
+    let transcript_events = vec![]; // TODO: parse transcript events if needed
+
+    if hooks_path.exists() {
+        use crate::metrics::parse_hooks_file;
+        let hook_metrics = parse_hooks_file(&hooks_path)?;
+        bash_commands = hook_metrics.bash_commands;
+        file_modifications = hook_metrics.file_modifications;
+    }
+
+    // Parse git commits
+    let mut git_commits = vec![];
+    use crate::metrics::git;
+    if git::has_git_repository(state_dir) {
+        let project_root = state_dir.parent().unwrap();
+        git_commits = git::parse_git_commits(project_root, None).unwrap_or_default();
+    }
+
+    // Identify cowboy workflows between the archives
+    let cowboy_groups = identify_cowboy_workflows(
+        &bash_commands,
+        &file_modifications,
+        &git_commits,
+        &transcript_events,
+        &archives_to_check,
+    )?;
+
+    // Create and write synthetic archives for each gap
+    for group in cowboy_groups {
+        let synthetic_archive = build_synthetic_cowboy_archive(&group)?;
+
+        // Check if archive already exists (avoid duplicates)
+        let archive_path = state_dir
+            .join("archive")
+            .join(format!("{}.json", synthetic_archive.workflow_id));
+
+        if !archive_path.exists() {
+            write_archive(&synthetic_archive, state_dir)?;
+            println!(
+                "{} Detected cowboy activity ({})",
+                Theme::success("  ✓"),
+                synthetic_archive.workflow_id
+            );
+        }
+    }
+
+    Ok(())
+}
+
 /// Archive completed workflow and delete raw logs
 fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state_dir = storage.state_dir();
@@ -164,6 +239,9 @@ fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
 
     // Write archive
     write_archive(&archive, state_dir)?;
+
+    // Check for cowboy activity between previous workflow and this one
+    detect_and_archive_cowboy_activity(state_dir, &archive)?;
 
     // Update cumulative totals in state
     let mut updated_state = state.clone();

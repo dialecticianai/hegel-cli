@@ -161,6 +161,8 @@ mod tests {
     /// the end_time will still be set to BASE_TIME (zero duration).
     /// If you want an active phase, construct manually with end_time: None.
     fn phase(duration_secs: u64, input_tokens: u64, output_tokens: u64) -> PhaseMetrics {
+        use crate::test_helpers::test_phase_metrics_with;
+
         PhaseMetrics {
             phase_name: "code".to_string(),
             start_time: BASE_TIME.to_string(),
@@ -173,9 +175,7 @@ mod tests {
                 total_cache_read_tokens: 0,
                 assistant_turns: 10,
             },
-            bash_commands: vec![],
-            file_modifications: vec![],
-            git_commits: vec![],
+            ..test_phase_metrics_with(true)
         }
     }
 
@@ -702,6 +702,8 @@ mod tests {
     fn test_phase_timeout_active_phase_uses_current_time() {
         use chrono::Utc;
 
+        use crate::test_helpers::test_phase_metrics_with;
+
         let start = (Utc::now() - chrono::Duration::seconds(700)).to_rfc3339();
         let phase_ref = Box::leak(Box::new(PhaseMetrics {
             phase_name: "code".to_string(),
@@ -709,9 +711,7 @@ mod tests {
             end_time: None,
             duration_seconds: 0,
             token_metrics: TokenMetrics::default(),
-            bash_commands: vec![],
-            file_modifications: vec![],
-            git_commits: vec![],
+            ..test_phase_metrics_with(true)
         }));
 
         let context = RuleEvaluationContext {
