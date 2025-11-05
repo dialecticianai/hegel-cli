@@ -80,10 +80,11 @@ A **PLAN.md is high-level prose** describing the development approach step-by-st
 ## Key Practices
 
 ### TDD Discipline
-- Write failing tests first
+- Write failing tests first (when tests drive development)
 - Red → Green → Next
 - Focus on interfaces and contracts
-- Cover error paths explicitly
+- Cover essential error paths, not hypothetical edge cases
+- Tests should enable forward progress, not block it
 - **Commit after every numbered step** (Red → Green cycle)
 
 ### Commit Discipline
@@ -95,8 +96,9 @@ A **PLAN.md is high-level prose** describing the development approach step-by-st
 - Commit immediately after completing each step — do not batch
 
 ### Test Scope
-- ✅ Test: core features, errors, integration points
-- ❌ Skip: helpers, edge cases, perf, internals
+- ✅ Test: core features that drive development, essential errors, integration points
+- ❌ Skip: helpers, hypothetical edge cases, perf optimization, internals, exhaustive coverage
+- **TDD serves development, not audit requirements**
 
 ### Implementation Description (Prose Only)
 
@@ -144,8 +146,10 @@ Always check with concrete, objective bullets:
 ### Execution Mode PLANs
 - Build incrementally on production codebase (`src/`)
 - No isolated experiments — all code is production code
-- Comprehensive test coverage required
+- Tests that drive development forward, not exhaustive coverage
 - Integration points with existing features explicit
+- **Agile approach**: working functionality over defensive programming
+- Focus on core behavior, add edge cases only when essential
 
 ---
 

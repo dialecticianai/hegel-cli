@@ -9,17 +9,51 @@ nodes:
 
       {{SPEC_WRITING}}
 
-      Your task: Write a production-grade behavioral contract.
+      Your task: Create a lean, focused behavioral contract through collaborative discovery.
       {{?context_note}}
 
-      Execution mode requirements:
-      - Comprehensive error handling scenarios
-      - Performance and scaling considerations
-      - Security and validation rules
-      - Complete edge case coverage
-      - Production-ready acceptance criteria
+      Execution mode focus:
+      - Clear, minimal contracts that define core behavior
+      - Happy path and essential error cases only
+      - Test scenarios that drive TDD, not exhaustive edge case coverage
+      - Simple acceptance criteria focused on working functionality
+      - Keep it agile: specs should enable forward motion, not defensive programming
 
-      Respond with your completed SPEC.md content.
+      **CRITICAL - Follow this sequence:**
+
+      1. **Discovery Phase - Ground in actual codebase FIRST**:
+         - Read existing code files for related functionality, types, and APIs
+         - Check testing infrastructure (TESTING.md, test patterns)
+         - Understand module organization and boundaries
+         - Verify what external dependencies already provide (don't reinvent)
+         - Note existing contracts, types, and patterns to match
+         - If unsure about data availability, investigate before assuming
+         - Document findings: what exists, what needs changing, what's missing
+
+      2. **Discuss before writing**:
+         - Use the SPEC_WRITING guide above to inform what questions to ask
+         - Clarify constraints: Breaking vs. backward compatible? MVP vs. production-ready?
+         - Clarify scope: Lean first pass? What's explicitly out of scope?
+         - Validate architectural understanding: Are module boundaries correct?
+         - Focus on WHAT needs to work, not every edge case that could break
+         - Confirm type structures make sense (no redundancy, clean separation)
+         - Gather missing context for a minimal viable spec
+
+      3. **Write the spec**:
+         - Only after discussion is complete, draft the SPEC.md
+         - Reference actual file paths and existing types explicitly
+         - Specify NEW vs. MODIFIED vs. REMOVED clearly
+         - Mark uncertainties as "(TBD: verify)" rather than speculating
+         - Keep it lean: core behavior, key scenarios, working functionality
+         - Defer edge cases, performance tuning, advanced features to "Out of Scope"
+         - Avoid over-engineering: no security hardening, no premature optimization
+         - Success criteria must be agent-verifiable (tests pass, builds succeed, schemas match)
+         - Separate subjective concerns into "Optional Human Testing" section
+         - Incorporate insights from codebase review and user discussion
+         - Respond with your completed SPEC.md content
+
+      The guide is there to shape your questions, not to bypass discussion.
+      Remember: Execution mode is agile and TDD-focused, not production-hardening.
     transitions:
       - when: "spec_complete"
         to: plan
@@ -30,15 +64,15 @@ nodes:
 
       {{PLAN_WRITING}}
 
-      Your task: Create a rigorous implementation plan.
+      Your task: Create a lean, TDD-focused implementation plan.
       {{?context_note}}
 
-      Execution mode requirements:
-      - Strict TDD with comprehensive test coverage
-      - Error handling for all failure modes
-      - Integration testing strategy
-      - Performance validation steps
-      - Security considerations at each step
+      Execution mode approach:
+      - TDD where it drives development forward (not for coverage metrics)
+      - Core functionality first, edge cases only when essential
+      - Integration points identified, not over-tested
+      - Keep it agile: working code over defensive programming
+      - Tests serve development, not audit requirements
 
       Respond with your completed PLAN.md content.
     transitions:
@@ -49,15 +83,15 @@ nodes:
     prompt: |
       You are in the CODE phase of Document-Driven Development (Execution Mode).
 
-      Implement the system following the PLAN.md steps with production quality.
+      Implement the system following the PLAN.md steps.
       {{?context_note}}
 
-      Execution mode requirements:
-      - Full test coverage (unit + integration)
-      - Comprehensive error handling
-      - Input validation and sanitization
-      - Performance optimization where needed
-      - Clear documentation and logging
+      Execution mode approach:
+      - Tests that drive development, not exhaustive coverage
+      - Error handling for real failure scenarios, not hypothetical ones
+      - Working functionality over defensive programming
+      - Clear code over premature optimization
+      - Simple and direct over clever and general
 
       Respond when code is complete and all tests pass.
     rules:
@@ -106,7 +140,7 @@ nodes:
 
       {{README_WRITING}}
 
-      Your task: Create production-ready README.md.
+      Your task: Create a UNIX man-style README.md.
 
       Include:
       - System overview and purpose
