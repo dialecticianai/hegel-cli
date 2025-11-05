@@ -16,7 +16,7 @@ mod workflow;
 mod wrapped;
 
 // Re-export public functions
-pub use analyze::analyze_metrics;
+pub use analyze::{analyze_metrics, AnalyzeOptions};
 pub use archive::archive;
 pub use astq::run_astq;
 pub use config::handle_config;

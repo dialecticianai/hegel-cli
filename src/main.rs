@@ -93,6 +93,18 @@ enum Commands {
         /// Output repair results as JSON (implies --dry-run, requires --fix-archives)
         #[arg(long, requires = "fix_archives")]
         json: bool,
+        /// Display summary section (session, tokens, activity)
+        #[arg(long)]
+        summary: bool,
+        /// Display workflow transitions section
+        #[arg(long)]
+        workflow_transitions: bool,
+        /// Display phase breakdown section
+        #[arg(long)]
+        phase_breakdown: bool,
+        /// Display workflow graph section
+        #[arg(long)]
+        workflow_graph: bool,
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
@@ -314,8 +326,22 @@ fn main() -> Result<()> {
             fix_archives,
             dry_run,
             json,
+            summary,
+            workflow_transitions,
+            phase_breakdown,
+            workflow_graph,
         } => {
-            commands::analyze_metrics(&storage, export_dot, fix_archives, dry_run, json)?;
+            let options = commands::AnalyzeOptions {
+                export_dot,
+                fix_archives,
+                dry_run,
+                json,
+                summary,
+                workflow_transitions,
+                phase_breakdown,
+                workflow_graph,
+            };
+            commands::analyze_metrics(&storage, options)?;
         }
         Commands::Archive(args) => {
             commands::archive(args, &storage)?;

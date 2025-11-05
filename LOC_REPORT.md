@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 11:29
+**Last Updated**: 2025-11-05 11:42
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,976 | 9,072 | 23,048 |
-| **Comments** | 1,928 | - | 1,928 |
-| **Blank Lines** | 2,588 | - | 2,588 |
-| **Total Lines** | 18,492 | 9,072 | 27,564 |
+| **Lines** | 14,030 | 9,072 | 23,102 |
+| **Comments** | 1,934 | - | 1,934 |
+| **Blank Lines** | 2,594 | - | 2,594 |
+| **Total Lines** | 18,558 | 9,072 | 27,630 |
 | **Files** | 86 | 50 | 136 |
 
 **Documentation Ratio**: 0.65 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            86           2588           1928          13976
+Rust                            86           2594           1934          14030
 Markdown                        14            134              0            395
 -------------------------------------------------------------------------------
-SUM:                           100           2722           1928          14371
+SUM:                           100           2728           1934          14425
 -------------------------------------------------------------------------------
 ```
 
@@ -47,7 +47,7 @@ SUM:                           100           2722           1928          14371
 | `analyze/repair.rs` | 192 | 192 | 0 | 0.0% | ✅ |
 | `analyze/sections.rs` | 339 | 339 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
-| `commands/analyze/mod.rs` | 200 | 46 | 154 | 77.0% | ✅ |
+| `commands/analyze/mod.rs` | 240 | 73 | 167 | 69.6% | ✅ |
 | `commands/archive.rs` | 302 | 213 | 89 | 29.5% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
@@ -87,7 +87,7 @@ SUM:                           100           2722           1928          14371
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 367 | 14 | 353 | 96.2% | ✅ |
+| `main.rs` | 393 | 14 | 379 | 96.4% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 205 | 146 | 59 | 28.8% | ✅ |
 | `metrics/cowboy.rs` | 470 | 289 | 181 | 38.5% | ⚠️ Large |

@@ -6,40 +6,67 @@ use crate::metrics::parse_unified_metrics;
 use crate::storage::FileStorage;
 use crate::theme::Theme;
 
-pub fn analyze_metrics(
-    storage: &FileStorage,
-    export_dot: bool,
-    fix_archives: bool,
-    dry_run: bool,
-    json: bool,
-) -> Result<()> {
+pub struct AnalyzeOptions {
+    pub export_dot: bool,
+    pub fix_archives: bool,
+    pub dry_run: bool,
+    pub json: bool,
+    pub summary: bool,
+    pub workflow_transitions: bool,
+    pub phase_breakdown: bool,
+    pub workflow_graph: bool,
+}
+
+pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result<()> {
     // Handle archive repair if requested
-    if fix_archives {
-        return repair_archives(storage, dry_run || json, json);
+    if options.fix_archives {
+        return repair_archives(storage, options.dry_run || options.json, options.json);
     }
 
     // analyze command needs ALL metrics including archives
     let metrics = parse_unified_metrics(storage.state_dir(), true)?;
 
     // Export DOT format if requested
-    if export_dot {
+    if options.export_dot {
         render_workflow_graph_dot(&metrics)?;
         return Ok(());
     }
 
-    // Otherwise, render full analysis
+    // Determine which sections to display
+    // If no flags provided, show all sections
+    let show_all = !options.summary
+        && !options.workflow_transitions
+        && !options.phase_breakdown
+        && !options.workflow_graph;
+    let show_summary = show_all || options.summary;
+    let show_workflow_transitions = show_all || options.workflow_transitions;
+    let show_phase_breakdown = show_all || options.phase_breakdown;
+    let show_workflow_graph = show_all || options.workflow_graph;
+
+    // Render selected sections
     println!("{}", Theme::header("=== Hegel Metrics Analysis ==="));
     println!();
 
-    render_session(&metrics);
-    render_tokens(&metrics);
-    render_activity(&metrics);
-    render_top_bash_commands(&metrics);
-    render_command_output_summary(&metrics);
-    render_top_file_modifications(&metrics);
-    render_state_transitions(&metrics);
-    render_phase_breakdown(&metrics.phase_metrics);
-    render_workflow_graph(&metrics);
+    if show_summary {
+        render_session(&metrics);
+        render_tokens(&metrics);
+        render_activity(&metrics);
+        render_top_bash_commands(&metrics);
+        render_command_output_summary(&metrics);
+        render_top_file_modifications(&metrics);
+    }
+
+    if show_workflow_transitions {
+        render_state_transitions(&metrics);
+    }
+
+    if show_phase_breakdown {
+        render_phase_breakdown(&metrics.phase_metrics);
+    }
+
+    if show_workflow_graph {
+        render_workflow_graph(&metrics);
+    }
 
     Ok(())
 }
@@ -49,12 +76,25 @@ mod tests {
     use super::*;
     use crate::test_helpers::*;
 
+    fn default_options() -> AnalyzeOptions {
+        AnalyzeOptions {
+            export_dot: false,
+            fix_archives: false,
+            dry_run: false,
+            json: false,
+            summary: false,
+            workflow_transitions: false,
+            phase_breakdown: false,
+            workflow_graph: false,
+        }
+    }
+
     #[test]
     fn test_analyze_empty_state() {
         // Empty state directory - should not error
         let (_temp_dir, storage) = test_storage_with_files(None, None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -66,7 +106,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -80,7 +120,7 @@ mod tests {
         let hook = hook_with_transcript(&transcript_path, "test", "2025-01-01T10:00:00Z");
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook]), None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -94,7 +134,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -107,7 +147,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -120,7 +160,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -137,7 +177,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -149,7 +189,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(None, Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -163,7 +203,7 @@ mod tests {
         );
         let (_temp_dir, storage) = test_storage_with_files(Some(&[&hook_str]), None);
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 
@@ -194,7 +234,7 @@ mod tests {
         ];
         let (_temp_dir, storage) = test_storage_with_files(Some(&hooks), Some(&states));
 
-        let result = analyze_metrics(&storage, false, false, false, false);
+        let result = analyze_metrics(&storage, default_options());
         assert!(result.is_ok());
     }
 }
