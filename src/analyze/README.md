@@ -11,7 +11,7 @@ Provides the implementation for metrics analysis, repair operations, and display
 ```
 analyze/
 ├── mod.rs               Module exports
-├── sections.rs          Rendering sections (session, tokens, activity, commands/files, transitions, phases, graph)
+├── sections.rs          Rendering sections (brief summary, activity, tokens, transitions, phases, graph)
 ├── repair.rs            Archive repair orchestration (cleanup trait integration, reporting)
 ├── cleanup/             Trait-based archive cleanup system (See cleanup/README.md)
 ├── gap_detection.rs     Workflow gap detection (identify and create synthetic cowboy archives)
@@ -20,7 +20,7 @@ analyze/
 
 ## Key Features
 
-**Section Rendering**: Formats metrics output (tokens, activity, phase breakdown, workflow graphs)
+**Section Rendering**: Formats metrics output with progressive disclosure (brief summary default, detailed sections via flags)
 **Archive Repair**: Detects gaps in workflow coverage and repairs archives via cleanup trait implementations
 **Cleanup System**: Pluggable repair operations (git backfill, aborted node addition) via ArchiveCleanup trait
 **Totals Computation**: Aggregates metrics across all archived workflows
