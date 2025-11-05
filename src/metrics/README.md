@@ -17,7 +17,7 @@ metrics/
 ├── transcript.rs        Parses Claude Code transcripts for token usage (handles old and new format)
 ├── git.rs               Git commit tracking and attribution (parse git log, attribute to phases by timestamp)
 ├── cowboy.rs            Cowboy mode activity attribution (detects inter-workflow gaps, creates synthetic cowboy sessions)
-└── graph.rs             Workflow DAG reconstruction (build from transitions, cycle detection, ASCII/DOT rendering)
+└── graph.rs             Workflow DAG reconstruction (groups workflows, tracks inter-workflow connections, ASCII/DOT rendering)
 ```
 
 ## Event Stream Correlation

@@ -6,230 +6,267 @@
 use crate::metrics::{PhaseMetrics, StateTransitionEvent};
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Clone)]
-pub struct DAGNode {
-    pub phase_name: String,
-    pub visits: usize,
-    pub total_tokens: u64,
-    pub total_duration_secs: u64,
-    pub file_modifications: usize,
-    pub bash_commands: usize,
-    pub is_synthetic: bool,
-}
+/// Number of workflows to display per row in DOT graph layout
+const WORKFLOWS_PER_ROW: usize = 5;
 
+/// A single workflow with its phases in sequence
 #[derive(Debug, Clone)]
-pub struct DAGEdge {
-    pub from: String,
-    pub to: String,
-    pub count: usize,
+pub struct WorkflowGroup {
+    pub workflow_id: String,
+    pub phases: Vec<String>,
+    pub phase_data: HashMap<String, PhaseMetrics>,
+    pub is_synthetic: bool,
 }
 
 #[derive(Debug)]
 pub struct WorkflowDAG {
-    pub nodes: HashMap<String, DAGNode>,
-    pub edges: Vec<DAGEdge>,
+    pub workflows: Vec<WorkflowGroup>,
+    pub inter_workflow_edges: Vec<(String, String, String, String)>,
 }
 
 impl WorkflowDAG {
-    /// Build DAG from state transitions and phase metrics
+    /// Build grouped DAG from state transitions and phase metrics
     pub fn from_transitions(
         transitions: &[StateTransitionEvent],
         phase_metrics: &[PhaseMetrics],
     ) -> Self {
-        let mut nodes = HashMap::new();
-        let mut edges_map: HashMap<(String, String), usize> = HashMap::new();
-
-        // Initialize nodes from phase metrics
-        for phase in phase_metrics {
-            let entry = nodes
-                .entry(phase.phase_name.clone())
-                .or_insert_with(|| DAGNode {
-                    phase_name: phase.phase_name.clone(),
-                    visits: 0,
-                    total_tokens: 0,
-                    total_duration_secs: 0,
-                    file_modifications: 0,
-                    bash_commands: 0,
-                    is_synthetic: phase.is_synthetic,
-                });
-
-            entry.visits += 1;
-            entry.total_tokens +=
-                phase.token_metrics.total_input_tokens + phase.token_metrics.total_output_tokens;
-            entry.total_duration_secs += phase.duration_seconds;
-            entry.file_modifications += phase.file_modifications.len();
-            entry.bash_commands += phase.bash_commands.len();
-            // If any phase for this node is synthetic, mark the whole node as synthetic
-            entry.is_synthetic = entry.is_synthetic || phase.is_synthetic;
+        // Create a map of phase metrics by phase name for quick lookup
+        let mut phase_data_map: HashMap<String, Vec<PhaseMetrics>> = HashMap::new();
+        for metric in phase_metrics {
+            phase_data_map
+                .entry(metric.phase_name.clone())
+                .or_insert_with(Vec::new)
+                .push(metric.clone());
         }
 
-        // Build edges from transitions
-        for i in 0..transitions.len().saturating_sub(1) {
-            let from = &transitions[i].phase;
-            let to = &transitions[i + 1].phase;
-
-            // Skip self-loops (same phase transition)
-            if from != to {
-                *edges_map.entry((from.clone(), to.clone())).or_insert(0) += 1;
+        // Group transitions by workflow_id
+        let mut workflow_transitions: HashMap<String, Vec<StateTransitionEvent>> = HashMap::new();
+        for transition in transitions {
+            if let Some(wid) = &transition.workflow_id {
+                workflow_transitions
+                    .entry(wid.clone())
+                    .or_insert_with(Vec::new)
+                    .push(transition.clone());
             }
         }
 
-        let edges: Vec<DAGEdge> = edges_map
-            .into_iter()
-            .map(|((from, to), count)| DAGEdge { from, to, count })
-            .collect();
+        // Build workflow groups
+        let mut workflows = Vec::new();
+        let mut inter_workflow_edges = Vec::new();
+        let mut prev_workflow_id: Option<String> = None;
+        let mut prev_phase: Option<String> = None;
 
-        Self { nodes, edges }
-    }
+        for (workflow_id, trans) in &workflow_transitions {
+            // Extract ordered phases for this workflow
+            let mut phases = Vec::new();
+            let mut seen_phases = HashSet::new();
 
-    /// Detect cycles in the graph (indicates workflow loops)
-    pub fn find_cycles(&self) -> Vec<Vec<String>> {
-        let mut cycles = Vec::new();
-        let mut visited = HashSet::new();
-        let mut rec_stack = HashSet::new();
-
-        for node in self.nodes.keys() {
-            if !visited.contains(node) {
-                self.dfs_cycle(node, &mut visited, &mut rec_stack, &mut vec![], &mut cycles);
-            }
-        }
-
-        cycles
-    }
-
-    fn dfs_cycle(
-        &self,
-        node: &str,
-        visited: &mut HashSet<String>,
-        rec_stack: &mut HashSet<String>,
-        path: &mut Vec<String>,
-        cycles: &mut Vec<Vec<String>>,
-    ) {
-        visited.insert(node.to_string());
-        rec_stack.insert(node.to_string());
-        path.push(node.to_string());
-
-        // Find outgoing edges
-        for edge in &self.edges {
-            if edge.from == node {
-                if rec_stack.contains(&edge.to) {
-                    // Found cycle - extract the cycle portion
-                    if let Some(cycle_start) = path.iter().position(|n| n == &edge.to) {
-                        let mut cycle = path[cycle_start..].to_vec();
-                        cycle.push(edge.to.clone()); // Close the cycle
-                        cycles.push(cycle);
-                    }
-                } else if !visited.contains(&edge.to) {
-                    self.dfs_cycle(&edge.to, visited, rec_stack, path, cycles);
+            for t in trans {
+                if !seen_phases.contains(&t.phase) {
+                    phases.push(t.phase.clone());
+                    seen_phases.insert(t.phase.clone());
                 }
             }
+
+            // Determine if workflow is synthetic
+            let is_synthetic = trans.iter().any(|t| {
+                if let Some(metrics) = phase_data_map.get(&t.phase) {
+                    metrics.iter().any(|m| m.is_synthetic)
+                } else {
+                    false
+                }
+            });
+
+            // Build phase_data map for this workflow
+            let mut phase_data = HashMap::new();
+            for phase in &phases {
+                if let Some(metrics) = phase_data_map.get(phase) {
+                    if let Some(metric) = metrics.first() {
+                        phase_data.insert(phase.clone(), metric.clone());
+                    }
+                }
+            }
+
+            workflows.push(WorkflowGroup {
+                workflow_id: workflow_id.clone(),
+                phases,
+                phase_data,
+                is_synthetic,
+            });
+
+            // Check for inter-workflow edge
+            if let (Some(prev_wid), Some(prev_p)) = (&prev_workflow_id, &prev_phase) {
+                if let Some(current_first_phase) = workflows.last().and_then(|w| w.phases.first()) {
+                    if prev_wid != workflow_id {
+                        inter_workflow_edges.push((
+                            prev_wid.clone(),
+                            prev_p.clone(),
+                            workflow_id.clone(),
+                            current_first_phase.clone(),
+                        ));
+                    }
+                }
+            }
+
+            prev_workflow_id = Some(workflow_id.clone());
+            prev_phase = workflows.last().and_then(|w| w.phases.last()).cloned();
         }
 
-        rec_stack.remove(node);
-        path.pop();
+        Self {
+            workflows,
+            inter_workflow_edges,
+        }
     }
 
-    /// Render as ASCII art using box-drawing characters
+    /// Render grouped workflows as ASCII
     pub fn render_ascii(&self) -> String {
         let mut output = String::new();
 
-        // Sort nodes alphabetically for consistent output
-        let mut sorted_nodes: Vec<_> = self.nodes.keys().collect();
-        sorted_nodes.sort();
+        for (idx, workflow) in self.workflows.iter().enumerate() {
+            let synthetic_label = if workflow.is_synthetic {
+                " (synthetic)"
+            } else {
+                ""
+            };
 
-        for node_name in &sorted_nodes {
-            let node = &self.nodes[*node_name];
-
-            // Node header
-            output.push_str(&format!("┌─ {} ", node.phase_name.to_uppercase()));
-            output.push_str(&"─".repeat(50));
+            output.push_str(&format!(
+                "\n┌─ Workflow {}: {}{} ",
+                idx + 1,
+                workflow.workflow_id,
+                synthetic_label
+            ));
+            output.push_str(&"─".repeat(40));
             output.push_str("┐\n");
 
-            // Node stats
-            output.push_str(&format!(
-                "│ Visits: {:>3}  Tokens: {:>8}  Duration: {:>5}s",
-                node.visits, node.total_tokens, node.total_duration_secs
-            ));
-            output.push_str(&" ".repeat(12));
-            output.push_str("│\n");
+            // Show phases in sequence
+            for (phase_idx, phase_name) in workflow.phases.iter().enumerate() {
+                let arrow = if phase_idx == 0 { "│ " } else { "│ → " };
 
-            output.push_str(&format!(
-                "│ Bash: {:>3}  Files: {:>3}",
-                node.bash_commands, node.file_modifications
-            ));
-            output.push_str(&" ".repeat(42));
-            output.push_str("│\n");
+                if let Some(metrics) = workflow.phase_data.get(phase_name) {
+                    let total_tokens = metrics.token_metrics.total_input_tokens
+                        + metrics.token_metrics.total_output_tokens;
+                    let duration = metrics.duration_seconds;
 
-            output.push_str("└");
-            output.push_str(&"─".repeat(62));
-            output.push_str("┘\n");
-
-            // Outgoing edges
-            let outgoing: Vec<_> = self
-                .edges
-                .iter()
-                .filter(|e| e.from == **node_name)
-                .collect();
-
-            for (i, edge) in outgoing.iter().enumerate() {
-                let connector = if i == outgoing.len() - 1 {
-                    "└─"
+                    output.push_str(&format!(
+                        "{}{} ({} tokens, {}s)\n",
+                        arrow,
+                        phase_name.to_uppercase(),
+                        total_tokens,
+                        duration
+                    ));
                 } else {
-                    "├─"
-                };
-                output.push_str(&format!(
-                    "  {}→ {}  ({}x)\n",
-                    connector, edge.to, edge.count
-                ));
+                    output.push_str(&format!("{}{}\n", arrow, phase_name.to_uppercase()));
+                }
             }
 
-            output.push('\n');
+            output.push_str("└");
+            output.push_str(&"─".repeat(64));
+            output.push_str("┘\n");
+        }
+
+        // Show inter-workflow connections
+        if !self.inter_workflow_edges.is_empty() {
+            output.push_str("\nInter-workflow Connections:\n");
+            for (from_wid, from_phase, to_wid, to_phase) in &self.inter_workflow_edges {
+                output.push_str(&format!(
+                    "  {} ({}) → {} ({})\n",
+                    from_wid, from_phase, to_wid, to_phase
+                ));
+            }
         }
 
         output
     }
 
-    /// Export as DOT format for Graphviz
+    /// Export as DOT format with subgraph clusters
     pub fn export_dot(&self) -> String {
         let mut dot = String::from("digraph workflow {\n");
-        dot.push_str("  rankdir=LR;\n");
-        dot.push_str("  node [shape=box, style=rounded];\n\n");
+        dot.push_str("  rankdir=TB;\n");
+        dot.push_str("  node [shape=box, style=rounded];\n");
+        dot.push_str("  compound=true;\n");
+        dot.push_str("  newrank=true;\n");
+        dot.push_str("  ranksep=1.5;\n\n");
 
-        // Nodes
-        for (name, node) in &self.nodes {
-            let synthetic_label = if node.is_synthetic {
+        // Generate subgraph for each workflow
+        for (idx, workflow) in self.workflows.iter().enumerate() {
+            let synthetic_label = if workflow.is_synthetic {
                 " (synthetic)"
             } else {
                 ""
             };
-            let label = format!(
-                "{}{}\\n{} tokens\\n{}s\\n{} visits",
-                name, synthetic_label, node.total_tokens, node.total_duration_secs, node.visits
-            );
 
-            // Synthetic nodes: diamond shape + dashed border
-            // Explicit nodes: rounded box (default)
-            let style = if node.is_synthetic {
-                " [shape=diamond, style=dashed]"
+            dot.push_str(&format!("  subgraph cluster_{} {{\n", idx));
+            dot.push_str(&format!(
+                "    label=\"Workflow {}{}\";\n",
+                workflow.workflow_id, synthetic_label
+            ));
+
+            if workflow.is_synthetic {
+                dot.push_str("    style=dashed;\n");
             } else {
-                ""
-            };
+                dot.push_str("    style=solid;\n");
+            }
 
-            dot.push_str(&format!("  \"{}\" [label=\"{}\"]{};\n", name, label, style));
+            dot.push_str("    color=blue;\n\n");
+
+            // Add nodes for each phase
+            for phase_name in &workflow.phases {
+                let node_id = format!("{}_{}", workflow.workflow_id, phase_name);
+
+                if let Some(metrics) = workflow.phase_data.get(phase_name) {
+                    let total_tokens = metrics.token_metrics.total_input_tokens
+                        + metrics.token_metrics.total_output_tokens;
+                    let duration = metrics.duration_seconds;
+
+                    dot.push_str(&format!(
+                        "    \"{}\" [label=\"{}\\n{} tokens\\n{}s\"];\n",
+                        node_id, phase_name, total_tokens, duration
+                    ));
+                } else {
+                    dot.push_str(&format!(
+                        "    \"{}\" [label=\"{}\"];\n",
+                        node_id, phase_name
+                    ));
+                }
+            }
+
+            // Add edges between phases within workflow
+            for i in 0..workflow.phases.len().saturating_sub(1) {
+                let from = format!("{}_{}", workflow.workflow_id, workflow.phases[i]);
+                let to = format!("{}_{}", workflow.workflow_id, workflow.phases[i + 1]);
+                dot.push_str(&format!("    \"{}\" -> \"{}\";\n", from, to));
+            }
+
+            dot.push_str("  }\n\n");
         }
 
+        // Group workflows into rows using rank=same
+        let mut row_start = 0;
+        while row_start < self.workflows.len() {
+            let row_end = (row_start + WORKFLOWS_PER_ROW).min(self.workflows.len());
+            if row_end - row_start > 1 {
+                dot.push_str("  { rank=same; ");
+                for i in row_start..row_end {
+                    let first_node = format!(
+                        "\"{}_{}\";",
+                        self.workflows[i].workflow_id, self.workflows[i].phases[0]
+                    );
+                    dot.push_str(&first_node);
+                    dot.push(' ');
+                }
+                dot.push_str("}\n");
+            }
+            row_start = row_end;
+        }
         dot.push('\n');
 
-        // Edges
-        for edge in &self.edges {
-            let label = if edge.count > 1 {
-                format!(" [label=\"{}x\"]", edge.count)
-            } else {
-                String::new()
-            };
+        // Add inter-workflow edges
+        for (from_wid, from_phase, to_wid, to_phase) in &self.inter_workflow_edges {
+            let from_node = format!("{}_{}", from_wid, from_phase);
+            let to_node = format!("{}_{}", to_wid, to_phase);
             dot.push_str(&format!(
-                "  \"{}\" -> \"{}\"{};\n",
-                edge.from, edge.to, label
+                "  \"{}\" -> \"{}\" [style=dashed, color=red];\n",
+                from_node, to_node
             ));
         }
 
@@ -300,12 +337,15 @@ mod tests {
         let phase_metrics = test_phase_metrics();
         let dag = WorkflowDAG::from_transitions(&transitions, &phase_metrics);
 
-        assert_eq!(dag.nodes.len(), 2); // spec and plan (code has no metrics)
-        assert!(dag.nodes.contains_key("spec"));
-        assert!(dag.nodes.contains_key("plan"));
+        // All transitions have same workflow_id, should be 1 workflow
+        assert_eq!(dag.workflows.len(), 1);
 
-        // Check edges
-        assert_eq!(dag.edges.len(), 2); // spec->plan, plan->code
+        let workflow = &dag.workflows[0];
+        assert_eq!(workflow.workflow_id, "test");
+        assert_eq!(workflow.phases.len(), 3); // spec, plan, code
+        assert!(workflow.phases.contains(&"spec".to_string()));
+        assert!(workflow.phases.contains(&"plan".to_string()));
+        assert!(workflow.phases.contains(&"code".to_string()));
     }
 
     #[test]
@@ -314,36 +354,50 @@ mod tests {
         let phase_metrics = test_phase_metrics();
         let dag = WorkflowDAG::from_transitions(&transitions, &phase_metrics);
 
-        let spec_node = &dag.nodes["spec"];
-        assert_eq!(spec_node.total_tokens, 1500); // 1000 + 500
-        assert_eq!(spec_node.total_duration_secs, 900);
-        assert_eq!(spec_node.visits, 1);
+        let workflow = &dag.workflows[0];
 
-        let plan_node = &dag.nodes["plan"];
-        assert_eq!(plan_node.total_tokens, 3000); // 2000 + 1000
+        // Check spec metrics
+        let spec_metrics = &workflow.phase_data["spec"];
+        assert_eq!(
+            spec_metrics.token_metrics.total_input_tokens
+                + spec_metrics.token_metrics.total_output_tokens,
+            1500
+        );
+        assert_eq!(spec_metrics.duration_seconds, 900);
+
+        // Check plan metrics
+        let plan_metrics = &workflow.phase_data["plan"];
+        assert_eq!(
+            plan_metrics.token_metrics.total_input_tokens
+                + plan_metrics.token_metrics.total_output_tokens,
+            3000
+        );
     }
 
     #[test]
-    fn test_detect_cycles() {
+    fn test_multi_workflow() {
         let mut transitions = test_transitions();
 
-        // Add a cycle: code -> spec
+        // Add another workflow
         transitions.push(StateTransitionEvent {
-            timestamp: "2025-01-01T10:45:00Z".to_string(),
-            workflow_id: Some("test".to_string()),
-            from_node: "code".to_string(),
+            timestamp: "2025-01-01T11:00:00Z".to_string(),
+            workflow_id: Some("test2".to_string()),
+            from_node: "START".to_string(),
             to_node: "spec".to_string(),
             phase: "spec".to_string(),
             mode: "discovery".to_string(),
         });
 
         let dag = WorkflowDAG::from_transitions(&transitions, &test_phase_metrics());
-        let cycles = dag.find_cycles();
 
-        assert!(!cycles.is_empty());
-        assert!(cycles.iter().any(|c| c.contains(&"spec".to_string())
-            && c.contains(&"plan".to_string())
-            && c.contains(&"code".to_string())));
+        assert_eq!(dag.workflows.len(), 2);
+        let workflow_ids: Vec<_> = dag
+            .workflows
+            .iter()
+            .map(|w| w.workflow_id.as_str())
+            .collect();
+        assert!(workflow_ids.contains(&"test"));
+        assert!(workflow_ids.contains(&"test2"));
     }
 
     #[test]
@@ -353,10 +407,10 @@ mod tests {
         let dag = WorkflowDAG::from_transitions(&transitions, &phase_metrics);
         let ascii = dag.render_ascii();
 
+        assert!(ascii.contains("Workflow"));
         assert!(ascii.contains("SPEC"));
         assert!(ascii.contains("PLAN"));
         assert!(ascii.contains("→"));
-        assert!(ascii.contains("├─") || ascii.contains("└─"));
     }
 
     #[test]
@@ -367,6 +421,7 @@ mod tests {
         let dot = dag.export_dot();
 
         assert!(dot.contains("digraph workflow"));
+        assert!(dot.contains("subgraph cluster"));
         assert!(dot.contains("spec"));
         assert!(dot.contains("plan"));
         assert!(dot.contains("->"));

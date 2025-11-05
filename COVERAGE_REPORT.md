@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 11:51
+**Last Updated**: 2025-11-05 12:16
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **87.29%** lines | **86.23%** regions | **86.62%** functions
+**Overall Coverage**: **87.18%** lines | **86.10%** regions | **86.58%** functions
 
 ## Summary
 
 ```
-TOTAL                                      17082              2353    86.23%         912               122    86.62%       10355              1316    87.29%           0                 0         -
+TOTAL                                      17151              2384    86.10%         909               122    86.58%       10416              1335    87.18%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -21,7 +21,7 @@ TOTAL                                      17082              2353    86.23%    
 | `src/analyze/backfill.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/gap_detection.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/analyze/sections.rs` | 87.83% | 81.82% | 88.24% | 🟡 Good |
+| `src/analyze/sections.rs` | 89.66% | 84.20% | 88.24% | 🟡 Good |
 | `src/analyze/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/commands/analyze/mod.rs` | 97.74% | 92.91% | 100.00% | 🟢 Excellent |
 | `src/commands/archive.rs` | 59.30% | 62.27% | 64.29% | 🟠 Moderate |
@@ -59,7 +59,7 @@ TOTAL                                      17082              2353    86.23%    
 | `src/metrics/aggregation.rs` | 97.22% | 95.52% | 100.00% | 🟢 Excellent |
 | `src/metrics/cowboy.rs` | 93.69% | 89.18% | 100.00% | 🟢 Excellent |
 | `src/metrics/git.rs` | 92.43% | 91.65% | 95.45% | 🟢 Excellent |
-| `src/metrics/graph.rs` | 98.34% | 98.03% | 100.00% | 🟢 Excellent |
+| `src/metrics/graph.rs` | 90.79% | 89.68% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `src/metrics/mod.rs` | 96.19% | 94.97% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -116,7 +116,7 @@ TOTAL                                      17082              2353    86.23%    
 - `src/metrics/aggregation.rs` - 97.22%
 - `src/metrics/cowboy.rs` - 93.69%
 - `src/metrics/git.rs` - 92.43%
-- `src/metrics/graph.rs` - 98.34%
+- `src/metrics/graph.rs` - 90.79%
 - `src/metrics/hooks.rs` - 94.22%
 - `src/metrics/mod.rs` - 96.19%
 - `src/metrics/states.rs` - 100.00%
@@ -141,7 +141,7 @@ TOTAL                                      17082              2353    86.23%    
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/analyze/sections.rs` - 87.83%
+- `src/analyze/sections.rs` - 89.66%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 83.89%
@@ -175,7 +175,7 @@ TOTAL                                      17082              2353    86.23%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 87.29% | ✅ Met |
+| Overall | ≥80% | 87.18% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

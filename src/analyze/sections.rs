@@ -296,24 +296,14 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
 pub fn render_workflow_graph(metrics: &UnifiedMetrics) {
     if !metrics.state_transitions.is_empty() && !metrics.phase_metrics.is_empty() {
         println!("{}", Theme::label("Workflow Graph"));
-        println!();
 
         let graph =
             WorkflowDAG::from_transitions(&metrics.state_transitions, &metrics.phase_metrics);
 
-        // ASCII visualization
+        // ASCII visualization with grouped workflows
         print!("{}", graph.render_ascii());
 
-        // Cycle detection
-        let cycles = graph.find_cycles();
-        if !cycles.is_empty() {
-            println!("{}", Theme::warning("⚠ Cycles Detected:").bold());
-            for cycle in cycles {
-                println!("  {}", Theme::warning(cycle.join(" → ")));
-            }
-            println!();
-        }
-
+        println!();
         println!("{}", Theme::secondary("Export Options:"));
         println!(
             "  {} hegel analyze --export-dot > workflow.dot",

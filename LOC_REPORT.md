@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 11:51
+**Last Updated**: 2025-11-05 12:16
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,031 | 9,077 | 23,108 |
-| **Comments** | 1,934 | - | 1,934 |
-| **Blank Lines** | 2,594 | - | 2,594 |
-| **Total Lines** | 18,559 | 9,077 | 27,636 |
-| **Files** | 86 | 50 | 136 |
+| **Lines** | 14,072 | 9,182 | 23,254 |
+| **Comments** | 1,936 | - | 1,936 |
+| **Blank Lines** | 2,596 | - | 2,596 |
+| **Total Lines** | 18,604 | 9,182 | 27,786 |
+| **Files** | 86 | 51 | 137 |
 
 **Documentation Ratio**: 0.65 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            86           2594           1934          14031
+Rust                            86           2596           1936          14072
 Markdown                        14            134              0            395
 -------------------------------------------------------------------------------
-SUM:                           100           2728           1934          14426
+SUM:                           100           2730           1936          14467
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                           100           2728           1934          14426
 | `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `analyze/repair.rs` | 192 | 192 | 0 | 0.0% | ✅ |
-| `analyze/sections.rs` | 340 | 340 | 0 | 0.0% | ⚠️ Large |
+| `analyze/sections.rs` | 330 | 330 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 240 | 73 | 167 | 69.6% | ✅ |
 | `commands/archive.rs` | 302 | 213 | 89 | 29.5% | ⚠️ Large |
@@ -92,7 +92,7 @@ SUM:                           100           2728           1934          14426
 | `metrics/aggregation.rs` | 205 | 146 | 59 | 28.8% | ✅ |
 | `metrics/cowboy.rs` | 470 | 289 | 181 | 38.5% | ⚠️ Large |
 | `metrics/git.rs` | 496 | 158 | 338 | 68.1% | ✅ |
-| `metrics/graph.rs` | 375 | 240 | 135 | 36.0% | ✅ (infra) |
+| `metrics/graph.rs` | 430 | 277 | 153 | 35.6% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
 | `metrics/mod.rs` | 764 | 222 | 542 | 70.9% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
@@ -141,6 +141,7 @@ SUM:                           100           2728           1934          14426
 | `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
 | `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
+| `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
 | `CLAUDE.md` | 179 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 202 |
@@ -164,7 +165,7 @@ SUM:                           100           2728           1934          14426
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 208 |
+| `LOC_REPORT.md` | 209 |
 | `README.md` | 584 |
 | `ROADMAP.md` | 212 |
 | `src/adapters/README.md` | 25 |

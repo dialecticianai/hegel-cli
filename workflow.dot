@@ -1,0 +1,642 @@
+digraph workflow {
+  rankdir=TB;
+  node [shape=box, style=rounded];
+  compound=true;
+  newrank=true;
+  ranksep=1.5;
+
+  subgraph cluster_0 {
+    label="Workflow 2025-11-03T05:12:19+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T05:12:19+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T05:12:19+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T05:12:19+00:00_ride" -> "2025-11-03T05:12:19+00:00_done";
+  }
+
+  subgraph cluster_1 {
+    label="Workflow 2025-10-11T00:55:23+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-11T00:55:23+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-11T00:55:23+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-11T00:55:23+00:00_ride" -> "2025-10-11T00:55:23+00:00_done";
+  }
+
+  subgraph cluster_2 {
+    label="Workflow 2025-10-15T01:50:01+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-15T01:50:01+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-15T01:50:01+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-15T01:50:01+00:00_ride" -> "2025-10-15T01:50:01+00:00_done";
+  }
+
+  subgraph cluster_3 {
+    label="Workflow 2025-11-04T17:13:21.097097+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-04T17:13:21.097097+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-04T17:13:21.097097+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T17:13:21.097097+00:00_ride" -> "2025-11-04T17:13:21.097097+00:00_done";
+  }
+
+  subgraph cluster_4 {
+    label="Workflow 2025-10-29T21:18:55+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-29T21:18:55+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-29T21:18:55+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-29T21:18:55+00:00_ride" -> "2025-10-29T21:18:55+00:00_done";
+  }
+
+  subgraph cluster_5 {
+    label="Workflow 2025-11-04T19:17:29+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-04T19:17:29+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-04T19:17:29+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T19:17:29+00:00_ride" -> "2025-11-04T19:17:29+00:00_done";
+  }
+
+  subgraph cluster_6 {
+    label="Workflow 2025-10-14T22:24:09+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-14T22:24:09+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-14T22:24:09+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-14T22:24:09+00:00_ride" -> "2025-10-14T22:24:09+00:00_done";
+  }
+
+  subgraph cluster_7 {
+    label="Workflow 2025-11-04T17:55:09+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-04T17:55:09+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-04T17:55:09+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T17:55:09+00:00_ride" -> "2025-11-04T17:55:09+00:00_done";
+  }
+
+  subgraph cluster_8 {
+    label="Workflow 2025-10-24T16:39:50+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-24T16:39:50+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-24T16:39:50+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-24T16:39:50+00:00_ride" -> "2025-10-24T16:39:50+00:00_done";
+  }
+
+  subgraph cluster_9 {
+    label="Workflow 2025-10-15T21:30:33+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-15T21:30:33+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-15T21:30:33+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-15T21:30:33+00:00_ride" -> "2025-10-15T21:30:33+00:00_done";
+  }
+
+  subgraph cluster_10 {
+    label="Workflow 2025-11-05T01:40:03.050563+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-05T01:40:03.050563+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-11-05T01:40:03.050563+00:00_code_review" [label="code_review\n987 tokens\n121s"];
+    "2025-11-05T01:40:03.050563+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-05T01:40:03.050563+00:00_refactor" -> "2025-11-05T01:40:03.050563+00:00_code_review";
+    "2025-11-05T01:40:03.050563+00:00_code_review" -> "2025-11-05T01:40:03.050563+00:00_done";
+  }
+
+  subgraph cluster_11 {
+    label="Workflow 2025-10-11T09:01:59+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-11T09:01:59+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-11T09:01:59+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-11T09:01:59+00:00_ride" -> "2025-10-11T09:01:59+00:00_done";
+  }
+
+  subgraph cluster_12 {
+    label="Workflow 2025-10-26T19:20:03+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-26T19:20:03+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-26T19:20:03+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-26T19:20:03+00:00_ride" -> "2025-10-26T19:20:03+00:00_done";
+  }
+
+  subgraph cluster_13 {
+    label="Workflow 2025-10-09T23:01:36+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-09T23:01:36+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-09T23:01:36+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-09T23:01:36+00:00_ride" -> "2025-10-09T23:01:36+00:00_done";
+  }
+
+  subgraph cluster_14 {
+    label="Workflow 2025-10-16T00:32:24+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-16T00:32:24+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-16T00:32:24+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-16T00:32:24+00:00_ride" -> "2025-10-16T00:32:24+00:00_done";
+  }
+
+  subgraph cluster_15 {
+    label="Workflow 2025-10-17T22:25:09+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-17T22:25:09+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-17T22:25:09+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-17T22:25:09+00:00_ride" -> "2025-10-17T22:25:09+00:00_done";
+  }
+
+  subgraph cluster_16 {
+    label="Workflow 2025-10-27T02:23:14.902509+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-10-27T02:23:14.902509+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-10-27T02:23:14.902509+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-10-27T02:23:14.902509+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-10-27T02:23:14.902509+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-27T02:23:14.902509+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-10-27T02:23:14.902509+00:00_refactor" -> "2025-10-27T02:23:14.902509+00:00_code";
+    "2025-10-27T02:23:14.902509+00:00_code" -> "2025-10-27T02:23:14.902509+00:00_review";
+    "2025-10-27T02:23:14.902509+00:00_review" -> "2025-10-27T02:23:14.902509+00:00_done";
+    "2025-10-27T02:23:14.902509+00:00_done" -> "2025-10-27T02:23:14.902509+00:00_plan";
+  }
+
+  subgraph cluster_17 {
+    label="Workflow 2025-10-13T06:44:04+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-13T06:44:04+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-13T06:44:04+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-13T06:44:04+00:00_ride" -> "2025-10-13T06:44:04+00:00_done";
+  }
+
+  subgraph cluster_18 {
+    label="Workflow 2025-10-09T02:47:24+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-09T02:47:24+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-09T02:47:24+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-09T02:47:24+00:00_ride" -> "2025-10-09T02:47:24+00:00_done";
+  }
+
+  subgraph cluster_19 {
+    label="Workflow 2025-11-04T21:24:29+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-04T21:24:29+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-04T21:24:29+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T21:24:29+00:00_ride" -> "2025-11-04T21:24:29+00:00_done";
+  }
+
+  subgraph cluster_20 {
+    label="Workflow 2025-10-24T04:27:42.051042+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-10-24T04:27:42.051042+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-10-24T04:27:42.051042+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-10-24T04:27:42.051042+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-10-24T04:27:42.051042+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-24T04:27:42.051042+00:00_plan" -> "2025-10-24T04:27:42.051042+00:00_code";
+    "2025-10-24T04:27:42.051042+00:00_code" -> "2025-10-24T04:27:42.051042+00:00_review";
+    "2025-10-24T04:27:42.051042+00:00_review" -> "2025-10-24T04:27:42.051042+00:00_done";
+  }
+
+  subgraph cluster_21 {
+    label="Workflow 2025-11-03T03:13:27.161792+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-03T03:13:27.161792+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-11-03T03:13:27.161792+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-11-03T03:13:27.161792+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-11-03T03:13:27.161792+00:00_readme" [label="readme\n140 tokens\n6s"];
+    "2025-11-03T03:13:27.161792+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T03:13:27.161792+00:00_architecture" [label="architecture\n0 tokens\n308s"];
+    "2025-11-03T03:13:27.161792+00:00_git_commit" [label="git_commit\n0 tokens\n352592s"];
+    "2025-11-03T03:13:27.161792+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-11-03T03:13:27.161792+00:00_spec" [label="spec\n25262 tokens\n1584s"];
+    "2025-11-03T03:13:27.161792+00:00_plan" -> "2025-11-03T03:13:27.161792+00:00_code";
+    "2025-11-03T03:13:27.161792+00:00_code" -> "2025-11-03T03:13:27.161792+00:00_review";
+    "2025-11-03T03:13:27.161792+00:00_review" -> "2025-11-03T03:13:27.161792+00:00_readme";
+    "2025-11-03T03:13:27.161792+00:00_readme" -> "2025-11-03T03:13:27.161792+00:00_done";
+    "2025-11-03T03:13:27.161792+00:00_done" -> "2025-11-03T03:13:27.161792+00:00_architecture";
+    "2025-11-03T03:13:27.161792+00:00_architecture" -> "2025-11-03T03:13:27.161792+00:00_git_commit";
+    "2025-11-03T03:13:27.161792+00:00_git_commit" -> "2025-11-03T03:13:27.161792+00:00_refactor";
+    "2025-11-03T03:13:27.161792+00:00_refactor" -> "2025-11-03T03:13:27.161792+00:00_spec";
+  }
+
+  subgraph cluster_22 {
+    label="Workflow 2025-11-05T01:39:50.350467+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-05T01:39:50.350467+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-05T01:39:50.350467+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-05T01:39:50.350467+00:00_ride" -> "2025-11-05T01:39:50.350467+00:00_done";
+  }
+
+  subgraph cluster_23 {
+    label="Workflow 2025-10-09T03:48:33+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-09T03:48:33+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-09T03:48:33+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-09T03:48:33+00:00_ride" -> "2025-10-09T03:48:33+00:00_done";
+  }
+
+  subgraph cluster_24 {
+    label="Workflow 2025-11-05T16:56:52.774779+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-05T16:56:52.774779+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-11-05T16:56:52.774779+00:00_code_review" [label="code_review\n987 tokens\n121s"];
+    "2025-11-05T16:56:52.774779+00:00_refactor" -> "2025-11-05T16:56:52.774779+00:00_code_review";
+  }
+
+  subgraph cluster_25 {
+    label="Workflow 2025-10-09T20:37:01+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-09T20:37:01+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-09T20:37:01+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-09T20:37:01+00:00_ride" -> "2025-10-09T20:37:01+00:00_done";
+  }
+
+  subgraph cluster_26 {
+    label="Workflow 2025-11-03T20:58:08+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T20:58:08+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T20:58:08+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T20:58:08+00:00_ride" -> "2025-11-03T20:58:08+00:00_done";
+  }
+
+  subgraph cluster_27 {
+    label="Workflow 2025-10-18T02:07:02+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-18T02:07:02+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-18T02:07:02+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-18T02:07:02+00:00_ride" -> "2025-10-18T02:07:02+00:00_done";
+  }
+
+  subgraph cluster_28 {
+    label="Workflow 2025-11-03T01:40:07.199336+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-03T01:40:07.199336+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-11-03T01:40:07.199336+00:00_architecture" [label="architecture\n0 tokens\n308s"];
+    "2025-11-03T01:40:07.199336+00:00_git_commit" [label="git_commit\n0 tokens\n352592s"];
+    "2025-11-03T01:40:07.199336+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-11-03T01:40:07.199336+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-11-03T01:40:07.199336+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T01:40:07.199336+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-11-03T01:40:07.199336+00:00_code" -> "2025-11-03T01:40:07.199336+00:00_architecture";
+    "2025-11-03T01:40:07.199336+00:00_architecture" -> "2025-11-03T01:40:07.199336+00:00_git_commit";
+    "2025-11-03T01:40:07.199336+00:00_git_commit" -> "2025-11-03T01:40:07.199336+00:00_plan";
+    "2025-11-03T01:40:07.199336+00:00_plan" -> "2025-11-03T01:40:07.199336+00:00_review";
+    "2025-11-03T01:40:07.199336+00:00_review" -> "2025-11-03T01:40:07.199336+00:00_done";
+    "2025-11-03T01:40:07.199336+00:00_done" -> "2025-11-03T01:40:07.199336+00:00_refactor";
+  }
+
+  subgraph cluster_29 {
+    label="Workflow 2025-10-20T02:06:27+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-20T02:06:27+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-20T02:06:27+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-20T02:06:27+00:00_ride" -> "2025-10-20T02:06:27+00:00_done";
+  }
+
+  subgraph cluster_30 {
+    label="Workflow 2025-11-03T20:50:52.866856+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T20:50:52.866856+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T20:50:52.866856+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T20:50:52.866856+00:00_ride" -> "2025-11-03T20:50:52.866856+00:00_done";
+  }
+
+  subgraph cluster_31 {
+    label="Workflow 2025-10-27T02:21:02.946557+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-10-27T02:21:02.946557+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-27T02:21:02.946557+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-10-27T02:21:02.946557+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-10-27T02:21:02.946557+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-10-27T02:21:02.946557+00:00_done" -> "2025-10-27T02:21:02.946557+00:00_plan";
+    "2025-10-27T02:21:02.946557+00:00_plan" -> "2025-10-27T02:21:02.946557+00:00_code";
+    "2025-10-27T02:21:02.946557+00:00_code" -> "2025-10-27T02:21:02.946557+00:00_review";
+  }
+
+  subgraph cluster_32 {
+    label="Workflow 2025-11-04T22:11:56.681400+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-04T22:11:56.681400+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-11-04T22:11:56.681400+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-11-04T22:11:56.681400+00:00_code_review" [label="code_review\n987 tokens\n121s"];
+    "2025-11-04T22:11:56.681400+00:00_readme" [label="readme\n140 tokens\n6s"];
+    "2025-11-04T22:11:56.681400+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T22:11:56.681400+00:00_plan" -> "2025-11-04T22:11:56.681400+00:00_code";
+    "2025-11-04T22:11:56.681400+00:00_code" -> "2025-11-04T22:11:56.681400+00:00_code_review";
+    "2025-11-04T22:11:56.681400+00:00_code_review" -> "2025-11-04T22:11:56.681400+00:00_readme";
+    "2025-11-04T22:11:56.681400+00:00_readme" -> "2025-11-04T22:11:56.681400+00:00_done";
+  }
+
+  subgraph cluster_33 {
+    label="Workflow 2025-11-03T02:07:48+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T02:07:48+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T02:07:48+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T02:07:48+00:00_ride" -> "2025-11-03T02:07:48+00:00_done";
+  }
+
+  subgraph cluster_34 {
+    label="Workflow 2025-10-10T19:47:22+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-10T19:47:22+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-10T19:47:22+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-10T19:47:22+00:00_ride" -> "2025-10-10T19:47:22+00:00_done";
+  }
+
+  subgraph cluster_35 {
+    label="Workflow 2025-10-26T22:44:13+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-26T22:44:13+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-26T22:44:13+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-26T22:44:13+00:00_ride" -> "2025-10-26T22:44:13+00:00_done";
+  }
+
+  subgraph cluster_36 {
+    label="Workflow 2025-10-11T03:03:33+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-11T03:03:33+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-11T03:03:33+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-11T03:03:33+00:00_ride" -> "2025-10-11T03:03:33+00:00_done";
+  }
+
+  subgraph cluster_37 {
+    label="Workflow 2025-10-19T01:41:16+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-19T01:41:16+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-19T01:41:16+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-19T01:41:16+00:00_ride" -> "2025-10-19T01:41:16+00:00_done";
+  }
+
+  subgraph cluster_38 {
+    label="Workflow 2025-10-24T04:51:46+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-24T04:51:46+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-24T04:51:46+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-24T04:51:46+00:00_ride" -> "2025-10-24T04:51:46+00:00_done";
+  }
+
+  subgraph cluster_39 {
+    label="Workflow 2025-10-24T02:02:04+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-24T02:02:04+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-24T02:02:04+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-24T02:02:04+00:00_ride" -> "2025-10-24T02:02:04+00:00_done";
+  }
+
+  subgraph cluster_40 {
+    label="Workflow 2025-10-27T02:21:22+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-27T02:21:22+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-27T02:21:22+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-27T02:21:22+00:00_ride" -> "2025-10-27T02:21:22+00:00_done";
+  }
+
+  subgraph cluster_41 {
+    label="Workflow 2025-11-03T14:49:45.503035+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T14:49:45.503035+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T14:49:45.503035+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T14:49:45.503035+00:00_ride" -> "2025-11-03T14:49:45.503035+00:00_done";
+  }
+
+  subgraph cluster_42 {
+    label="Workflow 2025-10-09T08:34:10+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-09T08:34:10+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-09T08:34:10+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-09T08:34:10+00:00_ride" -> "2025-10-09T08:34:10+00:00_done";
+  }
+
+  subgraph cluster_43 {
+    label="Workflow 2025-10-27T02:18:57.187972+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-10-27T02:18:57.187972+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-27T02:18:57.187972+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-10-27T02:18:57.187972+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-10-27T02:18:57.187972+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-10-27T02:18:57.187972+00:00_done" -> "2025-10-27T02:18:57.187972+00:00_plan";
+    "2025-10-27T02:18:57.187972+00:00_plan" -> "2025-10-27T02:18:57.187972+00:00_code";
+    "2025-10-27T02:18:57.187972+00:00_code" -> "2025-10-27T02:18:57.187972+00:00_review";
+  }
+
+  subgraph cluster_44 {
+    label="Workflow 2025-11-03T02:53:43.108952+00:00";
+    style=solid;
+    color=blue;
+
+    "2025-11-03T02:53:43.108952+00:00_spec" [label="spec\n25262 tokens\n1584s"];
+    "2025-11-03T02:53:43.108952+00:00_plan" [label="plan\n0 tokens\n3401s"];
+    "2025-11-03T02:53:43.108952+00:00_code" [label="code\n11432 tokens\n6485s"];
+    "2025-11-03T02:53:43.108952+00:00_review" [label="review\n0 tokens\n328s"];
+    "2025-11-03T02:53:43.108952+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T02:53:43.108952+00:00_architecture" [label="architecture\n0 tokens\n308s"];
+    "2025-11-03T02:53:43.108952+00:00_git_commit" [label="git_commit\n0 tokens\n352592s"];
+    "2025-11-03T02:53:43.108952+00:00_refactor" [label="refactor\n22585 tokens\n842s"];
+    "2025-11-03T02:53:43.108952+00:00_spec" -> "2025-11-03T02:53:43.108952+00:00_plan";
+    "2025-11-03T02:53:43.108952+00:00_plan" -> "2025-11-03T02:53:43.108952+00:00_code";
+    "2025-11-03T02:53:43.108952+00:00_code" -> "2025-11-03T02:53:43.108952+00:00_review";
+    "2025-11-03T02:53:43.108952+00:00_review" -> "2025-11-03T02:53:43.108952+00:00_done";
+    "2025-11-03T02:53:43.108952+00:00_done" -> "2025-11-03T02:53:43.108952+00:00_architecture";
+    "2025-11-03T02:53:43.108952+00:00_architecture" -> "2025-11-03T02:53:43.108952+00:00_git_commit";
+    "2025-11-03T02:53:43.108952+00:00_git_commit" -> "2025-11-03T02:53:43.108952+00:00_refactor";
+  }
+
+  subgraph cluster_45 {
+    label="Workflow 2025-10-14T06:41:03+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-14T06:41:03+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-14T06:41:03+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-14T06:41:03+00:00_ride" -> "2025-10-14T06:41:03+00:00_done";
+  }
+
+  subgraph cluster_46 {
+    label="Workflow 2025-11-02T22:22:15+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-02T22:22:15+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-02T22:22:15+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-02T22:22:15+00:00_ride" -> "2025-11-02T22:22:15+00:00_done";
+  }
+
+  subgraph cluster_47 {
+    label="Workflow 2025-11-03T05:09:52.842791+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-03T05:09:52.842791+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-03T05:09:52.842791+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-03T05:09:52.842791+00:00_ride" -> "2025-11-03T05:09:52.842791+00:00_done";
+  }
+
+  subgraph cluster_48 {
+    label="Workflow 2025-10-27T04:46:41+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-27T04:46:41+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-27T04:46:41+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-27T04:46:41+00:00_ride" -> "2025-10-27T04:46:41+00:00_done";
+  }
+
+  subgraph cluster_49 {
+    label="Workflow 2025-10-19T21:15:07+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-10-19T21:15:07+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-10-19T21:15:07+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-10-19T21:15:07+00:00_ride" -> "2025-10-19T21:15:07+00:00_done";
+  }
+
+  subgraph cluster_50 {
+    label="Workflow 2025-11-04T21:17:03.635374+00:00 (synthetic)";
+    style=dashed;
+    color=blue;
+
+    "2025-11-04T21:17:03.635374+00:00_ride" [label="ride\n0 tokens\n3819s"];
+    "2025-11-04T21:17:03.635374+00:00_done" [label="done\n0 tokens\n0s"];
+    "2025-11-04T21:17:03.635374+00:00_ride" -> "2025-11-04T21:17:03.635374+00:00_done";
+  }
+
+  { rank=same; "2025-11-03T05:12:19+00:00_ride"; "2025-10-11T00:55:23+00:00_ride"; "2025-10-15T01:50:01+00:00_ride"; "2025-11-04T17:13:21.097097+00:00_ride"; "2025-10-29T21:18:55+00:00_ride"; }
+  { rank=same; "2025-11-04T19:17:29+00:00_ride"; "2025-10-14T22:24:09+00:00_ride"; "2025-11-04T17:55:09+00:00_ride"; "2025-10-24T16:39:50+00:00_ride"; "2025-10-15T21:30:33+00:00_ride"; }
+  { rank=same; "2025-11-05T01:40:03.050563+00:00_refactor"; "2025-10-11T09:01:59+00:00_ride"; "2025-10-26T19:20:03+00:00_ride"; "2025-10-09T23:01:36+00:00_ride"; "2025-10-16T00:32:24+00:00_ride"; }
+  { rank=same; "2025-10-17T22:25:09+00:00_ride"; "2025-10-27T02:23:14.902509+00:00_refactor"; "2025-10-13T06:44:04+00:00_ride"; "2025-10-09T02:47:24+00:00_ride"; "2025-11-04T21:24:29+00:00_ride"; }
+  { rank=same; "2025-10-24T04:27:42.051042+00:00_plan"; "2025-11-03T03:13:27.161792+00:00_plan"; "2025-11-05T01:39:50.350467+00:00_ride"; "2025-10-09T03:48:33+00:00_ride"; "2025-11-05T16:56:52.774779+00:00_refactor"; }
+  { rank=same; "2025-10-09T20:37:01+00:00_ride"; "2025-11-03T20:58:08+00:00_ride"; "2025-10-18T02:07:02+00:00_ride"; "2025-11-03T01:40:07.199336+00:00_code"; "2025-10-20T02:06:27+00:00_ride"; }
+  { rank=same; "2025-11-03T20:50:52.866856+00:00_ride"; "2025-10-27T02:21:02.946557+00:00_done"; "2025-11-04T22:11:56.681400+00:00_plan"; "2025-11-03T02:07:48+00:00_ride"; "2025-10-10T19:47:22+00:00_ride"; }
+  { rank=same; "2025-10-26T22:44:13+00:00_ride"; "2025-10-11T03:03:33+00:00_ride"; "2025-10-19T01:41:16+00:00_ride"; "2025-10-24T04:51:46+00:00_ride"; "2025-10-24T02:02:04+00:00_ride"; }
+  { rank=same; "2025-10-27T02:21:22+00:00_ride"; "2025-11-03T14:49:45.503035+00:00_ride"; "2025-10-09T08:34:10+00:00_ride"; "2025-10-27T02:18:57.187972+00:00_done"; "2025-11-03T02:53:43.108952+00:00_spec"; }
+  { rank=same; "2025-10-14T06:41:03+00:00_ride"; "2025-11-02T22:22:15+00:00_ride"; "2025-11-03T05:09:52.842791+00:00_ride"; "2025-10-27T04:46:41+00:00_ride"; "2025-10-19T21:15:07+00:00_ride"; }
+
+  "2025-11-03T05:12:19+00:00_done" -> "2025-10-11T00:55:23+00:00_ride" [style=dashed, color=red];
+  "2025-10-11T00:55:23+00:00_done" -> "2025-10-15T01:50:01+00:00_ride" [style=dashed, color=red];
+  "2025-10-15T01:50:01+00:00_done" -> "2025-11-04T17:13:21.097097+00:00_ride" [style=dashed, color=red];
+  "2025-11-04T17:13:21.097097+00:00_done" -> "2025-10-29T21:18:55+00:00_ride" [style=dashed, color=red];
+  "2025-10-29T21:18:55+00:00_done" -> "2025-11-04T19:17:29+00:00_ride" [style=dashed, color=red];
+  "2025-11-04T19:17:29+00:00_done" -> "2025-10-14T22:24:09+00:00_ride" [style=dashed, color=red];
+  "2025-10-14T22:24:09+00:00_done" -> "2025-11-04T17:55:09+00:00_ride" [style=dashed, color=red];
+  "2025-11-04T17:55:09+00:00_done" -> "2025-10-24T16:39:50+00:00_ride" [style=dashed, color=red];
+  "2025-10-24T16:39:50+00:00_done" -> "2025-10-15T21:30:33+00:00_ride" [style=dashed, color=red];
+  "2025-10-15T21:30:33+00:00_done" -> "2025-11-05T01:40:03.050563+00:00_refactor" [style=dashed, color=red];
+  "2025-11-05T01:40:03.050563+00:00_done" -> "2025-10-11T09:01:59+00:00_ride" [style=dashed, color=red];
+  "2025-10-11T09:01:59+00:00_done" -> "2025-10-26T19:20:03+00:00_ride" [style=dashed, color=red];
+  "2025-10-26T19:20:03+00:00_done" -> "2025-10-09T23:01:36+00:00_ride" [style=dashed, color=red];
+  "2025-10-09T23:01:36+00:00_done" -> "2025-10-16T00:32:24+00:00_ride" [style=dashed, color=red];
+  "2025-10-16T00:32:24+00:00_done" -> "2025-10-17T22:25:09+00:00_ride" [style=dashed, color=red];
+  "2025-10-17T22:25:09+00:00_done" -> "2025-10-27T02:23:14.902509+00:00_refactor" [style=dashed, color=red];
+  "2025-10-27T02:23:14.902509+00:00_plan" -> "2025-10-13T06:44:04+00:00_ride" [style=dashed, color=red];
+  "2025-10-13T06:44:04+00:00_done" -> "2025-10-09T02:47:24+00:00_ride" [style=dashed, color=red];
+  "2025-10-09T02:47:24+00:00_done" -> "2025-11-04T21:24:29+00:00_ride" [style=dashed, color=red];
+  "2025-11-04T21:24:29+00:00_done" -> "2025-10-24T04:27:42.051042+00:00_plan" [style=dashed, color=red];
+  "2025-10-24T04:27:42.051042+00:00_done" -> "2025-11-03T03:13:27.161792+00:00_plan" [style=dashed, color=red];
+  "2025-11-03T03:13:27.161792+00:00_spec" -> "2025-11-05T01:39:50.350467+00:00_ride" [style=dashed, color=red];
+  "2025-11-05T01:39:50.350467+00:00_done" -> "2025-10-09T03:48:33+00:00_ride" [style=dashed, color=red];
+  "2025-10-09T03:48:33+00:00_done" -> "2025-11-05T16:56:52.774779+00:00_refactor" [style=dashed, color=red];
+  "2025-11-05T16:56:52.774779+00:00_code_review" -> "2025-10-09T20:37:01+00:00_ride" [style=dashed, color=red];
+  "2025-10-09T20:37:01+00:00_done" -> "2025-11-03T20:58:08+00:00_ride" [style=dashed, color=red];
+  "2025-11-03T20:58:08+00:00_done" -> "2025-10-18T02:07:02+00:00_ride" [style=dashed, color=red];
+  "2025-10-18T02:07:02+00:00_done" -> "2025-11-03T01:40:07.199336+00:00_code" [style=dashed, color=red];
+  "2025-11-03T01:40:07.199336+00:00_refactor" -> "2025-10-20T02:06:27+00:00_ride" [style=dashed, color=red];
+  "2025-10-20T02:06:27+00:00_done" -> "2025-11-03T20:50:52.866856+00:00_ride" [style=dashed, color=red];
+  "2025-11-03T20:50:52.866856+00:00_done" -> "2025-10-27T02:21:02.946557+00:00_done" [style=dashed, color=red];
+  "2025-10-27T02:21:02.946557+00:00_review" -> "2025-11-04T22:11:56.681400+00:00_plan" [style=dashed, color=red];
+  "2025-11-04T22:11:56.681400+00:00_done" -> "2025-11-03T02:07:48+00:00_ride" [style=dashed, color=red];
+  "2025-11-03T02:07:48+00:00_done" -> "2025-10-10T19:47:22+00:00_ride" [style=dashed, color=red];
+  "2025-10-10T19:47:22+00:00_done" -> "2025-10-26T22:44:13+00:00_ride" [style=dashed, color=red];
+  "2025-10-26T22:44:13+00:00_done" -> "2025-10-11T03:03:33+00:00_ride" [style=dashed, color=red];
+  "2025-10-11T03:03:33+00:00_done" -> "2025-10-19T01:41:16+00:00_ride" [style=dashed, color=red];
+  "2025-10-19T01:41:16+00:00_done" -> "2025-10-24T04:51:46+00:00_ride" [style=dashed, color=red];
+  "2025-10-24T04:51:46+00:00_done" -> "2025-10-24T02:02:04+00:00_ride" [style=dashed, color=red];
+  "2025-10-24T02:02:04+00:00_done" -> "2025-10-27T02:21:22+00:00_ride" [style=dashed, color=red];
+  "2025-10-27T02:21:22+00:00_done" -> "2025-11-03T14:49:45.503035+00:00_ride" [style=dashed, color=red];
+  "2025-11-03T14:49:45.503035+00:00_done" -> "2025-10-09T08:34:10+00:00_ride" [style=dashed, color=red];
+  "2025-10-09T08:34:10+00:00_done" -> "2025-10-27T02:18:57.187972+00:00_done" [style=dashed, color=red];
+  "2025-10-27T02:18:57.187972+00:00_review" -> "2025-11-03T02:53:43.108952+00:00_spec" [style=dashed, color=red];
+  "2025-11-03T02:53:43.108952+00:00_refactor" -> "2025-10-14T06:41:03+00:00_ride" [style=dashed, color=red];
+  "2025-10-14T06:41:03+00:00_done" -> "2025-11-02T22:22:15+00:00_ride" [style=dashed, color=red];
+  "2025-11-02T22:22:15+00:00_done" -> "2025-11-03T05:09:52.842791+00:00_ride" [style=dashed, color=red];
+  "2025-11-03T05:09:52.842791+00:00_done" -> "2025-10-27T04:46:41+00:00_ride" [style=dashed, color=red];
+  "2025-10-27T04:46:41+00:00_done" -> "2025-10-19T21:15:07+00:00_ride" [style=dashed, color=red];
+  "2025-10-19T21:15:07+00:00_done" -> "2025-11-04T21:17:03.635374+00:00_ride" [style=dashed, color=red];
+}
+
