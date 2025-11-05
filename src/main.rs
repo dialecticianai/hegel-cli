@@ -80,7 +80,7 @@ enum Commands {
         /// Export workflow graph as DOT format (for Graphviz visualization)
         #[arg(long)]
         export_dot: bool,
-        /// Repair archives: backfill missing git metrics and rebuild cumulative totals
+        /// Repair archives: backfill git metrics and create synthetic cowboy workflows for inter-workflow activity
         #[arg(long)]
         fix_archives: bool,
         /// Show what would be fixed without making changes (requires --fix-archives)

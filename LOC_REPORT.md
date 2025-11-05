@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 19:21
+**Last Updated**: 2025-11-04 19:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,777 | 8,454 | 22,231 |
+| **Lines** | 13,777 | 8,473 | 22,250 |
 | **Comments** | 1,911 | - | 1,911 |
 | **Blank Lines** | 2,544 | - | 2,544 |
-| **Total Lines** | 18,232 | 8,454 | 26,686 |
+| **Total Lines** | 18,232 | 8,473 | 26,705 |
 | **Files** | 77 | 37 | 114 |
 
-**Documentation Ratio**: 0.61 lines of docs per line of code
+**Documentation Ratio**: 0.62 lines of docs per line of code
 
 ---
 
@@ -131,7 +131,7 @@ SUM:                            78           2575           1911          13865
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
 | `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
 | `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
-| `CLAUDE.md` | 155 |
+| `CLAUDE.md` | 174 |
 | `CODE_MAP.md` | 215 |
 | `commands/hegel.md` | 23 |
 | `COVERAGE_REPORT.md` | 186 |
@@ -167,7 +167,7 @@ SUM:                            78           2575           1911          13865
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.61 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.62 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
