@@ -70,8 +70,9 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
             print!("{}: {}", Theme::label("Git"), Theme::highlight(branch));
 
             // Add uncommitted changes summary
-            if let Some(changes) = get_uncommitted_changes(storage)? {
-                print!(" {}", Theme::secondary(&format!("({})", changes)));
+            match get_uncommitted_changes(storage)? {
+                Some(changes) => print!(" {}", Theme::secondary(&format!("({})", changes))),
+                None => print!(" {}", Theme::secondary("(no changes)")),
             }
             println!();
         }

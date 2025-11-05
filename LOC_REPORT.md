@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 13:33
+**Last Updated**: 2025-11-05 13:41
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,309 | 9,186 | 23,495 |
+| **Lines** | 14,310 | 9,210 | 23,520 |
 | **Comments** | 1,981 | - | 1,981 |
 | **Blank Lines** | 2,644 | - | 2,644 |
-| **Total Lines** | 18,934 | 9,186 | 28,120 |
-| **Files** | 88 | 51 | 139 |
+| **Total Lines** | 18,935 | 9,210 | 28,145 |
+| **Files** | 88 | 52 | 140 |
 
 **Documentation Ratio**: 0.64 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            88           2644           1981          14309
-Markdown                        14            134              0            395
+Rust                            88           2644           1981          14310
+Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           102           2778           1981          14704
+SUM:                           103           2785           1981          14720
 -------------------------------------------------------------------------------
 ```
 
@@ -69,7 +69,7 @@ SUM:                           102           2778           1981          14704
 | `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
-| `commands/status.rs` | 130 | 130 | 0 | 0.0% | ✅ |
+| `commands/status.rs` | 131 | 131 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/workflow/mod.rs` | 514 | 16 | 498 | 96.9% | ✅ |
@@ -167,10 +167,11 @@ SUM:                           102           2778           1981          14704
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 209 |
+| `LOC_REPORT.md` | 211 |
 | `README.md` | 584 |
 | `ROADMAP.md` | 212 |
 | `src/adapters/README.md` | 25 |
+| `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 26 |
 | `src/commands/fork/README.md` | 30 |
 | `src/commands/README.md` | 43 |
