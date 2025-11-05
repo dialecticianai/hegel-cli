@@ -207,7 +207,7 @@ fn test_analyze_empty_state() {
     assert!(output.status.success());
     let out = stdout(&output);
     assert!(out.contains("Hegel Metrics Analysis"));
-    assert!(out.contains("Session"));
+    assert!(out.contains("Brief Summary"));
 }
 
 #[test]
