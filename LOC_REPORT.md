@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 19:25
+**Last Updated**: 2025-11-04 20:58
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 13,777 | 8,473 | 22,250 |
-| **Comments** | 1,911 | - | 1,911 |
-| **Blank Lines** | 2,544 | - | 2,544 |
-| **Total Lines** | 18,232 | 8,473 | 26,705 |
-| **Files** | 77 | 37 | 114 |
+| **Lines** | 13,814 | 8,831 | 22,645 |
+| **Comments** | 1,913 | - | 1,913 |
+| **Blank Lines** | 2,555 | - | 2,555 |
+| **Total Lines** | 18,282 | 8,831 | 27,113 |
+| **Files** | 80 | 38 | 118 |
 
-**Documentation Ratio**: 0.62 lines of docs per line of code
+**Documentation Ratio**: 0.64 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            77           2544           1911          13777
+Rust                            80           2555           1913          13814
 Markdown                         1             31              0             88
 -------------------------------------------------------------------------------
-SUM:                            78           2575           1911          13865
+SUM:                            81           2586           1913          13902
 -------------------------------------------------------------------------------
 ```
 
@@ -95,7 +95,10 @@ SUM:                            78           2575           1911          13865
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
-| `storage/archive.rs` | 586 | 322 | 264 | 45.1% | ⚠️ Large |
+| `storage/archive/aggregation.rs` | 98 | 98 | 0 | 0.0% | ✅ |
+| `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
+| `storage/archive/mod.rs` | 346 | 158 | 188 | 54.3% | ✅ |
+| `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/mod.rs` | 788 | 399 | 389 | 49.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -115,7 +118,7 @@ SUM:                            78           2575           1911          13865
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -131,10 +134,11 @@ SUM:                            78           2575           1911          13865
 | `.ddd/feat/log_retention/SPEC.md` | 366 |
 | `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
 | `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
+| `.ddd/refactor/2025-11-04_large-files.md` | 261 |
 | `CLAUDE.md` | 174 |
-| `CODE_MAP.md` | 215 |
+| `CODE_MAP.md` | 216 |
 | `commands/hegel.md` | 23 |
-| `COVERAGE_REPORT.md` | 186 |
+| `COVERAGE_REPORT.md` | 192 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -145,10 +149,10 @@ SUM:                            78           2575           1911          13865
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
 | `guides/LEXICON.md` | 84 |
-| `guides/PLAN_WRITING.md` | 161 |
+| `guides/PLAN_WRITING.md` | 165 |
 | `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 142 |
-| `guides/SPEC_WRITING.md` | 123 |
+| `guides/SPEC_WRITING.md` | 209 |
 | `guides/STUDY_PLANNING.md` | 209 |
 | `guides/templates/code_map_hierarchical.md` | 57 |
 | `guides/templates/code_map_monolithic.md` | 41 |
@@ -167,7 +171,7 @@ SUM:                            78           2575           1911          13865
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.62 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.64 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

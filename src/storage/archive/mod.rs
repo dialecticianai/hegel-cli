@@ -1,10 +1,16 @@
+mod aggregation;
+mod builder;
+mod validation;
+
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-use crate::metrics::{git::GitCommit, UnifiedMetrics};
+use crate::metrics::git::GitCommit;
+
+// Re-export for backwards compatibility
+pub use validation::validate_workflow_id;
 
 /// Archived workflow with pre-computed aggregates
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -83,176 +89,6 @@ pub struct WorkflowTotals {
     pub git_commits: usize,
 }
 
-impl WorkflowArchive {
-    /// Create archive from unified metrics
-    pub fn from_metrics(
-        metrics: &UnifiedMetrics,
-        workflow_id: &str,
-        is_synthetic: bool,
-    ) -> Result<Self> {
-        validate_workflow_id(workflow_id)?;
-
-        // Extract mode from first transition
-        let mode = metrics
-            .state_transitions
-            .first()
-            .map(|t| t.mode.clone())
-            .unwrap_or_else(|| "unknown".to_string());
-
-        // Completed_at is the last transition timestamp
-        let completed_at = metrics
-            .state_transitions
-            .last()
-            .map(|t| t.timestamp.clone())
-            .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
-
-        // Convert phases
-        let phases: Vec<PhaseArchive> = metrics
-            .phase_metrics
-            .iter()
-            .map(|phase| {
-                // Aggregate bash commands by command string
-                let mut bash_freq: HashMap<String, Vec<String>> = HashMap::new();
-                for cmd in &phase.bash_commands {
-                    bash_freq
-                        .entry(cmd.command.clone())
-                        .or_insert_with(Vec::new)
-                        .push(cmd.timestamp.clone().unwrap_or_default());
-                }
-                let bash_commands: Vec<BashCommandSummary> = bash_freq
-                    .into_iter()
-                    .map(|(command, timestamps)| BashCommandSummary {
-                        count: timestamps.len(),
-                        command,
-                        timestamps,
-                    })
-                    .collect();
-
-                // Aggregate file modifications by file_path
-                let mut file_freq: HashMap<(String, String), Vec<String>> = HashMap::new();
-                for file_mod in &phase.file_modifications {
-                    file_freq
-                        .entry((file_mod.file_path.clone(), file_mod.tool.clone()))
-                        .or_insert_with(Vec::new)
-                        .push(file_mod.timestamp.clone().unwrap_or_default());
-                }
-                let file_modifications: Vec<FileModificationSummary> = file_freq
-                    .into_iter()
-                    .map(|((file_path, tool), timestamps)| FileModificationSummary {
-                        count: timestamps.len(),
-                        file_path,
-                        tool,
-                        timestamps,
-                    })
-                    .collect();
-
-                PhaseArchive {
-                    phase_name: phase.phase_name.clone(),
-                    start_time: phase.start_time.clone(),
-                    end_time: phase.end_time.clone(),
-                    duration_seconds: phase.duration_seconds,
-                    tokens: TokenTotals {
-                        input: phase.token_metrics.total_input_tokens,
-                        output: phase.token_metrics.total_output_tokens,
-                        cache_creation: phase.token_metrics.total_cache_creation_tokens,
-                        cache_read: phase.token_metrics.total_cache_read_tokens,
-                        assistant_turns: phase.token_metrics.assistant_turns,
-                    },
-                    bash_commands,
-                    file_modifications,
-                    git_commits: phase.git_commits.clone(),
-                }
-            })
-            .collect();
-
-        // Convert transitions
-        let transitions: Vec<TransitionArchive> = metrics
-            .state_transitions
-            .iter()
-            .map(|t| TransitionArchive {
-                from_node: t.from_node.clone(),
-                to_node: t.to_node.clone(),
-                timestamp: t.timestamp.clone(),
-            })
-            .collect();
-
-        // Compute totals
-        let totals = compute_totals(&phases, &metrics.hook_metrics);
-
-        Ok(Self {
-            workflow_id: workflow_id.to_string(),
-            mode,
-            completed_at,
-            session_id: metrics.session_id.clone(),
-            phases,
-            transitions,
-            totals,
-            is_synthetic,
-        })
-    }
-}
-
-/// Validate workflow_id for path safety
-fn validate_workflow_id(workflow_id: &str) -> Result<()> {
-    // Must not contain path separators
-    if workflow_id.contains('/') || workflow_id.contains('\\') {
-        bail!("Invalid workflow_id: contains path separator");
-    }
-
-    // Must not contain path traversal
-    if workflow_id.contains("..") {
-        bail!("Invalid workflow_id: contains path traversal");
-    }
-
-    // Must be valid ISO 8601 timestamp
-    if chrono::DateTime::parse_from_rfc3339(workflow_id).is_err() {
-        bail!("Invalid workflow_id: not a valid ISO 8601 timestamp");
-    }
-
-    Ok(())
-}
-
-/// Compute workflow-level totals
-fn compute_totals(
-    phases: &[PhaseArchive],
-    hook_metrics: &crate::metrics::HookMetrics,
-) -> WorkflowTotals {
-    let mut totals = WorkflowTotals::default();
-
-    // Sum tokens across phases
-    for phase in phases {
-        totals.tokens.input += phase.tokens.input;
-        totals.tokens.output += phase.tokens.output;
-        totals.tokens.cache_creation += phase.tokens.cache_creation;
-        totals.tokens.cache_read += phase.tokens.cache_read;
-        totals.tokens.assistant_turns += phase.tokens.assistant_turns;
-    }
-
-    // Count bash commands and files
-    totals.bash_commands = hook_metrics.bash_commands.len();
-    totals.file_modifications = hook_metrics.file_modifications.len();
-
-    // Unique counts
-    let unique_commands: std::collections::HashSet<_> = hook_metrics
-        .bash_commands
-        .iter()
-        .map(|c| &c.command)
-        .collect();
-    totals.unique_commands = unique_commands.len();
-
-    let unique_files: std::collections::HashSet<_> = hook_metrics
-        .file_modifications
-        .iter()
-        .map(|f| &f.file_path)
-        .collect();
-    totals.unique_files = unique_files.len();
-
-    // Count git commits across all phases
-    totals.git_commits = phases.iter().map(|p| p.git_commits.len()).sum();
-
-    totals
-}
-
 /// Write archive to disk with atomic operation
 pub fn write_archive(archive: &WorkflowArchive, state_dir: &Path) -> Result<()> {
     let archive_dir = state_dir.join("archive");
@@ -323,9 +159,6 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::metrics::{HookMetrics, StateTransitionEvent, TokenMetrics};
-    use crate::test_helpers::test_phase_metrics;
-
     use tempfile::TempDir;
 
     /// Helper to create test archive with default values
@@ -340,21 +173,6 @@ mod tests {
             transitions: vec![],
             totals: WorkflowTotals::default(),
         }
-    }
-
-    #[test]
-    fn test_validate_workflow_id() {
-        // Valid ISO 8601 timestamp
-        assert!(validate_workflow_id("2025-10-24T10:00:00Z").is_ok());
-
-        // Invalid: contains slash
-        assert!(validate_workflow_id("2025-10-24/foo").is_err());
-
-        // Invalid: contains path traversal
-        assert!(validate_workflow_id("../2025-10-24T10:00:00Z").is_err());
-
-        // Invalid: not ISO 8601
-        assert!(validate_workflow_id("not-a-timestamp").is_err());
     }
 
     #[test]
@@ -407,34 +225,6 @@ mod tests {
 
         // Verify round-trip
         assert_eq!(archive, deserialized);
-    }
-
-    #[test]
-    fn test_from_metrics() {
-        let metrics = UnifiedMetrics {
-            hook_metrics: HookMetrics::default(),
-            token_metrics: TokenMetrics::default(),
-            state_transitions: vec![StateTransitionEvent {
-                timestamp: "2025-10-24T10:00:00Z".to_string(),
-                workflow_id: Some("2025-10-24T10:00:00Z".to_string()),
-                from_node: "START".to_string(),
-                to_node: "spec".to_string(),
-                phase: "spec".to_string(),
-                mode: "discovery".to_string(),
-            }],
-            session_id: Some("test-session".to_string()),
-            phase_metrics: vec![test_phase_metrics()],
-            git_commits: vec![],
-        };
-
-        let archive =
-            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", false).unwrap();
-
-        assert_eq!(archive.workflow_id, "2025-10-24T10:00:00Z");
-        assert_eq!(archive.mode, "discovery");
-        assert_eq!(archive.session_id, Some("test-session".to_string()));
-        assert_eq!(archive.phases.len(), 1);
-        assert_eq!(archive.transitions.len(), 1);
     }
 
     #[test]
@@ -552,35 +342,5 @@ mod tests {
         let deserialized: WorkflowArchive = serde_json::from_str(&json).unwrap();
 
         assert_eq!(deserialized.is_synthetic, true);
-    }
-
-    #[test]
-    fn test_from_metrics_with_is_synthetic() {
-        let metrics = UnifiedMetrics {
-            hook_metrics: HookMetrics::default(),
-            token_metrics: TokenMetrics::default(),
-            state_transitions: vec![StateTransitionEvent {
-                timestamp: "2025-10-24T10:00:00Z".to_string(),
-                workflow_id: Some("2025-10-24T10:00:00Z".to_string()),
-                from_node: "START".to_string(),
-                to_node: "ride".to_string(),
-                phase: "ride".to_string(),
-                mode: "cowboy".to_string(),
-            }],
-            session_id: None,
-            phase_metrics: vec![],
-            git_commits: vec![],
-        };
-
-        // Test explicit workflow (is_synthetic=false)
-        let explicit_archive =
-            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", false).unwrap();
-        assert_eq!(explicit_archive.is_synthetic, false);
-
-        // Test synthetic workflow (is_synthetic=true)
-        let synthetic_archive =
-            WorkflowArchive::from_metrics(&metrics, "2025-10-24T10:00:00Z", true).unwrap();
-        assert_eq!(synthetic_archive.is_synthetic, true);
-        assert_eq!(synthetic_archive.mode, "cowboy");
     }
 }
