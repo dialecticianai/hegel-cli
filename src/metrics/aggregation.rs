@@ -58,17 +58,42 @@ pub fn build_phase_metrics(
             .collect();
 
         // Aggregate tokens from transcript for this phase
-        let token_metrics = if let Some(transcript_path) = transcript_path {
-            aggregate_tokens_for_phase(
-                transcript_path,
-                &start_time,
-                end_time.as_deref(),
-                &phase_name,
-                debug_config,
-            )?
-        } else {
-            TokenMetrics::default()
-        };
+        let (token_metrics, examined_count, matched_count) =
+            if let Some(transcript_path) = transcript_path {
+                aggregate_tokens_for_phase(
+                    transcript_path,
+                    &start_time,
+                    end_time.as_deref(),
+                    &phase_name,
+                    debug_config,
+                )?
+            } else {
+                (TokenMetrics::default(), 0, 0)
+            };
+
+        // Handle debug output/collection for live phases
+        if let Some(cfg) = debug_config {
+            if cfg.overlaps(&start_time, end_time.as_deref()) {
+                let total_tokens =
+                    token_metrics.total_input_tokens + token_metrics.total_output_tokens;
+
+                if cfg.json_output {
+                    // Collect data for JSON output
+                    cfg.add_phase_info(crate::metrics::PhaseDebugInfo {
+                        workflow_id: "live".to_string(), // Live phases don't have workflow_id yet
+                        phase_name: phase_name.clone(),
+                        start_time: start_time.clone(),
+                        end_time: end_time.clone(),
+                        duration_seconds,
+                        tokens_attributed: total_tokens,
+                        is_archived: false,
+                        transcript_events_examined: Some(examined_count),
+                        transcript_events_matched: Some(matched_count),
+                    });
+                }
+                // Text output already printed in aggregate_tokens_for_phase
+            }
+        }
 
         phases.push(PhaseMetrics {
             phase_name,
@@ -104,13 +129,14 @@ fn is_in_range(timestamp: &str, start: &str, end: Option<&str>) -> bool {
 }
 
 /// Aggregate token usage from transcript for a specific phase
+/// Returns (TokenMetrics, examined_count, matched_count)
 fn aggregate_tokens_for_phase(
     transcript_path: &str,
     start_time: &str,
     end_time: Option<&str>,
     phase_name: &str,
     debug_config: Option<&crate::metrics::DebugConfig>,
-) -> Result<TokenMetrics> {
+) -> Result<(TokenMetrics, usize, usize)> {
     use crate::metrics::transcript::TranscriptEvent;
 
     let content = fs::read_to_string(transcript_path)?;
@@ -193,7 +219,8 @@ fn aggregate_tokens_for_phase(
         }
     }
 
-    if should_debug {
+    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
+        // Only print text summary if not in JSON mode
         let total_tokens = metrics.total_input_tokens + metrics.total_output_tokens;
         eprintln!(
             "  Summary: examined {} events, matched {}, attributed {} tokens",
@@ -201,7 +228,7 @@ fn aggregate_tokens_for_phase(
         );
     }
 
-    Ok(metrics)
+    Ok((metrics, examined_count, matched_count))
 }
 
 #[cfg(test)]

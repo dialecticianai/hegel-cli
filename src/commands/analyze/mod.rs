@@ -33,7 +33,11 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
 
     // Parse debug config if provided
     let debug_config = if let Some(ref range) = options.debug {
-        Some(DebugConfig::from_range(range, options.verbose)?)
+        Some(DebugConfig::from_range(
+            range,
+            options.verbose,
+            options.json,
+        )?)
     } else {
         None
     };
@@ -41,8 +45,14 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
     // analyze command needs ALL metrics including archives
     let metrics = parse_unified_metrics(storage.state_dir(), true, debug_config.as_ref())?;
 
-    // If debug mode is active, skip normal output (debug output already printed)
-    if options.debug.is_some() {
+    // If debug mode is active, output results and skip normal output
+    if let Some(ref cfg) = debug_config {
+        if options.json {
+            // Output collected debug data as JSON
+            let debug_data = cfg.get_debug_data();
+            println!("{}", serde_json::to_string_pretty(&debug_data)?);
+        }
+        // Text output already printed during parsing
         return Ok(());
     }
 

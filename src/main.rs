@@ -90,8 +90,8 @@ enum Commands {
         /// Show what would be fixed without making changes (requires --fix-archives)
         #[arg(long, requires = "fix_archives")]
         dry_run: bool,
-        /// Output repair results as JSON (implies --dry-run, requires --fix-archives)
-        #[arg(long, requires = "fix_archives")]
+        /// Output results as JSON
+        #[arg(long)]
         json: bool,
         /// Display brief cross-section summary
         #[arg(long)]

@@ -22,6 +22,22 @@ use std::path::Path;
 
 use crate::storage::FileStorage;
 
+/// Debug output data for a single phase
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct PhaseDebugInfo {
+    pub workflow_id: String,
+    pub phase_name: String,
+    pub start_time: String,
+    pub end_time: Option<String>,
+    pub duration_seconds: u64,
+    pub tokens_attributed: u64,
+    pub is_archived: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transcript_events_examined: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transcript_events_matched: Option<usize>,
+}
+
 /// Debug configuration for token attribution tracing
 #[derive(Debug, Clone)]
 pub struct DebugConfig {
@@ -31,11 +47,15 @@ pub struct DebugConfig {
     pub end: chrono::DateTime<chrono::Utc>,
     /// Show per-event details
     pub verbose: bool,
+    /// Output JSON instead of text
+    pub json_output: bool,
+    /// Collected debug data (when json_output is true)
+    pub debug_data: std::sync::Arc<std::sync::Mutex<Vec<PhaseDebugInfo>>>,
 }
 
 impl DebugConfig {
     /// Parse debug range from string format "START..END"
-    pub fn from_range(range: &str, verbose: bool) -> Result<Self> {
+    pub fn from_range(range: &str, verbose: bool, json_output: bool) -> Result<Self> {
         let parts: Vec<&str> = range.split("..").collect();
         if parts.len() != 2 {
             anyhow::bail!("Debug range must be in format START..END (RFC3339 timestamps)");
@@ -52,7 +72,27 @@ impl DebugConfig {
             start,
             end,
             verbose,
+            json_output,
+            debug_data: std::sync::Arc::new(std::sync::Mutex::new(Vec::new())),
         })
+    }
+
+    /// Add phase debug info to collected data
+    pub fn add_phase_info(&self, info: PhaseDebugInfo) {
+        if self.json_output {
+            if let Ok(mut data) = self.debug_data.lock() {
+                data.push(info);
+            }
+        }
+    }
+
+    /// Get all collected debug data
+    pub fn get_debug_data(&self) -> Vec<PhaseDebugInfo> {
+        if let Ok(data) = self.debug_data.lock() {
+            data.clone()
+        } else {
+            Vec::new()
+        }
     }
 
     /// Check if a timestamp overlaps with the debug range
@@ -223,14 +263,31 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 if cfg.overlaps(&phase.start_time, phase.end_time.as_deref()) {
                     let total_tokens = phase.token_metrics.total_input_tokens
                         + phase.token_metrics.total_output_tokens;
-                    eprintln!(
-                        "[DEBUG ARCHIVED] Workflow {} | Phase '{}' ({} to {}): {} tokens (from archive)",
-                        archive.workflow_id,
-                        phase.phase_name,
-                        phase.start_time,
-                        phase.end_time.as_deref().unwrap_or("active"),
-                        total_tokens
-                    );
+
+                    if cfg.json_output {
+                        // Collect data for JSON output
+                        cfg.add_phase_info(PhaseDebugInfo {
+                            workflow_id: archive.workflow_id.clone(),
+                            phase_name: phase.phase_name.clone(),
+                            start_time: phase.start_time.clone(),
+                            end_time: phase.end_time.clone(),
+                            duration_seconds: phase.duration_seconds,
+                            tokens_attributed: total_tokens,
+                            is_archived: true,
+                            transcript_events_examined: None,
+                            transcript_events_matched: None,
+                        });
+                    } else {
+                        // Print text output
+                        eprintln!(
+                            "[DEBUG ARCHIVED] Workflow {} | Phase '{}' ({} to {}): {} tokens (from archive)",
+                            archive.workflow_id,
+                            phase.phase_name,
+                            phase.start_time,
+                            phase.end_time.as_deref().unwrap_or("active"),
+                            total_tokens
+                        );
+                    }
                 }
             }
 
