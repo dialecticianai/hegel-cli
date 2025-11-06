@@ -1,5 +1,9 @@
 use anyhow::{anyhow, Result};
-use handlebars::Handlebars;
+use handlebars::{
+    Context, Handlebars, Helper, HelperDef, HelperResult, Output, RenderContext, RenderError,
+    RenderErrorReason, ScopedJson,
+};
+use serde_json::value::Value as Json;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -95,15 +99,61 @@ fn register_partials(registry: &mut Handlebars, guides_dir: &Path) -> Result<()>
     Ok(())
 }
 
+/// Custom eq helper for string equality comparison
+/// Used in conditionals like {{#if (eq x "value")}}
+#[derive(Clone, Copy)]
+struct EqHelper;
+
+impl HelperDef for EqHelper {
+    fn call_inner<'reg: 'rc, 'rc>(
+        &self,
+        h: &Helper<'rc>,
+        _: &'reg Handlebars<'reg>,
+        _: &'rc Context,
+        _: &mut RenderContext<'reg, 'rc>,
+    ) -> Result<ScopedJson<'rc>, RenderError> {
+        // Get two parameters to compare
+        let param0 = h
+            .param(0)
+            .ok_or(RenderErrorReason::ParamNotFoundForIndex("eq", 0))?;
+        let param1 = h
+            .param(1)
+            .ok_or(RenderErrorReason::ParamNotFoundForIndex("eq", 1))?;
+
+        // Compare values as JSON
+        let equal = param0.value() == param1.value();
+
+        Ok(ScopedJson::Derived(Json::Bool(equal)))
+    }
+}
+
 /// Render Handlebars template with guide/partial loading
 pub fn render_template_hbs(
     template: &str,
     guides_dir: &Path,
     context: &HashMap<String, String>,
 ) -> Result<String> {
-    // TODO: Implement in Step 3
-    let _ = (template, guides_dir, context);
-    Ok(String::new())
+    // Initialize Handlebars registry
+    let mut hbs = Handlebars::new();
+
+    // Register partials from guides directories
+    register_partials(&mut hbs, guides_dir)?;
+
+    // Register custom eq helper
+    hbs.register_helper("eq", Box::new(EqHelper));
+
+    // Convert HashMap<String, String> to JSON for Handlebars
+    let json_context = Json::Object(
+        context
+            .iter()
+            .map(|(k, v)| (k.clone(), Json::String(v.clone())))
+            .collect(),
+    );
+
+    // Render the template
+    let result = hbs.render_template(template, &json_context)?;
+
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -207,6 +257,93 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("Nested subdirectories"));
+    }
+
+    // ========== Step 3: Core Rendering Tests ==========
+
+    #[test]
+    fn test_render_simple_variable_substitution() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        let mut context = HashMap::new();
+        context.insert("name".to_string(), "World".to_string());
+
+        let result = render_template_hbs("Hello {{name}}!", guides_dir, &context).unwrap();
+        assert_eq!(result, "Hello World!");
+    }
+
+    #[test]
+    fn test_render_with_partial_inclusion() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        // Create a partial
+        let partials_dir = guides_dir.join("partials");
+        fs::create_dir_all(&partials_dir).unwrap();
+        fs::write(partials_dir.join("greeting.hbs"), "Hello {{name}}!").unwrap();
+
+        let mut context = HashMap::new();
+        context.insert("name".to_string(), "World".to_string());
+
+        let result = render_template_hbs("{{> greeting}}", guides_dir, &context).unwrap();
+        assert_eq!(result, "Hello World!");
+    }
+
+    #[test]
+    fn test_render_with_conditional() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        let template = "{{#if show}}Visible{{else}}Hidden{{/if}}";
+
+        // Test true case
+        let mut context = HashMap::new();
+        context.insert("show".to_string(), "true".to_string());
+        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        assert_eq!(result, "Visible");
+
+        // Test false case (empty string is falsy)
+        context.insert("show".to_string(), "".to_string());
+        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        assert_eq!(result, "Hidden");
+    }
+
+    #[test]
+    fn test_render_with_eq_helper() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        let template = "{{#if (eq style \"hierarchical\")}}Hierarchical{{else}}Monolithic{{/if}}";
+
+        // Test eq returns true
+        let mut context = HashMap::new();
+        context.insert("style".to_string(), "hierarchical".to_string());
+        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        assert_eq!(result, "Hierarchical");
+
+        // Test eq returns false
+        context.insert("style".to_string(), "monolithic".to_string());
+        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        assert_eq!(result, "Monolithic");
+    }
+
+    #[test]
+    fn test_render_error_missing_partial() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        let result = render_template_hbs("{{> nonexistent}}", guides_dir, &HashMap::new());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_render_error_invalid_syntax() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        let result = render_template_hbs("{{#if unclosed", guides_dir, &HashMap::new());
+        assert!(result.is_err());
     }
 
     // ========== Step 1: Original Placeholder Test ==========
