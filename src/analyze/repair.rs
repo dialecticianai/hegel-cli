@@ -7,7 +7,6 @@ use crate::storage::FileStorage;
 use crate::theme::Theme;
 
 use super::cleanup::all_cleanups;
-use super::gap_detection::detect_and_create_cowboy_archives;
 use super::totals::rebuild_cumulative_totals;
 
 /// Repair archives: backfill missing git metrics and rebuild cumulative totals
@@ -239,8 +238,8 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
 
     // Ensure exactly one cowboy per gap between non-synthetic workflows
     // Pass the in-memory archives which include repairs (even in dry-run mode)
-    let (cowboys_created, cowboys_removed) =
-        super::cowboy_gap_filler::ensure_cowboy_coverage(state_dir, &archives, dry_run)?;
+    let (cowboys_created, _cowboys_removed) =
+        super::gap_detection::ensure_cowboy_coverage(state_dir, &archives, dry_run)?;
     let synthetic_count = cowboys_created;
 
     writeln!(

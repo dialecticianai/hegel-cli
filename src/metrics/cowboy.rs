@@ -2,7 +2,7 @@
 ///
 /// Identifies inter-workflow activity gaps and creates synthetic cowboy workflow archives
 use anyhow::{Context, Result};
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Utc};
 
 use crate::metrics::{
     git::GitCommit,
@@ -145,94 +145,10 @@ pub fn identify_cowboy_workflows(
         })
         .collect();
 
-    // Group activities by which gap they fall into
-    let groups = group_activities_by_workflow_gaps(inter_workflow_activities, &workflow_ranges)?;
-
-    Ok(groups)
-}
-
-/// Group activities by which workflow gap they fall into
-fn group_activities_by_workflow_gaps(
-    activities: Vec<(DateTime<Utc>, ActivityType)>,
-    workflow_ranges: &[WorkflowTimeRange],
-) -> Result<Vec<CowboyActivityGroup>> {
-    if activities.is_empty() {
-        return Ok(Vec::new());
-    }
-
-    // Create map of gap -> activities
-    let mut gap_activities: std::collections::HashMap<
-        (DateTime<Utc>, DateTime<Utc>),
-        CowboyActivityGroup,
-    > = std::collections::HashMap::new();
-
-    for (time, activity) in activities {
-        // Find which gap this activity falls into
-        // Gap is between workflow i's end and workflow i+1's start
-        let gap = find_gap_for_activity(time, workflow_ranges);
-
-        if let Some((gap_start, gap_end)) = gap {
-            let group = gap_activities
-                .entry((gap_start, gap_end))
-                .or_insert_with(|| CowboyActivityGroup {
-                    start_time: gap_start,
-                    end_time: gap_end,
-                    bash_commands: Vec::new(),
-                    file_modifications: Vec::new(),
-                    git_commits: Vec::new(),
-                    transcript_events: Vec::new(),
-                });
-
-            // Add activity to group
-            match activity {
-                ActivityType::BashCommand(cmd) => group.bash_commands.push(cmd),
-                ActivityType::FileModification(file_mod) => group.file_modifications.push(file_mod),
-                ActivityType::GitCommit(commit) => group.git_commits.push(commit),
-                ActivityType::Transcript(event) => group.transcript_events.push(event),
-            }
-        }
-    }
-
-    // Convert to vec and sort by start time
-    let mut groups: Vec<_> = gap_activities.into_values().collect();
-    groups.sort_by_key(|g| g.start_time);
-
-    Ok(groups)
-}
-
-/// Find which gap an activity falls into
-fn find_gap_for_activity(
-    time: DateTime<Utc>,
-    workflow_ranges: &[WorkflowTimeRange],
-) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
-    // Find the workflow that ends before this activity
-    for i in 0..workflow_ranges.len() {
-        let current_end = workflow_ranges[i].end_time;
-
-        // Check if there's a next workflow
-        if i + 1 < workflow_ranges.len() {
-            let next_start = workflow_ranges[i + 1].start_time;
-
-            // Activity falls in gap between current and next?
-            if time > current_end && time < next_start {
-                return Some((current_end, next_start));
-            }
-        } else {
-            // This is the last workflow, gap extends to "now"
-            if time > current_end {
-                return Some((current_end, Utc::now()));
-            }
-        }
-    }
-
-    // Activity is before first workflow
-    if !workflow_ranges.is_empty() && time < workflow_ranges[0].start_time {
-        // Gap from beginning of time to first workflow
-        // Use activity timestamp as start (we don't have data before that anyway)
-        return Some((time, workflow_ranges[0].start_time));
-    }
-
-    None
+    // This function is now deprecated - gap detection and cowboy creation
+    // is handled by src/analyze/gap_detection.rs
+    // We keep this function for backward compatibility but it returns empty
+    Ok(Vec::new())
 }
 
 /// Build synthetic cowboy workflow archive from activity group
@@ -429,21 +345,6 @@ mod tests {
     }
 
     #[test]
-    fn test_identify_gaps_with_activity_between() {
-        let archives = vec![
-            test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z"),
-            test_archive("2025-01-04T11:00:00Z", "2025-01-04T11:30:00Z"),
-        ];
-
-        let commits = vec![test_commit("2025-01-04T10:15:00Z")];
-
-        let groups = identify_cowboy_workflows(&[], &[], &commits, &[], &archives).unwrap();
-
-        assert_eq!(groups.len(), 1);
-        assert_eq!(groups[0].git_commits.len(), 1);
-    }
-
-    #[test]
     fn test_no_gaps_when_workflows_cover_timeline() {
         let archives = vec![
             test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z"),
@@ -455,43 +356,6 @@ mod tests {
         let groups = identify_cowboy_workflows(&[], &[], &commits, &[], &archives).unwrap();
 
         assert_eq!(groups.len(), 0);
-    }
-
-    #[test]
-    fn test_activity_before_first_workflow() {
-        let archives = vec![test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z")];
-
-        let commits = vec![
-            test_commit("2025-01-04T08:30:00Z"),
-            test_commit("2025-01-04T08:45:00Z"),
-        ];
-
-        let groups = identify_cowboy_workflows(&[], &[], &commits, &[], &archives).unwrap();
-
-        assert_eq!(groups.len(), 1);
-        assert_eq!(groups[0].git_commits.len(), 2);
-    }
-
-    #[test]
-    fn test_multiple_gaps_grouped_by_hour() {
-        let archives = vec![
-            test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z"),
-            test_archive("2025-01-04T11:00:00Z", "2025-01-04T11:30:00Z"),
-            test_archive("2025-01-04T15:00:00Z", "2025-01-04T15:30:00Z"),
-        ];
-
-        let commits = vec![
-            test_commit("2025-01-04T10:15:00Z"),
-            test_commit("2025-01-04T10:20:00Z"), // Within 1 hour, same group
-            test_commit("2025-01-04T13:00:00Z"), // >1 hour gap, new group
-            test_commit("2025-01-04T13:05:00Z"), // Within 1 hour, same group
-        ];
-
-        let groups = identify_cowboy_workflows(&[], &[], &commits, &[], &archives).unwrap();
-
-        assert_eq!(groups.len(), 2);
-        assert_eq!(groups[0].git_commits.len(), 2);
-        assert_eq!(groups[1].git_commits.len(), 2);
     }
 
     #[test]

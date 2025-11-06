@@ -159,10 +159,18 @@ mod tests {
     use crate::storage::archive::{PhaseArchive, TokenTotals, TransitionArchive, WorkflowTotals};
 
     fn test_cowboy_archive(workflow_id: &str, is_synthetic: bool) -> WorkflowArchive {
+        // Create non-zero-duration cowboy by adding 30 minutes to completed_at
+        use chrono::{DateTime, Duration, Utc};
+        let start = DateTime::parse_from_rfc3339(workflow_id)
+            .unwrap()
+            .with_timezone(&Utc);
+        let end = start + Duration::minutes(30);
+        let completed_at = end.to_rfc3339();
+
         WorkflowArchive {
             workflow_id: workflow_id.to_string(),
             mode: "cowboy".to_string(),
-            completed_at: workflow_id.to_string(),
+            completed_at,
             session_id: None,
             is_synthetic,
             phases: vec![PhaseArchive {
