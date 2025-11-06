@@ -70,6 +70,7 @@ impl ArchiveCleanup for GitBackfillCleanup {
                 file_modifications: vec![],
                 git_commits: vec![],
                 is_synthetic: archive.is_synthetic,
+                workflow_id: Some(archive.workflow_id.clone()),
             })
             .collect();
 

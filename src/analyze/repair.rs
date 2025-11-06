@@ -62,7 +62,7 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
     let mut issues = Vec::new();
 
     // Get all cleanup strategies
-    let cleanups = all_cleanups();
+    let mut cleanups = all_cleanups();
 
     // Process each archive
     for archive in &mut archives {
@@ -142,8 +142,67 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
         }
     }
 
+    // Run post-processing hooks (for batch operations like duplicate removal)
+    let mut total_removed = 0;
+    for cleanup in &mut cleanups {
+        let to_remove = cleanup.post_process(&mut archives, state_dir, dry_run)?;
+
+        if !to_remove.is_empty() {
+            let count = to_remove.len();
+            total_removed += count;
+            *repairs_by_type
+                .entry(cleanup.name().to_string())
+                .or_insert(0) += count;
+
+            if !json {
+                for &index in &to_remove {
+                    if dry_run {
+                        println!(
+                            "{} {}",
+                            Theme::highlight(&archives[index].workflow_id),
+                            Theme::secondary(&format!("({} - would be removed)", cleanup.name()))
+                        );
+                    } else {
+                        println!(
+                            "{} {}",
+                            Theme::highlight(&archives[index].workflow_id),
+                            Theme::secondary(&format!("({} - removing)", cleanup.name()))
+                        );
+                    }
+                }
+            }
+
+            // DON'T remove from archives vec yet or delete files - gap detection needs to see them
+        }
+    }
+
+    repaired_count += total_removed;
+
     // Detect and create synthetic cowboy workflows for historical gaps
     let synthetic_count = detect_and_create_cowboy_archives(state_dir, &archives, dry_run, json)?;
+
+    // NOW delete duplicate cowboy files and remove from archives vec (after gap detection)
+    if !dry_run && total_removed > 0 {
+        for cleanup in &mut cleanups {
+            let to_remove = cleanup.post_process(&mut archives, state_dir, true)?; // Get indices again
+
+            // Delete files
+            for &index in &to_remove {
+                let archive = &archives[index];
+                let archive_path = state_dir
+                    .join("archive")
+                    .join(format!("{}.json", archive.workflow_id));
+                if archive_path.exists() {
+                    std::fs::remove_file(&archive_path)?;
+                }
+            }
+
+            // Remove from archives vec (in reverse to maintain indices)
+            for &index in to_remove.iter().rev() {
+                archives.remove(index);
+            }
+        }
+    }
 
     // Output results
     if json {

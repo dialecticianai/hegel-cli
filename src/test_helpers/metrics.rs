@@ -27,6 +27,7 @@ pub fn test_phase_metrics_with(minimal: bool) -> PhaseMetrics {
             file_modifications: vec![],
             git_commits: vec![],
             is_synthetic: false,
+            workflow_id: Some("2025-10-24T10:00:00Z".to_string()),
         }
     } else {
         // Full version: realistic test data
@@ -46,6 +47,7 @@ pub fn test_phase_metrics_with(minimal: bool) -> PhaseMetrics {
             file_modifications: vec![],
             git_commits: vec![],
             is_synthetic: false,
+            workflow_id: Some("2025-10-24T10:00:00Z".to_string()),
         }
     }
 }
@@ -221,6 +223,7 @@ impl UnifiedMetricsBuilder {
                 file_modifications: vec![],
                 git_commits: vec![],
                 is_synthetic: false,
+                workflow_id: Some("test-workflow".to_string()),
             });
 
             // Add corresponding state transition

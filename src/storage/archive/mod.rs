@@ -152,6 +152,9 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
         }
     }
 
+    // Sort archives by workflow_id (chronological order)
+    archives.sort_by(|a, b| a.workflow_id.cmp(&b.workflow_id));
+
     Ok(archives)
 }
 

@@ -30,13 +30,12 @@ impl WorkflowDAG {
         transitions: &[StateTransitionEvent],
         phase_metrics: &[PhaseMetrics],
     ) -> Self {
-        // Create a map of phase metrics by phase name for quick lookup
-        let mut phase_data_map: HashMap<String, Vec<PhaseMetrics>> = HashMap::new();
+        // Create a map of phase metrics by (workflow_id, phase_name) for precise lookup
+        let mut phase_data_map: HashMap<(String, String), PhaseMetrics> = HashMap::new();
         for metric in phase_metrics {
-            phase_data_map
-                .entry(metric.phase_name.clone())
-                .or_insert_with(Vec::new)
-                .push(metric.clone());
+            if let Some(wid) = &metric.workflow_id {
+                phase_data_map.insert((wid.clone(), metric.phase_name.clone()), metric.clone());
+            }
         }
 
         // Group transitions by workflow_id
@@ -56,7 +55,11 @@ impl WorkflowDAG {
         let mut prev_workflow_id: Option<String> = None;
         let mut prev_phase: Option<String> = None;
 
-        for (workflow_id, trans) in &workflow_transitions {
+        // Sort workflows by workflow_id (chronological order)
+        let mut sorted_workflows: Vec<_> = workflow_transitions.iter().collect();
+        sorted_workflows.sort_by_key(|(wid, _)| wid.as_str());
+
+        for (workflow_id, trans) in sorted_workflows {
             // Extract ordered phases for this workflow
             let mut phases = Vec::new();
             let mut seen_phases = HashSet::new();
@@ -71,20 +74,17 @@ impl WorkflowDAG {
             // Determine if workflow is synthetic (gap-detected implicit workflow)
             // Note: Explicit workflows (e.g., `hegel start cowboy`) are NOT synthetic
             let is_synthetic = trans.iter().any(|t| {
-                if let Some(metrics) = phase_data_map.get(&t.phase) {
-                    metrics.iter().any(|m| m.is_synthetic)
-                } else {
-                    false
-                }
+                phase_data_map
+                    .get(&(workflow_id.clone(), t.phase.clone()))
+                    .map(|m| m.is_synthetic)
+                    .unwrap_or(false)
             });
 
-            // Build phase_data map for this workflow
+            // Build phase_data map for this workflow using precise (workflow_id, phase_name) lookup
             let mut phase_data = HashMap::new();
             for phase in &phases {
-                if let Some(metrics) = phase_data_map.get(phase) {
-                    if let Some(metric) = metrics.first() {
-                        phase_data.insert(phase.clone(), metric.clone());
-                    }
+                if let Some(metric) = phase_data_map.get(&(workflow_id.clone(), phase.clone())) {
+                    phase_data.insert(phase.clone(), metric.clone());
                 }
             }
 
@@ -320,10 +320,25 @@ mod tests {
     }
 
     fn test_phase_metrics() -> Vec<PhaseMetrics> {
-        use crate::test_helpers::test_phase_metrics;
-
         vec![
-            test_phase_metrics(),
+            PhaseMetrics {
+                phase_name: "spec".to_string(),
+                start_time: "2025-10-24T10:00:00Z".to_string(),
+                end_time: Some("2025-10-24T10:15:00Z".to_string()),
+                duration_seconds: 900,
+                token_metrics: TokenMetrics {
+                    total_input_tokens: 1000,
+                    total_output_tokens: 500,
+                    total_cache_creation_tokens: 200,
+                    total_cache_read_tokens: 300,
+                    assistant_turns: 5,
+                },
+                bash_commands: vec![],
+                file_modifications: vec![],
+                git_commits: vec![],
+                is_synthetic: false,
+                workflow_id: Some("test".to_string()),
+            },
             PhaseMetrics {
                 phase_name: "plan".to_string(),
                 start_time: "2025-01-01T10:15:00Z".to_string(),
@@ -336,7 +351,11 @@ mod tests {
                     total_cache_read_tokens: 0,
                     assistant_turns: 8,
                 },
-                ..test_phase_metrics()
+                bash_commands: vec![],
+                file_modifications: vec![],
+                git_commits: vec![],
+                is_synthetic: false,
+                workflow_id: Some("test".to_string()),
             },
         ]
     }

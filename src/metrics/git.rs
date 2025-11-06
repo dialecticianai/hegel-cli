@@ -433,6 +433,7 @@ mod tests {
             file_modifications: vec![],
             git_commits: vec![],
             is_synthetic: false,
+            workflow_id: Some("2025-01-01T10:00:00Z".to_string()),
         }];
 
         attribute_commits_to_phases(commits, &mut phases);

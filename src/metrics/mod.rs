@@ -37,6 +37,9 @@ pub struct PhaseMetrics {
     /// Whether this phase is from a synthetic cowboy workflow
     #[serde(default)]
     pub is_synthetic: bool,
+    /// Workflow ID this phase belongs to (for proper phase-to-workflow association)
+    #[serde(default)]
+    pub workflow_id: Option<String>,
 }
 
 /// Unified metrics combining all data sources
@@ -156,6 +159,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 file_modifications: vec![], // Archived as summaries, not individual modifications
                 git_commits: phase_archive.git_commits.clone(),
                 is_synthetic: archive.is_synthetic,
+                workflow_id: Some(archive.workflow_id.clone()),
             };
             all_phase_metrics.push(phase);
         }

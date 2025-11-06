@@ -39,13 +39,9 @@ pub fn identify_cowboy_workflows(
     existing_archives: &[WorkflowArchive],
 ) -> Result<Vec<CowboyActivityGroup>> {
     // Build timeline of existing workflow ranges
+    // Include ALL workflows (synthetic and non-synthetic) to prevent duplicate cowboys
     let mut workflow_ranges = Vec::new();
     for archive in existing_archives {
-        // Skip synthetic archives (don't create synthetic archives for gaps within synthetic archives)
-        if archive.is_synthetic {
-            continue;
-        }
-
         let start_time = parse_timestamp(&archive.workflow_id)?;
         let end_time = parse_timestamp(&archive.completed_at)?;
 
@@ -226,6 +222,7 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
 
     // Create single "ride" phase
     let duration_seconds = (group.end_time - group.start_time).num_seconds() as u64;
+    let workflow_id = group.start_time.to_rfc3339();
     let phase_metrics = vec![PhaseMetrics {
         phase_name: "ride".to_string(),
         start_time: group.start_time.to_rfc3339(),
@@ -236,6 +233,7 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
         file_modifications: group.file_modifications.clone(),
         git_commits: group.git_commits.clone(),
         is_synthetic: true, // Gap-detected cowboy workflows are synthetic (vs explicit `hegel start cowboy`)
+        workflow_id: Some(workflow_id.clone()),
     }];
 
     // Create minimal state transitions

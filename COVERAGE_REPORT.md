@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 18:53
+**Last Updated**: 2025-11-05 20:04
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **85.09%** lines | **84.33%** regions | **85.44%** functions
+**Overall Coverage**: **84.76%** lines | **84.08%** regions | **85.20%** functions
 
 ## Summary
 
 ```
-TOTAL                                      17620              2761    84.33%         934               136    85.44%       10707              1596    85.09%           0                 0         -
+TOTAL                                         17879              2847    84.08%         946               140    85.20%       10911              1663    84.76%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -19,6 +19,7 @@ TOTAL                                      17620              2761    84.33%    
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
 | `src/analyze/cleanup/aborted.rs` | 97.30% | 97.42% | 90.91% | 🟢 Excellent |
+| `src/analyze/cleanup/duplicate_cowboy.rs` | 90.76% | 95.56% | 75.00% | 🟢 Excellent |
 | `src/analyze/cleanup/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/cleanup/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/gap_detection.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -58,12 +59,12 @@ TOTAL                                      17620              2761    84.33%    
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `src/main.rs` | 53.49% | 40.23% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
-| `src/metrics/aggregation.rs` | 97.22% | 95.52% | 100.00% | 🟢 Excellent |
-| `src/metrics/cowboy.rs` | 93.69% | 89.18% | 100.00% | 🟢 Excellent |
-| `src/metrics/git.rs` | 92.43% | 91.65% | 95.45% | 🟢 Excellent |
-| `src/metrics/graph.rs` | 89.39% | 88.65% | 100.00% | 🟡 Good |
+| `src/metrics/aggregation.rs` | 97.24% | 95.54% | 100.00% | 🟢 Excellent |
+| `src/metrics/cowboy.rs` | 93.99% | 89.43% | 100.00% | 🟢 Excellent |
+| `src/metrics/git.rs` | 92.45% | 91.68% | 95.45% | 🟢 Excellent |
+| `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 96.19% | 94.97% | 84.21% | 🟢 Excellent |
+| `src/metrics/mod.rs` | 96.20% | 94.99% | 84.21% | 🟢 Excellent |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 98.43% | 97.74% | 96.15% | 🟢 Excellent |
@@ -71,7 +72,7 @@ TOTAL                                      17620              2761    84.33%    
 | `src/rules/types.rs` | 96.22% | 92.51% | 100.00% | 🟢 Excellent |
 | `src/storage/archive/aggregation.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/storage/archive/builder.rs` | 98.25% | 96.38% | 77.78% | 🟢 Excellent |
-| `src/storage/archive/mod.rs` | 93.37% | 93.73% | 75.00% | 🟢 Excellent |
+| `src/storage/archive/mod.rs` | 93.44% | 93.85% | 76.47% | 🟢 Excellent |
 | `src/storage/archive/validation.rs` | 94.44% | 94.12% | 100.00% | 🟢 Excellent |
 | `src/storage/log_cleanup.rs` | 75.00% | 73.08% | 33.33% | 🟡 Good |
 | `src/storage/mod.rs` | 89.96% | 91.03% | 70.00% | 🟡 Good |
@@ -99,6 +100,7 @@ TOTAL                                      17620              2761    84.33%    
 - `src/adapters/cursor.rs` - 93.84%
 - `src/adapters/mod.rs` - 98.91%
 - `src/analyze/cleanup/aborted.rs` - 97.30%
+- `src/analyze/cleanup/duplicate_cowboy.rs` - 90.76%
 - `src/commands/analyze/mod.rs` - 98.37%
 - `src/commands/config.rs` - 91.95%
 - `src/commands/fork/amp.rs` - 100.00%
@@ -117,11 +119,12 @@ TOTAL                                      17620              2761    84.33%    
 - `src/guardrails/parser.rs` - 97.78%
 - `src/guardrails/types.rs` - 94.38%
 - `src/metamodes/mod.rs` - 99.29%
-- `src/metrics/aggregation.rs` - 97.22%
-- `src/metrics/cowboy.rs` - 93.69%
-- `src/metrics/git.rs` - 92.43%
+- `src/metrics/aggregation.rs` - 97.24%
+- `src/metrics/cowboy.rs` - 93.99%
+- `src/metrics/git.rs` - 92.45%
+- `src/metrics/graph.rs` - 90.06%
 - `src/metrics/hooks.rs` - 94.22%
-- `src/metrics/mod.rs` - 96.19%
+- `src/metrics/mod.rs` - 96.20%
 - `src/metrics/states.rs` - 100.00%
 - `src/metrics/transcript.rs` - 100.00%
 - `src/rules/evaluator.rs` - 98.43%
@@ -129,7 +132,7 @@ TOTAL                                      17620              2761    84.33%    
 - `src/rules/types.rs` - 96.22%
 - `src/storage/archive/aggregation.rs` - 100.00%
 - `src/storage/archive/builder.rs` - 98.25%
-- `src/storage/archive/mod.rs` - 93.37%
+- `src/storage/archive/mod.rs` - 93.44%
 - `src/storage/archive/validation.rs` - 94.44%
 - `src/test_helpers/jsonl.rs` - 100.00%
 - `src/test_helpers/metrics.rs` - 100.00%
@@ -147,7 +150,6 @@ TOTAL                                      17620              2761    84.33%    
 - `src/commands/workflow/transitions.rs` - 85.52%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/embedded.rs` - 82.79%
-- `src/metrics/graph.rs` - 89.39%
 - `src/storage/log_cleanup.rs` - 75.00%
 - `src/storage/mod.rs` - 89.96%
 - `src/test_helpers/fixtures.rs` - 80.00%
@@ -181,7 +183,7 @@ TOTAL                                      17620              2761    84.33%    
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 85.09% | ✅ Met |
+| Overall | ≥80% | 84.76% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

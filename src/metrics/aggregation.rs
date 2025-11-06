@@ -73,6 +73,7 @@ pub fn build_phase_metrics(
             file_modifications,
             git_commits: vec![],
             is_synthetic: false, // Live phases are never synthetic
+            workflow_id: None,   // Live phases don't have workflow_id yet (set later if archived)
         });
     }
 

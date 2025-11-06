@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 18:53
+**Last Updated**: 2025-11-05 20:04
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,436 | 9,640 | 24,076 |
-| **Comments** | 2,003 | - | 2,003 |
-| **Blank Lines** | 2,674 | - | 2,674 |
-| **Total Lines** | 19,113 | 9,640 | 28,753 |
-| **Files** | 89 | 54 | 143 |
+| **Lines** | 14,664 | 9,644 | 24,308 |
+| **Comments** | 2,062 | - | 2,062 |
+| **Blank Lines** | 2,707 | - | 2,707 |
+| **Total Lines** | 19,433 | 9,644 | 29,077 |
+| **Files** | 90 | 54 | 144 |
 
-**Documentation Ratio**: 0.67 lines of docs per line of code
+**Documentation Ratio**: 0.66 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            89           2674           2003          14436
+Rust                            90           2707           2062          14664
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           104           2815           2003          14846
+SUM:                           105           2848           2062          15074
 -------------------------------------------------------------------------------
 ```
 
@@ -42,11 +42,12 @@ SUM:                           104           2815           2003          14846
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `analyze/cleanup/aborted.rs` | 162 | 64 | 98 | 60.5% | ✅ |
-| `analyze/cleanup/git.rs` | 89 | 89 | 0 | 0.0% | ✅ |
-| `analyze/cleanup/mod.rs` | 41 | 41 | 0 | 0.0% | ✅ |
+| `analyze/cleanup/duplicate_cowboy.rs` | 197 | 100 | 97 | 49.2% | ✅ |
+| `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
+| `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
 | `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
-| `analyze/repair.rs` | 188 | 188 | 0 | 0.0% | ✅ |
+| `analyze/repair.rs` | 247 | 247 | 0 | 0.0% | ⚠️ Large |
 | `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 337 | 87 | 250 | 74.2% | ✅ |
@@ -91,12 +92,12 @@ SUM:                           104           2815           2003          14846
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
 | `main.rs` | 403 | 14 | 389 | 96.5% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
-| `metrics/aggregation.rs` | 205 | 146 | 59 | 28.8% | ✅ |
-| `metrics/cowboy.rs` | 470 | 289 | 181 | 38.5% | ⚠️ Large |
-| `metrics/git.rs` | 496 | 158 | 338 | 68.1% | ✅ |
-| `metrics/graph.rs` | 440 | 287 | 153 | 34.8% | ✅ (infra) |
+| `metrics/aggregation.rs` | 206 | 147 | 59 | 28.6% | ✅ |
+| `metrics/cowboy.rs` | 468 | 287 | 181 | 38.7% | ⚠️ Large |
+| `metrics/git.rs` | 497 | 158 | 339 | 68.2% | ✅ |
+| `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 764 | 222 | 542 | 70.9% | ⚠️ Large |
+| `metrics/mod.rs` | 768 | 226 | 542 | 70.6% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
@@ -105,13 +106,13 @@ SUM:                           104           2815           2003          14846
 | `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
 | `storage/archive/aggregation.rs` | 98 | 98 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 345 | 157 | 188 | 54.5% | ✅ |
+| `storage/archive/mod.rs` | 348 | 160 | 188 | 54.0% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 791 | 400 | 391 | 49.4% | ✅ (infra) |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
-| `test_helpers/metrics.rs` | 323 | 323 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/metrics.rs` | 326 | 326 | 0 | 0.0% | ✅ (infra) |
 | `test_helpers/mod.rs` | 20 | 10 | 10 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
@@ -127,7 +128,7 @@ SUM:                           104           2815           2003          14846
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -149,7 +150,7 @@ SUM:                           104           2815           2003          14846
 | `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
 | `CLAUDE.md` | 179 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 208 |
+| `COVERAGE_REPORT.md` | 210 |
 | `DEP_REVIEW.md` | 678 |
 | `docs/astq_patterns/README.md` | 127 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
@@ -170,7 +171,7 @@ SUM:                           104           2815           2003          14846
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 214 |
+| `LOC_REPORT.md` | 216 |
 | `README.md` | 597 |
 | `ROADMAP.md` | 234 |
 | `src/adapters/README.md` | 25 |
@@ -196,7 +197,7 @@ SUM:                           104           2815           2003          14846
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.67 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.66 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
