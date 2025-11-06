@@ -39,18 +39,70 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
         "duplicate cowboy removal"
     }
 
-    // Use default needs_repair() which returns false
-    // Duplicate detection happens entirely in post_process()
+    fn needs_repair(&self, archive: &WorkflowArchive) -> bool {
+        // Repair zero-duration synthetic cowboys (workflow_id == completed_at)
+        archive.is_synthetic
+            && archive.mode == "cowboy"
+            && archive.workflow_id == archive.completed_at
+    }
 
     fn repair(
         &self,
-        _archive: &mut WorkflowArchive,
-        _state_dir: &Path,
-        _dry_run: bool,
+        archive: &mut WorkflowArchive,
+        state_dir: &Path,
+        dry_run: bool,
     ) -> Result<bool> {
-        // This cleanup uses post_process() instead of repair()
-        // Individual archives can't be repaired in isolation
-        Ok(false)
+        // Fix zero-duration cowboys by updating completed_at
+        // This happens when old cowboy archives were created with the same start/end timestamp
+
+        if !self.needs_repair(archive) {
+            return Ok(false);
+        }
+
+        // Read all archives to find the next workflow after this cowboy
+        let all_archives = crate::storage::archive::read_archives(state_dir)?;
+        let current_start =
+            chrono::DateTime::parse_from_rfc3339(&archive.workflow_id)?.with_timezone(&chrono::Utc);
+
+        // Find next workflow (any workflow that starts after this one)
+        let next_workflow_start = all_archives
+            .iter()
+            .filter_map(|a| chrono::DateTime::parse_from_rfc3339(&a.workflow_id).ok())
+            .map(|dt| dt.with_timezone(&chrono::Utc))
+            .filter(|dt| *dt > current_start)
+            .min();
+
+        let new_completed_at = if let Some(next_start) = next_workflow_start {
+            next_start.to_rfc3339()
+        } else {
+            // No next workflow, use current time
+            chrono::Utc::now().to_rfc3339()
+        };
+
+        // Always update the in-memory archive (even in dry-run)
+        // so gap detection sees the corrected timestamps
+        archive.completed_at = new_completed_at.clone();
+
+        // Update the done transition timestamp if it exists
+        if let Some(done_transition) = archive.transitions.iter_mut().find(|t| t.to_node == "done")
+        {
+            done_transition.timestamp = new_completed_at.clone();
+        }
+
+        // Update phase end_time if it exists
+        if let Some(phase) = archive.phases.first_mut() {
+            phase.end_time = Some(new_completed_at.clone());
+
+            // Recalculate duration
+            if let (Ok(start), Ok(end)) = (
+                chrono::DateTime::parse_from_rfc3339(&phase.start_time),
+                chrono::DateTime::parse_from_rfc3339(&new_completed_at),
+            ) {
+                phase.duration_seconds = (end - start).num_seconds() as u64;
+            }
+        }
+
+        Ok(true)
     }
 
     fn post_process(
@@ -61,6 +113,7 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
     ) -> Result<Vec<usize>> {
         // Remove consecutive synthetic cowboys: A->B->C->D->E where B,C,D are cowboys becomes A->B->E
         // Keep the first cowboy in any consecutive sequence, remove the rest
+        // Skip zero-duration cowboys (they need to be fixed first in the repair phase)
         let mut to_remove = Vec::new();
         let mut prev_was_cowboy = false;
 
@@ -69,12 +122,14 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
             archives.len()
         );
         for (index, archive) in archives.iter().enumerate() {
-            let is_cowboy = archive.is_synthetic && archive.mode == "cowboy";
+            // Skip zero-duration cowboys - they haven't been repaired yet
+            let is_zero_duration = archive.workflow_id == archive.completed_at;
+            let is_cowboy = archive.is_synthetic && archive.mode == "cowboy" && !is_zero_duration;
 
-            if is_cowboy {
+            if archive.is_synthetic && archive.mode == "cowboy" {
                 eprintln!(
-                    "DEBUG: [{}] {} - cowboy (prev_was_cowboy={})",
-                    index, archive.workflow_id, prev_was_cowboy
+                    "DEBUG: [{}] {} - cowboy (prev_was_cowboy={}, zero_duration={})",
+                    index, archive.workflow_id, prev_was_cowboy, is_zero_duration
                 );
             }
 

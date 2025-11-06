@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 20:04
+**Last Updated**: 2025-11-05 20:50
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,664 | 9,644 | 24,308 |
-| **Comments** | 2,062 | - | 2,062 |
-| **Blank Lines** | 2,707 | - | 2,707 |
-| **Total Lines** | 19,433 | 9,644 | 29,077 |
-| **Files** | 90 | 54 | 144 |
+| **Lines** | 15,125 | 9,644 | 24,769 |
+| **Comments** | 2,121 | - | 2,121 |
+| **Blank Lines** | 2,777 | - | 2,777 |
+| **Total Lines** | 20,023 | 9,644 | 29,667 |
+| **Files** | 91 | 54 | 145 |
 
-**Documentation Ratio**: 0.66 lines of docs per line of code
+**Documentation Ratio**: 0.64 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            90           2707           2062          14664
+Rust                            91           2777           2121          15125
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           105           2848           2062          15074
+SUM:                           106           2918           2121          15535
 -------------------------------------------------------------------------------
 ```
 
@@ -42,12 +42,13 @@ SUM:                           105           2848           2062          15074
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `analyze/cleanup/aborted.rs` | 162 | 64 | 98 | 60.5% | ✅ |
-| `analyze/cleanup/duplicate_cowboy.rs` | 197 | 100 | 97 | 49.2% | ✅ |
+| `analyze/cleanup/duplicate_cowboy.rs` | 252 | 155 | 97 | 38.5% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
-| `analyze/gap_detection.rs` | 95 | 95 | 0 | 0.0% | ✅ |
-| `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
-| `analyze/repair.rs` | 247 | 247 | 0 | 0.0% | ⚠️ Large |
+| `analyze/cowboy_gap_filler.rs` | 288 | 288 | 0 | 0.0% | ⚠️ Large |
+| `analyze/gap_detection.rs` | 165 | 165 | 0 | 0.0% | ✅ |
+| `analyze/mod.rs` | 6 | 6 | 0 | 0.0% | ✅ |
+| `analyze/repair.rs` | 363 | 363 | 0 | 0.0% | ⚠️ Large |
 | `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
 | `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 337 | 87 | 250 | 74.2% | ✅ |
@@ -93,7 +94,7 @@ SUM:                           105           2848           2062          15074
 | `main.rs` | 403 | 14 | 389 | 96.5% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 206 | 147 | 59 | 28.6% | ✅ |
-| `metrics/cowboy.rs` | 468 | 287 | 181 | 38.7% | ⚠️ Large |
+| `metrics/cowboy.rs` | 528 | 347 | 181 | 34.3% | ⚠️ Large |
 | `metrics/git.rs` | 497 | 158 | 339 | 68.2% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
@@ -128,7 +129,7 @@ SUM:                           105           2848           2062          15074
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 7 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -197,7 +198,7 @@ SUM:                           105           2848           2062          15074
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.66 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.64 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

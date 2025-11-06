@@ -38,12 +38,42 @@ pub fn identify_cowboy_workflows(
     transcripts: &[TranscriptEvent],
     existing_archives: &[WorkflowArchive],
 ) -> Result<Vec<CowboyActivityGroup>> {
+    use std::io::Write;
+    let mut debug_file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("/tmp/hegel_repair_debug.log")?;
+
+    writeln!(debug_file, "DEBUG COWBOY: identify_cowboy_workflows called")?;
+    writeln!(
+        debug_file,
+        "DEBUG COWBOY: existing_archives.len() = {}",
+        existing_archives.len()
+    )?;
+
+    eprintln!("DEBUG COWBOY: identify_cowboy_workflows called");
+    eprintln!(
+        "DEBUG COWBOY: existing_archives.len() = {}",
+        existing_archives.len()
+    );
+
     // Build timeline of existing workflow ranges
     // Include ALL workflows (synthetic and non-synthetic) to prevent duplicate cowboys
     let mut workflow_ranges = Vec::new();
     for archive in existing_archives {
         let start_time = parse_timestamp(&archive.workflow_id)?;
         let end_time = parse_timestamp(&archive.completed_at)?;
+
+        writeln!(
+            debug_file,
+            "DEBUG COWBOY: Archive {} to {} (mode={}, synthetic={})",
+            archive.workflow_id, archive.completed_at, archive.mode, archive.is_synthetic
+        )?;
+
+        eprintln!(
+            "DEBUG COWBOY: Archive {} to {} (mode={}, synthetic={})",
+            archive.workflow_id, archive.completed_at, archive.mode, archive.is_synthetic
+        );
 
         workflow_ranges.push(WorkflowTimeRange {
             start_time,
@@ -53,6 +83,16 @@ pub fn identify_cowboy_workflows(
 
     // Sort workflow ranges by start time
     workflow_ranges.sort_by_key(|r| r.start_time);
+
+    writeln!(
+        debug_file,
+        "DEBUG COWBOY: Built {} workflow_ranges",
+        workflow_ranges.len()
+    )?;
+    eprintln!(
+        "DEBUG COWBOY: Built {} workflow_ranges",
+        workflow_ranges.len()
+    );
 
     // Collect all timestamped activities
     let mut activities: Vec<(DateTime<Utc>, ActivityType)> = Vec::new();
@@ -105,59 +145,45 @@ pub fn identify_cowboy_workflows(
         })
         .collect();
 
-    // Group consecutive activities within 1-hour window
-    let groups = group_activities_by_proximity(inter_workflow_activities)?;
+    // Group activities by which gap they fall into
+    let groups = group_activities_by_workflow_gaps(inter_workflow_activities, &workflow_ranges)?;
 
     Ok(groups)
 }
 
-/// Group activities by temporal proximity (1-hour threshold)
-fn group_activities_by_proximity(
+/// Group activities by which workflow gap they fall into
+fn group_activities_by_workflow_gaps(
     activities: Vec<(DateTime<Utc>, ActivityType)>,
+    workflow_ranges: &[WorkflowTimeRange],
 ) -> Result<Vec<CowboyActivityGroup>> {
     if activities.is_empty() {
         return Ok(Vec::new());
     }
 
-    let one_hour = Duration::hours(1);
-    let mut groups = Vec::new();
-    let mut current_group: Option<CowboyActivityGroup> = None;
+    // Create map of gap -> activities
+    let mut gap_activities: std::collections::HashMap<
+        (DateTime<Utc>, DateTime<Utc>),
+        CowboyActivityGroup,
+    > = std::collections::HashMap::new();
 
     for (time, activity) in activities {
-        match &mut current_group {
-            None => {
-                // Start new group
-                current_group = Some(CowboyActivityGroup {
-                    start_time: time,
-                    end_time: time,
+        // Find which gap this activity falls into
+        // Gap is between workflow i's end and workflow i+1's start
+        let gap = find_gap_for_activity(time, workflow_ranges);
+
+        if let Some((gap_start, gap_end)) = gap {
+            let group = gap_activities
+                .entry((gap_start, gap_end))
+                .or_insert_with(|| CowboyActivityGroup {
+                    start_time: gap_start,
+                    end_time: gap_end,
                     bash_commands: Vec::new(),
                     file_modifications: Vec::new(),
                     git_commits: Vec::new(),
                     transcript_events: Vec::new(),
                 });
-            }
-            Some(group) => {
-                // Check if this activity is within 1 hour of the last activity
-                if time - group.end_time > one_hour {
-                    // Gap too large, finish current group and start new one
-                    groups.push(group.clone());
-                    current_group = Some(CowboyActivityGroup {
-                        start_time: time,
-                        end_time: time,
-                        bash_commands: Vec::new(),
-                        file_modifications: Vec::new(),
-                        git_commits: Vec::new(),
-                        transcript_events: Vec::new(),
-                    });
-                } else {
-                    // Update end time
-                    group.end_time = time;
-                }
-            }
-        }
 
-        // Add activity to current group
-        if let Some(group) = &mut current_group {
+            // Add activity to group
             match activity {
                 ActivityType::BashCommand(cmd) => group.bash_commands.push(cmd),
                 ActivityType::FileModification(file_mod) => group.file_modifications.push(file_mod),
@@ -167,12 +193,46 @@ fn group_activities_by_proximity(
         }
     }
 
-    // Push final group
-    if let Some(group) = current_group {
-        groups.push(group);
-    }
+    // Convert to vec and sort by start time
+    let mut groups: Vec<_> = gap_activities.into_values().collect();
+    groups.sort_by_key(|g| g.start_time);
 
     Ok(groups)
+}
+
+/// Find which gap an activity falls into
+fn find_gap_for_activity(
+    time: DateTime<Utc>,
+    workflow_ranges: &[WorkflowTimeRange],
+) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
+    // Find the workflow that ends before this activity
+    for i in 0..workflow_ranges.len() {
+        let current_end = workflow_ranges[i].end_time;
+
+        // Check if there's a next workflow
+        if i + 1 < workflow_ranges.len() {
+            let next_start = workflow_ranges[i + 1].start_time;
+
+            // Activity falls in gap between current and next?
+            if time > current_end && time < next_start {
+                return Some((current_end, next_start));
+            }
+        } else {
+            // This is the last workflow, gap extends to "now"
+            if time > current_end {
+                return Some((current_end, Utc::now()));
+            }
+        }
+    }
+
+    // Activity is before first workflow
+    if !workflow_ranges.is_empty() && time < workflow_ranges[0].start_time {
+        // Gap from beginning of time to first workflow
+        // Use activity timestamp as start (we don't have data before that anyway)
+        return Some((time, workflow_ranges[0].start_time));
+    }
+
+    None
 }
 
 /// Build synthetic cowboy workflow archive from activity group
