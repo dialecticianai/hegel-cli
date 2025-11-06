@@ -14,7 +14,7 @@ nodes:
 
       When done, summarize what you accomplished.
     transitions:
-      - when: task_complete
+      - when: ride_complete
         to: done
 
   done:
