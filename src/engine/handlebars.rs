@@ -429,6 +429,72 @@ mod tests {
         assert_eq!(result2, "New engine");
     }
 
+    // ========== Step 6: Code Map Proof-of-Concept Tests ==========
+
+    #[test]
+    fn test_code_map_hierarchical_mode() {
+        // Use actual guides directory
+        let guides_dir = std::path::Path::new("guides");
+
+        let mut context = HashMap::new();
+        context.insert("code_map_style".to_string(), "hierarchical".to_string());
+
+        let result = render_template_hbs("{{> code_map}}", guides_dir, &hbs_ctx(&context)).unwrap();
+
+        // Verify hierarchical content is present
+        assert!(result.contains("Larger Projects"));
+        assert!(result.contains("Hierarchical Principles"));
+        assert!(result.contains("Non-recursive"));
+
+        // Verify monolithic content is NOT present
+        assert!(!result.contains("Small Projects"));
+        assert!(!result.contains("When to Switch to Hierarchical"));
+    }
+
+    #[test]
+    fn test_code_map_monolithic_mode() {
+        // Use actual guides directory
+        let guides_dir = std::path::Path::new("guides");
+
+        let mut context = HashMap::new();
+        context.insert("code_map_style".to_string(), "monolithic".to_string());
+
+        let result = render_template_hbs("{{> code_map}}", guides_dir, &hbs_ctx(&context)).unwrap();
+
+        // Verify monolithic content is present
+        assert!(result.contains("Small Projects"));
+        assert!(result.contains("When to Use Monolithic Mode"));
+        assert!(result.contains("When to Switch to Hierarchical"));
+
+        // Verify hierarchical content is NOT present
+        assert!(!result.contains("Larger Projects"));
+        assert!(!result.contains("Hierarchical Principles"));
+    }
+
+    #[test]
+    fn test_code_map_partial_precedence() {
+        // Test that guides/partials/code_map.hbs takes precedence over
+        // guides/templates/code_map_*.md files
+
+        let guides_dir = std::path::Path::new("guides");
+        let mut context = HashMap::new();
+        context.insert("code_map_style".to_string(), "hierarchical".to_string());
+
+        let result = render_template_hbs("{{> code_map}}", guides_dir, &hbs_ctx(&context)).unwrap();
+
+        // The .hbs file uses conditional logic (if/else), while the .md files are separate
+        // If we get content that varies based on the context variable, we're using .hbs
+        assert!(result.contains("Larger Projects"));
+
+        // Change context and verify different output (proves conditional logic works)
+        context.insert("code_map_style".to_string(), "monolithic".to_string());
+        let result2 =
+            render_template_hbs("{{> code_map}}", guides_dir, &hbs_ctx(&context)).unwrap();
+
+        assert!(result2.contains("Small Projects"));
+        assert!(result != result2); // Different content for different context
+    }
+
     // ========== Step 1: Original Placeholder Test ==========
 
     #[test]

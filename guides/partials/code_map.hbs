@@ -1,0 +1,101 @@
+{{#if (eq context.code_map_style "hierarchical")}}
+## Structure for Larger Projects (>50 files)
+
+For larger codebases, use **one README.md per directory** with embedded code map.
+
+### Format
+
+Use a tree structure (like `tree` command output) with inline descriptions:
+
+```markdown
+# src/
+
+Brief description of this directory's purpose.
+
+## Structure
+
+```
+src/
+├── lib.rs              Library root exposing core modules
+├── main.rs             Binary entry point
+├── module1.rs          Brief description (1 sentence)
+├── module2.rs          Brief description (1 sentence)
+│
+├── commands/           CLI command implementations
+│   └── See commands/README.md
+│
+├── metrics/            Metrics parsing and analysis
+│   └── See metrics/README.md
+│
+└── test_helpers.rs     Shared test utilities
+```
+
+## Key Patterns
+
+**Pattern name**: Brief explanation of architectural patterns used
+```
+
+### Hierarchical Principles
+
+1. **Non-recursive**: Each README describes only its direct children
+2. **Scoped**: One directory's README = one file's responsibility
+3. **Linked**: Reference subdirectory READMEs explicitly (see X/README.md)
+4. **Visual tree**: Use box-drawing characters (├──, └──, │) for structure
+5. **Concise**: 1 sentence per file, use alignment for readability
+
+### When to Use Hierarchical Mode
+
+- Total files >50
+- Deep directory nesting (>2 levels)
+- Multi-language or multi-module projects
+- Clear separation of concerns across directories
+
+### Maintenance
+
+Update README.md in a directory whenever you:
+- Add/remove/rename files in that directory
+- Change file responsibilities
+- Reorganize subdirectories
+{{else}}
+## Structure for Small Projects (<50 files)
+
+For smaller codebases, include the code map as a **section in root README.md**.
+
+### Format
+
+Use a tree structure (like `tree` command output) with inline descriptions:
+
+```markdown
+# Project Name
+
+One-line project description.
+
+## Code Structure
+
+```
+src/
+├── file1.ext              Brief description (1 sentence)
+├── file2.ext              Brief description (1 sentence)
+├── tests/
+│   └── test_file.ext      Brief description of what's tested
+└── config.ext             Brief description of configuration purpose
+```
+```
+
+**Key principles:**
+- Use actual tree formatting with box-drawing characters (├──, └──, │)
+- Keep descriptions to 1 sentence per file
+- Group related files under directories
+- Show the structure visually, not in sections
+
+### When to Use Monolithic Mode
+
+- Total files <50
+- Flat or shallow directory structure
+- Single-language projects
+- Quick orientation is priority over hierarchical organization
+
+### When to Switch to Hierarchical
+
+If your code map section exceeds ~100 lines or you have >3 subdirectories with distinct purposes, switch to hierarchical mode (separate README.md per directory).
+{{/if}}
