@@ -3,10 +3,19 @@ use handlebars::{
     Context, Handlebars, Helper, HelperDef, HelperResult, Output, RenderContext, RenderError,
     RenderErrorReason, ScopedJson,
 };
+use serde::{Deserialize, Serialize};
 use serde_json::value::Value as Json;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+
+/// Context structure for Handlebars templates
+/// Wraps user context for extensibility (future: config, metadata, etc.)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HandlebarsContext {
+    pub context: HashMap<String, String>,
+    // Future fields: config, metadata, etc.
+}
 
 /// Validate partial name to prevent path traversal attacks
 fn validate_partial_name(name: &str) -> Result<()> {
@@ -131,7 +140,7 @@ impl HelperDef for EqHelper {
 pub fn render_template_hbs(
     template: &str,
     guides_dir: &Path,
-    context: &HashMap<String, String>,
+    hbs_context: &HandlebarsContext,
 ) -> Result<String> {
     // Initialize Handlebars registry
     let mut hbs = Handlebars::new();
@@ -142,16 +151,9 @@ pub fn render_template_hbs(
     // Register custom eq helper
     hbs.register_helper("eq", Box::new(EqHelper));
 
-    // Convert HashMap<String, String> to JSON for Handlebars
-    let json_context = Json::Object(
-        context
-            .iter()
-            .map(|(k, v)| (k.clone(), Json::String(v.clone())))
-            .collect(),
-    );
-
     // Render the template
-    let result = hbs.render_template(template, &json_context)?;
+    // HandlebarsContext serializes to {context: {...}, future: config, etc.}
+    let result = hbs.render_template(template, hbs_context)?;
 
     Ok(result)
 }
@@ -162,6 +164,13 @@ mod tests {
     use std::collections::HashMap;
     use std::fs;
     use tempfile::TempDir;
+
+    // Helper to create HandlebarsContext from HashMap
+    fn hbs_ctx(context: &HashMap<String, String>) -> HandlebarsContext {
+        HandlebarsContext {
+            context: context.clone(),
+        }
+    }
 
     // ========== Step 2: Partial Loading Tests ==========
 
@@ -269,7 +278,8 @@ mod tests {
         let mut context = HashMap::new();
         context.insert("name".to_string(), "World".to_string());
 
-        let result = render_template_hbs("Hello {{name}}!", guides_dir, &context).unwrap();
+        let result =
+            render_template_hbs("Hello {{context.name}}!", guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Hello World!");
     }
 
@@ -281,12 +291,12 @@ mod tests {
         // Create a partial
         let partials_dir = guides_dir.join("partials");
         fs::create_dir_all(&partials_dir).unwrap();
-        fs::write(partials_dir.join("greeting.hbs"), "Hello {{name}}!").unwrap();
+        fs::write(partials_dir.join("greeting.hbs"), "Hello {{context.name}}!").unwrap();
 
         let mut context = HashMap::new();
         context.insert("name".to_string(), "World".to_string());
 
-        let result = render_template_hbs("{{> greeting}}", guides_dir, &context).unwrap();
+        let result = render_template_hbs("{{> greeting}}", guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Hello World!");
     }
 
@@ -295,17 +305,17 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let guides_dir = temp_dir.path();
 
-        let template = "{{#if show}}Visible{{else}}Hidden{{/if}}";
+        let template = "{{#if context.show}}Visible{{else}}Hidden{{/if}}";
 
         // Test true case
         let mut context = HashMap::new();
         context.insert("show".to_string(), "true".to_string());
-        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        let result = render_template_hbs(template, guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Visible");
 
         // Test false case (empty string is falsy)
         context.insert("show".to_string(), "".to_string());
-        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        let result = render_template_hbs(template, guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Hidden");
     }
 
@@ -314,17 +324,18 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let guides_dir = temp_dir.path();
 
-        let template = "{{#if (eq style \"hierarchical\")}}Hierarchical{{else}}Monolithic{{/if}}";
+        let template =
+            "{{#if (eq context.style \"hierarchical\")}}Hierarchical{{else}}Monolithic{{/if}}";
 
         // Test eq returns true
         let mut context = HashMap::new();
         context.insert("style".to_string(), "hierarchical".to_string());
-        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        let result = render_template_hbs(template, guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Hierarchical");
 
         // Test eq returns false
         context.insert("style".to_string(), "monolithic".to_string());
-        let result = render_template_hbs(template, guides_dir, &context).unwrap();
+        let result = render_template_hbs(template, guides_dir, &hbs_ctx(&context)).unwrap();
         assert_eq!(result, "Monolithic");
     }
 
@@ -333,7 +344,8 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let guides_dir = temp_dir.path();
 
-        let result = render_template_hbs("{{> nonexistent}}", guides_dir, &HashMap::new());
+        let result =
+            render_template_hbs("{{> nonexistent}}", guides_dir, &hbs_ctx(&HashMap::new()));
         assert!(result.is_err());
     }
 
@@ -342,7 +354,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let guides_dir = temp_dir.path();
 
-        let result = render_template_hbs("{{#if unclosed", guides_dir, &HashMap::new());
+        let result = render_template_hbs("{{#if unclosed", guides_dir, &hbs_ctx(&HashMap::new()));
         assert!(result.is_err());
     }
 
@@ -356,7 +368,7 @@ mod tests {
         // Create a partial for Handlebars
         let partials_dir = guides_dir.join("partials");
         fs::create_dir_all(&partials_dir).unwrap();
-        fs::write(partials_dir.join("test.hbs"), "HBS: {{value}}").unwrap();
+        fs::write(partials_dir.join("test.hbs"), "HBS: {{context.value}}").unwrap();
 
         let mut context = HashMap::new();
         context.insert("value".to_string(), "works".to_string());
@@ -424,7 +436,11 @@ mod tests {
         // Placeholder test for basic Handlebars rendering
         let temp_dir = TempDir::new().unwrap();
         let context = HashMap::new();
-        let result = render_template_hbs("Hello {{name}}", temp_dir.path(), &context);
+        let result = render_template_hbs(
+            "Hello {{context.name}}",
+            temp_dir.path(),
+            &hbs_ctx(&context),
+        );
         assert!(result.is_ok());
     }
 }

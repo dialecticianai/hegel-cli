@@ -50,6 +50,7 @@ pub fn transition(when: &str, to: &str) -> Transition {
 pub fn node(prompt: &str, transitions: Vec<Transition>) -> Node {
     Node {
         prompt: prompt.to_string(),
+        prompt_hbs: String::new(),
         transitions,
         rules: vec![],
     }

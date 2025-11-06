@@ -32,7 +32,11 @@ pub fn render_prompt(
     context: &HashMap<String, String>,
 ) -> Result<String> {
     if is_handlebars {
-        render_template_hbs(template_content, guides_dir, context)
+        // Wrap context for Handlebars (enables future extensibility: config, etc.)
+        let hbs_context = handlebars::HandlebarsContext {
+            context: context.clone(),
+        };
+        render_template_hbs(template_content, guides_dir, &hbs_context)
     } else {
         render_template(template_content, guides_dir, context)
     }
@@ -50,6 +54,8 @@ pub struct Transition {
 pub struct Node {
     #[serde(default)]
     pub prompt: String,
+    #[serde(default)]
+    pub prompt_hbs: String,
     pub transitions: Vec<Transition>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub rules: Vec<crate::rules::RuleConfig>,
