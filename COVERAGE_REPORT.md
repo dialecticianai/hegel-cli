@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 22:15
+**Last Updated**: 2025-11-05 22:17
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **83.14%** lines | **82.53%** regions | **84.11%** functions
+**Overall Coverage**: **83.22%** lines | **82.62%** regions | **84.18%** functions
 
 ## Summary
 
 ```
-TOTAL                                         18657              3259    82.53%         982               156    84.11%       11319              1908    83.14%           0                 0         -
+TOTAL                                         18750              3259    82.62%         986               156    84.18%       11369              1908    83.22%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -53,8 +53,8 @@ TOTAL                                         18657              3259    82.53% 
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
-| `src/engine/handlebars.rs` | 97.70% | 96.30% | 100.00% | 🟢 Excellent |
-| `src/engine/mod.rs` | 99.83% | 99.63% | 97.50% | 🟢 Excellent |
+| `src/engine/handlebars.rs` | 98.05% | 96.83% | 100.00% | 🟢 Excellent |
+| `src/engine/mod.rs` | 99.83% | 99.63% | 97.56% | 🟢 Excellent |
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -114,7 +114,7 @@ TOTAL                                         18657              3259    82.53% 
 - `src/commands/workflow/claims.rs` - 100.00%
 - `src/commands/workflow/context.rs` - 100.00%
 - `src/config.rs` - 91.67%
-- `src/engine/handlebars.rs` - 97.70%
+- `src/engine/handlebars.rs` - 98.05%
 - `src/engine/mod.rs` - 99.83%
 - `src/engine/template.rs` - 97.25%
 - `src/guardrails/parser.rs` - 97.78%
@@ -185,7 +185,7 @@ TOTAL                                         18657              3259    82.53% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 83.14% | ✅ Met |
+| Overall | ≥80% | 83.22% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

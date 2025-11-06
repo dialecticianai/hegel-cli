@@ -346,6 +346,77 @@ mod tests {
         assert!(result.is_err());
     }
 
+    // ========== Step 4: Dual-Engine Routing Tests ==========
+
+    #[test]
+    fn test_routing_to_handlebars_engine() {
+        let temp_dir = TempDir::new().unwrap();
+        let guides_dir = temp_dir.path();
+
+        // Create a partial for Handlebars
+        let partials_dir = guides_dir.join("partials");
+        fs::create_dir_all(&partials_dir).unwrap();
+        fs::write(partials_dir.join("test.hbs"), "HBS: {{value}}").unwrap();
+
+        let mut context = HashMap::new();
+        context.insert("value".to_string(), "works".to_string());
+
+        // Route to Handlebars engine
+        let result = crate::engine::render_prompt(
+            "{{> test}}",
+            true, // is_handlebars = true
+            guides_dir,
+            &context,
+        )
+        .unwrap();
+
+        assert_eq!(result, "HBS: works");
+    }
+
+    #[test]
+    fn test_routing_to_markdown_engine() {
+        use crate::test_helpers::test_guides;
+
+        let (_temp_dir, guides_dir) = test_guides();
+        let context = HashMap::new();
+
+        // Route to Markdown engine (existing template system)
+        let result = crate::engine::render_prompt(
+            "{{SPEC_WRITING}}",
+            false, // is_handlebars = false
+            &guides_dir,
+            &context,
+        )
+        .unwrap();
+
+        // Verify it's using the old engine (loads guides/SPEC_WRITING.md)
+        assert!(result.contains("# SPEC Writing Guide"));
+    }
+
+    #[test]
+    fn test_both_engines_coexist() {
+        use crate::test_helpers::test_guides;
+
+        let (_temp_dir, guides_dir) = test_guides();
+
+        // Old engine works
+        let result1 =
+            crate::engine::render_prompt("{{SPEC_WRITING}}", false, &guides_dir, &HashMap::new())
+                .unwrap();
+        assert!(result1.contains("# SPEC Writing Guide"));
+
+        // New engine works in same test run
+        let temp_dir2 = TempDir::new().unwrap();
+        let guides_dir2 = temp_dir2.path();
+        let partials_dir = guides_dir2.join("partials");
+        fs::create_dir_all(&partials_dir).unwrap();
+        fs::write(partials_dir.join("test.hbs"), "New engine").unwrap();
+
+        let result2 =
+            crate::engine::render_prompt("{{> test}}", true, guides_dir2, &HashMap::new()).unwrap();
+        assert_eq!(result2, "New engine");
+    }
+
     // ========== Step 1: Original Placeholder Test ==========
 
     #[test]

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 22:15
+**Last Updated**: 2025-11-05 22:17
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 15,138 | 10,294 | 25,432 |
-| **Comments** | 2,153 | - | 2,153 |
-| **Blank Lines** | 2,803 | - | 2,803 |
-| **Total Lines** | 20,094 | 10,294 | 30,388 |
+| **Lines** | 15,199 | 10,294 | 25,493 |
+| **Comments** | 2,174 | - | 2,174 |
+| **Blank Lines** | 2,819 | - | 2,819 |
+| **Total Lines** | 20,192 | 10,294 | 30,486 |
 | **Files** | 91 | 56 | 147 |
 
 **Documentation Ratio**: 0.68 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            91           2803           2153          15138
+Rust                            91           2819           2174          15199
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           106           2944           2153          15548
+SUM:                           106           2960           2174          15609
 -------------------------------------------------------------------------------
 ```
 
@@ -84,8 +84,8 @@ SUM:                           106           2944           2153          15548
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
-| `engine/handlebars.rs` | 359 | 158 | 201 | 56.0% | ✅ |
-| `engine/mod.rs` | 867 | 187 | 680 | 78.4% | ✅ |
+| `engine/handlebars.rs` | 430 | 158 | 272 | 63.3% | ✅ |
+| `engine/mod.rs` | 894 | 214 | 680 | 76.1% | ⚠️ Large |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
@@ -129,7 +129,7 @@ SUM:                           106           2944           2153          15548
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 7 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 8 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 

@@ -11,6 +11,33 @@ use crate::storage::WorkflowState;
 pub use handlebars::render_template_hbs;
 pub use template::render_template;
 
+/// Render template using appropriate engine based on is_handlebars flag
+///
+/// Routes to either the Markdown template engine (template::render_template)
+/// or the Handlebars engine (handlebars::render_template_hbs) based on the
+/// is_handlebars parameter.
+///
+/// # Arguments
+/// * `template_content` - The template string to render
+/// * `is_handlebars` - If true, use Handlebars engine; if false, use Markdown engine
+/// * `guides_dir` - Directory containing guide files and partials
+/// * `context` - Context variables for template rendering
+///
+/// # Returns
+/// Rendered template string or error
+pub fn render_prompt(
+    template_content: &str,
+    is_handlebars: bool,
+    guides_dir: &Path,
+    context: &HashMap<String, String>,
+) -> Result<String> {
+    if is_handlebars {
+        render_template_hbs(template_content, guides_dir, context)
+    } else {
+        render_template(template_content, guides_dir, context)
+    }
+}
+
 /// Workflow transition definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Transition {
