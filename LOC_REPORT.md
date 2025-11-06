@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 23:49
+**Last Updated**: 2025-11-05 23:55
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 15,482 | 10,235 | 25,717 |
-| **Comments** | 2,271 | - | 2,271 |
+| **Lines** | 15,489 | 10,236 | 25,725 |
+| **Comments** | 2,275 | - | 2,275 |
 | **Blank Lines** | 2,885 | - | 2,885 |
-| **Total Lines** | 20,638 | 10,235 | 30,873 |
+| **Total Lines** | 20,649 | 10,236 | 30,885 |
 | **Files** | 92 | 56 | 148 |
 
 **Documentation Ratio**: 0.66 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            92           2885           2271          15482
+Rust                            92           2885           2275          15489
 Markdown                        15            144              0            429
 -------------------------------------------------------------------------------
-SUM:                           107           3029           2271          15911
+SUM:                           107           3029           2275          15918
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                           107           3029           2271          15911
 | `analyze/cleanup/duplicate_cowboy.rs` | 263 | 158 | 105 | 39.9% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
-| `analyze/gap_detection.rs` | 293 | 293 | 0 | 0.0% | ⚠️ Large |
+| `analyze/gap_detection.rs` | 304 | 304 | 0 | 0.0% | ⚠️ Large |
 | `analyze/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `analyze/repair.rs` | 362 | 362 | 0 | 0.0% | ⚠️ Large |
 | `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
@@ -175,7 +175,7 @@ SUM:                           107           3029           2271          15911
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 219 |
+| `LOC_REPORT.md` | 220 |
 | `README.md` | 653 |
 | `ROADMAP.md` | 182 |
 | `src/adapters/README.md` | 25 |

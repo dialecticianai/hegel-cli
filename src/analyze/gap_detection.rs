@@ -25,9 +25,14 @@ use crate::storage::archive::{write_archive, WorkflowArchive};
 /// Only creates cowboys for gaps with git commits. Removes cowboys from gaps without activity.
 /// Takes the current archives (which may include in-memory repairs not yet written to disk)
 /// to correctly identify gaps even in dry-run mode
+///
+/// # Arguments
+/// * `git_commits` - Optional git commits to use. If `None`, reads from filesystem (production).
+///                   If `Some`, uses provided commits (testing).
 pub fn ensure_cowboy_coverage(
     state_dir: &Path,
     archives: &[WorkflowArchive],
+    git_commits: Option<&[crate::metrics::git::GitCommit]>,
     dry_run: bool,
 ) -> Result<(usize, usize)> {
     // Use provided archives (may have repairs applied)
@@ -50,12 +55,18 @@ pub fn ensure_cowboy_coverage(
     );
 
     // Identify gaps between consecutive real workflows that have git activity
-    // Read git commits to check if gaps have activity
-    let git_commits = if crate::metrics::git::has_git_repository(state_dir) {
+    // Either use provided commits (testing) or read from filesystem (production)
+    let git_commits_vec;
+    let empty_commits = vec![];
+    let git_commits = if let Some(commits) = git_commits {
+        commits
+    } else if crate::metrics::git::has_git_repository(state_dir) {
         let project_root = state_dir.parent().unwrap();
-        crate::metrics::git::parse_git_commits(project_root, None).unwrap_or_default()
+        git_commits_vec =
+            crate::metrics::git::parse_git_commits(project_root, None).unwrap_or_default();
+        &git_commits_vec
     } else {
-        vec![]
+        &empty_commits
     };
 
     let mut gaps = Vec::new();
