@@ -1,20 +1,20 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-06 17:24
+**Last Updated**: 2025-11-06 18:53
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **84.04%** lines | **83.65%** regions | **84.52%** functions
+**Overall Coverage**: **83.52%** lines | **83.15%** regions | **84.07%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19214              3142    83.65%        1014               157    84.52%       11754              1876    84.04%           0                 0         -
+TOTAL                                         19467              3280    83.15%        1023               163    84.07%       11917              1964    83.52%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `src/adapters/claude_code.rs` | 93.82% | 94.29% | 90.00% | 🟢 Excellent |
+| `src/adapters/claude_code.rs` | 87.32% | 87.30% | 83.33% | 🟡 Good |
 | `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
@@ -22,7 +22,7 @@ TOTAL                                         19214              3142    83.65% 
 | `src/analyze/cleanup/duplicate_cowboy.rs` | 69.94% | 66.98% | 46.15% | 🟠 Moderate |
 | `src/analyze/cleanup/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/cleanup/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
-| `src/analyze/gap_detection.rs` | 84.29% | 82.37% | 90.91% | 🟡 Good |
+| `src/analyze/gap_detection.rs` | 86.03% | 83.29% | 91.67% | 🟡 Good |
 | `src/analyze/repair.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/sections.rs` | 30.21% | 27.98% | 61.11% | 🔴 Needs Work |
 | `src/analyze/totals.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -60,12 +60,12 @@ TOTAL                                         19214              3142    83.65% 
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `src/main.rs` | 55.56% | 41.57% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
-| `src/metrics/aggregation.rs` | 75.80% | 79.74% | 93.75% | 🟡 Good |
+| `src/metrics/aggregation.rs` | 57.91% | 60.68% | 75.00% | 🟠 Moderate |
 | `src/metrics/cowboy.rs` | 100.00% | 99.42% | 100.00% | 🟢 Excellent |
 | `src/metrics/git.rs` | 92.45% | 91.68% | 95.45% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 84.04% | 83.66% | 69.57% | 🟡 Good |
+| `src/metrics/mod.rs` | 84.74% | 84.08% | 69.57% | 🟡 Good |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 98.43% | 97.74% | 96.15% | 🟢 Excellent |
@@ -97,7 +97,6 @@ TOTAL                                         19214              3142    83.65% 
 ## Coverage Tiers
 
 ### 🟢 Excellent (≥90% lines)
-- `src/adapters/claude_code.rs` - 93.82%
 - `src/adapters/codex.rs` - 94.43%
 - `src/adapters/cursor.rs` - 93.84%
 - `src/adapters/mod.rs` - 98.91%
@@ -146,14 +145,14 @@ TOTAL                                         19214              3142    83.65% 
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/analyze/gap_detection.rs` - 84.29%
+- `src/adapters/claude_code.rs` - 87.32%
+- `src/analyze/gap_detection.rs` - 86.03%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/workflow/transitions.rs` - 86.79%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/embedded.rs` - 82.79%
-- `src/metrics/aggregation.rs` - 75.80%
-- `src/metrics/mod.rs` - 84.04%
+- `src/metrics/mod.rs` - 84.74%
 - `src/storage/log_cleanup.rs` - 87.50%
 - `src/storage/mod.rs` - 89.96%
 - `src/test_helpers/fixtures.rs` - 80.00%
@@ -173,6 +172,7 @@ TOTAL                                         19214              3142    83.65% 
 - `src/commands/status.rs` - 43.21%
 - `src/commands/workflow/mod.rs` - 59.54%
 - `src/main.rs` - 55.56%
+- `src/metrics/aggregation.rs` - 57.91%
 
 ### 🔴 Needs Work (<40% lines)
 - `src/analyze/cleanup/git.rs` - 0.00%
@@ -187,7 +187,7 @@ TOTAL                                         19214              3142    83.65% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 84.04% | ✅ Met |
+| Overall | ≥80% | 83.52% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

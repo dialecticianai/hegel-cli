@@ -10,8 +10,8 @@ Different agent CLIs emit hook events in different formats. Adapters provide a u
 
 ```
 adapters/
-├── mod.rs              AgentAdapter trait, CanonicalHookEvent schema, AdapterRegistry
-├── claude_code.rs      Claude Code adapter (env detection, event normalization)
+├── mod.rs              AgentAdapter trait, CanonicalHookEvent schema, AdapterRegistry, transcript discovery exports
+├── claude_code.rs      Claude Code adapter (env detection, event normalization, transcript file discovery)
 ├── cursor.rs           Cursor adapter (future multi-agent support)
 └── codex.rs            Codex adapter (future multi-agent support)
 ```

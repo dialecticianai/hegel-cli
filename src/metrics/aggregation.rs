@@ -3,12 +3,13 @@ use crate::metrics::{
 };
 use anyhow::Result;
 use std::fs;
+use std::path::PathBuf;
 
-/// Build per-phase metrics from state transitions, hooks, and transcript
+/// Build per-phase metrics from state transitions, hooks, and transcripts
 pub fn build_phase_metrics(
     transitions: &[StateTransitionEvent],
     hook_metrics: &HookMetrics,
-    transcript_path: Option<&str>,
+    transcript_files: &[PathBuf],
     debug_config: Option<&crate::metrics::DebugConfig>,
 ) -> Result<Vec<PhaseMetrics>> {
     use chrono::DateTime;
@@ -57,19 +58,17 @@ pub fn build_phase_metrics(
             .cloned()
             .collect();
 
-        // Aggregate tokens from transcript for this phase
-        let (token_metrics, examined_count, matched_count) =
-            if let Some(transcript_path) = transcript_path {
-                aggregate_tokens_for_phase(
-                    transcript_path,
-                    &start_time,
-                    end_time.as_deref(),
-                    &phase_name,
-                    debug_config,
-                )?
-            } else {
-                (TokenMetrics::default(), 0, 0)
-            };
+        // Aggregate tokens from all transcript files for this phase
+        let (token_metrics, examined_count, matched_count) = if !transcript_files.is_empty() {
+            aggregate_tokens_for_range(
+                transcript_files,
+                &start_time,
+                end_time.as_deref(),
+                debug_config,
+            )?
+        } else {
+            (TokenMetrics::default(), 0, 0)
+        };
 
         // Handle debug output/collection for live phases
         if let Some(cfg) = debug_config {
@@ -231,13 +230,127 @@ fn aggregate_tokens_for_phase(
     Ok((metrics, examined_count, matched_count))
 }
 
+/// Aggregate token usage from multiple transcript files for a time range
+///
+/// Agent-agnostic function that scans a list of transcript files and
+/// accumulates token metrics for events within [start, end) time range.
+///
+/// Returns (TokenMetrics, total_examined, total_matched)
+pub fn aggregate_tokens_for_range(
+    transcript_files: &[PathBuf],
+    start_time: &str,
+    end_time: Option<&str>,
+    debug_config: Option<&crate::metrics::DebugConfig>,
+) -> Result<(TokenMetrics, usize, usize)> {
+    use crate::metrics::transcript::TranscriptEvent;
+
+    let mut total_metrics = TokenMetrics::default();
+    let mut total_examined = 0;
+    let mut total_matched = 0;
+
+    // Debug: Check if we should output for this time range
+    let should_debug = debug_config.map_or(false, |cfg| cfg.overlaps(start_time, end_time));
+
+    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
+        eprintln!(
+            "\n[DEBUG] Scanning {} transcript files for range {} to {}",
+            transcript_files.len(),
+            start_time,
+            end_time.unwrap_or("active")
+        );
+    }
+
+    // Stream each transcript file
+    for transcript_path in transcript_files {
+        if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+            eprintln!("  Scanning file: {}", transcript_path.display());
+        }
+
+        let content = match fs::read_to_string(transcript_path) {
+            Ok(c) => c,
+            Err(e) => {
+                if should_debug {
+                    eprintln!("    Warning: Failed to read file: {}", e);
+                }
+                continue;
+            }
+        };
+
+        let mut file_examined = 0;
+        let mut file_matched = 0;
+
+        for line in content.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+
+            let event: TranscriptEvent = match serde_json::from_str(line) {
+                Ok(e) => e,
+                Err(_) => continue, // Skip malformed lines
+            };
+
+            // Only process assistant events
+            if event.event_type != "assistant" {
+                continue;
+            }
+
+            file_examined += 1;
+
+            // Check if timestamp is in time range
+            let event_timestamp = match &event.timestamp {
+                Some(ts) => ts,
+                None => continue,
+            };
+
+            if !is_in_range(event_timestamp, start_time, end_time) {
+                continue;
+            }
+
+            // Extract token usage (handle both formats)
+            let usage = event
+                .usage
+                .or_else(|| event.message.as_ref().and_then(|m| m.usage.clone()));
+
+            if let Some(usage) = usage {
+                file_matched += 1;
+                total_metrics.total_input_tokens += usage.input_tokens;
+                total_metrics.total_output_tokens += usage.output_tokens;
+                total_metrics.total_cache_creation_tokens +=
+                    usage.cache_creation_input_tokens.unwrap_or(0);
+                total_metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
+                total_metrics.assistant_turns += 1;
+            }
+        }
+
+        if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+            eprintln!("    Examined: {}, Matched: {}", file_examined, file_matched);
+        }
+
+        total_examined += file_examined;
+        total_matched += file_matched;
+    }
+
+    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
+        let total_tokens = total_metrics.total_input_tokens + total_metrics.total_output_tokens;
+        eprintln!(
+            "  Total: examined {} events across {} files, matched {}, attributed {} tokens",
+            total_examined,
+            transcript_files.len(),
+            total_matched,
+            total_tokens
+        );
+    }
+
+    Ok((total_metrics, total_examined, total_matched))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_phase_metrics_empty_transitions() {
-        let metrics = build_phase_metrics(&[], &HookMetrics::default(), None, None).unwrap();
+        let metrics = build_phase_metrics(&[], &HookMetrics::default(), &[], None).unwrap();
         assert!(metrics.is_empty());
     }
 
@@ -253,7 +366,7 @@ mod tests {
         }];
 
         let metrics =
-            build_phase_metrics(&transitions, &HookMetrics::default(), None, None).unwrap();
+            build_phase_metrics(&transitions, &HookMetrics::default(), &[], None).unwrap();
 
         assert_eq!(metrics.len(), 1);
         assert_eq!(metrics[0].phase_name, "spec");

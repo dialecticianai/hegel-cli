@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-06 17:24
+**Last Updated**: 2025-11-06 18:53
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 15,945 | 10,647 | 26,592 |
-| **Comments** | 2,345 | - | 2,345 |
-| **Blank Lines** | 2,964 | - | 2,964 |
-| **Total Lines** | 21,254 | 10,647 | 31,901 |
-| **Files** | 94 | 58 | 152 |
+| **Lines** | 16,119 | 11,281 | 27,400 |
+| **Comments** | 2,383 | - | 2,383 |
+| **Blank Lines** | 3,005 | - | 3,005 |
+| **Total Lines** | 21,507 | 11,281 | 32,788 |
+| **Files** | 94 | 60 | 154 |
 
-**Documentation Ratio**: 0.67 lines of docs per line of code
+**Documentation Ratio**: 0.70 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            94           2964           2345          15945
+Rust                            94           3005           2383          16119
 Markdown                        15            144              0            431
 -------------------------------------------------------------------------------
-SUM:                           109           3108           2345          16376
+SUM:                           109           3149           2383          16550
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                           109           3108           2345          16376
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `adapters/claude_code.rs` | 258 | 129 | 129 | 50.0% | ✅ |
+| `adapters/claude_code.rs` | 321 | 192 | 129 | 40.2% | ✅ |
 | `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ (infra) |
 | `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
@@ -45,7 +45,7 @@ SUM:                           109           3108           2345          16376
 | `analyze/cleanup/duplicate_cowboy.rs` | 263 | 158 | 105 | 39.9% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
-| `analyze/gap_detection.rs` | 304 | 304 | 0 | 0.0% | ⚠️ Large |
+| `analyze/gap_detection.rs` | 365 | 365 | 0 | 0.0% | ⚠️ Large |
 | `analyze/mod.rs` | 8 | 6 | 2 | 25.0% | ✅ |
 | `analyze/repair.rs` | 362 | 362 | 0 | 0.0% | ⚠️ Large |
 | `analyze/sections.rs` | 369 | 369 | 0 | 0.0% | ⚠️ Large |
@@ -95,12 +95,12 @@ SUM:                           109           3108           2345          16376
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
 | `main.rs` | 415 | 14 | 401 | 96.6% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
-| `metrics/aggregation.rs` | 293 | 233 | 60 | 20.5% | ⚠️ Large |
+| `metrics/aggregation.rs` | 406 | 346 | 60 | 14.8% | ⚠️ Large |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
 | `metrics/git.rs` | 497 | 158 | 339 | 68.2% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
-| `metrics/mod.rs` | 898 | 356 | 542 | 60.4% | ⚠️ Large |
+| `metrics/mod.rs` | 914 | 372 | 542 | 59.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
@@ -155,8 +155,9 @@ SUM:                           109           3108           2345          16376
 | `.ddd/PLAN.md` | 210 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
 | `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
+| `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
 | `.ddd/SPEC.md` | 102 |
-| `CLAUDE.md` | 185 |
+| `CLAUDE.md` | 191 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 214 |
 | `DEP_REVIEW.md` | 678 |
@@ -180,6 +181,7 @@ SUM:                           109           3108           2345          16376
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
 | `LOC_REPORT.md` | 224 |
+| `METRICS.md` | 258 |
 | `README.md` | 653 |
 | `ROADMAP.md` | 246 |
 | `src/adapters/README.md` | 25 |
@@ -205,7 +207,7 @@ SUM:                           109           3108           2345          16376
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.67 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.70 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

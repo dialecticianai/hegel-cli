@@ -1,5 +1,6 @@
 use super::{AgentAdapter, CanonicalHookEvent, EventType};
 use anyhow::{Context, Result};
+use std::path::{Path, PathBuf};
 
 /// Claude Code adapter - normalizes Claude Code hook events
 pub struct ClaudeCodeAdapter;
@@ -125,6 +126,68 @@ impl AgentAdapter for ClaudeCodeAdapter {
 
         Ok(Some(canonical))
     }
+}
+
+/// Discover Claude Code transcript directory for a given repository path
+///
+/// Converts repository path to Claude Code's project directory naming scheme:
+/// `/Users/foo/Code/bar` → `~/.claude/projects/-Users-foo-Code-bar/`
+///
+/// Returns error if HOME env var not set or directory doesn't exist.
+pub fn find_transcript_dir(repo_path: &Path) -> Result<PathBuf> {
+    let home = std::env::var("HOME").context("HOME environment variable not set")?;
+
+    // Convert path to string, normalize
+    let path_str = repo_path
+        .to_str()
+        .context("Repository path contains invalid UTF-8")?;
+
+    // Remove leading / and convert remaining / and . to -
+    let normalized = path_str.trim_start_matches('/').replace(['/', '.'], "-");
+
+    // Prefix with - and build full path
+    let project_dir = PathBuf::from(home)
+        .join(".claude")
+        .join("projects")
+        .join(format!("-{}", normalized));
+
+    if !project_dir.exists() {
+        anyhow::bail!(
+            "Claude Code project directory not found: {}",
+            project_dir.display()
+        );
+    }
+
+    Ok(project_dir)
+}
+
+/// List all transcript files for a Claude Code project
+///
+/// Discovers transcript directory and returns all .jsonl files sorted by modification time.
+///
+/// Returns empty vec if directory not found (graceful fallback).
+pub fn list_transcript_files(repo_path: &Path) -> Result<Vec<PathBuf>> {
+    let project_dir = match find_transcript_dir(repo_path) {
+        Ok(dir) => dir,
+        Err(_) => return Ok(Vec::new()), // Graceful fallback
+    };
+
+    // Glob for all .jsonl files
+    let pattern = project_dir
+        .join("*.jsonl")
+        .to_str()
+        .context("Invalid glob pattern")?
+        .to_string();
+
+    let mut files: Vec<PathBuf> = glob::glob(&pattern)
+        .context("Failed to execute glob pattern")?
+        .filter_map(Result::ok)
+        .collect();
+
+    // Sort by modification time (oldest first)
+    files.sort_by_key(|f| std::fs::metadata(f).and_then(|m| m.modified()).ok());
+
+    Ok(files)
 }
 
 #[cfg(test)]

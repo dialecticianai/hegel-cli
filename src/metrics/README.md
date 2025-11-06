@@ -10,8 +10,8 @@ Parses three independent event streams (hooks.jsonl, states.jsonl, transcripts) 
 
 ```
 metrics/
-├── mod.rs               Unified metrics orchestrator, parse_unified_metrics entry point
-├── aggregation.rs       Phase metrics builder (timestamp correlation, token aggregation per phase)
+├── mod.rs               Unified metrics orchestrator, parse_unified_metrics entry point, multi-file transcript discovery
+├── aggregation.rs       Phase metrics builder (timestamp correlation, multi-file token aggregation per phase)
 ├── hooks.rs             Parses Claude Code hook events, extracts bash commands and file modifications
 ├── states.rs            Parses workflow state transition events
 ├── transcript.rs        Parses Claude Code transcripts for token usage (handles old and new format)

@@ -2,7 +2,7 @@ mod claude_code;
 mod codex;
 mod cursor;
 
-pub use claude_code::ClaudeCodeAdapter;
+pub use claude_code::{find_transcript_dir, list_transcript_files, ClaudeCodeAdapter};
 pub use codex::CodexAdapter;
 pub use cursor::CursorAdapter;
 

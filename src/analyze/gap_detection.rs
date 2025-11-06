@@ -269,10 +269,57 @@ fn parse_timestamp(ts: &str) -> Result<DateTime<Utc>> {
 }
 
 fn create_cowboy_for_gap(start: DateTime<Utc>, end: DateTime<Utc>, state_dir: &Path) -> Result<()> {
-    // Read git commits in this time range
-    let git_commits = if crate::metrics::git::has_git_repository(state_dir) {
+    use crate::metrics::{
+        build_phase_metrics, parse_hooks_file, HookMetrics, StateTransitionEvent, UnifiedMetrics,
+    };
+    use crate::storage::FileStorage;
+
+    let workflow_id = start.to_rfc3339();
+
+    // Create synthetic state transitions for this gap
+    let state_transitions = vec![
+        StateTransitionEvent {
+            timestamp: start.to_rfc3339(),
+            workflow_id: Some(workflow_id.clone()),
+            from_node: "START".to_string(),
+            to_node: "ride".to_string(),
+            phase: "ride".to_string(),
+            mode: "cowboy".to_string(),
+        },
+        StateTransitionEvent {
+            timestamp: end.to_rfc3339(),
+            workflow_id: Some(workflow_id.clone()),
+            from_node: "ride".to_string(),
+            to_node: "done".to_string(),
+            phase: "ride".to_string(),
+            mode: "cowboy".to_string(),
+        },
+    ];
+
+    // Parse hooks if available
+    let hooks_path = state_dir.join("hooks.jsonl");
+    let hook_metrics = if hooks_path.exists() {
+        parse_hooks_file(&hooks_path)?
+    } else {
+        HookMetrics::default()
+    };
+
+    // Discover all transcript files for this project
+    let project_root = state_dir.parent().unwrap();
+    let transcript_files = crate::adapters::list_transcript_files(project_root).unwrap_or_default();
+
+    // Build phase metrics using shared aggregation logic (filters by time range)
+    let mut phase_metrics =
+        build_phase_metrics(&state_transitions, &hook_metrics, &transcript_files, None)?;
+
+    // Also load current state for session_id tracking
+    let storage = FileStorage::new(state_dir)?;
+    let state = storage.load()?;
+
+    // Parse git commits and attribute to phases
+    if crate::metrics::git::has_git_repository(state_dir) {
         let project_root = state_dir.parent().unwrap();
-        crate::metrics::git::parse_git_commits(project_root, None)
+        let git_commits = crate::metrics::git::parse_git_commits(project_root, None)
             .unwrap_or_default()
             .into_iter()
             .filter(|c| {
@@ -282,22 +329,36 @@ fn create_cowboy_for_gap(start: DateTime<Utc>, end: DateTime<Utc>, state_dir: &P
                     false
                 }
             })
-            .collect()
-    } else {
-        vec![]
+            .collect::<Vec<_>>();
+
+        crate::metrics::git::attribute_commits_to_phases(git_commits, &mut phase_metrics);
+    }
+
+    // Mark phases as synthetic
+    for phase in &mut phase_metrics {
+        phase.is_synthetic = true;
+        phase.workflow_id = Some(workflow_id.clone());
+    }
+
+    // Build UnifiedMetrics
+    let token_metrics = phase_metrics
+        .first()
+        .map(|p| p.token_metrics.clone())
+        .unwrap_or_default();
+
+    let metrics = UnifiedMetrics {
+        hook_metrics,
+        token_metrics,
+        state_transitions,
+        session_id: state.session_metadata.map(|s| s.session_id),
+        phase_metrics,
+        git_commits: vec![], // Git commits already attributed to phases
     };
 
-    // Build cowboy group
-    let group = crate::metrics::cowboy::CowboyActivityGroup {
-        start_time: start,
-        end_time: end,
-        bash_commands: vec![],
-        file_modifications: vec![],
-        git_commits,
-        transcript_events: vec![],
-    };
+    // Create archive (synthetic cowboy)
+    let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id, true)?;
+    archive.completed_at = end.to_rfc3339();
 
-    let archive = crate::metrics::cowboy::build_synthetic_cowboy_archive(&group)?;
     write_archive(&archive, state_dir)?;
 
     Ok(())

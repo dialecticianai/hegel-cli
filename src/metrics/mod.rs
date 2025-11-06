@@ -14,11 +14,11 @@ pub use states::{parse_states_file, StateTransitionEvent};
 pub use transcript::{parse_transcript_file, TokenMetrics, TranscriptEvent};
 
 // Re-export aggregation functions
-use aggregation::build_phase_metrics;
+pub use aggregation::{aggregate_tokens_for_range, build_phase_metrics};
 
 use anyhow::Result;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::storage::FileStorage;
 
@@ -171,49 +171,45 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
     };
 
     // Parse hooks if available
-    let mut transcript_path_opt: Option<String> = None;
     if hooks_path.exists() {
         unified.hook_metrics = parse_hooks_file(&hooks_path)?;
     }
 
-    // Load current session metadata - try state.json first, fall back to scanning hooks.jsonl
+    // Load current session metadata for session_id tracking
     let storage = FileStorage::new(state_dir)?;
     let state = storage.load()?;
 
-    if let Some(session) = state.session_metadata {
-        // Fast path: O(1) lookup from state.json
-        unified.session_id = Some(session.session_id);
+    let mut transcript_files = Vec::new();
 
-        // Parse transcript if the file exists
-        if Path::new(&session.transcript_path).exists() {
-            unified.token_metrics = parse_transcript_file(&session.transcript_path)?;
-            transcript_path_opt = Some(session.transcript_path);
+    if let Some(session) = state.session_metadata {
+        unified.session_id = Some(session.session_id.clone());
+
+        // Try to discover Claude Code transcript directory first (multi-session support)
+        let project_root = state_dir.parent().unwrap();
+        transcript_files = crate::adapters::list_transcript_files(project_root).unwrap_or_default();
+
+        // Fallback: If no Claude Code transcripts found, use the single session transcript
+        // This handles test scenarios and non-Claude Code environments
+        if transcript_files.is_empty() && Path::new(&session.transcript_path).exists() {
+            transcript_files.push(PathBuf::from(session.transcript_path));
         }
     } else if hooks_path.exists() {
         // Fallback: O(n) scan of hooks.jsonl for backward compatibility
-        // (handles sessions that started before state.json session_metadata feature was deployed)
         let content = fs::read_to_string(&hooks_path)?;
-        let mut last_session_start: Option<HookEvent> = None;
-
         for line in content.lines() {
             if line.trim().is_empty() {
                 continue;
             }
             if let Ok(event) = serde_json::from_str::<HookEvent>(line) {
                 if event.hook_event_name == "SessionStart" {
-                    last_session_start = Some(event);
-                }
-            }
-        }
-
-        if let Some(event) = last_session_start {
-            unified.session_id = Some(event.session_id.clone());
-
-            // Parse transcript if we have a path
-            if let Some(transcript_path) = event.transcript_path {
-                if Path::new(&transcript_path).exists() {
-                    unified.token_metrics = parse_transcript_file(&transcript_path)?;
-                    transcript_path_opt = Some(transcript_path);
+                    unified.session_id = Some(event.session_id);
+                    // Also try to get transcript path from hooks
+                    if let Some(transcript_path) = event.transcript_path {
+                        if Path::new(&transcript_path).exists() {
+                            transcript_files.push(PathBuf::from(transcript_path));
+                        }
+                    }
+                    break; // Take the last one found
                 }
             }
         }
@@ -225,12 +221,32 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
     }
 
     // Build phase metrics from state transitions (live workflow)
+    // Token metrics will be aggregated from all transcript files per phase
     let live_phase_metrics = build_phase_metrics(
         &unified.state_transitions,
         &unified.hook_metrics,
-        transcript_path_opt.as_deref(),
+        &transcript_files,
         debug_config,
     )?;
+
+    // Aggregate token totals from all phases
+    if !live_phase_metrics.is_empty() {
+        for phase in &live_phase_metrics {
+            unified.token_metrics.total_input_tokens += phase.token_metrics.total_input_tokens;
+            unified.token_metrics.total_output_tokens += phase.token_metrics.total_output_tokens;
+            unified.token_metrics.total_cache_creation_tokens +=
+                phase.token_metrics.total_cache_creation_tokens;
+            unified.token_metrics.total_cache_read_tokens +=
+                phase.token_metrics.total_cache_read_tokens;
+            unified.token_metrics.assistant_turns += phase.token_metrics.assistant_turns;
+        }
+    } else if !transcript_files.is_empty() {
+        // Fallback: If no phases but we have transcripts, parse them for overall metrics
+        // This handles backward compatibility and test scenarios without state transitions
+        let (token_metrics, _, _) =
+            aggregate_tokens_for_range(&transcript_files, "1970-01-01T00:00:00Z", None, None)?;
+        unified.token_metrics = token_metrics;
+    }
 
     // Merge archived phase metrics with live phase metrics
     let mut all_phase_metrics = Vec::new();
