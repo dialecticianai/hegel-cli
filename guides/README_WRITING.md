@@ -1,71 +1,17 @@
-# README Writing Guidelines for Internal Libraries
+# README Writing Guidelines
 
-Guidelines for creating concise, AI assistant–focused README.md files for internal libraries and modules.
-
----
-
-## When to Use This
-
-**For Internal Modules/Libraries**: `src/module_name/README.md` or similar
-Use this guide when documenting reusable internal modules that need context refresh documentation.
-
-**For Toys (Discovery Mode)**: `toys/toyN_name/README.md`
-Every completed toy gets a 100-200 word README for quick context refresh. Follow this guide.
-
-**Not For**: Project-level README.md files (root of repository) — those have different audiences and purposes.
+General principles for creating AI assistant-focused README documentation.
 
 ---
 
 ## Purpose
 
-These READMEs serve as **context refresh documents** for AI assistants working with the codebase. They should quickly re-establish understanding of what each library does, how to use it, and what to watch out for.
+READMEs serve as **context refresh documents** for AI assistants working with code. They should quickly establish understanding of what the code does, how to use it, and what to watch out for.
 
-**Target audience**: AI assistants needing to quickly understand library/toy purpose and usage patterns
-**Length target**: 100–200 words total
+**Target audience**: AI assistants needing to rapidly understand purpose and usage patterns
 **Focus**: Dense, essential information only
 
-**Context**:
-- **Toys**: After completing implementation, write README summarizing what was built and key learnings
-- **Libraries**: Write README when module is stable enough for reuse across features
-
----
-
-## Required Structure
-
-### **1. Header + One-Liner**
-```markdown
-# library_name
-Brief description of what it does and key technology/pattern
-```
-
-### **2. Purpose (2–3 sentences)**
-- What core problem this solves
-- Key architectural approach or design pattern
-- How it fits in the broader system/integration
-
-### **3. Key API (essential methods only)**
-```
-primary_operation(input) -> output
-secondary_operation(config) -> result
-utility_function(data) -> transformed
-```
-
-### **4. Core Concepts (bullet list)**
-- Key data structures or abstractions
-- Critical constraints or assumptions
-- Integration points with other libraries
-- Important design patterns
-
-### **5. Gotchas & Caveats**
-- Known limitations or scale constraints
-- Common usage mistakes
-- Performance considerations
-- Integration pitfalls
-
-### **6. Quick Test**
-```
-command to run most representative test
-```
+**Note**: Specific workflows provide context-specific structure and requirements (length, sections, etc.). These are universal writing principles that apply across all README types.
 
 ---
 
@@ -77,53 +23,20 @@ command to run most representative test
 - Assume reader has basic programming knowledge
 
 ### **Be Specific**
-- Include actual method signatures, not generic descriptions
+- Include actual signatures, commands, or APIs, not generic descriptions
 - Mention specific constraints (e.g., "performance degrades beyond 10K items")
-- Reference specific test files for examples
+- Reference specific files or tests for examples
 
 ### **Be Practical**
-- Lead with most commonly used methods
-- Highlight integration points with other libraries
+- Lead with most commonly used functionality
+- Highlight integration points with other components
 - Focus on "what you need to know to use this correctly"
 
 ### **Avoid**
 - Marketing language or feature lists
 - Detailed implementation explanations
-- Extensive examples (link to tests instead)
-- Installation instructions (assume internal development environment)
-
----
-
-## Template
-
-```markdown
-# library_name
-Brief description of what it does
-
-## Purpose
-2–3 sentences covering the core problem solved, architectural approach, and role in broader integration.
-
-## Key API
-```
-most_important_method(params) -> return_value
-second_most_important(params) -> return_value
-utility_method(params) -> return_value
-```
-
-## Core Concepts
-- Key data structure or abstraction
-- Critical constraint or assumption
-- Integration point with other libraries
-- Important design pattern
-
-## Gotchas
-- Known limitation or performance constraint
-- Common usage mistake to avoid
-- Integration pitfall with other libraries
-
-## Quick Test
-`command to run representative test`
-```
+- Extensive examples (prefer links to code/tests)
+- Unnecessary setup details (unless workflow-specific)
 
 ---
 
@@ -133,10 +46,10 @@ utility_method(params) -> return_value
 
 ## Quality Check
 
-A good library README should allow an AI assistant to:
-1. **Understand purpose** in 10 seconds
-2. **Know primary methods** to call
-3. **Avoid common mistakes** through gotchas section
-4. **Validate functionality** through quick test
+A good README should allow an AI assistant to:
+1. **Understand purpose** quickly (seconds, not minutes)
+2. **Know primary operations** to perform
+3. **Avoid common mistakes** through warnings or caveats
+4. **Validate or test** the functionality
 
-If any of these takes longer than expected, the README needs to be more concise or better organized.
+If understanding takes longer than expected, the README needs to be more concise or better organized.

@@ -103,11 +103,42 @@ nodes:
 
       Your task: Create a README.md summarizing the toy model for future AI context refresh.
 
-      Keep it concise (100-200 words):
-      - What the system does
-      - Key APIs/interfaces
-      - Usage examples
-      - Integration points
+      **Toy README Requirements:**
+
+      **Length**: 100-200 words total
+
+      **Required Structure:**
+      ```markdown
+      # toy_name
+      Brief description of what it does and key technology/pattern
+
+      ## Purpose
+      2–3 sentences covering the core problem solved, architectural approach, and role in broader integration.
+
+      ## Key API
+      ```
+      primary_operation(input) -> output
+      secondary_operation(config) -> result
+      utility_function(data) -> transformed
+      ```
+
+      ## Core Concepts
+      - Key data structures or abstractions
+      - Critical constraints or assumptions
+      - Integration points with other components
+      - Important design patterns
+
+      ## Gotchas
+      - Known limitations or scale constraints
+      - Common usage mistakes
+      - Performance considerations
+      - Integration pitfalls
+
+      ## Quick Test
+      `command to run most representative test`
+      ```
+
+      Write the README summarizing what was built and key learnings.
 
       Respond with your completed README.md content.
     transitions:

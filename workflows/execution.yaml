@@ -138,20 +138,44 @@ nodes:
     prompt: |
       You are in the README phase of Document-Driven Development (Execution Mode).
 
+      **CRITICAL - Project-Level README Update Protocol:**
+
+      1. **Read the WHOLE existing README.md first** (root-level project README)
+         - Understand current structure, sections, and organization
+         - Note the existing writing style, tone, and formatting conventions
+         - Identify code map sections (monolithic or hierarchical)
+         - Find where the new feature naturally fits
+
+      2. **Match existing style and structure**
+         - Follow established patterns for headings, code blocks, examples
+         - Maintain consistency with existing section depth and organization
+         - Preserve any existing navigation or cross-references
+         - Keep the same voice and level of detail
+
+      3. **Update appropriate sections to document the new feature**
+         - Add feature to relevant sections (don't create duplicate structure)
+         - Update code structure/architecture sections if needed
+         - Add usage examples that match existing example style
+         - Update table of contents or navigation if present
+
+      4. **Focus on integration, not wholesale rewrite**
+         - Minimal changes to accomplish documentation goal
+         - Preserve existing content that remains accurate
+         - Only modify sections directly related to the new feature
+
       {{README_WRITING}}
 
-      Your task: Create a UNIX man-style README.md.
+      Your task: Update the root README.md to document the implemented feature.
 
-      Include:
-      - System overview and purpose
-      - Installation and setup
-      - API documentation
-      - Usage examples
-      - Error handling guide
-      - Performance characteristics
-      - Integration points
+      Typical areas to update (if they exist):
+      - System overview (mention new capability)
+      - Installation/setup (if changed)
+      - API documentation (new commands, options, or interfaces)
+      - Usage examples (demonstrate new feature)
+      - Code structure section (new files or modules)
+      - Integration points (if new integrations added)
 
-      Respond with your completed README.md content.
+      Respond when the README.md has been updated.
     transitions:
       - when: "readme_complete"
         to: done
