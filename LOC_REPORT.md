@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-06 12:14
+**Last Updated**: 2025-11-06 12:15
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 15,745 | 10,577 | 26,322 |
+| **Lines** | 15,745 | 10,581 | 26,326 |
 | **Comments** | 2,315 | - | 2,315 |
 | **Blank Lines** | 2,939 | - | 2,939 |
-| **Total Lines** | 20,999 | 10,577 | 31,576 |
+| **Total Lines** | 20,999 | 10,581 | 31,580 |
 | **Files** | 94 | 58 | 152 |
 
 **Documentation Ratio**: 0.67 lines of docs per line of code
@@ -179,7 +179,7 @@ SUM:                           109           3083           2315          16174
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 220 |
+| `LOC_REPORT.md` | 224 |
 | `README.md` | 653 |
 | `ROADMAP.md` | 182 |
 | `src/adapters/README.md` | 25 |
