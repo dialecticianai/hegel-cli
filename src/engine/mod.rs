@@ -928,4 +928,163 @@ nodes:
         let result = workflow.validate();
         assert!(result.is_ok());
     }
+
+    // ========== Step 7: End-to-End Integration Tests ==========
+
+    #[test]
+    fn test_workflow_with_prompt_hbs_field() {
+        // Test that workflow nodes can use prompt_hbs field
+        let yaml = r#"
+mode: test
+start_node: spec
+nodes:
+  spec:
+    prompt_hbs: "Write {{> code_map}}"
+    transitions:
+      - when: done
+        to: done
+  done:
+    transitions: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+
+        // Verify prompt_hbs field is set
+        assert!(workflow.nodes["spec"].prompt.is_empty());
+        assert!(!workflow.nodes["spec"].prompt_hbs.is_empty());
+        assert_eq!(workflow.nodes["spec"].prompt_hbs, "Write {{> code_map}}");
+    }
+
+    #[test]
+    fn test_workflow_rejects_both_prompt_and_prompt_hbs() {
+        let yaml = r#"
+mode: test
+start_node: spec
+nodes:
+  spec:
+    prompt: "Old style"
+    prompt_hbs: "New style"
+    transitions:
+      - when: done
+        to: done
+"#;
+        let result: Result<Workflow, _> = serde_yaml::from_str(yaml);
+        assert!(result.is_ok()); // YAML parses fine
+
+        // But validation should fail
+        let workflow = result.unwrap();
+        let validation = workflow.validate();
+        assert!(validation.is_err());
+        assert!(validation
+            .unwrap_err()
+            .to_string()
+            .contains("cannot have both"));
+    }
+
+    #[test]
+    fn test_init_state_sets_is_handlebars_for_hbs_node() {
+        // Create workflow with prompt_hbs start node
+        let yaml = r#"
+mode: test
+start_node: spec
+nodes:
+  spec:
+    prompt_hbs: "{{> code_map}}"
+    transitions: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+        let state = init_state(&workflow);
+
+        // Verify is_handlebars is set to true
+        assert!(state.is_handlebars);
+    }
+
+    #[test]
+    fn test_init_state_sets_is_handlebars_false_for_md_node() {
+        use crate::test_helpers::*;
+
+        // Create workflow with regular prompt start node
+        let workflow = workflow("test", "spec")
+            .with_node("spec", node("Write SPEC.md", vec![]))
+            .build();
+
+        let state = init_state(&workflow);
+
+        // Verify is_handlebars is set to false
+        assert!(!state.is_handlebars);
+    }
+
+    #[test]
+    fn test_get_next_prompt_updates_is_handlebars_on_transition() {
+        use crate::test_helpers::*;
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create workflow with mixed nodes
+        let mut node_md = node("Old style prompt", vec![transition("next", "hbs_node")]);
+        let mut node_hbs = Node {
+            prompt: String::new(),
+            prompt_hbs: "{{> code_map}}".to_string(),
+            transitions: vec![],
+            rules: vec![],
+        };
+
+        let workflow = workflow("test", "md_node")
+            .with_node("md_node", node_md)
+            .with_node("hbs_node", node_hbs)
+            .build();
+
+        let state = init_state(&workflow);
+        assert!(!state.is_handlebars); // Start with MD
+
+        // Transition to HBS node
+        let mut claims = HashSet::new();
+        claims.insert("next".to_string());
+
+        let (prompt, new_state) =
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+
+        // Verify transition happened
+        assert_eq!(new_state.current_node, "hbs_node");
+
+        // Verify is_handlebars was updated
+        assert!(new_state.is_handlebars);
+
+        // Verify correct prompt was returned
+        assert_eq!(prompt, "{{> code_map}}");
+    }
+
+    #[test]
+    fn test_end_to_end_workflow_with_handlebars_partial() {
+        use crate::test_helpers::*;
+
+        // Create workflow that references actual code_map partial
+        let yaml = r#"
+mode: test
+start_node: spec
+nodes:
+  spec:
+    prompt_hbs: "{{> code_map}}"
+    transitions:
+      - when: done
+        to: done
+  done:
+    transitions: []
+"#;
+        let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+
+        // Validate workflow
+        assert!(workflow.validate().is_ok());
+
+        // Initialize state
+        let state = init_state(&workflow);
+        assert_eq!(state.current_node, "spec");
+        assert!(state.is_handlebars);
+
+        // Get next prompt
+        let temp_dir = TempDir::new().unwrap();
+        let claims = HashSet::new();
+        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+
+        // Verify we got the Handlebars template (not rendered yet - that happens in render_node_prompt)
+        assert_eq!(prompt, "{{> code_map}}");
+    }
 }
