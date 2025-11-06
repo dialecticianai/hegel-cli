@@ -151,25 +151,63 @@ Available guides:
 
 ### Customizing Workflows and Guides
 
-Hegel supports user-defined workflows and guides that can extend or override the embedded defaults:
+Hegel supports user-defined workflows and guides that can extend or override the embedded defaults.
+
+#### Template Engines
+
+Hegel supports two template engines for workflow prompts and guides:
+
+**Markdown templates** (legacy, simple):
+- Files: `*.md` in `guides/` and `guides/templates/`
+- Syntax: `{{GUIDE_NAME}}`, `{{templates/name}}`, `{{variable}}`
+- Use in workflows: `prompt:` field
+- Best for: Simple guide inclusion and variable substitution
+
+**Handlebars templates** (new, expressive):
+- Files: `*.hbs` in `guides/partials/` and `guides/`
+- Syntax: `{{> partial}}`, `{{context.variable}}`, `{{#if (eq ...)}}`, `{{#each}}`
+- Use in workflows: `prompt_hbs:` field
+- Best for: Conditional logic, loops, and dynamic content
+
+**Load precedence:** `guides/partials/*.hbs` > `guides/*.hbs` > `guides/*.md` > `guides/templates/*.md`
+
+This allows gradual migration—new templates can use Handlebars while existing Markdown templates continue working.
 
 **Create custom workflows:**
 ```bash
 # Create workflows directory
 mkdir -p .hegel/workflows
 
-# Add a new custom workflow
+# Markdown template example (simple)
 cat > .hegel/workflows/my-workflow.yaml <<EOF
 mode: discovery
 start_node: start
 nodes:
   start:
-    prompt: "Custom workflow step"
+    prompt: "{{MY_GUIDE}}"
     transitions:
       - when: done
         to: done
   done:
-    prompt: "Complete!"
+    transitions: []
+EOF
+
+# Handlebars template example (with conditionals)
+cat > .hegel/workflows/my-workflow.yaml <<EOF
+mode: discovery
+start_node: start
+nodes:
+  start:
+    prompt_hbs: |
+      {{> my_partial}}
+
+      {{#if context.detailed_mode}}
+      Additional detailed instructions here.
+      {{/if}}
+    transitions:
+      - when: done
+        to: done
+  done:
     transitions: []
 EOF
 
@@ -192,22 +230,34 @@ cp workflows/discovery.yaml .hegel/workflows/discovery.yaml
 # Create guides directory
 mkdir -p .hegel/guides
 
-# Add a custom guide
+# Markdown guide (simple)
 echo "# My Custom Spec Guide" > .hegel/guides/MY_GUIDE.md
+# Reference with {{MY_GUIDE}} in prompt: fields
 
-# Reference it in workflow prompts with {{MY_GUIDE}}
+# Handlebars partial (with logic)
+mkdir -p .hegel/guides/partials
+cat > .hegel/guides/partials/my_partial.hbs <<EOF
+{{#if (eq context.mode "detailed")}}
+Detailed instructions go here.
+{{else}}
+Brief instructions go here.
+{{/if}}
+EOF
+# Reference with {{> my_partial}} in prompt_hbs: fields
 ```
 
 **Override embedded guides:**
 ```bash
-# Override the default SPEC_WRITING guide
+# Override the default SPEC_WRITING guide (Markdown)
 cp guides/SPEC_WRITING.md .hegel/guides/SPEC_WRITING.md
-
 # Edit .hegel/guides/SPEC_WRITING.md to match your style
-# Workflows using {{SPEC_WRITING}} will now use your version
+
+# Override with Handlebars partial (takes precedence)
+cp guides/partials/code_map.hbs .hegel/guides/partials/code_map.hbs
+# Edit .hegel/guides/partials/code_map.hbs for custom logic
 ```
 
-**Priority:** Filesystem (`.hegel/`) takes precedence over embedded resources, allowing you to customize any aspect of Hegel's workflows.
+**Priority:** Filesystem (`.hegel/`) takes precedence over embedded resources, and Handlebars partials take precedence over Markdown guides, allowing you to customize any aspect of Hegel's workflows.
 
 ### Advancing Through Phases
 
@@ -331,10 +381,16 @@ hegel-cli/
 ├── src/
 │   ├── main.rs          # CLI entry point
 │   ├── commands/        # Command implementations
-│   ├── engine/          # Workflow state machine
+│   ├── engine/          # Workflow state machine (dual template engines)
+│   │   ├── mod.rs       # Workflow definitions and routing
+│   │   ├── handlebars.rs  # Handlebars template engine
+│   │   └── template.rs  # Markdown template engine (legacy)
 │   └── storage/         # File-based state persistence
 ├── workflows/           # YAML workflow definitions
-└── guides/              # Writing guides for documentation
+└── guides/              # Writing guides and templates
+    ├── *.md             # Markdown guides
+    ├── partials/        # Handlebars partials (.hbs files)
+    └── templates/       # Markdown template fragments
 ```
 
 ## State Storage
