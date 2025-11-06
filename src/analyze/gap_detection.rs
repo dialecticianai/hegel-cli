@@ -18,7 +18,7 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 use std::path::Path;
 
-use crate::storage::archive::{read_archives, write_archive, WorkflowArchive};
+use crate::storage::archive::{write_archive, WorkflowArchive};
 
 /// Ensures exactly one cowboy per gap between non-synthetic workflows that contains git activity
 ///
@@ -196,7 +196,7 @@ pub fn ensure_cowboy_coverage(
             eprintln!("DEBUG COWBOY_GAP_FILLER: Correct cowboy exists for gap");
 
             // Remove all OTHER cowboys in this gap
-            for (idx, cow) in &cowboys_in_gap {
+            for (_idx, cow) in &cowboys_in_gap {
                 let cow_start = parse_timestamp(&cow.workflow_id).ok();
                 let cow_end = parse_timestamp(&cow.completed_at).ok();
 
@@ -222,7 +222,7 @@ pub fn ensure_cowboy_coverage(
             eprintln!("DEBUG COWBOY_GAP_FILLER: No correct cowboy, need to create one");
 
             // Remove all incorrect cowboys
-            for (idx, cow) in &cowboys_in_gap {
+            for (_idx, cow) in &cowboys_in_gap {
                 eprintln!(
                     "DEBUG COWBOY_GAP_FILLER: Removing incorrect cowboy {}",
                     cow.workflow_id

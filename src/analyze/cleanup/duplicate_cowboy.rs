@@ -50,7 +50,7 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
         &self,
         archive: &mut WorkflowArchive,
         state_dir: &Path,
-        dry_run: bool,
+        _dry_run: bool,
     ) -> Result<bool> {
         // Fix zero-duration cowboys by updating completed_at
         // This happens when old cowboy archives were created with the same start/end timestamp
@@ -58,6 +58,10 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
         if !self.needs_repair(archive) {
             return Ok(false);
         }
+
+        // NOTE: Unlike other repairs, this ALWAYS mutates the in-memory archive, even in dry-run.
+        // This is necessary so gap_detection.rs sees corrected timestamps when analyzing gaps.
+        // The dry_run flag only affects whether we persist changes to disk (handled by caller).
 
         // Read all archives to find the next workflow after this cowboy
         let all_archives = crate::storage::archive::read_archives(state_dir)?;
@@ -79,8 +83,7 @@ impl ArchiveCleanup for DuplicateCowboyCleanup {
             chrono::Utc::now().to_rfc3339()
         };
 
-        // Always update the in-memory archive (even in dry-run)
-        // so gap detection sees the corrected timestamps
+        // Update the in-memory archive
         archive.completed_at = new_completed_at.clone();
 
         // Update the done transition timestamp if it exists

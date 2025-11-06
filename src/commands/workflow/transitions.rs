@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use crate::engine::get_next_prompt;
 use crate::metamodes::evaluate_workflow_completion;
-use crate::metrics::cowboy::{build_synthetic_cowboy_archive, identify_cowboy_workflows};
+use crate::metrics::cowboy::{build_synthetic_cowboy_archive, CowboyActivityGroup};
 use crate::metrics::parse_unified_metrics;
 use crate::storage::archive::{read_archives, write_archive, WorkflowArchive};
 use crate::storage::log_cleanup::cleanup_logs;
@@ -123,6 +123,8 @@ pub(super) fn detect_and_archive_cowboy_activity(
     state_dir: &std::path::Path,
     current_timestamp: &str,
 ) -> Result<()> {
+    use chrono::{DateTime, Utc};
+
     // Load all existing archives
     let all_archives = read_archives(state_dir)?;
 
@@ -132,29 +134,25 @@ pub(super) fn detect_and_archive_cowboy_activity(
         .filter(|a| a.workflow_id.as_str() < current_timestamp && !a.is_synthetic)
         .max_by_key(|a| a.workflow_id.as_str());
 
-    // Create a minimal archive-like struct for the current timestamp to use as boundary
-    let current_boundary = WorkflowArchive {
-        workflow_id: current_timestamp.to_string(),
-        completed_at: current_timestamp.to_string(),
-        mode: "cowboy".to_string(),
-        phases: vec![],
-        transitions: vec![],
-        totals: Default::default(),
-        session_id: None,
-        is_synthetic: false,
+    // Determine the gap we're checking: from previous workflow's end to now
+    let gap_start = if let Some(prev) = previous_archive {
+        DateTime::parse_from_rfc3339(&prev.completed_at)
+            .context("Failed to parse previous workflow completed_at")?
+            .with_timezone(&Utc)
+    } else {
+        // No previous workflow - gap starts from beginning of time (earliest activity)
+        DateTime::<Utc>::MIN_UTC
     };
 
-    let archives_to_check = if let Some(prev) = previous_archive {
-        vec![prev.clone(), current_boundary]
-    } else {
-        vec![current_boundary]
-    };
+    let gap_end = DateTime::parse_from_rfc3339(current_timestamp)
+        .context("Failed to parse current timestamp")?
+        .with_timezone(&Utc);
 
     // Parse current metrics from hooks/transcripts/git (these haven't been deleted yet)
     let hooks_path = state_dir.join("hooks.jsonl");
     let mut bash_commands = vec![];
     let mut file_modifications = vec![];
-    let transcript_events = vec![]; // TODO: parse transcript events if needed
+    let transcript_events: Vec<crate::metrics::TranscriptEvent> = vec![]; // TODO: parse transcript events if needed
 
     if hooks_path.exists() {
         use crate::metrics::parse_hooks_file;
@@ -171,17 +169,74 @@ pub(super) fn detect_and_archive_cowboy_activity(
         git_commits = git::parse_git_commits(project_root, None).unwrap_or_default();
     }
 
-    // Identify cowboy workflows between the archives
-    let cowboy_groups = identify_cowboy_workflows(
-        &bash_commands,
-        &file_modifications,
-        &git_commits,
-        &transcript_events,
-        &archives_to_check,
-    )?;
+    // Helper to parse timestamp
+    let parse_ts = |ts: &str| -> Option<DateTime<Utc>> {
+        DateTime::parse_from_rfc3339(ts)
+            .ok()
+            .map(|dt| dt.with_timezone(&Utc))
+    };
 
-    // Create and write synthetic archives for each gap
-    for group in cowboy_groups {
+    // Filter activity to only what's in the gap
+    let bash_in_gap: Vec<_> = bash_commands
+        .into_iter()
+        .filter(|cmd| {
+            cmd.timestamp
+                .as_ref()
+                .and_then(|ts| parse_ts(ts))
+                .map(|t| t > gap_start && t < gap_end)
+                .unwrap_or(false)
+        })
+        .collect();
+
+    let files_in_gap: Vec<_> = file_modifications
+        .into_iter()
+        .filter(|fm| {
+            fm.timestamp
+                .as_ref()
+                .and_then(|ts| parse_ts(ts))
+                .map(|t| t > gap_start && t < gap_end)
+                .unwrap_or(false)
+        })
+        .collect();
+
+    let commits_in_gap: Vec<_> = git_commits
+        .into_iter()
+        .filter(|commit| {
+            parse_ts(&commit.timestamp)
+                .map(|t| t > gap_start && t < gap_end)
+                .unwrap_or(false)
+        })
+        .collect();
+
+    let transcripts_in_gap: Vec<_> = transcript_events
+        .into_iter()
+        .filter(|event| {
+            event
+                .timestamp
+                .as_ref()
+                .and_then(|ts| parse_ts(ts))
+                .map(|t| t > gap_start && t < gap_end)
+                .unwrap_or(false)
+        })
+        .collect();
+
+    // Check if there's ANY activity in the gap
+    let has_activity = !bash_in_gap.is_empty()
+        || !files_in_gap.is_empty()
+        || !commits_in_gap.is_empty()
+        || !transcripts_in_gap.is_empty();
+
+    if has_activity {
+        // Create ONE cowboy workflow for this gap
+        let group = CowboyActivityGroup {
+            start_time: gap_start,
+            end_time: gap_end,
+            bash_commands: bash_in_gap,
+            file_modifications: files_in_gap,
+            git_commits: commits_in_gap,
+            transcript_events: transcripts_in_gap,
+        };
+
         let synthetic_archive = build_synthetic_cowboy_archive(&group)?;
 
         // Check if archive already exists (avoid duplicates)

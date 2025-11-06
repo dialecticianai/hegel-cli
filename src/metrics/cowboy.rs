@@ -1,7 +1,7 @@
 /// Synthetic cowboy workflow detection and creation
 ///
 /// Identifies inter-workflow activity gaps and creates synthetic cowboy workflow archives
-use anyhow::{Context, Result};
+use anyhow::Result;
 use chrono::{DateTime, Utc};
 
 use crate::metrics::{
@@ -23,139 +23,8 @@ pub struct CowboyActivityGroup {
     pub transcript_events: Vec<TranscriptEvent>,
 }
 
-/// Workflow time range for gap detection
-#[derive(Debug, Clone)]
-struct WorkflowTimeRange {
-    start_time: DateTime<Utc>,
-    end_time: DateTime<Utc>,
-}
-
-/// Identify inter-workflow activity gaps and group them
-pub fn identify_cowboy_workflows(
-    hooks: &[BashCommand],
-    file_mods: &[FileModification],
-    commits: &[GitCommit],
-    transcripts: &[TranscriptEvent],
-    existing_archives: &[WorkflowArchive],
-) -> Result<Vec<CowboyActivityGroup>> {
-    use std::io::Write;
-    let mut debug_file = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("/tmp/hegel_repair_debug.log")?;
-
-    writeln!(debug_file, "DEBUG COWBOY: identify_cowboy_workflows called")?;
-    writeln!(
-        debug_file,
-        "DEBUG COWBOY: existing_archives.len() = {}",
-        existing_archives.len()
-    )?;
-
-    eprintln!("DEBUG COWBOY: identify_cowboy_workflows called");
-    eprintln!(
-        "DEBUG COWBOY: existing_archives.len() = {}",
-        existing_archives.len()
-    );
-
-    // Build timeline of existing workflow ranges
-    // Include ALL workflows (synthetic and non-synthetic) to prevent duplicate cowboys
-    let mut workflow_ranges = Vec::new();
-    for archive in existing_archives {
-        let start_time = parse_timestamp(&archive.workflow_id)?;
-        let end_time = parse_timestamp(&archive.completed_at)?;
-
-        writeln!(
-            debug_file,
-            "DEBUG COWBOY: Archive {} to {} (mode={}, synthetic={})",
-            archive.workflow_id, archive.completed_at, archive.mode, archive.is_synthetic
-        )?;
-
-        eprintln!(
-            "DEBUG COWBOY: Archive {} to {} (mode={}, synthetic={})",
-            archive.workflow_id, archive.completed_at, archive.mode, archive.is_synthetic
-        );
-
-        workflow_ranges.push(WorkflowTimeRange {
-            start_time,
-            end_time,
-        });
-    }
-
-    // Sort workflow ranges by start time
-    workflow_ranges.sort_by_key(|r| r.start_time);
-
-    writeln!(
-        debug_file,
-        "DEBUG COWBOY: Built {} workflow_ranges",
-        workflow_ranges.len()
-    )?;
-    eprintln!(
-        "DEBUG COWBOY: Built {} workflow_ranges",
-        workflow_ranges.len()
-    );
-
-    // Collect all timestamped activities
-    let mut activities: Vec<(DateTime<Utc>, ActivityType)> = Vec::new();
-
-    // Add bash commands
-    for cmd in hooks {
-        if let Some(ref ts) = cmd.timestamp {
-            if let Ok(time) = parse_timestamp(ts) {
-                activities.push((time, ActivityType::BashCommand(cmd.clone())));
-            }
-        }
-    }
-
-    // Add file modifications
-    for file_mod in file_mods {
-        if let Some(ref ts) = file_mod.timestamp {
-            if let Ok(time) = parse_timestamp(ts) {
-                activities.push((time, ActivityType::FileModification(file_mod.clone())));
-            }
-        }
-    }
-
-    // Add git commits
-    for commit in commits {
-        if let Ok(time) = parse_timestamp(&commit.timestamp) {
-            activities.push((time, ActivityType::GitCommit(commit.clone())));
-        }
-    }
-
-    // Add transcript events
-    for event in transcripts {
-        if let Some(ref ts) = event.timestamp {
-            if let Ok(time) = parse_timestamp(ts) {
-                activities.push((time, ActivityType::Transcript(event.clone())));
-            }
-        }
-    }
-
-    // Sort activities by timestamp
-    activities.sort_by_key(|(time, _)| *time);
-
-    // Filter to only inter-workflow activities
-    let inter_workflow_activities: Vec<_> = activities
-        .into_iter()
-        .filter(|(time, _)| {
-            // Activity is inter-workflow if it doesn't fall within any workflow range
-            !workflow_ranges
-                .iter()
-                .any(|range| *time >= range.start_time && *time <= range.end_time)
-        })
-        .collect();
-
-    // This function is now deprecated - gap detection and cowboy creation
-    // is handled by src/analyze/gap_detection.rs
-    // We keep this function for backward compatibility but it returns empty
-    Ok(Vec::new())
-}
-
 /// Build synthetic cowboy workflow archive from activity group
 pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<WorkflowArchive> {
-    // Use start time as workflow_id
-    let workflow_id = group.start_time.to_rfc3339();
-
     // Build UnifiedMetrics from the activity group
     let hook_metrics = HookMetrics {
         total_events: group.bash_commands.len() + group.file_modifications.len(),
@@ -245,22 +114,6 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
     WorkflowArchive::from_metrics(&metrics, &workflow_id, true)
 }
 
-/// Activity type for grouping
-#[derive(Debug, Clone)]
-enum ActivityType {
-    BashCommand(BashCommand),
-    FileModification(FileModification),
-    GitCommit(GitCommit),
-    Transcript(TranscriptEvent),
-}
-
-/// Parse ISO 8601 timestamp
-fn parse_timestamp(ts: &str) -> Result<DateTime<Utc>> {
-    DateTime::parse_from_rfc3339(ts)
-        .context("Failed to parse timestamp")
-        .map(|dt| dt.with_timezone(&Utc))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -314,6 +167,8 @@ mod tests {
         }
     }
 
+    // TODO: use this when adding coverage to gap detection code
+    #[allow(dead_code)]
     fn test_archive(workflow_id: &str, completed_at: &str) -> WorkflowArchive {
         use crate::storage::archive::{
             PhaseArchive, TokenTotals, TransitionArchive, WorkflowTotals,
@@ -345,24 +200,17 @@ mod tests {
     }
 
     #[test]
-    fn test_no_gaps_when_workflows_cover_timeline() {
-        let archives = vec![
-            test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z"),
-            test_archive("2025-01-04T09:30:00Z", "2025-01-04T10:00:00Z"),
-        ];
-
-        let commits = vec![test_commit("2025-01-04T09:45:00Z")];
-
-        let groups = identify_cowboy_workflows(&[], &[], &commits, &[], &archives).unwrap();
-
-        assert_eq!(groups.len(), 0);
-    }
-
-    #[test]
     fn test_build_synthetic_cowboy_archive() {
+        use chrono::DateTime;
+        let parse_ts = |s: &str| {
+            DateTime::parse_from_rfc3339(s)
+                .unwrap()
+                .with_timezone(&chrono::Utc)
+        };
+
         let group = CowboyActivityGroup {
-            start_time: parse_timestamp("2025-01-04T10:00:00Z").unwrap(),
-            end_time: parse_timestamp("2025-01-04T10:30:00Z").unwrap(),
+            start_time: parse_ts("2025-01-04T10:00:00Z"),
+            end_time: parse_ts("2025-01-04T10:30:00Z"),
             bash_commands: vec![test_bash_command("2025-01-04T10:05:00Z")],
             file_modifications: vec![test_file_mod("2025-01-04T10:10:00Z")],
             git_commits: vec![test_commit("2025-01-04T10:15:00Z")],
@@ -379,14 +227,5 @@ mod tests {
         assert_eq!(archive.phases[0].bash_commands.len(), 1);
         assert_eq!(archive.phases[0].file_modifications.len(), 1);
         assert_eq!(archive.totals.git_commits, 1);
-    }
-
-    #[test]
-    fn test_empty_activity_results_in_no_archives() {
-        let archives = vec![test_archive("2025-01-04T09:00:00Z", "2025-01-04T09:30:00Z")];
-
-        let groups = identify_cowboy_workflows(&[], &[], &[], &[], &archives).unwrap();
-
-        assert_eq!(groups.len(), 0);
     }
 }

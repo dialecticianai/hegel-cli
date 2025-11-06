@@ -40,3 +40,6 @@ serial_test = "3.2"
 default = []
 # Bundle ast-grep binary at compile time (for production releases)
 bundle-ast-grep = ["hegel-ast-grep/bundle"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

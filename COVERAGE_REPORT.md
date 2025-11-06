@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 22:37
+**Last Updated**: 2025-11-05 23:32
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **83.45%** lines | **82.85%** regions | **84.34%** functions
+**Overall Coverage**: **82.93%** lines | **82.57%** regions | **83.05%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19033              3264    82.85%         996               156    84.34%       11576              1916    83.45%           0                 0         -
+TOTAL                                         18939              3302    82.57%        1003               170    83.05%       11540              1970    82.93%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -49,7 +49,7 @@ TOTAL                                         19033              3264    82.85% 
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 100.00% | 93.24% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/mod.rs` | 59.54% | 56.46% | 50.00% | 🟠 Moderate |
-| `src/commands/workflow/transitions.rs` | 85.30% | 78.97% | 64.29% | 🟡 Good |
+| `src/commands/workflow/transitions.rs` | 74.93% | 71.77% | 33.33% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
@@ -61,7 +61,7 @@ TOTAL                                         19033              3264    82.85% 
 | `src/main.rs` | 53.49% | 40.23% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 97.24% | 95.54% | 100.00% | 🟢 Excellent |
-| `src/metrics/cowboy.rs` | 93.08% | 88.56% | 100.00% | 🟢 Excellent |
+| `src/metrics/cowboy.rs` | 84.94% | 87.31% | 88.89% | 🟡 Good |
 | `src/metrics/git.rs` | 92.45% | 91.68% | 95.45% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
@@ -121,7 +121,6 @@ TOTAL                                         19033              3264    82.85% 
 - `src/guardrails/types.rs` - 94.38%
 - `src/metamodes/mod.rs` - 99.29%
 - `src/metrics/aggregation.rs` - 97.24%
-- `src/metrics/cowboy.rs` - 93.08%
 - `src/metrics/git.rs` - 92.45%
 - `src/metrics/graph.rs` - 90.06%
 - `src/metrics/hooks.rs` - 94.22%
@@ -148,9 +147,10 @@ TOTAL                                         19033              3264    82.85% 
 ### 🟡 Good (70-89% lines)
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
-- `src/commands/workflow/transitions.rs` - 85.30%
+- `src/commands/workflow/transitions.rs` - 74.93%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/embedded.rs` - 82.79%
+- `src/metrics/cowboy.rs` - 84.94%
 - `src/storage/log_cleanup.rs` - 75.00%
 - `src/storage/mod.rs` - 89.96%
 - `src/test_helpers/fixtures.rs` - 80.00%
@@ -185,7 +185,7 @@ TOTAL                                         19033              3264    82.85% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 83.45% | ✅ Met |
+| Overall | ≥80% | 82.93% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

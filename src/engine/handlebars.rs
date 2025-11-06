@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use handlebars::{
-    Context, Handlebars, Helper, HelperDef, HelperResult, Output, RenderContext, RenderError,
-    RenderErrorReason, ScopedJson,
+    Context, Handlebars, Helper, HelperDef, RenderContext, RenderError, RenderErrorReason,
+    ScopedJson,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::value::Value as Json;

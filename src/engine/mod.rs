@@ -1019,8 +1019,8 @@ nodes:
         let temp_dir = TempDir::new().unwrap();
 
         // Create workflow with mixed nodes
-        let mut node_md = node("Old style prompt", vec![transition("next", "hbs_node")]);
-        let mut node_hbs = Node {
+        let node_md = node("Old style prompt", vec![transition("next", "hbs_node")]);
+        let node_hbs = Node {
             prompt: String::new(),
             prompt_hbs: "{{> code_map}}".to_string(),
             transitions: vec![],
@@ -1054,8 +1054,6 @@ nodes:
 
     #[test]
     fn test_end_to_end_workflow_with_handlebars_partial() {
-        use crate::test_helpers::*;
-
         // Create workflow that references actual code_map partial
         let yaml = r#"
 mode: test
