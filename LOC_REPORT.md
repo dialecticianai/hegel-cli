@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 22:11
+**Last Updated**: 2025-11-05 22:13
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 14,912 | 10,291 | 25,203 |
-| **Comments** | 2,114 | - | 2,114 |
-| **Blank Lines** | 2,740 | - | 2,740 |
-| **Total Lines** | 19,766 | 10,291 | 30,057 |
+| **Lines** | 15,044 | 10,294 | 25,338 |
+| **Comments** | 2,139 | - | 2,139 |
+| **Blank Lines** | 2,774 | - | 2,774 |
+| **Total Lines** | 19,957 | 10,294 | 30,251 |
 | **Files** | 91 | 56 | 147 |
 
-**Documentation Ratio**: 0.69 lines of docs per line of code
+**Documentation Ratio**: 0.68 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            91           2740           2114          14912
+Rust                            91           2774           2139          15044
 Markdown                        15            141              0            410
 -------------------------------------------------------------------------------
-SUM:                           106           2881           2114          15322
+SUM:                           106           2915           2139          15454
 -------------------------------------------------------------------------------
 ```
 
@@ -84,7 +84,7 @@ SUM:                           106           2881           2114          15322
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 147 | 102 | 45 | 30.6% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
-| `engine/handlebars.rs` | 31 | 16 | 15 | 48.4% | ✅ |
+| `engine/handlebars.rs` | 222 | 108 | 114 | 51.4% | ✅ |
 | `engine/mod.rs` | 867 | 187 | 680 | 78.4% | ✅ |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
@@ -174,7 +174,7 @@ SUM:                           106           2881           2114          15322
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 216 |
+| `LOC_REPORT.md` | 219 |
 | `README.md` | 597 |
 | `ROADMAP.md` | 234 |
 | `src/adapters/README.md` | 25 |
@@ -200,7 +200,7 @@ SUM:                           106           2881           2114          15322
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.69 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.68 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
