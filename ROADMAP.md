@@ -135,6 +135,70 @@ hegel fork --agent=codex -- --full-auto "Y"   # Codex with auto-approval
 - Compare agent outputs (same prompt, different agents)
 - Leverage agent-specific features (codex sandbox, gemini web search)
 
+### 2.3 Subworkflow Execution
+
+**Goal:** Allow running partial workflow graphs with explicit phase sequences.
+
+**Syntax:**
+```bash
+hegel start execution spec->plan              # Run spec, then plan, then done
+hegel start execution code->review            # Run code, then review, then done
+hegel start discovery exploration->synthesis  # Custom sequences
+```
+
+**Behavior:**
+- Parse `node1->node2->...` syntax to build subgraph
+- Validate that transitions exist between specified nodes
+- Automatically append `done` node as final step
+- Execute only the specified phases in sequence
+- Useful for iterating on specific workflow segments
+
+**Implementation:**
+- Extend `hegel start` command parser to detect `->` sequences
+- Validate phase connectivity using workflow YAML graph
+- Build temporary workflow state with custom node sequence
+- Track subworkflow execution in metrics (differentiate from full workflows)
+
+**Use cases:**
+- Test workflow changes iteratively
+- Re-run specific segments without full workflow execution
+- Quick prototyping of new workflow patterns
+
+### 2.4 New Workflow Types
+
+**init-scaffold workflow:**
+- **Goal:** Create new projects based on reference project(s)
+- **Use case:** Bootstrap new codebases with proven architecture patterns
+- **Flow:**
+  1. User provides reference project path(s) or URLs
+  2. Analyze reference structure (directory layout, key files, patterns)
+  3. Generate project scaffold adapted to new context
+  4. Create README, configuration files, initial code structure
+  5. Document architectural decisions and patterns extracted
+- **Key features:**
+  - Multi-reference synthesis (combine patterns from multiple sources)
+  - Template variable substitution (project name, language, etc.)
+  - Dependency version resolution (update to latest compatible)
+  - Architecture documentation generation
+
+**debug workflow:**
+- **Goal:** Systematic TDD debugging with test-first methodology
+- **Use case:** Fix failing tests or bugs through disciplined process
+- **Flow:**
+  1. Identify failing test or bug report
+  2. Write minimal reproduction test (if not exists)
+  3. Analyze failure root cause
+  4. Propose fix with explanation
+  5. Verify fix passes all tests
+  6. Document bug pattern and prevention strategy
+- **Key features:**
+  - Red-green-refactor cycle enforcement
+  - Root cause analysis prompts
+  - Regression test validation
+  - Bug pattern library accumulation
+
+**Implementation priority:** init-scaffold first (higher impact for bootstrapping), debug second (complements existing workflows).
+
 ---
 
 ## Phase 3: Experimental Features
