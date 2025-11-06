@@ -49,6 +49,16 @@ if [ "$BUMP_VERSION" = true ]; then
     # Update Cargo.lock to reflect new version
     cargo update -p hegel --quiet
 
+    # If there's a staged commit, amend it with the version bump
+    if git rev-parse HEAD >/dev/null 2>&1; then
+        # Check if we have a previous commit to amend
+        if git log -1 --oneline >/dev/null 2>&1; then
+            echo "📝 Amending last commit with version bump..."
+            git add Cargo.toml
+            git commit --amend --no-edit --no-verify
+        fi
+    fi
+
     BUILD_VERSION="$NEW_VERSION"
 else
     BUILD_VERSION="$CURRENT_VERSION"
