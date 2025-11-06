@@ -167,38 +167,6 @@ mod tests {
         }
     }
 
-    // TODO: use this when adding coverage to gap detection code
-    #[allow(dead_code)]
-    fn test_archive(workflow_id: &str, completed_at: &str) -> WorkflowArchive {
-        use crate::storage::archive::{
-            PhaseArchive, TokenTotals, TransitionArchive, WorkflowTotals,
-        };
-
-        WorkflowArchive {
-            workflow_id: workflow_id.to_string(),
-            mode: "discovery".to_string(),
-            completed_at: completed_at.to_string(),
-            session_id: None,
-            is_synthetic: false,
-            phases: vec![PhaseArchive {
-                phase_name: "spec".to_string(),
-                start_time: workflow_id.to_string(),
-                end_time: Some(completed_at.to_string()),
-                duration_seconds: 900,
-                tokens: TokenTotals::default(),
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-            }],
-            transitions: vec![TransitionArchive {
-                from_node: "START".to_string(),
-                to_node: "spec".to_string(),
-                timestamp: workflow_id.to_string(),
-            }],
-            totals: WorkflowTotals::default(),
-        }
-    }
-
     #[test]
     fn test_build_synthetic_cowboy_archive() {
         use chrono::DateTime;

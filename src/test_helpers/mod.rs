@@ -4,6 +4,7 @@
 //! test readability across the codebase.
 
 // Submodules
+pub mod archive;
 pub mod fixtures;
 pub mod jsonl;
 pub mod metrics;
@@ -13,6 +14,7 @@ pub mod tui;
 pub mod workflow;
 
 // Re-export all public items for backwards compatibility
+pub use archive::*;
 pub use fixtures::*;
 pub use jsonl::*;
 pub use metrics::*;
