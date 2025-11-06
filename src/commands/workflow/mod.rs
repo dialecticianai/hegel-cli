@@ -110,7 +110,13 @@ pub fn start_workflow(
     // Display output
     println!("{}", Theme::success("Workflow started").bold());
     println!();
-    display_workflow_prompt(current_node, &workflow_state.mode, &node.prompt, storage)?;
+    display_workflow_prompt(
+        current_node,
+        &workflow_state.mode,
+        &node.prompt,
+        workflow_state.is_handlebars,
+        storage,
+    )?;
 
     Ok(())
 }
@@ -227,11 +233,18 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     println!();
 
     // Check if node has a prompt
-    if node.prompt.is_empty() {
+    let prompt_text = if !node.prompt_hbs.is_empty() {
+        &node.prompt_hbs
+    } else {
+        &node.prompt
+    };
+
+    if prompt_text.is_empty() {
         println!("{}", Theme::secondary("(No prompt at this node)"));
     } else {
         // Render prompt with guides
-        let rendered_prompt = render_node_prompt(&node.prompt, storage)?;
+        let rendered_prompt =
+            render_node_prompt(prompt_text, workflow_state.is_handlebars, storage)?;
         println!("{}", Theme::header("Prompt:"));
         println!("{}", rendered_prompt);
     }
@@ -321,7 +334,21 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
         Theme::highlight(&to_node)
     );
     println!();
-    display_workflow_prompt(&to_node, &workflow_state.mode, &node.prompt, storage)?;
+
+    // Select prompt based on which field is present
+    let prompt_text = if !node.prompt_hbs.is_empty() {
+        &node.prompt_hbs
+    } else {
+        &node.prompt
+    };
+
+    display_workflow_prompt(
+        &to_node,
+        &workflow_state.mode,
+        prompt_text,
+        workflow_state.is_handlebars,
+        storage,
+    )?;
 
     Ok(())
 }

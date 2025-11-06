@@ -44,6 +44,9 @@ pub struct WorkflowState {
     /// RFC3339 timestamp when current phase started (for time-based rules)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phase_start_time: Option<String>,
+    /// Whether current prompt uses Handlebars (true) or Markdown (false) template engine
+    #[serde(default)]
+    pub is_handlebars: bool,
 }
 
 /// Complete state including workflow definition and current state

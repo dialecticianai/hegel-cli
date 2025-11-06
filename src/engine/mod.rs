@@ -73,10 +73,18 @@ impl Workflow {
     /// Validate all rules in all nodes
     pub fn validate(&self) -> Result<()> {
         for (node_name, node) in &self.nodes {
-            // Validate that 'done' nodes don't have prompts
-            if node_name == "done" && !node.prompt.is_empty() {
+            // Validate that nodes don't have both prompt and prompt_hbs
+            if !node.prompt.is_empty() && !node.prompt_hbs.is_empty() {
                 anyhow::bail!(
-                    "Workflow validation failed: 'done' node must not have a prompt field"
+                    "Workflow validation failed: Node '{}' cannot have both 'prompt' and 'prompt_hbs' fields",
+                    node_name
+                );
+            }
+
+            // Validate that 'done' nodes don't have prompts
+            if node_name == "done" && (!node.prompt.is_empty() || !node.prompt_hbs.is_empty()) {
+                anyhow::bail!(
+                    "Workflow validation failed: 'done' node must not have a prompt or prompt_hbs field"
                 );
             }
 
@@ -129,6 +137,14 @@ pub fn load_workflow<P: AsRef<Path>>(yaml_path: P) -> Result<Workflow> {
 /// Initialize workflow state from workflow definition
 pub fn init_state(workflow: &Workflow) -> WorkflowState {
     let start = workflow.start_node.clone();
+
+    // Determine if start node uses Handlebars
+    let is_handlebars = workflow
+        .nodes
+        .get(&start)
+        .map(|node| !node.prompt_hbs.is_empty())
+        .unwrap_or(false);
+
     WorkflowState {
         current_node: start.clone(),
         mode: workflow.mode.clone(),
@@ -136,6 +152,7 @@ pub fn init_state(workflow: &Workflow) -> WorkflowState {
         workflow_id: None,
         meta_mode: None, // Will be set by caller if needed
         phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
+        is_handlebars,
     }
 }
 
@@ -185,6 +202,9 @@ pub fn get_next_prompt(
             )
         })?;
 
+    // Set is_handlebars flag based on which prompt field is present
+    new_state.is_handlebars = !next_node_obj.prompt_hbs.is_empty();
+
     // Evaluate rules for resulting node (if any)
     let prompt = if !next_node_obj.rules.is_empty() {
         use crate::metrics::parse_unified_metrics;
@@ -209,10 +229,20 @@ pub fn get_next_prompt(
             // Interrupt REPLACES normal prompt
             generate_interrupt_prompt(&violation)
         } else {
-            next_node_obj.prompt.clone()
+            // Select prompt based on which field is present
+            if !next_node_obj.prompt_hbs.is_empty() {
+                next_node_obj.prompt_hbs.clone()
+            } else {
+                next_node_obj.prompt.clone()
+            }
         }
     } else {
-        next_node_obj.prompt.clone()
+        // Select prompt based on which field is present
+        if !next_node_obj.prompt_hbs.is_empty() {
+            next_node_obj.prompt_hbs.clone()
+        } else {
+            next_node_obj.prompt.clone()
+        }
     };
 
     Ok((prompt, new_state))
@@ -560,6 +590,7 @@ nodes:
             workflow_id: None,
             meta_mode: None,
             phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
+            is_handlebars: false,
         };
 
         // CODE -> REVIEW -> REFACTOR -> CODE (loop)

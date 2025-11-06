@@ -39,6 +39,7 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
         workflow_id: None,
         meta_mode: None,
         phase_start_time: Some(chrono::Utc::now().to_rfc3339()),
+        is_handlebars: false,
     }
 }
 

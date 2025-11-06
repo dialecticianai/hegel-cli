@@ -329,6 +329,7 @@ pub fn execute_transition(
                 &current_node,
                 &context.workflow_state.mode,
                 &prompt,
+                context.workflow_state.is_handlebars,
                 storage,
             )?;
         }
@@ -378,7 +379,13 @@ pub fn execute_transition(
                 Theme::highlight(&to_node)
             );
             println!();
-            display_workflow_prompt(&to_node, &context.workflow_state.mode, &prompt, storage)?;
+            display_workflow_prompt(
+                &to_node,
+                &context.workflow_state.mode,
+                &prompt,
+                context.workflow_state.is_handlebars,
+                storage,
+            )?;
         }
 
         TransitionOutcome::InterWorkflow {
@@ -446,7 +453,20 @@ pub fn execute_transition(
                 .get(&to_node)
                 .with_context(|| format!("Node not found: {}", to_node))?;
 
-            display_workflow_prompt(&to_node, &to_workflow, &node.prompt, storage)?;
+            // Select prompt based on which field is present
+            let prompt_text = if !node.prompt_hbs.is_empty() {
+                &node.prompt_hbs
+            } else {
+                &node.prompt
+            };
+
+            display_workflow_prompt(
+                &to_node,
+                &to_workflow,
+                prompt_text,
+                context.workflow_state.is_handlebars,
+                storage,
+            )?;
         }
 
         TransitionOutcome::Ambiguous { options } => {

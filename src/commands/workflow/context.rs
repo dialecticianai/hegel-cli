@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use crate::config::HegelConfig;
-use crate::engine::{render_template, Workflow};
+use crate::engine::{render_prompt, Workflow};
 use crate::storage::{FileStorage, SessionMetadata, WorkflowState};
 use crate::theme::Theme;
 
@@ -40,7 +40,11 @@ pub fn load_workflow_context(storage: &FileStorage) -> Result<WorkflowContext> {
 }
 
 /// Render a workflow node's prompt with guide templates
-pub fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String> {
+pub fn render_node_prompt(
+    prompt: &str,
+    is_handlebars: bool,
+    storage: &FileStorage,
+) -> Result<String> {
     let guides_dir_str = storage.guides_dir();
     let guides_dir = Path::new(&guides_dir_str);
 
@@ -53,7 +57,7 @@ pub fn render_node_prompt(prompt: &str, storage: &FileStorage) -> Result<String>
         context.insert(key, value);
     }
 
-    render_template(prompt, guides_dir, &context)
+    render_prompt(prompt, is_handlebars, guides_dir, &context)
         .with_context(|| "Failed to render prompt template")
 }
 
@@ -62,9 +66,10 @@ pub fn display_workflow_prompt(
     current_node: &str,
     mode: &str,
     prompt: &str,
+    is_handlebars: bool,
     storage: &FileStorage,
 ) -> Result<()> {
-    let rendered_prompt = render_node_prompt(prompt, storage)?;
+    let rendered_prompt = render_node_prompt(prompt, is_handlebars, storage)?;
 
     println!("{}: {}", Theme::label("Mode"), mode);
     println!("{}: {}", Theme::label("Current node"), current_node);

@@ -106,6 +106,12 @@
 
 **ROADMAP policy**: Future-only. Delete completed sections, don't mark them done.
 
+**Document reflection protocol**: After writing large documents (SPEC.md, PLAN.md, README.md, etc.):
+- **IMMEDIATELY** run `hegel reflect <filepath>` to launch review GUI
+- **NEVER** summarize what you wrote in chat - let the user review in the GUI
+- User will add inline comments via GUI if changes needed
+- Check for `.review.*` files after GUI closes for feedback
+
 ---
 
 ## Session Continuity Vectors

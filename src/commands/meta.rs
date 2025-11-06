@@ -51,6 +51,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
             workflow_id: None,
             meta_mode: Some(new_meta_mode),
             phase_start_time: None,
+            is_handlebars: false,
         }),
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
