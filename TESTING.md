@@ -29,10 +29,39 @@ If you need comments to explain what a test does, that’s a design failure: the
   If a comment explains a test, the test’s structure has failed.  
   Rewrite it until it speaks clearly on its own.
 
-- **5. Test failure as dialogue.**  
-  When a test fails, it should read as a coherent sentence:  
-  > “Expected workflow mode to be discovery, found execution.”  
+- **5. Test failure as dialogue.**
+  When a test fails, it should read as a coherent sentence:
+  > "Expected workflow mode to be discovery, found execution."
   Tests are conversations between system and author, not error dumps.
+
+### Test Organization
+
+**Three-tier structure based on scale:**
+
+1. **Inline tests** (`#[cfg(test)] mod tests {}`)
+   - When: File <200 lines total, simple unit tests
+   - Access: Can test private functions
+   - Pattern: `src/engine/template.rs`
+
+2. **Module test directory** (`src/<module>/tests/*.rs`)
+   - When: Module growing, multiple scenarios, >200 line threshold
+   - Access: Tests `pub(crate)` items, not private ones
+   - Pattern: `src/commands/workflow/tests/transitions.rs`
+   - Setup:
+     ```rust
+     // src/<module>/tests/mod.rs
+     mod transitions;
+
+     // src/<module>/mod.rs
+     #[cfg(test)]
+     mod tests;
+     ```
+
+3. **Integration tests** (`tests/` at project root)
+   - When: End-to-end CLI behavior, public API verification
+   - Separate compilation unit, slower builds
+
+**Decision point:** When implementation file exceeds 200 lines, split tests to their own module. This preserves the implementation's readability while allowing test infrastructure to grow.
 
 ### Outcome
 
