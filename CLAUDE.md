@@ -81,6 +81,12 @@
 
 **Scripts over inline commands**: NEVER write multi-line inline shell scripts. Always write to `scripts/` and execute. Check `scripts/` before writing - tool may already exist. Reusable scripts are infrastructure.
 
+**Git commit policy**:
+- **NEVER commit changes unless explicitly instructed in a prompt**
+- Valid triggers:
+  - User directly requests: "commit this", "push that", etc.
+  - Workflow prompt explicitly instructs: "commit your changes", "check git status and commit if needed"
+
 **Build protocol**:
 - **Testing fixes**: `./scripts/build.sh --install --skip-bump` (ALWAYS skip version bump when testing)
 - **Final commit**: `./scripts/build.sh --install` (version bump only for commits)
