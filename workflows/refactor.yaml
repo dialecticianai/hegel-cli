@@ -108,14 +108,24 @@ nodes:
       - Show proposed module names, file structure, and responsibilities
       - Wait for user confirmation before proceeding
       - Execute incrementally, testing after each step
+      - **CRITICAL: Commit after EACH completed step before advancing workflow**
+      - Never batch multiple steps into a single commit
+
+      **Commit workflow:**
+      1. Complete a refactoring step (e.g., "Add function X to module Y")
+      2. Run tests to verify step works
+      3. Commit the step with descriptive message
+      4. Verify user approval before next step
+      5. Repeat for each step
 
       **Success criteria:**
       - All existing tests pass without modification
       - Token overhead reduced through DRY/SoC
       - Code structure more navigable and context-efficient
+      - Each step committed atomically
       - User approves final structure
 
-      Respond when refactoring is complete, all tests pass, and user approves.
+      Respond when refactoring is complete, all tests pass, all steps committed, and user approves.
     transitions:
       - when: "refactor_complete"
         to: code_review
@@ -137,8 +147,15 @@ nodes:
       - Ensure descriptions accurately reflect current code structure
       - Keep descriptions concise (1-3 sentences per file)
       - Follow the code_map_style configured for this project
+      - **CRITICAL: Commit README updates before completing phase**
 
-      Respond when README code map updates are complete.
+      **Completion checklist:**
+      1. Update all relevant README code maps
+      2. Stage and commit README changes with descriptive message
+      3. Verify all refactoring commits are clean and complete
+      4. Confirm user approval
+
+      Respond when README code map updates are complete and committed.
     transitions:
       - when: "code_review_complete"
         to: done
