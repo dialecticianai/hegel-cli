@@ -13,9 +13,11 @@ analyze/
 ├── mod.rs               Module exports
 ├── sections.rs          Rendering sections (brief summary, activity, tokens, transitions, phases, graph)
 ├── repair.rs            Archive repair orchestration (cleanup trait integration, reporting)
-├── cleanup/             Trait-based archive cleanup system (See cleanup/README.md)
 ├── gap_detection.rs     Workflow gap detection (identify and create synthetic cowboy archives)
-└── totals.rs            Cumulative totals rebuilding (sum archive totals, update state)
+├── totals.rs            Cumulative totals rebuilding (sum archive totals, update state)
+│
+├── cleanup/             Trait-based archive cleanup system (See cleanup/README.md)
+└── tests/               Test suites for analyze module (gap_detection coverage)
 ```
 
 ## Key Features
