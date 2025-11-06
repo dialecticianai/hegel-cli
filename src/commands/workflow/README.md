@@ -12,8 +12,8 @@ Implements the workflow command surface (start, next, prev, repeat, restart, abo
 workflow/
 ├── mod.rs               Command handlers (start, next, prev, repeat, restart, abort, status, reset)
 ├── claims.rs            ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
-├── context.rs           WorkflowContext (loading, prompt rendering with guide injection)
-├── transitions.rs       Transition evaluation and execution (Stay/IntraWorkflow/InterWorkflow/Ambiguous)
+├── context.rs           WorkflowContext (loading), render_node_prompt (dual-engine routing), display_workflow_prompt
+├── transitions.rs       Transition evaluation and execution (Stay/IntraWorkflow/InterWorkflow/Ambiguous), is_handlebars propagation
 │
 └── tests/               Modular test structure
     ├── mod.rs           Shared test helpers
@@ -29,4 +29,4 @@ workflow/
 **Claims**: Simple string assertions that trigger transitions (e.g., "spec_complete", "needs_refactor")
 **Context**: Workflow definition + current state + guide/template resolution
 **Transitions**: Four outcomes: Stay (no match), IntraWorkflow (same workflow), InterWorkflow (switch workflows), Ambiguous (multiple matches)
-**Prompt Rendering**: Template expansion with {{GUIDE}} injection and {{?optional}} support
+**Prompt Rendering**: Dual-engine system - Markdown ({{GUIDE}}) or Handlebars ({{> partial}}) based on is_handlebars state flag

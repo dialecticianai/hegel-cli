@@ -29,7 +29,17 @@ storage/
 
 ## State Files
 
-- `state.json` - Current workflow state (workflow, workflow_state, session_metadata)
+- `state.json` - Current workflow state (workflow, workflow_state with is_handlebars flag, session_metadata)
 - `states.jsonl` - State transition event log (timestamped from→to transitions)
 - `hooks.jsonl` - Agent activity log (tool usage, bash commands, file edits)
 - `archives/` - Completed workflow snapshots with aggregated metrics
+
+## WorkflowState Fields
+
+- `current_node` - Current phase in workflow
+- `mode` - Workflow mode (discovery/execution)
+- `history` - Ordered list of visited nodes
+- `workflow_id` - Optional unique identifier for workflow run
+- `meta_mode` - Optional meta-mode wrapper (fork/mirror)
+- `phase_start_time` - RFC3339 timestamp for time-based rules
+- `is_handlebars` - Template engine flag (true = Handlebars, false = Markdown)

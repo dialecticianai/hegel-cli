@@ -16,7 +16,7 @@ Re-exports all public items from submodules for backwards compatibility. Tests c
 
 **Exports**:
 - `test_storage()` - Create temporary test storage
-- `test_workflow_state()` - Create test workflow state with defaults
+- `test_workflow_state()` - Create test workflow state with defaults (is_handlebars=false)
 - `assert_state_eq()` - Deep equality assertion for State objects
 
 **Unused**:
@@ -40,6 +40,9 @@ Re-exports all public items from submodules for backwards compatibility. Tests c
 
 **Exports**:
 - `WorkflowBuilder` - Fluent builder for test workflows
+- `node()` - Create test Node with prompt (prompt_hbs empty by default)
+- `transition()` - Create test Transition
+- `workflow()` - Create test Workflow
 - `setup_workflow_env()` - Setup temp dir + storage with discovery workflow ⚠️ UNUSED
 - `setup_meta_mode_workflows()` - Setup learning + discovery workflows ⚠️ UNUSED
 - `setup_production_workflows()` - Setup execution workflow ⚠️ UNUSED
