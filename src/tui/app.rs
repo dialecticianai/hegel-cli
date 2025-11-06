@@ -30,7 +30,7 @@ impl AppState {
     pub fn new(state_dir: impl AsRef<Path>) -> anyhow::Result<Self> {
         let state_dir = state_dir.as_ref();
         // TUI shows full history including archives
-        let metrics = parse_unified_metrics(state_dir, true)?;
+        let metrics = parse_unified_metrics(state_dir, true, None)?;
 
         // Setup file watcher
         let (tx, rx) = channel();
@@ -68,7 +68,7 @@ impl AppState {
 
         if updated {
             // Reload metrics
-            if let Ok(metrics) = parse_unified_metrics(&self.state_dir, true) {
+            if let Ok(metrics) = parse_unified_metrics(&self.state_dir, true, None) {
                 self.metrics = metrics;
             }
         }

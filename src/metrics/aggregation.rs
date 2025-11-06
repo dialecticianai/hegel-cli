@@ -9,6 +9,7 @@ pub fn build_phase_metrics(
     transitions: &[StateTransitionEvent],
     hook_metrics: &HookMetrics,
     transcript_path: Option<&str>,
+    debug_config: Option<&crate::metrics::DebugConfig>,
 ) -> Result<Vec<PhaseMetrics>> {
     use chrono::DateTime;
 
@@ -58,7 +59,13 @@ pub fn build_phase_metrics(
 
         // Aggregate tokens from transcript for this phase
         let token_metrics = if let Some(transcript_path) = transcript_path {
-            aggregate_tokens_for_phase(transcript_path, &start_time, end_time.as_deref())?
+            aggregate_tokens_for_phase(
+                transcript_path,
+                &start_time,
+                end_time.as_deref(),
+                &phase_name,
+                debug_config,
+            )?
         } else {
             TokenMetrics::default()
         };
@@ -101,11 +108,28 @@ fn aggregate_tokens_for_phase(
     transcript_path: &str,
     start_time: &str,
     end_time: Option<&str>,
+    phase_name: &str,
+    debug_config: Option<&crate::metrics::DebugConfig>,
 ) -> Result<TokenMetrics> {
     use crate::metrics::transcript::TranscriptEvent;
 
     let content = fs::read_to_string(transcript_path)?;
     let mut metrics = TokenMetrics::default();
+
+    // Debug: Check if we should output for this phase
+    let should_debug = debug_config.map_or(false, |cfg| cfg.overlaps(start_time, end_time));
+
+    let mut examined_count = 0;
+    let mut matched_count = 0;
+
+    if should_debug {
+        eprintln!(
+            "\n[DEBUG LIVE] Phase '{}' ({} to {})",
+            phase_name,
+            start_time,
+            end_time.unwrap_or("active")
+        );
+    }
 
     for line in content.lines() {
         if line.trim().is_empty() {
@@ -119,27 +143,62 @@ fn aggregate_tokens_for_phase(
             continue;
         }
 
+        examined_count += 1;
+
         // Check if timestamp is in phase range
-        if let Some(ref timestamp) = event.timestamp {
-            if !is_in_range(timestamp, start_time, end_time) {
+        let event_timestamp = match &event.timestamp {
+            Some(ts) => ts,
+            None => {
+                if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+                    eprintln!("  - Event #{}: NO TIMESTAMP → SKIPPED", examined_count);
+                }
                 continue;
             }
-        } else {
-            continue; // Skip events without timestamps
-        }
+        };
+
+        let in_range = is_in_range(event_timestamp, start_time, end_time);
 
         // Extract token usage
         let usage = event
             .usage
             .or_else(|| event.message.as_ref().and_then(|m| m.usage.clone()));
 
-        if let Some(usage) = usage {
-            metrics.total_input_tokens += usage.input_tokens;
-            metrics.total_output_tokens += usage.output_tokens;
-            metrics.total_cache_creation_tokens += usage.cache_creation_input_tokens.unwrap_or(0);
-            metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
-            metrics.assistant_turns += 1;
+        if in_range {
+            if let Some(usage) = usage {
+                matched_count += 1;
+                metrics.total_input_tokens += usage.input_tokens;
+                metrics.total_output_tokens += usage.output_tokens;
+                metrics.total_cache_creation_tokens +=
+                    usage.cache_creation_input_tokens.unwrap_or(0);
+                metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
+                metrics.assistant_turns += 1;
+
+                if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+                    eprintln!(
+                        "  - Event #{} at {}: {} in + {} out → MATCHED",
+                        examined_count, event_timestamp, usage.input_tokens, usage.output_tokens
+                    );
+                }
+            } else if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+                eprintln!(
+                    "  - Event #{} at {}: NO USAGE DATA → MATCHED (no tokens)",
+                    examined_count, event_timestamp
+                );
+            }
+        } else if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+            eprintln!(
+                "  - Event #{} at {}: OUT OF RANGE → SKIPPED",
+                examined_count, event_timestamp
+            );
         }
+    }
+
+    if should_debug {
+        let total_tokens = metrics.total_input_tokens + metrics.total_output_tokens;
+        eprintln!(
+            "  Summary: examined {} events, matched {}, attributed {} tokens",
+            examined_count, matched_count, total_tokens
+        );
     }
 
     Ok(metrics)
@@ -151,7 +210,7 @@ mod tests {
 
     #[test]
     fn test_phase_metrics_empty_transitions() {
-        let metrics = build_phase_metrics(&[], &HookMetrics::default(), None).unwrap();
+        let metrics = build_phase_metrics(&[], &HookMetrics::default(), None, None).unwrap();
         assert!(metrics.is_empty());
     }
 
@@ -166,7 +225,8 @@ mod tests {
             mode: "discovery".to_string(),
         }];
 
-        let metrics = build_phase_metrics(&transitions, &HookMetrics::default(), None).unwrap();
+        let metrics =
+            build_phase_metrics(&transitions, &HookMetrics::default(), None, None).unwrap();
 
         assert_eq!(metrics.len(), 1);
         assert_eq!(metrics[0].phase_name, "spec");

@@ -111,6 +111,14 @@ enum Commands {
         /// Display all sections in full detail
         #[arg(long)]
         full: bool,
+        /// Debug token attribution for timestamp range (format: START..END in RFC3339)
+        /// Example: 2025-11-04T00:00:00Z..2025-11-05T00:00:00Z
+        /// Shows phase-level summaries of token attribution
+        #[arg(long)]
+        debug: Option<String>,
+        /// Show per-event details in debug output (requires --debug)
+        #[arg(long, requires = "debug")]
+        verbose: bool,
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
@@ -338,6 +346,8 @@ fn main() -> Result<()> {
             phase_breakdown,
             workflow_graph,
             full,
+            debug,
+            verbose,
         } => {
             let options = commands::AnalyzeOptions {
                 export_dot,
@@ -350,6 +360,8 @@ fn main() -> Result<()> {
                 phase_breakdown,
                 workflow_graph,
                 full,
+                debug,
+                verbose,
             };
             commands::analyze_metrics(&storage, options)?;
         }

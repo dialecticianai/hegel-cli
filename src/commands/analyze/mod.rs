@@ -6,7 +6,7 @@ use crate::analyze::sections::{
     render_session, render_state_transitions, render_tokens, render_top_bash_commands,
     render_top_file_modifications, render_workflow_graph, render_workflow_graph_dot,
 };
-use crate::metrics::parse_unified_metrics;
+use crate::metrics::{parse_unified_metrics, DebugConfig};
 use crate::storage::FileStorage;
 use crate::theme::Theme;
 
@@ -21,6 +21,8 @@ pub struct AnalyzeOptions {
     pub phase_breakdown: bool,
     pub workflow_graph: bool,
     pub full: bool,
+    pub debug: Option<String>,
+    pub verbose: bool,
 }
 
 pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result<()> {
@@ -29,8 +31,20 @@ pub fn analyze_metrics(storage: &FileStorage, options: AnalyzeOptions) -> Result
         return repair_archives(storage, options.dry_run || options.json, options.json);
     }
 
+    // Parse debug config if provided
+    let debug_config = if let Some(ref range) = options.debug {
+        Some(DebugConfig::from_range(range, options.verbose)?)
+    } else {
+        None
+    };
+
     // analyze command needs ALL metrics including archives
-    let metrics = parse_unified_metrics(storage.state_dir(), true)?;
+    let metrics = parse_unified_metrics(storage.state_dir(), true, debug_config.as_ref())?;
+
+    // If debug mode is active, skip normal output (debug output already printed)
+    if options.debug.is_some() {
+        return Ok(());
+    }
 
     // Export DOT format if requested
     if options.export_dot {
@@ -102,6 +116,8 @@ mod tests {
             phase_breakdown: false,
             workflow_graph: false,
             full: false,
+            debug: None,
+            verbose: false,
         }
     }
 

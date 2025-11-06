@@ -22,6 +22,60 @@ use std::path::Path;
 
 use crate::storage::FileStorage;
 
+/// Debug configuration for token attribution tracing
+#[derive(Debug, Clone)]
+pub struct DebugConfig {
+    /// Start of timestamp range (RFC3339)
+    pub start: chrono::DateTime<chrono::Utc>,
+    /// End of timestamp range (RFC3339)
+    pub end: chrono::DateTime<chrono::Utc>,
+    /// Show per-event details
+    pub verbose: bool,
+}
+
+impl DebugConfig {
+    /// Parse debug range from string format "START..END"
+    pub fn from_range(range: &str, verbose: bool) -> Result<Self> {
+        let parts: Vec<&str> = range.split("..").collect();
+        if parts.len() != 2 {
+            anyhow::bail!("Debug range must be in format START..END (RFC3339 timestamps)");
+        }
+
+        let start = chrono::DateTime::parse_from_rfc3339(parts[0])?.with_timezone(&chrono::Utc);
+        let end = chrono::DateTime::parse_from_rfc3339(parts[1])?.with_timezone(&chrono::Utc);
+
+        if end <= start {
+            anyhow::bail!("Debug range end must be after start");
+        }
+
+        Ok(Self {
+            start,
+            end,
+            verbose,
+        })
+    }
+
+    /// Check if a timestamp overlaps with the debug range
+    pub fn overlaps(&self, phase_start: &str, phase_end: Option<&str>) -> bool {
+        let phase_start = match chrono::DateTime::parse_from_rfc3339(phase_start) {
+            Ok(ts) => ts.with_timezone(&chrono::Utc),
+            Err(_) => return false,
+        };
+
+        let phase_end = match phase_end {
+            Some(end_str) => match chrono::DateTime::parse_from_rfc3339(end_str) {
+                Ok(ts) => ts.with_timezone(&chrono::Utc),
+                Err(_) => chrono::Utc::now(), // Active phase, use current time
+            },
+            None => chrono::Utc::now(), // Active phase
+        };
+
+        // Check if phase range overlaps with debug range
+        // Overlap if: phase_start < debug_end AND phase_end > debug_start
+        phase_start < self.end && phase_end > self.start
+    }
+}
+
 /// Metrics for a single workflow phase
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhaseMetrics {
@@ -61,6 +115,7 @@ pub struct UnifiedMetrics {
 pub fn parse_unified_metrics<P: AsRef<Path>>(
     state_dir: P,
     include_archives: bool,
+    debug_config: Option<&DebugConfig>,
 ) -> Result<UnifiedMetrics> {
     let state_dir = state_dir.as_ref();
     let hooks_path = state_dir.join("hooks.jsonl");
@@ -134,6 +189,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
         &unified.state_transitions,
         &unified.hook_metrics,
         transcript_path_opt.as_deref(),
+        debug_config,
     )?;
 
     // Merge archived phase metrics with live phase metrics
@@ -161,6 +217,23 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 is_synthetic: archive.is_synthetic,
                 workflow_id: Some(archive.workflow_id.clone()),
             };
+
+            // Debug output for archived phases
+            if let Some(cfg) = debug_config {
+                if cfg.overlaps(&phase.start_time, phase.end_time.as_deref()) {
+                    let total_tokens = phase.token_metrics.total_input_tokens
+                        + phase.token_metrics.total_output_tokens;
+                    eprintln!(
+                        "[DEBUG ARCHIVED] Workflow {} | Phase '{}' ({} to {}): {} tokens (from archive)",
+                        archive.workflow_id,
+                        phase.phase_name,
+                        phase.start_time,
+                        phase.end_time.as_deref().unwrap_or("active"),
+                        total_tokens
+                    );
+                }
+            }
+
             all_phase_metrics.push(phase);
         }
 
@@ -234,7 +307,7 @@ mod tests {
     fn test_phase_metrics_empty_workflow() {
         // No states.jsonl = no phases
         let temp_dir = TempDir::new().unwrap();
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         assert!(metrics.phase_metrics.is_empty());
     }
@@ -250,7 +323,7 @@ mod tests {
         let (_states_temp, states_path) = create_states_file(&states);
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         assert_eq!(metrics.phase_metrics.len(), 1);
         assert_eq!(metrics.phase_metrics[0].phase_name, "spec");
@@ -271,7 +344,7 @@ mod tests {
         let (_states_temp, states_path) = create_states_file(&states);
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         assert_eq!(metrics.phase_metrics.len(), 3);
 
@@ -322,7 +395,7 @@ mod tests {
         let (_hooks_temp, hooks_path) = create_hooks_file(&hooks);
         std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         // spec phase should have 1 bash command, 1 file edit
         assert_eq!(metrics.phase_metrics[0].bash_commands.len(), 1);
@@ -386,7 +459,7 @@ mod tests {
         };
         storage.save(&state).unwrap();
 
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         // spec phase: 2 assistant turns (10:05, 10:10)
         assert_eq!(metrics.phase_metrics[0].token_metrics.assistant_turns, 2);
@@ -433,7 +506,7 @@ mod tests {
         std::fs::copy(&hooks_path, temp_dir.path().join("hooks.jsonl")).unwrap();
 
         // Parse metrics - should use fallback path
-        let metrics = parse_unified_metrics(temp_dir.path(), false).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), false, None).unwrap();
 
         // Verify session metadata was loaded from hooks.jsonl
         assert_eq!(metrics.session_id, Some("fallback-test".to_string()));
@@ -500,7 +573,7 @@ mod tests {
         write_archive(&archive, temp_dir.path()).unwrap();
 
         // Parse metrics - should include archived workflow
-        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true, None).unwrap();
 
         // Verify archived phase included
         assert_eq!(metrics.phase_metrics.len(), 1);
@@ -580,7 +653,7 @@ mod tests {
         }
 
         // Parse metrics - should aggregate both archives
-        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true, None).unwrap();
 
         // Verify both phases included
         assert_eq!(metrics.phase_metrics.len(), 2);
@@ -657,7 +730,7 @@ mod tests {
         std::fs::copy(&states_path, temp_dir.path().join("states.jsonl")).unwrap();
 
         // Parse metrics - should include archived + live
-        let metrics = parse_unified_metrics(temp_dir.path(), true).unwrap();
+        let metrics = parse_unified_metrics(temp_dir.path(), true, None).unwrap();
 
         // Verify both phases included (1 archived + 1 live)
         assert_eq!(metrics.phase_metrics.len(), 2);

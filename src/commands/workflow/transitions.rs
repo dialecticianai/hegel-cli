@@ -265,7 +265,7 @@ pub(crate) fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     let state_dir = storage.state_dir();
 
     // Parse current metrics WITHOUT archives AND git to prevent duplication bug
-    let mut metrics = parse_unified_metrics(state_dir, false)?;
+    let mut metrics = parse_unified_metrics(state_dir, false, None)?;
 
     // Get workflow_id from state
     let state = storage.load()?;
