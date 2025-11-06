@@ -1,3 +1,4 @@
+mod handlebars;
 mod template;
 
 use anyhow::{Context, Result};
@@ -7,6 +8,7 @@ use std::fs;
 use std::path::Path;
 
 use crate::storage::WorkflowState;
+pub use handlebars::render_template_hbs;
 pub use template::render_template;
 
 /// Workflow transition definition

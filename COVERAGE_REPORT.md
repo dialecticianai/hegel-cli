@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-05 20:58
+**Last Updated**: 2025-11-05 22:11
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **82.86%** lines | **82.16%** regions | **83.72%** functions
+**Overall Coverage**: **82.91%** lines | **82.21%** regions | **83.85%** functions
 
 ## Summary
 
 ```
-TOTAL                                         18171              3241    82.16%         958               156    83.72%       11102              1903    82.86%           0                 0         -
+TOTAL                                         18191              3237    82.21%         960               155    83.85%       11116              1900    82.91%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -53,6 +53,7 @@ TOTAL                                         18171              3241    82.16% 
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
+| `src/engine/handlebars.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/engine/mod.rs` | 99.83% | 99.63% | 97.50% | 🟢 Excellent |
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
@@ -83,7 +84,7 @@ TOTAL                                         18171              3241    82.16% 
 | `src/test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/test_helpers/workflow.rs` | 86.11% | 81.44% | 87.50% | 🟡 Good |
 | `src/theme.rs` | 85.71% | 85.94% | 81.82% | 🟡 Good |
-| `src/tui/app.rs` | 87.66% | 87.90% | 87.50% | 🟡 Good |
+| `src/tui/app.rs` | 88.94% | 89.05% | 91.67% | 🟡 Good |
 | `src/tui/mod.rs` | 11.36% | 13.70% | 16.67% | 🔴 Needs Work |
 | `src/tui/tabs/events.rs` | 90.24% | 87.10% | 100.00% | 🟢 Excellent |
 | `src/tui/tabs/files.rs` | 83.93% | 80.37% | 100.00% | 🟡 Good |
@@ -113,6 +114,7 @@ TOTAL                                         18171              3241    82.16% 
 - `src/commands/workflow/claims.rs` - 100.00%
 - `src/commands/workflow/context.rs` - 100.00%
 - `src/config.rs` - 91.67%
+- `src/engine/handlebars.rs` - 100.00%
 - `src/engine/mod.rs` - 99.83%
 - `src/engine/template.rs` - 97.25%
 - `src/guardrails/parser.rs` - 97.78%
@@ -154,7 +156,7 @@ TOTAL                                         18171              3241    82.16% 
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 86.11%
 - `src/theme.rs` - 85.71%
-- `src/tui/app.rs` - 87.66%
+- `src/tui/app.rs` - 88.94%
 - `src/tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
@@ -183,7 +185,7 @@ TOTAL                                         18171              3241    82.16% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 82.86% | ✅ Met |
+| Overall | ≥80% | 82.91% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
