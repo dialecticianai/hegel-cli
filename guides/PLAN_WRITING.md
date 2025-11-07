@@ -20,6 +20,8 @@ Plans describe WHAT to build and WHY, not HOW (that's for the implementation pha
 **Sequence**: Write after SPEC.md, before implementation
 **Context**: Discovery plans are exploratory; Execution plans build incrementally on production codebase
 
+**Scope**: Plans cover implementation only. Do not include manual testing steps or documentation updates (those happen in separate workflow phases).
+
 ---
 
 ## What a PLAN.md Actually Is
@@ -132,6 +134,8 @@ Always check with concrete, objective bullets:
 **❌ Writing code**: No code fences. Period.
 **❌ Writing tests**: Describe what to test, don't write test code.
 **❌ Over-detailing**: High-level only. Developer makes tactical decisions.
+**❌ Manual testing steps**: No "human validation" or "integration testing" steps requiring manual verification.
+**❌ Documentation updates**: No README, CLAUDE.md, or doc file updates. Those happen in separate workflow phases.
 
 ---
 

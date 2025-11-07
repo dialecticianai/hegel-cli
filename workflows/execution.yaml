@@ -21,13 +21,11 @@ nodes:
 
       **CRITICAL - Follow this sequence:**
 
-      1. **Discovery Phase - Ground in actual codebase FIRST**:
-         - Read existing code files for related functionality, types, and APIs
-         - Check testing infrastructure (TESTING.md, test patterns)
-         - Understand module organization and boundaries
-         - Verify what external dependencies already provide (don't reinvent)
-         - Note existing contracts, types, and patterns to match
-         - If unsure about data availability, investigate before assuming
+      1. **Discovery Phase - Orient from documentation, then code**:
+         - Read project documentation for architecture, conventions, patterns, testing infrastructure
+         - Read existing code for related functionality, types, and APIs
+         - Verify what dependencies already provide (don't reinvent)
+         - Understand module boundaries and type placement
          - Document findings: what exists, what needs changing, what's missing
 
       2. **Discuss before writing**:
@@ -73,6 +71,8 @@ nodes:
       - Integration points identified, not over-tested
       - Keep it agile: working code over defensive programming
       - Tests serve development, not audit requirements
+
+      Remember: This plan covers implementation only. Do not include manual testing or documentation update steps - those happen in later workflow phases.
 
       Respond with your completed PLAN.md content.
     transitions:

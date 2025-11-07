@@ -49,30 +49,17 @@ It exists to make implementation falsifiable — to ensure tests and validation 
 
 ## Before Writing: Discovery Phase
 
-**Read the codebase FIRST.** Do not invent data structures or APIs without checking reality.
+**Read documentation first, then code.** Do not invent data structures or APIs without checking reality.
 
 ### Required Research Steps
 
-1. **Existing Code**: Read relevant source files for:
-   - Current types and data structures
-   - Existing APIs and contracts
-   - Module organization and boundaries
-   - Patterns to match or extend
+1. **Documentation**: Orient from project docs (architecture, conventions, patterns, testing infrastructure)
 
-2. **Testing Infrastructure**: Check TESTING.md and test patterns:
-   - What test utilities exist?
-   - How are similar features tested?
-   - Can this be tested autonomously?
+2. **Existing Code**: Read relevant source for types, APIs, module boundaries, patterns to match
 
-3. **Dependencies**: Understand what libraries/modules already provide:
-   - Don't reinvent functionality that exists
-   - Trust existing abstractions
-   - Verify data availability before assuming
+3. **Dependencies**: Understand what libraries/modules provide (don't reinvent)
 
-4. **Architectural Boundaries**: Understand module responsibilities:
-   - Where do types belong?
-   - What's the separation of concerns?
-   - Are there migration constraints (breaking vs. backward compatible)?
+4. **Architectural Boundaries**: Module responsibilities, type placement, migration constraints
 
 ### Document Your Findings
 
