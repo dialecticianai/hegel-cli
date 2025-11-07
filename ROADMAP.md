@@ -139,6 +139,8 @@ hegel fork --agent=codex -- --full-auto "Y"   # Codex with auto-approval
 
 **Goal:** Allow running partial workflow graphs with explicit phase sequences.
 
+**Note:** This extends existing `hegel start <workflow> <node>` behavior (which lets you control the start point) to also control the end point and composition.
+
 **Syntax:**
 ```bash
 hegel start execution spec->plan              # Run spec, then plan, then done

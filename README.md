@@ -10,6 +10,8 @@ A command-line tool for orchestrating Dialectic-Driven Development workflows. He
 
 **Designed for AI agents, ergonomic for humans.** Hegel is primarily an agent-facing CLI that provides deterministic workflow guardrails for AI-assisted development. It's also comfortable for direct human use.
 
+**A swiss army knife for agents**—everything they need to keep themselves on track: workflow state machines, metrics tracking, safety guardrails, AST-based code search, document review, and external agent orchestration.
+
 ## Installation
 
 ```bash
@@ -34,18 +36,6 @@ hegel init
 - **Retrofit** (existing code): Analyzes project structure and creates code maps in README.md files
 - Walks through initialization workflow with prompts for each phase
 
-**Greenfield workflow phases:**
-1. `customize_claude` - Create CLAUDE.md with project conventions
-2. `vision` - Write VISION.md defining product goals
-3. `architecture` - Write ARCHITECTURE.md documenting tech stack
-4. `init_git` - Initialize git repository with initial commit
-
-**Retrofit workflow phases:**
-1. `detect_existing` - Analyze current project structure
-2. `code_map` - Create code maps in README.md files (monolithic or hierarchical based on size)
-3. `integrate_conventions` - Adapt DDD to existing patterns
-4. `git_strategy` - Discuss branching strategy for retrofit
-
 **Configuration:**
 
 Customize initialization behavior:
@@ -65,10 +55,6 @@ hegel config set code_map_style monolithic
 hegel config set use_reflect_gui true
 hegel config set use_reflect_gui false
 ```
-
-**Available config keys:**
-- `code_map_style` - Code map structure: `monolithic` (single README section) or `hierarchical` (per-directory READMEs). Default: `hierarchical`
-- `use_reflect_gui` - Auto-launch GUI for document review after writing docs. Default: `true`
 
 Configuration is persisted to `.hegel/config.toml`.
 
@@ -117,11 +103,11 @@ hegel start research study     # Start directly at study phase
 - Validates node exists and provides helpful error with available nodes
 
 Available workflows:
-- `cowboy` - **DEFAULT** - Minimal overhead for straightforward tasks (just LEXICON guidance)
-- `init-greenfield` - Initialize new DDD project (CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_INIT)
-- `init-retrofit` - Add DDD to existing project (DETECT_EXISTING → CODE_MAP → CUSTOMIZE_CLAUDE → VISION → ARCHITECTURE → GIT_COMMIT)
-- `research` - External knowledge gathering (PLAN → STUDY → ASSESS → QUESTIONS)
-- `discovery` - Optimized for learning density (SPEC → PLAN → CODE → LEARNINGS → README)
+- `cowboy` - **DEFAULT** - Minimal overhead for straightforward tasks
+- `init-greenfield` - Initialize new DDD project
+- `init-retrofit` - Add DDD to existing project
+- `research` - External knowledge gathering
+- `discovery` - Optimized for learning density
 - `execution` - Optimized for production delivery
 - `refactor` - Focused refactoring workflow
 
@@ -149,115 +135,7 @@ Available guides:
   MY_GUIDE.md (local)
 ```
 
-### Customizing Workflows and Guides
-
-Hegel supports user-defined workflows and guides that can extend or override the embedded defaults.
-
-#### Template Engines
-
-Hegel supports two template engines for workflow prompts and guides:
-
-**Markdown templates** (legacy, simple):
-- Files: `*.md` in `guides/` and `guides/templates/`
-- Syntax: `{{GUIDE_NAME}}`, `{{templates/name}}`, `{{variable}}`
-- Use in workflows: `prompt:` field
-- Best for: Simple guide inclusion and variable substitution
-
-**Handlebars templates** (new, expressive):
-- Files: `*.hbs` in `guides/partials/` and `guides/`
-- Syntax: `{{> partial}}`, `{{context.variable}}`, `{{#if (eq ...)}}`, `{{#each}}`
-- Use in workflows: `prompt_hbs:` field
-- Best for: Conditional logic, loops, and dynamic content
-
-**Load precedence:** `guides/partials/*.hbs` > `guides/*.hbs` > `guides/*.md` > `guides/templates/*.md`
-
-This allows gradual migration—new templates can use Handlebars while existing Markdown templates continue working.
-
-**Create custom workflows:**
-```bash
-# Create workflows directory
-mkdir -p .hegel/workflows
-
-# Markdown template example (simple)
-cat > .hegel/workflows/my-workflow.yaml <<EOF
-mode: discovery
-start_node: start
-nodes:
-  start:
-    prompt: "{{MY_GUIDE}}"
-    transitions:
-      - when: done
-        to: done
-  done:
-    transitions: []
-EOF
-
-# Handlebars template example (with conditionals)
-cat > .hegel/workflows/my-workflow.yaml <<EOF
-mode: discovery
-start_node: start
-nodes:
-  start:
-    prompt_hbs: |
-      {{> my_partial}}
-
-      {{#if context.detailed_mode}}
-      Additional detailed instructions here.
-      {{/if}}
-    transitions:
-      - when: done
-        to: done
-  done:
-    transitions: []
-EOF
-
-# Use your custom workflow
-hegel start my-workflow
-```
-
-**Override embedded workflows:**
-```bash
-# Copy embedded workflow to customize it
-# (filesystem versions take priority over embedded)
-cp workflows/discovery.yaml .hegel/workflows/discovery.yaml
-
-# Edit .hegel/workflows/discovery.yaml to customize
-# Hegel will now use your customized version!
-```
-
-**Create custom guides:**
-```bash
-# Create guides directory
-mkdir -p .hegel/guides
-
-# Markdown guide (simple)
-echo "# My Custom Spec Guide" > .hegel/guides/MY_GUIDE.md
-# Reference with {{MY_GUIDE}} in prompt: fields
-
-# Handlebars partial (with logic)
-mkdir -p .hegel/guides/partials
-cat > .hegel/guides/partials/my_partial.hbs <<EOF
-{{#if (eq context.mode "detailed")}}
-Detailed instructions go here.
-{{else}}
-Brief instructions go here.
-{{/if}}
-EOF
-# Reference with {{> my_partial}} in prompt_hbs: fields
-```
-
-**Override embedded guides:**
-```bash
-# Override the default SPEC_WRITING guide (Markdown)
-cp guides/SPEC_WRITING.md .hegel/guides/SPEC_WRITING.md
-# Edit .hegel/guides/SPEC_WRITING.md to match your style
-
-# Override with Handlebars partial (takes precedence)
-cp guides/partials/code_map.hbs .hegel/guides/partials/code_map.hbs
-# Edit .hegel/guides/partials/code_map.hbs for custom logic
-```
-
-**Priority:** Filesystem (`.hegel/`) takes precedence over embedded resources, and Handlebars partials take precedence over Markdown guides, allowing you to customize any aspect of Hegel's workflows.
+**See [CUSTOMIZING.md](CUSTOMIZING.md) for details on creating custom workflows and guides.**
 
 ### Advancing Through Phases
 
@@ -617,6 +495,30 @@ hegel reflect SPEC.md --headless
 - Comments saved to `.ddd/<filename>.review.N`
 - Auto-exit on submit (like `git commit`)
 - Session ID passthrough via `HEGEL_SESSION_ID`
+
+### Multi-Project Dashboard
+
+Manage multiple Hegel projects via web UI (no args) or CLI commands:
+
+```bash
+# Launch web dashboard (auto-opens browser)
+hegel pm
+
+# CLI: Discover projects and print info
+hegel pm discover
+
+# CLI: Run command across all projects
+hegel pm x status
+```
+
+**Powered by [hegel-pm](https://github.com/dialecticianai/hegel-pm)**, a web-based project manager. Requires `hegel-pm` binary built and available (adjacent repo or in PATH).
+
+**Features:**
+- Auto-discover projects with `.hegel/` directories
+- View workflow state and metrics across projects
+- Real-time updates and statistics
+- Run commands across multiple projects (`hegel pm x`)
+- HTTP endpoint benchmarks
 
 ### External Agent Orchestration
 
