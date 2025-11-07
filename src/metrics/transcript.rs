@@ -61,6 +61,8 @@ pub struct TokenMetrics {
 }
 
 /// Parse transcript file and extract token metrics
+// TODO: Investigate if this function is still needed or can be removed
+#[allow(dead_code)]
 pub fn parse_transcript_file<P: AsRef<Path>>(transcript_path: P) -> Result<TokenMetrics> {
     let content = fs::read_to_string(transcript_path.as_ref()).with_context(|| {
         format!(

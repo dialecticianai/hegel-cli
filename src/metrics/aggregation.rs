@@ -129,6 +129,8 @@ fn is_in_range(timestamp: &str, start: &str, end: Option<&str>) -> bool {
 
 /// Aggregate token usage from transcript for a specific phase
 /// Returns (TokenMetrics, examined_count, matched_count)
+// TODO: Investigate if this function is still needed or can be removed
+#[allow(dead_code)]
 fn aggregate_tokens_for_phase(
     transcript_path: &str,
     start_time: &str,

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-06 18:53
+**Last Updated**: 2025-11-07 11:05
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **83.52%** lines | **83.15%** regions | **84.07%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19467              3280    83.15%        1023               163    84.07%       11917              1964    83.52%           0                 0         -
+TOTAL                                         19467              3280    83.15%        1023               163    84.07%       11918              1964    83.52%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -42,7 +42,7 @@ TOTAL                                         19467              3280    83.15% 
 | `src/commands/hook.rs` | 96.64% | 92.78% | 61.54% | 🟢 Excellent |
 | `src/commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
 | `src/commands/init.rs` | 93.44% | 93.56% | 100.00% | 🟢 Excellent |
-| `src/commands/meta.rs` | 64.88% | 70.71% | 83.33% | 🟠 Moderate |
+| `src/commands/meta.rs` | 65.09% | 70.71% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
 | `src/commands/status.rs` | 43.21% | 37.42% | 50.00% | 🟠 Moderate |
@@ -166,7 +166,7 @@ TOTAL                                         19467              3280    83.15% 
 - `src/commands/archive.rs` - 43.35%
 - `src/commands/external_bin.rs` - 53.19%
 - `src/commands/fork/runtime.rs` - 44.20%
-- `src/commands/meta.rs` - 64.88%
+- `src/commands/meta.rs` - 65.09%
 - `src/commands/pm.rs` - 60.00%
 - `src/commands/reflect.rs` - 60.53%
 - `src/commands/status.rs` - 43.21%

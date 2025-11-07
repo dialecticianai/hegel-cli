@@ -40,7 +40,7 @@ pub fn start_workflow(
             if !existing_workflow.is_terminal_node(&existing_ws.current_node) {
                 anyhow::bail!(
                     "Cannot start new workflow: already in workflow '{}' at node '{}'.\n\
-                     Run 'hegel abort' to abandon the current workflow first.",
+                     Report to the user that there is an active workflow and ask how they want to proceed.",
                     existing_ws.mode,
                     existing_ws.current_node
                 );

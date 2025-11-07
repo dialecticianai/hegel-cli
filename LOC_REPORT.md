@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-06 18:53
+**Last Updated**: 2025-11-07 11:06
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 16,119 | 11,281 | 27,400 |
-| **Comments** | 2,383 | - | 2,383 |
+| **Lines** | 16,123 | 11,337 | 27,460 |
+| **Comments** | 2,386 | - | 2,386 |
 | **Blank Lines** | 3,005 | - | 3,005 |
-| **Total Lines** | 21,507 | 11,281 | 32,788 |
-| **Files** | 94 | 60 | 154 |
+| **Total Lines** | 21,514 | 11,337 | 32,851 |
+| **Files** | 94 | 63 | 157 |
 
 **Documentation Ratio**: 0.70 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            94           3005           2383          16119
+Rust                            94           3005           2386          16123
 Markdown                        15            144              0            431
 -------------------------------------------------------------------------------
-SUM:                           109           3149           2383          16550
+SUM:                           109           3149           2386          16554
 -------------------------------------------------------------------------------
 ```
 
@@ -68,7 +68,7 @@ SUM:                           109           3149           2383          16550
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/meta.rs` | 254 | 166 | 88 | 34.6% | ✅ |
+| `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
@@ -95,14 +95,14 @@ SUM:                           109           3149           2383          16550
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
 | `main.rs` | 415 | 14 | 401 | 96.6% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
-| `metrics/aggregation.rs` | 406 | 346 | 60 | 14.8% | ⚠️ Large |
+| `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ⚠️ Large |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
 | `metrics/git.rs` | 497 | 158 | 339 | 68.2% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ (infra) |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ (infra) |
 | `metrics/mod.rs` | 914 | 372 | 542 | 59.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
-| `metrics/transcript.rs` | 257 | 100 | 157 | 61.1% | ✅ |
+| `metrics/transcript.rs` | 259 | 102 | 157 | 60.6% | ✅ |
 | `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
@@ -113,7 +113,7 @@ SUM:                           109           3149           2383          16550
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 794 | 403 | 391 | 49.2% | ✅ (infra) |
-| `test_helpers/archive.rs` | 135 | 135 | 0 | 0.0% | ✅ |
+| `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
 | `test_helpers/metrics.rs` | 326 | 326 | 0 | 0.0% | ✅ (infra) |
@@ -140,28 +140,31 @@ SUM:                           109           3149           2383          16550
 
 | File | Lines |
 |------|-------|
-| `.ddd/feat/analyze_summary_default_PLAN.md` | 175 |
-| `.ddd/feat/analyze_summary_default.md` | 215 |
-| `.ddd/feat/done-node-refactor/PLAN.md` | 84 |
-| `.ddd/feat/done-node-refactor/SPEC.md` | 80 |
-| `.ddd/feat/git-commit-metrics/PLAN.md` | 402 |
-| `.ddd/feat/git-commit-metrics/SPEC.md` | 545 |
-| `.ddd/feat/handlebars_templates/PLAN.md` | 273 |
-| `.ddd/feat/handlebars_templates/SPEC.md` | 366 |
-| `.ddd/feat/log_retention/PLAN.md` | 535 |
-| `.ddd/feat/log_retention/SPEC.md` | 366 |
-| `.ddd/feat/non-phase-commits/PLAN.md` | 374 |
-| `.ddd/feat/non-phase-commits/SPEC.md` | 383 |
+| `.ddd/feat/20251104-1-non_phase_commits/PLAN.md` | 374 |
+| `.ddd/feat/20251104-1-non_phase_commits/SPEC.md` | 383 |
+| `.ddd/feat/20251104-2-done_node_refactor/PLAN.md` | 84 |
+| `.ddd/feat/20251104-2-done_node_refactor/SPEC.md` | 80 |
+| `.ddd/feat/20251104-3-git_commit_metrics/PLAN.md` | 402 |
+| `.ddd/feat/20251104-3-git_commit_metrics/SPEC.md` | 545 |
+| `.ddd/feat/20251104-4-log_retention/PLAN.md` | 535 |
+| `.ddd/feat/20251104-4-log_retention/SPEC.md` | 366 |
+| `.ddd/feat/20251105-handlebars_templates/PLAN.md` | 273 |
+| `.ddd/feat/20251105-handlebars_templates/SPEC.md` | 366 |
+| `.ddd/feat/20251106-analyze_summary/PLAN.md` | 175 |
+| `.ddd/feat/20251106-analyze_summary/SPEC.md` | 215 |
 | `.ddd/PLAN.md` | 210 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
 | `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
 | `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
+| `.ddd/reports/20251010-tui_dep_review.md` | 678 |
 | `.ddd/SPEC.md` | 102 |
 | `CLAUDE.md` | 191 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 214 |
-| `DEP_REVIEW.md` | 678 |
+| `docs/ADVANCED_TOOLS.md` | 90 |
 | `docs/astq_patterns/README.md` | 127 |
+| `docs/CUSTOMIZING.md` | 109 |
+| `docs/GUARDRAILS.md` | 53 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
 | `guides/CLAUDE_CUSTOMIZATION.md` | 312 |
 | `guides/CODE_MAP_WRITING.md` | 152 |
@@ -180,10 +183,10 @@ SUM:                           109           3149           2383          16550
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 224 |
+| `LOC_REPORT.md` | 226 |
 | `METRICS.md` | 258 |
-| `README.md` | 653 |
-| `ROADMAP.md` | 246 |
+| `README.md` | 418 |
+| `ROADMAP.md` | 283 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |

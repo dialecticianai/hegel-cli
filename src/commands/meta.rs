@@ -28,7 +28,8 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
         // Allow changing meta-mode if at a done node or no workflow active
         if workflow_state.current_node != "done" {
             anyhow::bail!(
-                "Cannot change meta-mode while workflow is active. Current: {} ({})\nComplete current workflow or run 'hegel abort' first.",
+                "Cannot change meta-mode while workflow is active. Current: {} ({})\n\
+                 Report to the user that there is an active workflow and ask how they want to proceed.",
                 workflow_state.mode,
                 workflow_state.current_node
             );

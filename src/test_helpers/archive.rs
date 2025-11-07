@@ -51,6 +51,8 @@ impl ArchiveBuilder {
     }
 
     /// Add git commits to the archive
+    // TODO: Investigate if this method is still needed or can be removed
+    #[allow(dead_code)]
     pub fn with_git_commits(mut self, commits: Vec<GitCommit>) -> Self {
         self.git_commits = commits;
         self
