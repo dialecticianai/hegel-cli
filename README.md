@@ -135,7 +135,7 @@ Available guides:
   MY_GUIDE.md (local)
 ```
 
-**See [CUSTOMIZING.md](CUSTOMIZING.md) for details on creating custom workflows and guides.**
+**See [CUSTOMIZING.md](docs/CUSTOMIZING.md) for details on creating custom workflows and guides.**
 
 ### Advancing Through Phases
 
@@ -399,11 +399,11 @@ See `.claude/settings.json` in this repository for an example hook configuration
 
 ## Command Wrapping with Guardrails
 
-**See [GUARDRAILS.md](GUARDRAILS.md) for configuring safety guardrails around dangerous commands.**
+**See [GUARDRAILS.md](docs/GUARDRAILS.md) for configuring safety guardrails around dangerous commands.**
 
 ## Advanced Tools
 
-**See [ADVANCED_TOOLS.md](ADVANCED_TOOLS.md) for AST-based code transformation, document review, multi-project dashboard, and external agent orchestration.**
+**See [ADVANCED_TOOLS.md](docs/ADVANCED_TOOLS.md) for AST-based code transformation, document review, multi-project dashboard, and external agent orchestration.**
 
 ## Contributing
 
