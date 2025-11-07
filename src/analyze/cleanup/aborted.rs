@@ -1,6 +1,7 @@
 use anyhow::Result;
 use std::path::Path;
 
+use crate::engine::is_terminal;
 use crate::storage::archive::{TransitionArchive, WorkflowArchive};
 
 use super::ArchiveCleanup;
@@ -19,11 +20,7 @@ impl ArchiveCleanup for AbortedNodeCleanup {
 
     fn needs_repair(&self, archive: &WorkflowArchive) -> bool {
         // An archive needs repair if it has no terminal transition
-        // Terminal transitions are: to_node = "done" or to_node = "aborted"
-        let has_terminal = archive
-            .transitions
-            .iter()
-            .any(|t| t.to_node == "done" || t.to_node == "aborted");
+        let has_terminal = archive.transitions.iter().any(|t| is_terminal(&t.to_node));
 
         !has_terminal
     }

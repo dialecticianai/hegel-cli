@@ -1,3 +1,4 @@
+use crate::engine::is_terminal;
 use crate::metrics::{PhaseMetrics, UnifiedMetrics, WorkflowDAG};
 use crate::theme::Theme;
 use std::fmt::Display;
@@ -248,7 +249,7 @@ pub fn render_phase_breakdown(phase_metrics: &[PhaseMetrics]) {
     if !phase_metrics.is_empty() {
         println!("{}", Theme::label("Phase Breakdown"));
         for phase in phase_metrics {
-            let is_terminal_node = phase.phase_name == "done" || phase.phase_name == "aborted";
+            let is_terminal_node = is_terminal(&phase.phase_name);
             let status = if phase.end_time.is_none() && !is_terminal_node {
                 Theme::success("active")
             } else if phase.is_synthetic {

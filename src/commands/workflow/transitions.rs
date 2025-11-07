@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use colored::Colorize;
 use std::collections::HashSet;
 
-use crate::engine::get_next_prompt;
+use crate::engine::{get_next_prompt, is_terminal};
 use crate::metamodes::evaluate_workflow_completion;
 use crate::metrics::cowboy::{build_synthetic_cowboy_archive, CowboyActivityGroup};
 use crate::metrics::parse_unified_metrics;
@@ -73,11 +73,14 @@ pub fn evaluate_transition(
         });
     }
 
-    // If we're at a done node with meta-mode, check for workflow transitions
-    if new_state.current_node == "done" {
+    // If we're at a terminal node with meta-mode, check for workflow transitions
+    if is_terminal(&new_state.current_node) {
         if let Some(meta_mode) = &context.workflow_state.meta_mode {
-            let meta_mode_transitions =
-                evaluate_workflow_completion(&meta_mode.name, workflow_mode, "done");
+            let meta_mode_transitions = evaluate_workflow_completion(
+                &meta_mode.name,
+                workflow_mode,
+                &new_state.current_node,
+            );
 
             if let Some(transitions) = meta_mode_transitions {
                 // Single transition option - auto-transition
@@ -417,8 +420,8 @@ pub fn execute_transition(
                 context.workflow_state.workflow_id.as_deref(),
             )?;
 
-            // Archive workflow if transitioning to done
-            if to_node == "done" {
+            // Archive workflow if transitioning to a terminal node
+            if is_terminal(&to_node) {
                 if let Err(e) = archive_and_cleanup(storage) {
                     eprintln!("{} {}", Theme::error("Warning: archiving failed:"), e);
                     eprintln!("Workflow logs preserved for manual inspection.");

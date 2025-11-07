@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-07 12:05
+**Last Updated**: 2025-11-07 17:21
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **83.23%** lines | **82.85%** regions | **83.77%** functions
+**Overall Coverage**: **83.22%** lines | **82.84%** regions | **83.79%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19555              3354    82.85%        1029               167    83.77%       11978              2009    83.23%           0                 0         -
+TOTAL                                         19569              3359    82.84%        1030               167    83.79%       11986              2011    83.22%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -18,7 +18,7 @@ TOTAL                                         19555              3354    82.85% 
 | `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
-| `src/analyze/cleanup/aborted.rs` | 97.30% | 97.42% | 90.91% | 🟢 Excellent |
+| `src/analyze/cleanup/aborted.rs` | 97.22% | 97.42% | 90.91% | 🟢 Excellent |
 | `src/analyze/cleanup/duplicate_cowboy.rs` | 69.94% | 66.98% | 46.15% | 🟠 Moderate |
 | `src/analyze/cleanup/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/analyze/cleanup/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -46,16 +46,16 @@ TOTAL                                         19555              3354    82.85% 
 | `src/commands/meta.rs` | 65.09% | 70.71% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
-| `src/commands/status.rs` | 43.21% | 37.42% | 50.00% | 🟠 Moderate |
+| `src/commands/status.rs` | 44.83% | 37.42% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 100.00% | 93.24% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/mod.rs` | 59.54% | 56.46% | 50.00% | 🟠 Moderate |
-| `src/commands/workflow/transitions.rs` | 86.79% | 82.50% | 62.96% | 🟡 Good |
+| `src/commands/workflow/transitions.rs` | 86.86% | 82.57% | 62.96% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 91.67% | 91.04% | 76.92% | 🟢 Excellent |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
 | `src/engine/handlebars.rs` | 98.31% | 97.26% | 100.00% | 🟢 Excellent |
-| `src/engine/mod.rs` | 99.72% | 99.52% | 97.92% | 🟢 Excellent |
+| `src/engine/mod.rs` | 99.72% | 99.52% | 97.96% | 🟢 Excellent |
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
@@ -101,7 +101,7 @@ TOTAL                                         19555              3354    82.85% 
 - `src/adapters/codex.rs` - 94.43%
 - `src/adapters/cursor.rs` - 93.84%
 - `src/adapters/mod.rs` - 98.91%
-- `src/analyze/cleanup/aborted.rs` - 97.30%
+- `src/analyze/cleanup/aborted.rs` - 97.22%
 - `src/commands/analyze/mod.rs` - 93.50%
 - `src/commands/config.rs` - 91.95%
 - `src/commands/fork/amp.rs` - 100.00%
@@ -150,7 +150,7 @@ TOTAL                                         19555              3354    82.85% 
 - `src/analyze/gap_detection.rs` - 86.03%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
-- `src/commands/workflow/transitions.rs` - 86.79%
+- `src/commands/workflow/transitions.rs` - 86.86%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/embedded.rs` - 82.79%
 - `src/metrics/mod.rs` - 84.74%
@@ -170,7 +170,7 @@ TOTAL                                         19555              3354    82.85% 
 - `src/commands/meta.rs` - 65.09%
 - `src/commands/pm.rs` - 60.00%
 - `src/commands/reflect.rs` - 60.53%
-- `src/commands/status.rs` - 43.21%
+- `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 59.54%
 - `src/main.rs` - 54.35%
 - `src/metrics/aggregation.rs` - 57.91%
@@ -189,7 +189,7 @@ TOTAL                                         19555              3354    82.85% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 83.23% | ✅ Met |
+| Overall | ≥80% | 83.22% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

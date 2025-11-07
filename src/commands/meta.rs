@@ -1,3 +1,4 @@
+use crate::engine::is_terminal;
 use crate::metamodes::{evaluate_workflow_completion, MetaModeDefinition};
 use crate::storage::{FileStorage, MetaMode};
 use crate::theme::Theme;
@@ -25,8 +26,8 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
 
     // Check if already in a workflow
     if let Some(workflow_state) = &state.workflow_state {
-        // Allow changing meta-mode if at a done node or no workflow active
-        if workflow_state.current_node != "done" {
+        // Allow changing meta-mode if at a terminal node or no workflow active
+        if !is_terminal(&workflow_state.current_node) {
             anyhow::bail!(
                 "Cannot change meta-mode while workflow is active. Current: {} ({})\n\
                  Report to the user that there is an active workflow and ask how they want to proceed.",

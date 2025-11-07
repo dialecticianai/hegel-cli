@@ -42,6 +42,20 @@ pub fn render_prompt(
     }
 }
 
+/// Check if a node is a terminal node (workflow completion state)
+///
+/// Terminal nodes are "done" (successful completion) or "aborted" (workflow termination).
+/// These nodes have no outgoing transitions and represent the end of a workflow.
+///
+/// # Arguments
+/// * `node` - The node name to check
+///
+/// # Returns
+/// `true` if the node is terminal, `false` otherwise
+pub fn is_terminal(node: &str) -> bool {
+    node == "done" || node == "aborted"
+}
+
 /// Workflow transition definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Transition {

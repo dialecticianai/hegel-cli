@@ -1,5 +1,6 @@
 use anyhow::Result;
 
+use crate::engine::is_terminal;
 use crate::storage::FileStorage;
 use crate::theme::Theme;
 
@@ -90,8 +91,16 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
 
     let workflow_state = state.workflow_state.as_ref().unwrap();
 
+    // Check if we're in a terminal state (done or aborted)
+    let in_terminal_state = is_terminal(&workflow_state.current_node);
+
     // Build single-line status: <mode> (<meta_mode>) node1->node2->[current]->...
-    print!("{}: ", Theme::label("Hegel"));
+    if in_terminal_state {
+        println!("{}", Theme::secondary("No active workflow"));
+        print!("{} ", Theme::label("Previous workflow:"));
+    } else {
+        print!("{}: ", Theme::label("Hegel"));
+    }
 
     // Workflow mode (highlighted)
     print!("{}", Theme::highlight(&workflow_state.mode));

@@ -3,6 +3,7 @@ use clap::Args;
 use std::collections::HashMap;
 use std::fs;
 
+use crate::engine::is_terminal;
 use crate::metrics::parse_unified_metrics;
 use crate::storage::archive::{write_archive, WorkflowArchive};
 use crate::storage::FileStorage;
@@ -201,7 +202,7 @@ fn identify_workflows(states_path: &std::path::Path) -> Result<HashMap<String, b
             let to_node = event.get("to_node").and_then(|v| v.as_str()).unwrap_or("");
 
             // Mark workflow as completed if it transitioned to a terminal node
-            if to_node == "done" || to_node == "aborted" {
+            if is_terminal(to_node) {
                 workflows.insert(workflow_id.to_string(), true);
             } else {
                 // Mark as incomplete unless already marked as completed

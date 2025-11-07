@@ -1,5 +1,7 @@
 use anyhow::Result;
 
+use crate::engine::is_terminal;
+
 /// Meta-mode transition option
 #[derive(Debug, Clone)]
 pub struct MetaModeTransition {
@@ -54,8 +56,8 @@ pub fn evaluate_workflow_completion(
     current_workflow: &str,
     current_node: &str,
 ) -> Option<Vec<MetaModeTransition>> {
-    // Only evaluate at workflow 'done' nodes
-    if current_node != "done" {
+    // Only evaluate at terminal nodes (done/aborted)
+    if !is_terminal(current_node) {
         return None;
     }
 
