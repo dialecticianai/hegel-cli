@@ -55,7 +55,7 @@ These features have partial implementations marked with `#[allow(dead_code)]` + 
 
 ## Phase 2: Safety and Orchestration
 
-### 2.0 Mode-Specific Subagents
+### 2.1 Mode-Specific Subagents
 
 **Goal:** Integration with platform subagent features (Claude Code Task tool, Cursor agent spawning, etc.)
 
@@ -164,22 +164,59 @@ hegel start discovery exploration->synthesis  # Custom sequences
 - Re-run specific segments without full workflow execution
 - Quick prototyping of new workflow patterns
 
-### 2.4 New Workflow Types
+### 2.4 Project Bootstrapping
 
-**init-scaffold workflow:**
-- **Goal:** Create new projects based on reference project(s)
-- **Use case:** Bootstrap new codebases with proven architecture patterns
+**`hegel seed` command:**
+- **Goal:** Instant project scaffolding with opinionated presets
+- **Type:** Command (not workflow) - zero LLM involvement, pure infrastructure
+- **Use case:** Fast bootstrapping when you want proven defaults, not customization
+- **Syntax:**
+  ```bash
+  hegel seed --preset rust-cli my-tool
+  hegel seed --preset python-mcp my-service
+  hegel seed --preset static-site my-blog
+  ```
+- **Preset categories:**
+  - `rust-cli` - From hegel-cli patterns: pre-commit hooks (rustfmt, coverage, LOC), build scripts with version bumping, test stability checks, metrics generation
+  - `rust-gui-egui` - From hegel-mirror patterns: Same as CLI plus egui/eframe setup, GUI-specific dependencies
+  - `python-mcp` - From ddd-mcp patterns: pytest with coverage, thread-safety tests, velocity analysis, codemap sync checker
+  - `static-site-quartz` - From dialectician.ai patterns: Quartz build pipeline, content aggregation, rsync deployment
+  - `docs-mdbook` - From ddd-book patterns: mdBook setup, pre-commit build/linkcheck, stats generation
+- **Implementation:**
+  - Presets defined as templates in `presets/` directory
+  - Template variables: project name, author, license, language version
+  - File generation: scripts, configs, git hooks, README boilerplate
+  - Foundation: BUILD_TOOLS.md analysis distilled into reusable templates
+- **Philosophy:** Opinionated defaults based on battle-tested patterns. "I've paid the cost of learning why this matters - trust me or use scaffold workflow instead."
+
+**`scaffold` workflow:**
+- **Goal:** LLM-guided project scaffolding with reference analysis and synthesis
+- **Type:** Workflow (with LLM) - slow, flexible, interactive
+- **Use case:** When you need customization, synthesis from multiple references, or architectural guidance
+- **When to use:**
+  - Right after `hegel init` (common case)
+  - Adding new component to existing project
+  - Creating parallel service in monorepo
+  - Bootstrapping toy model during discovery
+  - When presets don't fit your needs
 - **Flow:**
-  1. User provides reference project path(s) or URLs
-  2. Analyze reference structure (directory layout, key files, patterns)
-  3. Generate project scaffold adapted to new context
-  4. Create README, configuration files, initial code structure
-  5. Document architectural decisions and patterns extracted
+  1. User provides reference project path(s), URLs, or describes requirements
+  2. Agent analyzes reference structure (directory layout, key files, build patterns, test strategies)
+  3. Agent asks clarifying questions about tech stack, constraints, preferences
+  4. Generate customized scaffold adapted to context
+  5. Create README, configuration files, initial code structure
+  6. Document architectural decisions and extracted patterns
+  7. Optional: Save as custom preset for future reuse
 - **Key features:**
   - Multi-reference synthesis (combine patterns from multiple sources)
+  - Interactive decision-making (agent asks about trade-offs)
   - Template variable substitution (project name, language, etc.)
   - Dependency version resolution (update to latest compatible)
   - Architecture documentation generation
+  - Custom preset creation from scaffold output
+- **Contrast with seed:**
+  - seed = fast, opinionated, zero LLM ("cargo new" style)
+  - scaffold = slow, flexible, guided synthesis ("design with me" style)
 
 **debug workflow:**
 - **Goal:** Systematic TDD debugging with test-first methodology
@@ -196,8 +233,6 @@ hegel start discovery exploration->synthesis  # Custom sequences
   - Root cause analysis prompts
   - Regression test validation
   - Bug pattern library accumulation
-
-**Implementation priority:** init-scaffold first (higher impact for bootstrapping), debug second (complements existing workflows).
 
 ---
 
