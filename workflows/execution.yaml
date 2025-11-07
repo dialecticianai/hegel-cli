@@ -45,6 +45,7 @@ nodes:
          - Keep it lean: core behavior, key scenarios, working functionality
          - Defer edge cases, performance tuning, advanced features to "Out of Scope"
          - Avoid over-engineering: no security hardening, no premature optimization
+         - **CRITICAL: No implementation samples** - describe behavior in prose, not code snippets
          - Success criteria must be agent-verifiable (tests pass, builds succeed, schemas match)
          - Separate subjective concerns into "Optional Human Testing" section
          - Incorporate insights from codebase review and user discussion
@@ -71,6 +72,12 @@ nodes:
       - Integration points identified, not over-tested
       - Keep it agile: working code over defensive programming
       - Tests serve development, not audit requirements
+
+      **Commit Planning:**
+      - Identify logical commit boundaries as you write steps
+      - Group trivial steps (dependencies, scaffolding, helpers) into single commits
+      - Separate substantial implementation (features, integrations, major refactors) into their own commits
+      - Mark commit boundaries explicitly in the plan with "Commit Point" markers
 
       Remember: This plan covers implementation only. Do not include manual testing or documentation update steps - those happen in later workflow phases.
 

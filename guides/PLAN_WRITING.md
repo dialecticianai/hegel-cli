@@ -87,15 +87,17 @@ A **PLAN.md is high-level prose** describing the development approach step-by-st
 - Focus on interfaces and contracts
 - Cover essential error paths, not hypothetical edge cases
 - Tests should enable forward progress, not block it
-- **Commit after every numbered step** (Red → Green cycle)
 
 ### Commit Discipline
 - Use conventional commit format: `type(scope): subject`
 - Common types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`
-- Include step number in subject: `feat(toy1): complete Step 3 - global state`
+- **Group steps into logical commit units** - avoid cluttering git history with trivial commits
+- Trivial changes (adding dependencies, creating empty files, small config) should be bundled together
+- Substantial implementation (100+ LOC, complete features, significant refactors) can stand alone
+- **Explicitly mark commit boundaries in your plan** using "Commit Point" markers between step groups
 - Discovery mode: scope is toy name (e.g., `feat(toy1):`)
 - Execution mode: scope is feature area (e.g., `feat(auth):`)
-- Commit immediately after completing each step — do not batch
+
 
 ### Test Scope
 - ✅ Test: core features that drive development, essential errors, integration points
