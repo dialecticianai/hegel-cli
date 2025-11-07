@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-07 11:06
+**Last Updated**: 2025-11-07 12:05
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 16,123 | 11,337 | 27,460 |
-| **Comments** | 2,386 | - | 2,386 |
-| **Blank Lines** | 3,005 | - | 3,005 |
-| **Total Lines** | 21,514 | 11,337 | 32,851 |
-| **Files** | 94 | 63 | 157 |
+| **Lines** | 16,212 | 11,368 | 27,580 |
+| **Comments** | 2,412 | - | 2,412 |
+| **Blank Lines** | 3,023 | - | 3,023 |
+| **Total Lines** | 21,647 | 11,368 | 33,015 |
+| **Files** | 95 | 63 | 158 |
 
 **Documentation Ratio**: 0.70 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            94           3005           2386          16123
-Markdown                        15            144              0            431
+Rust                            95           3023           2412          16212
+Markdown                        15            144              0            432
 -------------------------------------------------------------------------------
-SUM:                           109           3149           2386          16554
+SUM:                           110           3167           2412          16644
 -------------------------------------------------------------------------------
 ```
 
@@ -56,7 +56,7 @@ SUM:                           109           3149           2386          16554
 | `commands/archive.rs` | 384 | 295 | 89 | 23.2% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/external_bin.rs` | 91 | 74 | 17 | 18.7% | ✅ |
+| `commands/external_bin.rs` | 175 | 144 | 31 | 17.7% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
 | `commands/fork/cody.rs` | 48 | 21 | 27 | 56.2% | ✅ |
@@ -67,9 +67,10 @@ SUM:                           109           3149           2386          16554
 | `commands/git.rs` | 48 | 0 | 48 | 100.0% | ✅ |
 | `commands/hook.rs` | 236 | 108 | 128 | 54.2% | ✅ |
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
+| `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
-| `commands/mod.rs` | 35 | 35 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 37 | 37 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
 | `commands/status.rs` | 131 | 131 | 0 | 0.0% | ✅ |
@@ -93,7 +94,7 @@ SUM:                           109           3149           2386          16554
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 415 | 14 | 401 | 96.6% | ✅ |
+| `main.rs` | 435 | 14 | 421 | 96.8% | ✅ |
 | `metamodes/mod.rs` | 204 | 99 | 105 | 51.5% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ⚠️ Large |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -158,10 +159,10 @@ SUM:                           109           3149           2386          16554
 | `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
 | `.ddd/reports/20251010-tui_dep_review.md` | 678 |
 | `.ddd/SPEC.md` | 102 |
-| `CLAUDE.md` | 191 |
+| `CLAUDE.md` | 194 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 214 |
-| `docs/ADVANCED_TOOLS.md` | 90 |
+| `COVERAGE_REPORT.md` | 216 |
+| `docs/ADVANCED_TOOLS.md` | 112 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
 | `docs/GUARDRAILS.md` | 53 |
@@ -183,7 +184,7 @@ SUM:                           109           3149           2386          16554
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 306 |
-| `LOC_REPORT.md` | 226 |
+| `LOC_REPORT.md` | 229 |
 | `METRICS.md` | 258 |
 | `README.md` | 418 |
 | `ROADMAP.md` | 283 |
@@ -191,7 +192,7 @@ SUM:                           109           3149           2386          16554
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
 | `src/commands/fork/README.md` | 30 |
-| `src/commands/README.md` | 43 |
+| `src/commands/README.md` | 44 |
 | `src/commands/workflow/README.md` | 32 |
 | `src/engine/README.md` | 38 |
 | `src/guardrails/README.md` | 34 |

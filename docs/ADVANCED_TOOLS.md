@@ -67,6 +67,28 @@ hegel pm x status
 - Run commands across multiple projects (`hegel pm x`)
 - HTTP endpoint benchmarks
 
+## No-Code IDE
+
+Launch Electron-based IDE for AI-first development:
+
+```bash
+# Launch IDE
+hegel ide
+
+# Pass Electron arguments
+hegel ide -- --inspect
+```
+
+**Powered by [hegel-ide](https://github.com/dialecticianai/hegel-ide)**, an Electron-based no-code IDE. Requires `hegel-ide` repo with dependencies installed (adjacent repo or via npx when published).
+
+**Features:**
+- Integrated terminal (xterm.js)
+- Workflow orchestration interface
+- No code editor by design (work at orchestration level)
+- Session ID passthrough via `HEGEL_SESSION_ID`
+
+**Philosophy:** AI handles code generation. Humans orchestrate workflows. No text editor needed.
+
 ## External Agent Orchestration
 
 Detect available agent CLIs for task delegation:

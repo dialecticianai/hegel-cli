@@ -184,6 +184,23 @@ enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// Launch Hegel IDE (Electron-based no-code IDE)
+    ///
+    /// Provides GUI for AI-first development without a code editor:
+    ///   - Integrated terminal with xterm.js
+    ///   - Workflow orchestration interface
+    ///   - No code editing by design (work at orchestration level)
+    ///
+    /// Launch modes:
+    ///   hegel ide           Start IDE
+    ///   hegel ide -- [args] Pass additional arguments to Electron
+    ///
+    /// All arguments are passed through to hegel-ide.
+    Ide {
+        /// Arguments to pass to hegel-ide
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
     /// Run git with guardrails and audit logging
     ///
     /// Guardrails configuration: .hegel/guardrails.yaml
@@ -384,6 +401,9 @@ fn main() -> Result<()> {
         }
         Commands::Pm { args } => {
             commands::run_pm(&args)?;
+        }
+        Commands::Ide { args } => {
+            commands::run_ide(&args)?;
         }
         Commands::Git { args } => {
             commands::run_wrapped_command("git", &args, &storage)?;
