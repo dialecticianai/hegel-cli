@@ -4,13 +4,14 @@ Workflow orchestration command implementations. Handles workflow lifecycle: star
 
 ## Purpose
 
-Implements the workflow command surface (start, next, prev, repeat, restart, abort, status) by coordinating the engine, storage, and rules layers. Evaluates transitions, renders prompts with guide injection, and maintains workflow state.
+Implements the workflow command surface (start, next, prev, repeat, restart, abort, status, stash operations) by coordinating the engine, storage, and rules layers. Evaluates transitions, renders prompts with guide injection, and maintains workflow state. Supports saving and restoring workflow snapshots via stash commands.
 
 ## Structure
 
 ```
 workflow/
-├── mod.rs               Command handlers (start, next, prev, repeat, restart, abort, status, reset)
+├── mod.rs               Command handlers (start, next, prev, repeat, restart, abort, status, reset, stash operations)
+│                        Stash operations: stash_workflow, list_stashes, pop_stash, drop_stash
 ├── claims.rs            ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
 ├── context.rs           WorkflowContext (loading), render_node_prompt (dual-engine routing), display_workflow_prompt
 ├── transitions.rs       Transition evaluation and execution (Stay/IntraWorkflow/InterWorkflow/Ambiguous), is_handlebars propagation
@@ -18,6 +19,7 @@ workflow/
 └── tests/               Modular test structure
     ├── mod.rs           Shared test helpers
     ├── commands.rs      Command tests (start, next, repeat, reset, status, restart)
+    ├── stash.rs         Stash command tests (save, list, pop, drop workflows)
     ├── transitions.rs   Transition and state logging tests
     ├── integration.rs   End-to-end workflow tests
     ├── production.rs    Production workflow validation

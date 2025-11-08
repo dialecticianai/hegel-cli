@@ -10,7 +10,10 @@ Provides reliable local-first persistence for workflow state. Manages `.hegel/st
 
 ```
 storage/
-├── mod.rs               FileStorage (load/save/clear state.json, log_state_transition, parent dir discovery, file locking)
+├── mod.rs               FileStorage (load/save/clear state.json, log_state_transition, stash operations, parent dir discovery, file locking)
+│                        StashEntry struct for workflow stash snapshots
+│
+├── log_cleanup.rs       JSONL log maintenance and cleanup utilities
 │
 └── archive/             Workflow archive storage with pre-computed aggregates
     ├── mod.rs           Core types (WorkflowArchive, PhaseArchive, TokenTotals) + I/O (read/write_archive)
@@ -33,6 +36,7 @@ storage/
 - `states.jsonl` - State transition event log (timestamped from→to transitions)
 - `hooks.jsonl` - Agent activity log (tool usage, bash commands, file edits)
 - `archives/` - Completed workflow snapshots with aggregated metrics
+- `stashes/` - Saved workflow snapshots for later restoration (stash@{0}, stash@{1}, etc.)
 
 ## WorkflowState Fields
 
