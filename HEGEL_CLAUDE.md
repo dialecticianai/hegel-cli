@@ -85,6 +85,39 @@ hegel start execution code      # Start directly at code phase
 - Invalid start node returns error with list of available nodes
 - Prevents accidental loss of workflow progress
 
+### Workflow Stashing
+
+Save and restore workflow snapshots for context switching:
+
+```bash
+hegel stash save -m "message"   # Save current workflow with message
+hegel stash save                # Save without message
+hegel stash list                # List all stashes (newest first)
+hegel stash pop [index]         # Restore stash (defaults to 0) and delete it
+hegel stash drop [index]        # Delete stash without restoring
+```
+
+**Format:** `stash@{0}: execution/code "message" (2 hours ago)`
+
+**Common workflow:**
+```bash
+# Save current work
+hegel stash save -m "feature A in progress"
+
+# Work on something else
+hegel start discovery
+# ... do work ...
+hegel abort
+
+# Resume feature A
+hegel stash pop
+```
+
+**Guardrails:**
+- Cannot stash if no active workflow
+- Cannot pop if workflow is active (must `abort` or `stash` first)
+- Stashes stored in `.hegel/stashes/` with auto-indexing
+
 ### Code Operations
 
 ```bash
@@ -189,7 +222,8 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 ├── hooks.jsonl         # Claude Code events (tool usage, file mods, timestamps)
 ├── states.jsonl        # Workflow transitions (from/to, mode, workflow_id)
 ├── command_log.jsonl   # Wrapped command invocations (success/failure, blocks)
-└── guardrails.yaml     # Command safety rules (patterns, reasons)
+├── guardrails.yaml     # Command safety rules (patterns, reasons)
+└── stashes/            # Workflow snapshots (stash@{0}, stash@{1}, etc.)
 ```
 
 **JSONL format:** One JSON object per line (newline-delimited)
@@ -230,6 +264,9 @@ docker:
 |-------|----------|
 | "No workflow loaded" | `hegel start <workflow>` |
 | "Cannot start workflow while one is active" | `hegel abort` then `hegel start <workflow>` |
+| "No active workflow to stash" | Start a workflow first with `hegel start <workflow>` |
+| "Cannot restore stash: active workflow" | `hegel abort` or `hegel stash save` first |
+| "Stash index N not found" | Check `hegel stash list` for available indices |
 | "Stayed at current node" (unexpected) | Check `hegel status`, verify not at terminal node, use `hegel restart` |
 | "⛔ Command blocked by guardrails" | Review reason, edit `.hegel/guardrails.yaml`, or find alternative |
 
@@ -269,6 +306,12 @@ hegel meta
 # Workflows
 hegel start <cowboy|discovery|execution|research|refactor>
 hegel next|restart|abort|repeat|status|reset
+
+# Stashing
+hegel stash save [-m "message"]
+hegel stash list
+hegel stash pop [index]
+hegel stash drop [index]
 
 # Commands
 hegel git <args>

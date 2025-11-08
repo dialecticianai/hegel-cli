@@ -181,6 +181,54 @@ hegel next needs_refactor        # Custom transition (e.g., in execution workflo
 
 The `next` command automatically infers the happy-path claim (`{current_phase}_complete`) when no claim is provided.
 
+### Stashing Workflows
+
+Temporarily save your current workflow to switch contexts, similar to `git stash`:
+
+```bash
+# Save current workflow with optional message
+hegel stash save -m "fixing auth bug"
+hegel stash save                         # No message
+
+# List all stashes (newest first)
+hegel stash list
+
+# Restore most recent stash and delete it
+hegel stash pop
+
+# Restore specific stash by index
+hegel stash pop 1
+
+# Delete stash without restoring
+hegel stash drop
+hegel stash drop 1                       # Delete specific index
+```
+
+**Stash format:**
+```
+stash@{0}: execution/code "fixing auth bug"  (2 hours ago)
+stash@{1}: discovery/plan (yesterday)
+```
+
+**Common workflow:**
+```bash
+# Working on feature A at execution/code
+hegel stash save -m "feature A in progress"
+
+# Switch to urgent bugfix
+hegel start discovery
+# ... work on bugfix ...
+hegel abort
+
+# Resume feature A
+hegel stash pop
+```
+
+**Guardrails:**
+- Cannot stash if no active workflow
+- Cannot pop stash if workflow is active (must `abort` or `stash` first)
+- Stashes are stored in `.hegel/stashes/` with auto-indexing
+
 ### Checking Status
 
 View your current workflow position:
@@ -210,6 +258,8 @@ Each workflow defines:
 - **Nodes** - Development phases with specific prompts
 - **Transitions** - Rules for moving between phases based on claims
 - **Mode** - Discovery (exploration) or Execution (delivery)
+
+**Workflow snapshots** can be saved to `.hegel/stashes/` for later restoration, enabling context switching between tasks without losing progress.
 
 ## Dialectic-Driven Development
 
