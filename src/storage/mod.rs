@@ -66,6 +66,17 @@ pub struct State {
     pub git_info: Option<GitInfo>,
 }
 
+/// Stash entry structure - stored workflow state for later restoration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StashEntry {
+    pub index: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+    pub timestamp: String,
+    pub workflow: Option<serde_yaml::Value>,
+    pub workflow_state: WorkflowState,
+}
+
 /// File-based state storage
 pub struct FileStorage {
     state_dir: PathBuf,
@@ -347,6 +358,186 @@ impl FileStorage {
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(entries)
+    }
+
+    /// Save current workflow state as a stash
+    pub fn save_stash(&self, message: Option<String>) -> Result<()> {
+        use chrono::Utc;
+
+        // Load current state
+        let state = self.load()?;
+
+        // Validate workflow exists
+        let workflow = state
+            .workflow
+            .as_ref()
+            .context("No active workflow to stash")?;
+
+        let workflow_state = state
+            .workflow_state
+            .as_ref()
+            .context("No active workflow to stash")?;
+
+        // Create stash directory if needed
+        let stash_dir = self.state_dir.join("stashes");
+        fs::create_dir_all(&stash_dir)
+            .with_context(|| format!("Failed to create stash directory: {:?}", stash_dir))?;
+
+        // Generate timestamp for filename
+        let timestamp = Utc::now().to_rfc3339();
+        let filename = format!("{}.json", timestamp.replace(':', "-"));
+        let stash_path = stash_dir.join(&filename);
+
+        // Create stash entry (index will be assigned during reindex)
+        let entry = StashEntry {
+            index: 0, // Placeholder, will be reindexed
+            message,
+            timestamp: timestamp.clone(),
+            workflow: Some(workflow.clone()),
+            workflow_state: workflow_state.clone(),
+        };
+
+        // Write stash file
+        let content = serde_json::to_string_pretty(&entry)
+            .with_context(|| "Failed to serialize stash entry")?;
+        fs::write(&stash_path, content)
+            .with_context(|| format!("Failed to write stash file: {:?}", stash_path))?;
+
+        // Reindex all stashes
+        self.reindex_stashes()?;
+
+        // Clear workflow state (preserve session metadata and other global fields)
+        let cleared_state = State {
+            workflow: None,
+            workflow_state: None,
+            session_metadata: state.session_metadata,
+            cumulative_totals: state.cumulative_totals,
+            git_info: state.git_info,
+        };
+        self.save(&cleared_state)?;
+
+        Ok(())
+    }
+
+    /// List all stashes, sorted newest first
+    pub fn list_stashes(&self) -> Result<Vec<StashEntry>> {
+        let stash_dir = self.state_dir.join("stashes");
+
+        // Return empty vector if directory doesn't exist
+        if !stash_dir.exists() {
+            return Ok(vec![]);
+        }
+
+        // Read all stash files
+        let mut entries = vec![];
+        for entry in fs::read_dir(&stash_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            // Skip non-JSON files
+            if !path.extension().map(|e| e == "json").unwrap_or(false) {
+                continue;
+            }
+
+            // Parse stash entry
+            let content = fs::read_to_string(&path)?;
+            let stash: StashEntry = serde_json::from_str(&content)
+                .with_context(|| format!("Failed to parse stash file: {:?}", path))?;
+
+            entries.push(stash);
+        }
+
+        // Sort by timestamp descending (newest first)
+        entries.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+        Ok(entries)
+    }
+
+    /// Load stash by index
+    pub fn load_stash(&self, index: usize) -> Result<StashEntry> {
+        let stashes = self.list_stashes()?;
+
+        if stashes.is_empty() {
+            anyhow::bail!("No stashes to restore");
+        }
+
+        stashes
+            .into_iter()
+            .find(|s| s.index == index)
+            .with_context(|| {
+                let max_index = self.list_stashes().unwrap().len().saturating_sub(1);
+                format!(
+                    "Stash index {} not found. Available stashes: 0-{}",
+                    index, max_index
+                )
+            })
+    }
+
+    /// Delete stash by index and reindex remaining
+    pub fn delete_stash(&self, index: usize) -> Result<()> {
+        let stash = self.load_stash(index)?;
+
+        // Find and delete the stash file
+        let stash_dir = self.state_dir.join("stashes");
+        for entry in fs::read_dir(&stash_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            if !path.extension().map(|e| e == "json").unwrap_or(false) {
+                continue;
+            }
+
+            let content = fs::read_to_string(&path)?;
+            let file_stash: StashEntry = serde_json::from_str(&content)?;
+
+            if file_stash.timestamp == stash.timestamp {
+                fs::remove_file(&path)
+                    .with_context(|| format!("Failed to delete stash file: {:?}", path))?;
+                break;
+            }
+        }
+
+        // Reindex remaining stashes
+        self.reindex_stashes()?;
+
+        Ok(())
+    }
+
+    /// Reindex all stashes to ensure sequential indices starting from 0
+    fn reindex_stashes(&self) -> Result<()> {
+        let stash_dir = self.state_dir.join("stashes");
+
+        if !stash_dir.exists() {
+            return Ok(());
+        }
+
+        // Load all stashes and sort by timestamp
+        let mut entries = vec![];
+        for entry in fs::read_dir(&stash_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            if !path.extension().map(|e| e == "json").unwrap_or(false) {
+                continue;
+            }
+
+            let content = fs::read_to_string(&path)?;
+            let stash: StashEntry = serde_json::from_str(&content)?;
+
+            entries.push((path, stash));
+        }
+
+        // Sort by timestamp descending (newest first)
+        entries.sort_by(|a, b| b.1.timestamp.cmp(&a.1.timestamp));
+
+        // Update indices and rewrite files
+        for (index, (path, mut stash)) in entries.into_iter().enumerate() {
+            stash.index = index;
+            let content = serde_json::to_string_pretty(&stash)?;
+            fs::write(&path, content)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -790,5 +981,261 @@ mod tests {
         let states_file = temp_dir.path().join("states.jsonl");
         let parsed = read_jsonl_line(&states_file, 0);
         assert!(parsed["workflow_id"].is_null());
+    }
+
+    // ========== Stash Helper Functions ==========
+
+    fn minimal_workflow() -> serde_yaml::Value {
+        serde_yaml::to_value(serde_yaml::Mapping::new()).unwrap()
+    }
+
+    fn stash_count(storage: &FileStorage) -> usize {
+        let stash_dir = storage.state_dir().join("stashes");
+        if !stash_dir.exists() {
+            return 0;
+        }
+        std::fs::read_dir(&stash_dir)
+            .unwrap()
+            .filter(|e| e.is_ok())
+            .count()
+    }
+
+    fn stash_with_message(storage: &FileStorage, message: &str) {
+        let mut state = test_state("plan", "discovery", &["spec", "plan"]);
+        state.workflow = Some(minimal_workflow());
+        storage.save(&state).unwrap();
+        storage.save_stash(Some(message.to_string())).unwrap();
+    }
+
+    fn stash_without_message(storage: &FileStorage) {
+        let mut state = test_state("code", "execution", &["spec", "plan", "code"]);
+        state.workflow = Some(minimal_workflow());
+        storage.save(&state).unwrap();
+        storage.save_stash(None).unwrap();
+    }
+
+    fn assert_stash_has_message(entry: &StashEntry, expected: &str) {
+        assert_eq!(entry.message.as_deref(), Some(expected));
+    }
+
+    fn assert_stash_no_message(entry: &StashEntry) {
+        assert!(entry.message.is_none());
+    }
+
+    // ========== Save Stash Tests ==========
+
+    #[test]
+    fn test_save_stash_creates_file_and_clears_state() {
+        let (_tmp, storage) = test_storage();
+        let mut state = test_state("spec", "discovery", &["spec"]);
+        state.workflow = Some(minimal_workflow());
+        storage.save(&state).unwrap();
+
+        storage.save_stash(Some("test stash".to_string())).unwrap();
+
+        assert_eq!(stash_count(&storage), 1);
+
+        let loaded = storage.load().unwrap();
+        assert!(loaded.workflow_state.is_none());
+        assert!(loaded.workflow.is_none());
+    }
+
+    #[test]
+    fn test_save_stash_with_message() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "fixing bug");
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 1);
+        assert_stash_has_message(&stashes[0], "fixing bug");
+    }
+
+    #[test]
+    fn test_save_stash_without_message() {
+        let (_tmp, storage) = test_storage();
+        stash_without_message(&storage);
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 1);
+        assert_stash_no_message(&stashes[0]);
+    }
+
+    #[test]
+    fn test_save_multiple_stashes_assigns_sequential_indices() {
+        let (_tmp, storage) = test_storage();
+
+        stash_with_message(&storage, "first");
+        stash_with_message(&storage, "second");
+        stash_with_message(&storage, "third");
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 3);
+        assert_eq!(stashes[0].index, 0);
+        assert_eq!(stashes[1].index, 1);
+        assert_eq!(stashes[2].index, 2);
+    }
+
+    #[test]
+    fn test_save_stash_preserves_workflow_state() {
+        let (_tmp, storage) = test_storage();
+        let mut state = test_state("plan", "discovery", &["spec", "plan"]);
+        state.workflow = Some(minimal_workflow());
+        storage.save(&state).unwrap();
+
+        storage.save_stash(None).unwrap();
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes[0].workflow_state.current_node, "plan");
+        assert_eq!(stashes[0].workflow_state.mode, "discovery");
+        assert_eq!(stashes[0].workflow_state.history, vec!["spec", "plan"]);
+    }
+
+    #[test]
+    fn test_save_stash_no_workflow_fails() {
+        let (_tmp, storage) = test_storage();
+
+        let result = storage.save_stash(None);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("No active workflow"));
+    }
+
+    // ========== List Stashes Tests ==========
+
+    #[test]
+    fn test_list_stashes_empty_returns_empty_vec() {
+        let (_tmp, storage) = test_storage();
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 0);
+    }
+
+    #[test]
+    fn test_list_stashes_returns_newest_first() {
+        let (_tmp, storage) = test_storage();
+
+        stash_with_message(&storage, "first");
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        stash_with_message(&storage, "second");
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        stash_with_message(&storage, "third");
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 3);
+        assert_stash_has_message(&stashes[0], "third");
+        assert_stash_has_message(&stashes[1], "second");
+        assert_stash_has_message(&stashes[2], "first");
+    }
+
+    #[test]
+    fn test_list_stashes_includes_timestamp() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "test");
+
+        let stashes = storage.list_stashes().unwrap();
+        use chrono::DateTime;
+        assert!(DateTime::parse_from_rfc3339(&stashes[0].timestamp).is_ok());
+    }
+
+    // ========== Load Stash Tests ==========
+
+    #[test]
+    fn test_load_stash_by_index() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "first");
+        stash_with_message(&storage, "second");
+
+        let stash = storage.load_stash(1).unwrap();
+        assert_stash_has_message(&stash, "first");
+    }
+
+    #[test]
+    fn test_load_stash_invalid_index_fails() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "only one");
+
+        let result = storage.load_stash(5);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Stash index 5 not found"));
+        assert!(err_msg.contains("0-0"));
+    }
+
+    #[test]
+    fn test_load_stash_empty_fails() {
+        let (_tmp, storage) = test_storage();
+
+        let result = storage.load_stash(0);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("No stashes"));
+    }
+
+    // ========== Delete Stash Tests ==========
+
+    #[test]
+    fn test_delete_stash_removes_file() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "to delete");
+
+        assert_eq!(stash_count(&storage), 1);
+        storage.delete_stash(0).unwrap();
+        assert_eq!(stash_count(&storage), 0);
+    }
+
+    #[test]
+    fn test_delete_stash_reindexes_remaining() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "first");
+        stash_with_message(&storage, "second");
+        stash_with_message(&storage, "third");
+
+        storage.delete_stash(1).unwrap();
+
+        let stashes = storage.list_stashes().unwrap();
+        assert_eq!(stashes.len(), 2);
+        assert_eq!(stashes[0].index, 0);
+        assert_eq!(stashes[1].index, 1);
+        assert_stash_has_message(&stashes[0], "third");
+        assert_stash_has_message(&stashes[1], "first");
+    }
+
+    #[test]
+    fn test_delete_stash_invalid_index_fails() {
+        let (_tmp, storage) = test_storage();
+        stash_with_message(&storage, "only one");
+
+        let result = storage.delete_stash(5);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Stash index 5 not found"));
+    }
+
+    // ========== Round-trip Tests ==========
+
+    #[test]
+    fn test_stash_and_restore_preserves_state_exactly() {
+        let (_tmp, storage) = test_storage();
+
+        let mut original = test_state("code", "execution", &["spec", "plan", "code"]);
+        original.workflow = Some(minimal_workflow());
+        storage.save(&original).unwrap();
+        storage
+            .save_stash(Some("round trip test".to_string()))
+            .unwrap();
+
+        let stash = storage.load_stash(0).unwrap();
+
+        let restored = State {
+            workflow: stash.workflow,
+            workflow_state: Some(stash.workflow_state),
+            session_metadata: None,
+            cumulative_totals: None,
+            git_info: None,
+        };
+
+        assert_state_eq(&restored, "code", "execution", &["spec", "plan", "code"]);
     }
 }
