@@ -6,11 +6,15 @@
 
 **Thesis. Antithesis. Synthesis.**
 
-A command-line tool for orchestrating Dialectic-Driven Development workflows. Hegel guides you through structured development cycles with state-based workflow management.
+Workflow orchestration CLI designed for AI agents, ergonomic for humans. Provides deterministic guardrails, metrics tracking, and state management for AI-assisted development.
 
-**Designed for AI agents, ergonomic for humans.** Hegel is primarily an agent-facing CLI that provides deterministic workflow guardrails for AI-assisted development. It's also comfortable for direct human use.
+## Overview
 
-**A swiss army knife for agents**—everything they need to keep themselves on track: workflow state machines, metrics tracking, safety guardrails, AST-based code search, document review, and external agent orchestration.
+Hegel orchestrates AI-assisted development through state-based workflows. Define phases in YAML, advance via CLI commands, track metrics automatically. Everything local—no APIs required.
+
+Works like a state machine: start a workflow, progress through phases, track history. Each phase provides specific prompts and transitions based on completion claims.
+
+Captures development activity from Claude Code hooks, enforces safety guardrails on dangerous commands, and provides AST-based code search and document review tools.
 
 ## Installation
 
