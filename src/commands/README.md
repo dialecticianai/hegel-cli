@@ -27,6 +27,7 @@ commands/
 ├── reflect.rs           Mirror GUI launcher (finds binary, passes files for review)
 ├── pm.rs                Project manager dashboard launcher (wraps hegel-pm binary)
 ├── ide.rs               Hegel IDE launcher (wraps hegel-ide Electron app)
+├── markdown.rs          Markdown file tree visualization (categorizes DDD vs regular docs)
 │
 ├── git.rs               Git wrapper with guardrails (delegates to wrapped.rs)
 ├── wrapped.rs           Generic command wrapper (guardrails evaluation, audit logging)
@@ -39,6 +40,6 @@ commands/
 **Workflow Management**: `workflow/` (start, next, prev, repeat, restart, abort)
 **Meta-Mode**: `meta.rs` (declare learning/standard patterns)
 **Metrics**: `analyze/` (command entry - implementation lives in src/analyze)
-**External Tools**: `astq.rs`, `reflect.rs`, `pm.rs`, `ide.rs`, `fork/` (AST search, doc review, PM dashboard, IDE, agent delegation)
+**External Tools**: `astq.rs`, `reflect.rs`, `pm.rs`, `ide.rs`, `markdown.rs`, `fork/` (AST search, doc review, PM dashboard, IDE, markdown visualization, agent delegation)
 **Safety**: `wrapped.rs`, `git.rs` (command guardrails and audit logging)
 **Setup**: `init.rs`, `hooks_setup.rs` (project initialization, hook configuration)

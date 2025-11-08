@@ -242,6 +242,46 @@ Shows:
 - Current node/phase
 - Full history of nodes visited
 
+### Viewing Markdown Files
+
+Visualize all markdown files in your project with categorization:
+
+```bash
+# Tree view with line counts
+hegel md
+
+# JSON output with full metadata
+hegel md --json
+
+# Exclude DDD artifacts (.ddd/, toys/, HANDOFF.md)
+hegel md --no-ddd
+```
+
+**Categorization:**
+- **DDD Documents**: Files in `.ddd/`, `toys/`, and `HANDOFF.md` (ephemeral)
+- **Other Markdown**: All other `.md` files in the project
+
+**Features:**
+- Respects `.gitignore` rules (except HANDOFF.md is always shown)
+- Themed tree output with line counts
+- JSON mode includes file size, timestamps, and metadata
+- Scans from current directory
+
+**Example output:**
+```
+DDD Documents:
+├── .ddd/
+│   ├── SPEC.md (142 lines)
+│   └── PLAN.md (89 lines)
+└── HANDOFF.md (23 lines) [ephemeral]
+
+Other Markdown:
+├── README.md (234 lines)
+└── guides/
+    ├── SPEC_WRITING.md (187 lines)
+    └── PLAN_WRITING.md (145 lines)
+```
+
 ### Resetting State
 
 Clear all workflow state:
