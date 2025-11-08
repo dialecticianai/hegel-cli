@@ -6,7 +6,9 @@
 
 **Thesis. Antithesis. Synthesis.**
 
-Workflow orchestration CLI designed for AI agents, ergonomic for humans. Provides deterministic guardrails, metrics tracking, and state management for AI-assisted development.
+A command-line tool for orchestrating Dialectic-Driven Development workflows through structured development cycles with state-based workflow management.
+
+**Designed for AI agents, ergonomic for humans.** A swiss army knife for agents—workflow state machines, metrics tracking, safety guardrails, AST-based code search, document review, and external agent orchestration.
 
 ## Overview
 
