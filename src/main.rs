@@ -308,6 +308,25 @@ enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// Display markdown files in tree structure
+    ///
+    /// Scans current directory for markdown files and categorizes them:
+    ///   - DDD artifacts: .ddd/, toys/, HANDOFF.md
+    ///   - Other markdown: all other .md files
+    ///
+    /// Output modes:
+    ///   hegel md            Tree view with line counts
+    ///   hegel md --json     JSON with full metadata
+    ///   hegel md --no-ddd   Exclude DDD artifacts
+    #[command(visible_alias = "markdown")]
+    Md {
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+        /// Exclude DDD artifacts
+        #[arg(long)]
+        no_ddd: bool,
+    },
 }
 
 fn main() -> Result<()> {
@@ -467,6 +486,10 @@ fn main() -> Result<()> {
             args,
         } => {
             commands::handle_fork(agent.as_deref(), prompt.as_deref(), &args)?;
+        }
+        Commands::Md { json, no_ddd } => {
+            let args = commands::MarkdownArgs { json, no_ddd };
+            commands::run_markdown(args)?;
         }
     }
 
