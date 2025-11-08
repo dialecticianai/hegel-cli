@@ -236,6 +236,35 @@ hegel start discovery exploration->synthesis  # Custom sequences
   - Regression test validation
   - Bug pattern library accumulation
 
+### 2.5 Custom Claude Commands Integration
+
+**Goal:** Integrate Hegel commands directly into Claude Code via custom slash command extension.
+
+**Command:** `/hegel` - Intelligent proxy for `hegel` CLI commands
+
+**Implementation plan:**
+1. Implement directly in hegel-cli (this repo) using `.claude/commands/` integration
+2. Parse slash command arguments and route to appropriate `hegel` subcommands
+3. Formalize into `../claude-plugins` for broader distribution and reuse
+
+**Features:**
+- Slash command parsing and routing to `hegel` subcommands
+- Context-aware command suggestions based on current workflow state
+- Workflow state awareness in Claude Code sessions
+- Seamless integration with Claude Code's custom command system
+
+**Use cases:**
+- Run `hegel` commands without leaving Claude Code conversation
+- Provide workflow context to Claude during execution phases
+- Enable Claude to understand and respond to current workflow state
+- Simplify workflow advancement (`/hegel next` instead of typing full command)
+
+**Technical approach:**
+- `.claude/commands/hegel.md` - Command definition with argument parsing
+- Dynamic command generation based on available `hegel` subcommands
+- State injection into Claude context (current phase, workflow, history)
+- Integration with existing hook system for telemetry
+
 ---
 
 ## Phase 3: Experimental Features
