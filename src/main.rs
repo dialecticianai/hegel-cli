@@ -33,6 +33,28 @@ struct Cli {
 }
 
 #[derive(Subcommand)]
+enum StashCommands {
+    /// Save current workflow for later restoration
+    Save {
+        /// Optional message describing the stash
+        #[arg(short, long)]
+        message: Option<String>,
+    },
+    /// List all stashes
+    List,
+    /// Restore stash and delete it
+    Pop {
+        /// Stash index to restore (defaults to 0)
+        index: Option<usize>,
+    },
+    /// Delete stash without restoring
+    Drop {
+        /// Stash index to delete (defaults to 0)
+        index: Option<usize>,
+    },
+}
+
+#[derive(Subcommand)]
 enum Commands {
     /// Initialize project (auto-detects greenfield or retrofit)
     Init {
@@ -74,6 +96,9 @@ enum Commands {
     Reset,
     /// Abort current workflow (clears state)
     Abort,
+    /// Stash workflow operations
+    #[command(subcommand)]
+    Stash(StashCommands),
     /// Handle Claude Code hook events
     Hook {
         /// Hook event name (e.g., PostToolUse, PreToolUse)
@@ -349,6 +374,20 @@ fn main() -> Result<()> {
         Commands::Abort => {
             commands::abort_workflow(&storage)?;
         }
+        Commands::Stash(stash_cmd) => match stash_cmd {
+            StashCommands::Save { message } => {
+                commands::stash_workflow(message, &storage)?;
+            }
+            StashCommands::List => {
+                commands::list_stashes(&storage)?;
+            }
+            StashCommands::Pop { index } => {
+                commands::pop_stash(index.clone(), &storage)?;
+            }
+            StashCommands::Drop { index } => {
+                commands::drop_stash(index.clone(), &storage)?;
+            }
+        },
         Commands::Hook { event_name } => {
             commands::handle_hook(&event_name, &storage)?;
         }

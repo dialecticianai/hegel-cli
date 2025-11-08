@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-07 21:42
+**Last Updated**: 2025-11-07 21:44
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **83.46%** lines | **83.06%** regions | **83.94%** functions
+**Overall Coverage**: **83.41%** lines | **82.98%** regions | **83.94%** functions
 
 ## Summary
 
 ```
-TOTAL                                         20419              3458    83.06%        1077               173    83.94%       12389              2049    83.46%           0                 0         -
+TOTAL                                         20441              3480    82.98%        1077               173    83.94%       12397              2057    83.41%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -59,7 +59,7 @@ TOTAL                                         20419              3458    83.06% 
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `src/main.rs` | 54.35% | 40.66% | 100.00% | 🟠 Moderate |
+| `src/main.rs` | 50.00% | 36.27% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 57.91% | 60.68% | 75.00% | 🟠 Moderate |
 | `src/metrics/cowboy.rs` | 100.00% | 99.42% | 100.00% | 🟢 Excellent |
@@ -172,7 +172,7 @@ TOTAL                                         20419              3458    83.06% 
 - `src/commands/reflect.rs` - 60.53%
 - `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 61.92%
-- `src/main.rs` - 54.35%
+- `src/main.rs` - 50.00%
 - `src/metrics/aggregation.rs` - 57.91%
 
 ### 🔴 Needs Work (<40% lines)
@@ -189,7 +189,7 @@ TOTAL                                         20419              3458    83.06% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 83.46% | ✅ Met |
+| Overall | ≥80% | 83.41% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
