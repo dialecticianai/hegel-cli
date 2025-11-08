@@ -104,3 +104,109 @@ fn test_list_stashes_shows_newest_first() {
     assert_eq!(stashes[0].message.as_deref(), Some("second"));
     assert_eq!(stashes[1].message.as_deref(), Some("first"));
 }
+
+// ========== Pop Command Tests ==========
+
+#[test]
+fn test_pop_restores_workflow_and_deletes_stash() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    next(&storage);
+    stash_active_workflow(&storage, Some("test pop"));
+
+    crate::commands::workflow::pop_stash(None, &storage).unwrap();
+
+    assert_eq!(list_stashes_count(&storage), 0);
+    let state = storage.load().unwrap();
+    assert!(state.workflow.is_some());
+    assert!(state.workflow_state.is_some());
+}
+
+#[test]
+fn test_pop_with_index() {
+    let (_tmp, storage) = setup_workflow_env();
+
+    start(&storage);
+    stash_active_workflow(&storage, Some("first"));
+
+    start(&storage);
+    next(&storage);
+    stash_active_workflow(&storage, Some("second"));
+
+    crate::commands::workflow::pop_stash(Some(1), &storage).unwrap();
+
+    assert_eq!(list_stashes_count(&storage), 1);
+    assert_at(&storage, "spec", "test_mode", &["spec"]);
+}
+
+#[test]
+fn test_pop_with_active_workflow_fails() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    stash_active_workflow(&storage, Some("test"));
+
+    start(&storage);
+
+    let result = crate::commands::workflow::pop_stash(None, &storage);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().to_string().contains("active workflow"));
+}
+
+#[test]
+fn test_pop_invalid_index_fails() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    stash_active_workflow(&storage, Some("only one"));
+
+    let result = crate::commands::workflow::pop_stash(Some(5), &storage);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().to_string().contains("not found"));
+}
+
+#[test]
+fn test_pop_empty_fails() {
+    let (_tmp, storage) = setup_workflow_env();
+
+    let result = crate::commands::workflow::pop_stash(None, &storage);
+    assert!(result.is_err());
+}
+
+// ========== Drop Command Tests ==========
+
+#[test]
+fn test_drop_removes_stash() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    stash_active_workflow(&storage, Some("test drop"));
+
+    crate::commands::workflow::drop_stash(None, &storage).unwrap();
+
+    assert_eq!(list_stashes_count(&storage), 0);
+}
+
+#[test]
+fn test_drop_with_index() {
+    let (_tmp, storage) = setup_workflow_env();
+
+    start(&storage);
+    stash_active_workflow(&storage, Some("first"));
+
+    start(&storage);
+    stash_active_workflow(&storage, Some("second"));
+
+    crate::commands::workflow::drop_stash(Some(1), &storage).unwrap();
+
+    assert_eq!(list_stashes_count(&storage), 1);
+    let stashes = storage.list_stashes().unwrap();
+    assert_eq!(stashes[0].message.as_deref(), Some("second"));
+}
+
+#[test]
+fn test_drop_invalid_index_fails() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    stash_active_workflow(&storage, Some("only one"));
+
+    let result = crate::commands::workflow::drop_stash(Some(5), &storage);
+    assert!(result.is_err());
+}

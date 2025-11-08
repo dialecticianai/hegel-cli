@@ -425,6 +425,97 @@ pub fn list_stashes(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
+/// Pop stash and restore workflow
+pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
+    let index = index.unwrap_or(0);
+
+    // Check for active workflow
+    let state = storage.load()?;
+    if state.workflow.is_some() {
+        anyhow::bail!(
+            "Cannot restore stash: active workflow at '{}/{}'. Run 'hegel abort' or 'hegel stash' first.",
+            state.workflow_state.as_ref().map(|ws| ws.mode.as_str()).unwrap_or("unknown"),
+            state.workflow_state.as_ref().map(|ws| ws.current_node.as_str()).unwrap_or("unknown")
+        );
+    }
+
+    // Load stash
+    let stash = storage.load_stash(index)?;
+
+    // Restore state
+    let restored = State {
+        workflow: stash.workflow,
+        workflow_state: Some(stash.workflow_state.clone()),
+        session_metadata: state.session_metadata,
+        cumulative_totals: state.cumulative_totals,
+        git_info: state.git_info,
+    };
+    storage.save(&restored)?;
+
+    // Delete stash
+    storage.delete_stash(index)?;
+
+    // Display restored workflow prompt
+    let msg_display = match &stash.message {
+        Some(m) => format!(r#" "{}""#, m),
+        None => String::new(),
+    };
+
+    println!(
+        "Restored stash@{{{}}}: {}/{}{}",
+        index, stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+    );
+    println!();
+
+    // Get workflow to display prompt
+    let workflow: crate::engine::Workflow =
+        serde_yaml::from_value(restored.workflow.context("No workflow in restored state")?)?;
+
+    let node = workflow
+        .nodes
+        .get(&stash.workflow_state.current_node)
+        .with_context(|| format!("Node not found: {}", stash.workflow_state.current_node))?;
+
+    let prompt_text = if !node.prompt_hbs.is_empty() {
+        &node.prompt_hbs
+    } else {
+        &node.prompt
+    };
+
+    display_workflow_prompt(
+        &stash.workflow_state.current_node,
+        &stash.workflow_state.mode,
+        prompt_text,
+        stash.workflow_state.is_handlebars,
+        storage,
+    )?;
+
+    Ok(())
+}
+
+/// Drop stash without restoring
+pub fn drop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
+    let index = index.unwrap_or(0);
+
+    // Load stash to show what's being dropped
+    let stash = storage.load_stash(index)?;
+
+    let msg_display = match &stash.message {
+        Some(m) => format!(r#" "{}""#, m),
+        None => String::new(),
+    };
+
+    // Delete stash (skip confirmation in non-interactive mode)
+    storage.delete_stash(index)?;
+
+    println!(
+        "Dropped stash@{{{}}}: {}/{}{}",
+        index, stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+    );
+
+    Ok(())
+}
+
 /// List all available workflows
 pub fn list_workflows(storage: &FileStorage) -> Result<()> {
     use std::collections::HashSet;
