@@ -6,17 +6,19 @@
 
 **Thesis. Antithesis. Synthesis.**
 
-A command-line tool for orchestrating Dialectic-Driven Development workflows through structured development cycles with state-based workflow management.
+Keep your AI coding sessions on track with structured workflows. Hegel guides you and your AI assistant through development cycles—from research to exploration to production delivery.
 
-**Designed for AI agents, ergonomic for humans.** A swiss army knife for agents—workflow state machines, metrics tracking, safety guardrails, AST-based code search, document review, and external agent orchestration.
+**Built for AI agents, great for humans too.** Think of it as a swiss army knife for orchestrating AI development: workflow guardrails, activity tracking, safety checks, document review, and more.
 
 ## Overview
 
-Hegel orchestrates AI-assisted development through state-based workflows. Define phases in YAML, advance via CLI commands, track metrics automatically. Everything local—no APIs required.
+Hegel uses state-based workflows to structure your development process. You define phases in YAML, advance through them with simple CLI commands, and get automatic metrics tracking. Everything runs locally—no API keys or external services needed.
 
-Works like a state machine: start a workflow, progress through phases, track history. Each phase provides specific prompts and transitions based on completion claims.
+It works like a state machine: start a workflow, move through phases, see your history. Each phase gives you specific prompts and knows when you're ready to move forward.
 
-Captures development activity from Claude Code hooks, enforces safety guardrails on dangerous commands, and provides AST-based code search and document review tools.
+The tool implements the Dialectic Driven Development paradigm with three modes: research for learning new domains, discovery for prototyping ideas, and execution for shipping features. The philosophy? Build clarity first—robust specs make code generation fast and reliable. Feels slower upfront, but you skip the costly flailing later.
+
+**Want to learn more?** Join us on [Discord](https://discord.gg/eVGgHAcMGY) to discuss DDD and Hegel with the community, or check out [the DDD book](https://dialecticianai.github.io/ddd-book/) for the full methodology.
 
 ## Installation
 
