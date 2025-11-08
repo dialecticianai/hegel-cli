@@ -137,21 +137,37 @@ pub(super) fn detect_and_archive_cowboy_activity(
         .filter(|a| a.workflow_id.as_str() < current_timestamp && !a.is_synthetic)
         .max_by_key(|a| a.workflow_id.as_str());
 
+    // Parse git commits early to determine gap_start if needed
+    let mut git_commits = vec![];
+    use crate::metrics::git;
+    if git::has_git_repository(state_dir) {
+        let project_root = state_dir.parent().unwrap();
+        git_commits = git::parse_git_commits(project_root, None).unwrap_or_default();
+    }
+
     // Determine the gap we're checking: from previous workflow's end to now
     let gap_start = if let Some(prev) = previous_archive {
         DateTime::parse_from_rfc3339(&prev.completed_at)
             .context("Failed to parse previous workflow completed_at")?
             .with_timezone(&Utc)
     } else {
-        // No previous workflow - gap starts from beginning of time (earliest activity)
-        DateTime::<Utc>::MIN_UTC
+        // No previous workflow - use earliest git commit timestamp
+        // If no commits exist, there's no activity to capture, so return early
+        let earliest_commit = git_commits
+            .iter()
+            .min_by_key(|c| c.timestamp.as_str())
+            .context("No previous workflow and no git commits found - nothing to archive")?;
+
+        DateTime::parse_from_rfc3339(&earliest_commit.timestamp)
+            .context("Failed to parse earliest commit timestamp")?
+            .with_timezone(&Utc)
     };
 
     let gap_end = DateTime::parse_from_rfc3339(current_timestamp)
         .context("Failed to parse current timestamp")?
         .with_timezone(&Utc);
 
-    // Parse current metrics from hooks/transcripts/git (these haven't been deleted yet)
+    // Parse current metrics from hooks/transcripts (these haven't been deleted yet)
     let hooks_path = state_dir.join("hooks.jsonl");
     let mut bash_commands = vec![];
     let mut file_modifications = vec![];
@@ -162,14 +178,6 @@ pub(super) fn detect_and_archive_cowboy_activity(
         let hook_metrics = parse_hooks_file(&hooks_path)?;
         bash_commands = hook_metrics.bash_commands;
         file_modifications = hook_metrics.file_modifications;
-    }
-
-    // Parse git commits
-    let mut git_commits = vec![];
-    use crate::metrics::git;
-    if git::has_git_repository(state_dir) {
-        let project_root = state_dir.parent().unwrap();
-        git_commits = git::parse_git_commits(project_root, None).unwrap_or_default();
     }
 
     // Helper to parse timestamp
