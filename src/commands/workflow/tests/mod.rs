@@ -6,6 +6,7 @@ mod commands;
 mod integration;
 mod node_flow;
 mod production;
+mod stash;
 mod transitions;
 
 // ========== Shared Test Helpers ==========

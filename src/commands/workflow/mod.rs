@@ -353,6 +353,78 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
+/// Stash current workflow with optional message
+pub fn stash_workflow(message: Option<String>, storage: &FileStorage) -> Result<()> {
+    // Save stash via storage layer
+    storage.save_stash(message.clone())?;
+
+    // Display confirmation
+    let stashes = storage.list_stashes()?;
+    let stash = &stashes[0]; // Newest stash is always at index 0
+
+    let msg_display = match &message {
+        Some(m) => format!(r#" "{}""#, m),
+        None => String::new(),
+    };
+
+    println!(
+        "Saved working directory to stash@{{0}}: {}/{}{}",
+        stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+    );
+
+    Ok(())
+}
+
+/// List all stashes
+pub fn list_stashes(storage: &FileStorage) -> Result<()> {
+    let stashes = storage.list_stashes()?;
+
+    if stashes.is_empty() {
+        println!("No stashes found");
+        return Ok(());
+    }
+
+    for stash in stashes {
+        // Format message
+        let msg_display = match &stash.message {
+            Some(m) => format!(r#" "{}""#, m),
+            None => String::new(),
+        };
+
+        // Format relative time
+        use chrono::{DateTime, Utc};
+        let timestamp = DateTime::parse_from_rfc3339(&stash.timestamp)
+            .with_context(|| format!("Invalid timestamp: {}", stash.timestamp))?;
+        let now = Utc::now();
+        let duration = now.signed_duration_since(timestamp);
+
+        let time_ago = if duration.num_seconds() < 60 {
+            "just now".to_string()
+        } else if duration.num_minutes() < 60 {
+            format!("{} minutes ago", duration.num_minutes())
+        } else if duration.num_hours() < 24 {
+            format!("{} hours ago", duration.num_hours())
+        } else if duration.num_days() < 7 {
+            format!("{} days ago", duration.num_days())
+        } else if duration.num_weeks() < 4 {
+            format!("{} weeks ago", duration.num_weeks())
+        } else {
+            format!("{} days ago", duration.num_days())
+        };
+
+        println!(
+            "stash@{{{}}}: {}/{}{}  ({})",
+            stash.index,
+            stash.workflow_state.mode,
+            stash.workflow_state.current_node,
+            msg_display,
+            time_ago
+        );
+    }
+
+    Ok(())
+}
+
 /// List all available workflows
 pub fn list_workflows(storage: &FileStorage) -> Result<()> {
     use std::collections::HashSet;
