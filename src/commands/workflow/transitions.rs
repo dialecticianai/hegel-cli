@@ -121,6 +121,44 @@ pub fn evaluate_transition(
     })
 }
 
+/// Check if there are uncommitted changes in the git repository
+fn has_uncommitted_changes(state_dir: &std::path::Path) -> bool {
+    let project_root = match state_dir.parent() {
+        Some(p) => p,
+        None => return false,
+    };
+
+    let repo = match git2::Repository::open(project_root) {
+        Ok(r) => r,
+        Err(_) => return false,
+    };
+
+    let head = match repo.head() {
+        Ok(h) => h,
+        Err(_) => return false,
+    };
+
+    let head_tree = match head.peel_to_tree() {
+        Ok(t) => t,
+        Err(_) => return false,
+    };
+
+    let mut opts = git2::DiffOptions::new();
+    opts.include_untracked(true);
+
+    let diff = match repo.diff_tree_to_workdir_with_index(Some(&head_tree), Some(&mut opts)) {
+        Ok(d) => d,
+        Err(_) => return false,
+    };
+
+    let stats = match diff.stats() {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+
+    stats.files_changed() > 0
+}
+
 /// Detect cowboy activity between the most recent archived workflow and the given timestamp
 pub(super) fn detect_and_archive_cowboy_activity(
     state_dir: &std::path::Path,
@@ -153,10 +191,10 @@ pub(super) fn detect_and_archive_cowboy_activity(
     } else {
         // No previous workflow - use earliest git commit timestamp
         // If no commits exist, there's no activity to capture, so return early
-        let earliest_commit = git_commits
-            .iter()
-            .min_by_key(|c| c.timestamp.as_str())
-            .context("No previous workflow and no git commits found - nothing to archive")?;
+        let earliest_commit = match git_commits.iter().min_by_key(|c| c.timestamp.as_str()) {
+            Some(commit) => commit,
+            None => return Ok(()), // No previous workflow and no commits - nothing to detect
+        };
 
         DateTime::parse_from_rfc3339(&earliest_commit.timestamp)
             .context("Failed to parse earliest commit timestamp")?
@@ -231,11 +269,11 @@ pub(super) fn detect_and_archive_cowboy_activity(
         })
         .collect();
 
-    // Check if there's ANY activity in the gap
-    let has_activity = !bash_in_gap.is_empty()
-        || !files_in_gap.is_empty()
-        || !commits_in_gap.is_empty()
-        || !transcripts_in_gap.is_empty();
+    // Check if there's git activity (commits OR uncommitted changes)
+    // Bash commands/file mods without commits don't count as real work
+    let has_commits = !commits_in_gap.is_empty();
+    let has_uncommitted = has_uncommitted_changes(state_dir);
+    let has_activity = has_commits || has_uncommitted;
 
     if has_activity {
         // Create ONE cowboy workflow for this gap
