@@ -70,6 +70,8 @@ pub struct Node {
     pub prompt: String,
     #[serde(default)]
     pub prompt_hbs: String,
+    #[serde(default)]
+    pub summary: String,
     pub transitions: Vec<Transition>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub rules: Vec<crate::rules::RuleConfig>,
@@ -1078,6 +1080,7 @@ nodes:
         let node_hbs = Node {
             prompt: String::new(),
             prompt_hbs: "{{> code_map}}".to_string(),
+            summary: String::new(),
             transitions: vec![],
             rules: vec![],
         };

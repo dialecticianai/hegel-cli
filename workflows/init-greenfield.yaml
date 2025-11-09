@@ -4,6 +4,7 @@ start_node: customize_claude
 
 nodes:
   customize_claude:
+    summary: Create CLAUDE.md documenting project-specific conventions and operational patterns.
     prompt: |
       You are initializing a new Dialectic-Driven Development project (Greenfield Mode).
 
@@ -35,6 +36,7 @@ nodes:
         to: vision
 
   vision:
+    summary: Create VISION.md defining product goals, target users, and success criteria.
     prompt: |
       You are in the VISION phase of project initialization (Greenfield Mode).
 
@@ -64,6 +66,7 @@ nodes:
         to: architecture
 
   architecture:
+    summary: Create ARCHITECTURE.md defining tech stack, patterns, and key architectural decisions.
     prompt: |
       You are in the ARCHITECTURE phase of project initialization (Greenfield Mode).
 
@@ -92,6 +95,7 @@ nodes:
         to: git_init
 
   git_init:
+    summary: Initialize git repository and create initial commit with project documentation.
     prompt: |
       Project initialization nearly complete.
 

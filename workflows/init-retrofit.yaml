@@ -4,6 +4,7 @@ start_node: detect_existing
 
 nodes:
   detect_existing:
+    summary: Analyze existing project structure, language, documentation, and conventions.
     prompt: |
       You are retrofitting Dialectic-Driven Development to an existing project.
 
@@ -35,6 +36,7 @@ nodes:
         to: code_map
 
   code_map:
+    summary: Create README code maps documenting existing codebase structure and organization.
     prompt: |
       You are in the CODE_MAP phase (Retrofit Mode).
 
@@ -73,6 +75,7 @@ nodes:
         to: customize_claude
 
   customize_claude:
+    summary: Create CLAUDE.md integrating DDD methodology with existing project conventions.
     prompt: |
       You are in the CLAUDE.md customization phase (Retrofit Mode).
 
@@ -108,6 +111,7 @@ nodes:
         to: vision
 
   vision:
+    summary: Create or formalize VISION.md based on existing project goals and direction.
     prompt: |
       You are in the VISION phase (Retrofit Mode).
 
@@ -141,6 +145,7 @@ nodes:
         to: architecture
 
   architecture:
+    summary: Document existing architecture including tech stack, patterns, and constraints.
     prompt: |
       You are in the ARCHITECTURE phase (Retrofit Mode).
 
@@ -192,6 +197,7 @@ nodes:
         to: git_commit
 
   git_commit:
+    summary: Commit DDD documentation to the repository completing the retrofit.
     prompt: |
       Retrofit initialization nearly complete.
 

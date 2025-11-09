@@ -4,6 +4,7 @@ start_node: review
 
 nodes:
   review:
+    summary: Collaborate with user to identify refactoring targets and analyze DRY/SoC violations.
     prompt: |
       You are in the REVIEW phase of the Refactor workflow.
 
@@ -69,6 +70,7 @@ nodes:
         to: refactor
 
   refactor:
+    summary: Execute refactorings incrementally to maximize token efficiency while preserving functionality.
     prompt: |
       You are in the REFACTOR phase.
 
@@ -134,6 +136,7 @@ nodes:
         to: code_review
 
   code_review:
+    summary: Update README code maps for refactored directories and commit the changes.
     prompt: |
       You are in the CODE_REVIEW phase of the Refactor workflow.
 

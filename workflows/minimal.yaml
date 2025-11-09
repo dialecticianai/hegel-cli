@@ -4,12 +4,14 @@ start_node: spec
 
 nodes:
   spec:
+    summary: Define inputs, outputs, and invariants in a specification document.
     prompt: "Write a SPEC.md defining inputs, outputs, and invariants."
     transitions:
       - when: "spec_complete"
         to: plan
 
   plan:
+    summary: Write an implementation plan with testable steps.
     prompt: "Write a PLAN.md with testable steps."
     transitions:
       - when: "plan_complete"

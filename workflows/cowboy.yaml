@@ -5,6 +5,7 @@ start_node: ride
 
 nodes:
   ride:
+    summary: Execute straightforward tasks with minimal process overhead using LEXICON guidance.
     prompt: |
       You are in COWBOY MODE - minimal process overhead for straightforward tasks.
 

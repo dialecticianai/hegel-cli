@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 16:00
+**Last Updated**: 2025-11-09 17:52
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,867 | 13,414 | 31,281 |
+| **Lines** | 17,871 | 13,414 | 31,285 |
 | **Comments** | 2,587 | - | 2,587 |
 | **Blank Lines** | 3,372 | - | 3,372 |
-| **Total Lines** | 23,826 | 13,414 | 37,240 |
+| **Total Lines** | 23,830 | 13,414 | 37,244 |
 | **Files** | 99 | 70 | 169 |
 
 **Documentation Ratio**: 0.75 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            99           3372           2587          17867
+Rust                            99           3372           2587          17871
 Markdown                        15            147              0            451
 -------------------------------------------------------------------------------
-SUM:                           114           3519           2587          18318
+SUM:                           114           3519           2587          18322
 -------------------------------------------------------------------------------
 ```
 
@@ -90,7 +90,7 @@ SUM:                           114           3519           2587          18318
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 512 | 160 | 352 | 68.8% | ✅ |
-| `engine/mod.rs` | 1,361 | 303 | 1,058 | 77.7% | ⚠️ Large |
+| `engine/mod.rs` | 1,364 | 305 | 1,059 | 77.6% | ⚠️ Large |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
@@ -125,7 +125,7 @@ SUM:                           114           3519           2587          18318
 | `test_helpers/mod.rs` | 22 | 11 | 11 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 68 | 68 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 299 | 299 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/workflow.rs` | 300 | 300 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 403 | 166 | 237 | 58.8% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |

@@ -4,6 +4,7 @@ start_node: spec
 
 nodes:
   spec:
+    summary: Create a lean behavioral contract through collaborative discovery and codebase review.
     prompt: |
       You are in the SPEC phase of Document-Driven Development (Execution Mode).
 
@@ -58,6 +59,7 @@ nodes:
         to: plan
 
   plan:
+    summary: Create a lean TDD-focused implementation plan with identified commit boundaries.
     prompt: |
       You are in the PLAN phase of Document-Driven Development (Execution Mode).
 
@@ -90,6 +92,7 @@ nodes:
         to: code
 
   code:
+    summary: Implement working functionality following the plan with tests that drive development.
     prompt: |
       You are in the CODE phase of Document-Driven Development (Execution Mode).
 
@@ -124,6 +127,7 @@ nodes:
         to: code_review
 
   code_review:
+    summary: Update README code maps for modified directories to reflect current structure.
     prompt: |
       You are in the CODE_REVIEW phase of Document-Driven Development (Execution Mode).
 
@@ -147,6 +151,7 @@ nodes:
         to: readme
 
   readme:
+    summary: Update root README to document the implemented feature while matching existing style.
     prompt: |
       You are in the README phase of Document-Driven Development (Execution Mode).
 

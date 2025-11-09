@@ -4,6 +4,7 @@ start_node: spec
 
 nodes:
   spec:
+    summary: Write a minimal behavioral contract defining inputs, outputs, and test scenarios.
     prompt: |
       You are in the SPEC phase of Dialectic-Driven Development (Discovery Mode).
 
@@ -24,6 +25,7 @@ nodes:
         to: plan
 
   plan:
+    summary: Create a test-driven implementation plan with numbered steps and clear goals.
     prompt: |
       You are in the PLAN phase of Dialectic-Driven Development (Discovery Mode).
 
@@ -47,6 +49,7 @@ nodes:
         to: code
 
   code:
+    summary: Implement the system following TDD, completing one step at a time with commits.
     prompt: |
       You are in the CODE phase of Dialectic-Driven Development (Discovery Mode).
 
@@ -78,6 +81,7 @@ nodes:
         to: learnings
 
   learnings:
+    summary: Extract insights from implementation including what worked, constraints, and pivots.
     prompt: |
       You are in the LEARNINGS phase of Dialectic-Driven Development (Discovery Mode).
 
@@ -101,6 +105,7 @@ nodes:
         to: spec
 
   readme:
+    summary: Create a concise README summarizing the toy model for future AI context refresh.
     prompt: |
       You are in the README phase of Dialectic-Driven Development (Discovery Mode).
 

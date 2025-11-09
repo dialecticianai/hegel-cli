@@ -4,6 +4,7 @@ start_node: plan
 
 nodes:
   plan:
+    summary: Define research priorities and scope for knowledge gathering.
     prompt: |
       You are in the PLANNING phase of Research Mode (Dialectic-Driven Development).
 
@@ -19,6 +20,7 @@ nodes:
         to: study
 
   study:
+    summary: Study external sources systematically and synthesize insights into learning documents.
     prompt: |
       You are in the STUDY phase of Research Mode (Dialectic-Driven Development).
 
@@ -54,6 +56,7 @@ nodes:
         to: study
 
   assess:
+    summary: Reflect on learning progress, insights gained, and decisions made during study.
     prompt: |
       You are in the ASSESSMENT phase of Research Mode (Dialectic-Driven Development).
 
@@ -85,6 +88,7 @@ nodes:
         to: study
 
   questions:
+    summary: Catalogue open questions discovered during research as a bridge to Discovery mode.
     prompt: |
       You are in the QUESTIONS phase of Research Mode (Dialectic-Driven Development).
 

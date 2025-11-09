@@ -14,7 +14,7 @@ fn test_discovery_workflow_loads_with_rules() {
 
     // Verify code node has rules
     let code_node = &workflow.nodes["code"];
-    assert_eq!(code_node.rules.len(), 3);
+    assert_eq!(code_node.rules.len(), 4);
 }
 
 #[test]
@@ -27,9 +27,9 @@ fn test_execution_workflow_loads_with_rules() {
     let workflow = load_workflow(&workflow_path).unwrap();
     assert_eq!(workflow.mode, "execution");
 
-    // Verify code node has rules (4 rules including phase_timeout)
+    // Verify code node has rules (5 rules including require_commits and phase_timeout)
     let code_node = &workflow.nodes["code"];
-    assert_eq!(code_node.rules.len(), 4);
+    assert_eq!(code_node.rules.len(), 5);
 }
 
 #[test]
