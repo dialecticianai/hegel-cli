@@ -20,7 +20,12 @@ Plans describe WHAT to build and WHY, not HOW (that's for the implementation pha
 **Sequence**: Write after SPEC.md, before implementation
 **Context**: Discovery plans are exploratory; Execution plans build incrementally on production codebase
 
-**Scope**: Plans cover implementation only. Do not include manual testing steps or documentation updates (those happen in separate workflow phases).
+**Scope**: Plans are 100% agent-facing implementation plans. Do not include:
+- Manual testing steps (human validation, browser testing, etc.)
+- Documentation updates (README, CLAUDE.md, etc. - those happen in separate workflow phases)
+- Any steps requiring human intervention
+
+Plans describe only what the AI agent will implement and verify programmatically (tests, builds, automated checks).
 
 ---
 
@@ -120,12 +125,16 @@ Break implementation into minimal units:
     4. Error handling
 
 ### Success Criteria
-Always check with concrete, objective bullets:
+Always check with concrete, objective, **agent-verifiable** bullets:
 
 - Module initializes cleanly
 - Operations produce expected output
 - Errors raised for invalid input
 - Test suite passes
+- Build succeeds with no warnings
+
+Success criteria must be verifiable by the agent through automated means (tests, builds, compiler checks).
+No subjective criteria like "code is readable" or "design feels clean".
 
 **Note:** Use plain bullets, not checkboxes `[ ]`. PLANs are frozen artifacts, not tracking documents.  
 
@@ -136,8 +145,9 @@ Always check with concrete, objective bullets:
 **❌ Writing code**: No code fences. Period.
 **❌ Writing tests**: Describe what to test, don't write test code.
 **❌ Over-detailing**: High-level only. Developer makes tactical decisions.
-**❌ Manual testing steps**: No "human validation" or "integration testing" steps requiring manual verification.
+**❌ Manual testing steps**: Plans are 100% agent-executable. No human validation, browser testing, or manual verification steps.
 **❌ Documentation updates**: No README, CLAUDE.md, or doc file updates. Those happen in separate workflow phases.
+**❌ Human intervention steps**: No "review", "manually check", "verify in browser", or any steps requiring human action.
 
 ---
 

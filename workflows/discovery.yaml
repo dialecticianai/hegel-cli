@@ -39,6 +39,9 @@ nodes:
       - Success criteria for each step
 
       Respond with your completed PLAN.md content.
+    rules:
+      - type: require_commits
+        lookback_phases: 2
     transitions:
       - when: "plan_complete"
         to: code
@@ -58,6 +61,8 @@ nodes:
 
       Respond when code is complete and all tests pass.
     rules:
+      - type: require_commits
+        lookback_phases: 1
       - type: repeated_command
         pattern: "cargo (build|check|test)"
         threshold: 6
@@ -141,6 +146,9 @@ nodes:
       Write the README summarizing what was built and key learnings.
 
       Respond with your completed README.md content.
+    rules:
+      - type: require_commits
+        lookback_phases: 2
     transitions:
       - when: "readme_complete"
         to: done

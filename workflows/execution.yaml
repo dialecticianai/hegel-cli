@@ -82,6 +82,9 @@ nodes:
       Remember: This plan covers implementation only. Do not include manual testing or documentation update steps - those happen in later workflow phases.
 
       Respond with your completed PLAN.md content.
+    rules:
+      - type: require_commits
+        lookback_phases: 2
     transitions:
       - when: "plan_complete"
         to: code
@@ -102,6 +105,8 @@ nodes:
 
       Respond when code is complete and all tests pass.
     rules:
+      - type: require_commits
+        lookback_phases: 1
       - type: repeated_command
         pattern: "cargo (build|check|test)"
         threshold: 5
@@ -183,6 +188,9 @@ nodes:
       - Integration points (if new integrations added)
 
       Respond when the README.md has been updated.
+    rules:
+      - type: require_commits
+        lookback_phases: 2
     transitions:
       - when: "readme_complete"
         to: done

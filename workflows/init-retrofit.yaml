@@ -217,6 +217,9 @@ nodes:
       - If on feature branch: consider creating PR for team review"
 
       Respond when git commit is complete.
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: git_commit_complete
         to: done

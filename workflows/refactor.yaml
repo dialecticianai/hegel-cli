@@ -126,6 +126,9 @@ nodes:
       - User approves final structure
 
       Respond when refactoring is complete, all tests pass, all steps committed, and user approves.
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: "refactor_complete"
         to: code_review
@@ -156,6 +159,9 @@ nodes:
       4. Confirm user approval
 
       Respond when README code map updates are complete and committed.
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: "code_review_complete"
         to: done

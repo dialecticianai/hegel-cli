@@ -11,6 +11,9 @@ nodes:
 
       Your task: Define research priorities and scope.
       {{?context_note}}
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: "plan_complete"
         to: study
@@ -40,6 +43,8 @@ nodes:
 
       Respond when you've completed a study priority/phase and are ready to assess.
     rules:
+      - type: require_commits
+        lookback_phases: 1
       - type: token_budget
         max_tokens: 15000
     transitions:
@@ -105,6 +110,9 @@ nodes:
       This document is the bridge: Research → Discovery.
 
       Respond with your completed/updated questions document.
+    rules:
+      - type: require_commits
+        lookback_phases: 2
     transitions:
       - when: "questions_complete"
         to: done

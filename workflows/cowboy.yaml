@@ -13,6 +13,9 @@ nodes:
       Execute the user's request following the guidance vectors above.
 
       When done, summarize what you accomplished.
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: ride_complete
         to: done

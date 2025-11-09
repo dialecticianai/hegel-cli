@@ -113,6 +113,9 @@ nodes:
       - Run 'hegel start discovery' to begin first feature exploration"
 
       Respond when git initialization is complete.
+    rules:
+      - type: require_commits
+        lookback_phases: 1
     transitions:
       - when: git_init_complete
         to: done
