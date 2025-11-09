@@ -7,17 +7,17 @@
 **Scope:**
 - Add RequireCommits variant to RuleConfig enum
 - Extend HegelConfig with commit_guard and use_git fields
-- Modify RuleEvaluationContext to provide full phase array
-- Add force flag with optional rule type filtering
+- Extend RuleEvaluationContext with full phase array, config, and git_info
+- Add force flag with optional rule type filtering to CLI
 - Validate lookback_phases >= 1
 
 **Priorities:**
-1. Core rule evaluation (commits present/absent)
-2. Config integration (global toggle, git override)
-3. Force bypass (all rules vs specific type)
-4. Existing rule updates (context change)
+1. Core rule evaluation (commits present/absent via lookback)
+2. Context enrichment (config and git_info for skip logic)
+3. Force bypass (filter rules before evaluation)
+4. Existing rule updates (context field changes)
 
-**Methodology:** TDD for rule evaluation logic, integration tests for CLI and config. Test core behavior, skip hypothetical edge cases.
+**Methodology:** TDD for rule evaluation logic. Use existing test helpers (test_phase_metrics_with, test_git_commit). Test core behavior, skip hypothetical edge cases.
 
 ---
 
@@ -35,54 +35,74 @@ Describe test strategy for rule type addition:
 - Test validate allows large values like 999
 - Test serialization roundtrip preserves lookback_phases
 
+Follow existing test pattern from RepeatedCommand variant tests.
+
 ### Step 1.b: Implement
 
 Add RequireCommits variant to RuleConfig enum in src/rules/types.rs:
 - Add variant with lookback_phases usize field
-- Implement validate method checking lookback_phases >= 1
-- Add test module following existing pattern from RepeatedCommand tests
-- Update RuleConfig validate match arm to call new validation
+- Add RequireCommits arm to validate method checking lookback_phases >= 1
+- Add test module following existing pattern
+- Error message format: "require_commits.lookback_phases must be >= 1"
 
 ### Success Criteria
 
 - RuleConfig deserializes require_commits from YAML
-- Validation rejects lookback_phases == 0
-- Validation accepts lookback_phases from 1 to 999
-- Serialization roundtrip works correctly
-- Tests pass for new variant
+- Validation rejects lookback_phases == 0 with clear error
+- Validation accepts lookback_phases from 1 to 999+
+- Serialization roundtrip preserves value
+- Tests follow existing patterns (no new test infrastructure needed)
 
 **Commit Point:** `feat(rules): add RequireCommits rule type with validation`
 
 ---
 
-## Step 2: Update RuleEvaluationContext
+## Step 2: Extend RuleEvaluationContext
 
 ### Goal
-Change context from single phase to full phase array to enable lookback.
+Add full phase array, config, and git_info to context for lookback and skip logic.
 
 ### Step 2.a: Write Tests
 
 Describe test strategy for context changes:
-- Test existing rules (repeated_command, phase_timeout, etc.) still work with new context structure
-- Test rules can find current phase in array
+- Test existing rules still work with all_phase_metrics array (find current phase)
 - Test rules handle empty phase array gracefully
+- Test config and git_info accessible from context
+- No new helpers needed - update existing ctx_with_cmds, ctx_with_edits, ctx_with_phase patterns
 
 ### Step 2.b: Implement
 
-Update RuleEvaluationContext structure in src/rules/types.rs:
-- Change phase_metrics from Option single phase to all_phase_metrics slice
-- Update all rule evaluators in src/rules/evaluator.rs to find current phase in array
-- Update context construction in src/engine/mod.rs to pass full phase array
-- Fix compilation errors in existing rule evaluation functions
+Update RuleEvaluationContext in src/rules/types.rs:
+- Change phase_metrics from Option single to all_phase_metrics slice
+- Add config field (reference to HegelConfig)
+- Add git_info field (Option reference to GitInfo)
+- Update doc comments
+
+Update all rule evaluators in src/rules/evaluator.rs:
+- Find current phase in all_phase_metrics array by matching current_phase name
+- Update repeated_command, repeated_file_edit, phase_timeout, token_budget evaluators
+- Use find to locate current phase where phase_name matches current_phase
+
+Update context construction in src/engine/mod.rs (line 227 area):
+- Load config: HegelConfig::load(state_dir)
+- Load state to get git_info
+- Pass full metrics.phase_metrics slice instead of single phase
+- Pass config and git_info references
+
+Update test helper functions in src/rules/evaluator.rs tests:
+- ctx_with_cmds, ctx_with_edits, ctx_with_phase to create full phase array
+- Use test_phase_metrics_with(true) for minimal phases
+- Add config and git_info (can use defaults initially)
 
 ### Success Criteria
 
-- RuleEvaluationContext has all_phase_metrics field
-- Existing rules compile and pass tests
-- Context construction passes full metrics array
+- RuleEvaluationContext has three new/changed fields
+- All existing rules compile and pass tests
+- Context construction in engine loads config and state
 - No regressions in existing rule behavior
+- Test helpers updated to use phase array pattern
 
-**Commit Point:** `refactor(rules): update context to provide full phase array`
+**Commit Point:** `refactor(rules): extend context with phase array, config, git_info`
 
 ---
 
@@ -94,33 +114,45 @@ Core logic to check for commits in lookback window.
 ### Step 3.a: Write Tests
 
 Describe test strategy for commit checking:
-- Test with commits present in current phase returns no violation
-- Test with no commits in current phase returns violation
-- Test lookback_phases equals 2 combines two phases
-- Test lookback exceeding available phases uses all available
-- Test empty git_commits vector triggers violation
-- Test violation message includes lookback count
+- Use test_git_commit helper from test_helpers/archive.rs
+- Use test_phase_metrics_with to create phases with git_commits populated
+- Test single phase with commits returns no violation
+- Test single phase without commits returns violation
+- Test lookback_phases 2 combines git_commits from two phases
+- Test lookback exceeding available phases uses all phases (graceful)
+- Test violation message format includes lookback count
+- Test config.commit_guard false skips rule
+- Test git_info.has_repo false skips rule
+- Test use_git Some(false) override skips rule
+- Test use_git Some(true) override enables rule
+
+Follow existing evaluator test patterns using time, phase, and context helpers.
 
 ### Step 3.b: Implement
 
 Add evaluate_require_commits function in src/rules/evaluator.rs:
-- Find current phase index in all_phase_metrics array
-- Calculate lookback window start index using max of zero and current minus lookback plus one
-- Collect all git_commits from phases in window
-- Return RuleViolation if combined commits is empty
+- Check context.config.commit_guard early return if false
+- Check git availability via context.git_info and context.config.use_git
+- Find current phase index in all_phase_metrics by name matching
+- Calculate lookback start: max(0, current_index - lookback_phases + 1)
+- Collect git_commits from all_phase_metrics[start..=current]
+- Return RuleViolation if combined commits empty
 - Return None if any commits found
-- Add to evaluate_rules match statement
-- Create RuleViolation with appropriate diagnostic and suggestion text
+- Add to evaluate_rules match statement (line 14 area)
+- RuleViolation diagnostic: "No commits found in last N phases"
+- RuleViolation suggestion: "Create a commit before advancing. Use `hegel next --force require_commits` to override."
 
 ### Success Criteria
 
-- Rule evaluation finds commits across multiple phases
-- Lookback window calculation handles edge cases
-- Violation returned when no commits found
-- None returned when commits present
-- Tests cover single phase, multi-phase, and exceeding history cases
+- Rule evaluation combines commits across phases
+- Lookback window handles 0 available phases gracefully
+- Config integration skips when commit_guard false
+- Git info integration skips when no repo
+- use_git override works both directions
+- Violation messages match spec format
+- Tests use existing helpers (no new infrastructure)
 
-**Commit Point:** `feat(rules): implement require_commits evaluation logic`
+**Commit Point:** `feat(rules): implement require_commits evaluation with config integration`
 
 ---
 
@@ -132,140 +164,117 @@ Extend HegelConfig with commit_guard and use_git toggles.
 ### Step 4.a: Write Tests
 
 Describe test strategy for config extension:
+- Follow existing config test patterns (test_default_config, test_save_and_load_roundtrip)
 - Test default config has commit_guard true and use_git None
-- Test set commit_guard to false persists
-- Test set use_git to true and false persists
-- Test get returns correct values for new fields
-- Test list includes new fields in output
-- Test save and load roundtrip preserves new fields
+- Test set and get for commit_guard (true/false)
+- Test set and get for use_git (true/false/unset)
+- Test list includes new fields
+- Test save/load roundtrip preserves values
+- Test invalid values rejected with clear errors
 
 ### Step 4.b: Implement
 
 Update HegelConfig in src/config.rs:
-- Add commit_guard bool field with default true
-- Add use_git Option bool field with default None
-- Update Default impl to set commit_guard true
-- Extend get method to handle commit_guard and use_git keys
-- Extend set method with validation for boolean parsing
+- Add commit_guard bool field
+- Add use_git Option bool field
+- Update Default impl: commit_guard true, use_git None
+- Extend get method with commit_guard and use_git keys
+- Extend set method with boolean parsing for both fields
+- Handle use_git unset by parsing empty string or "none" to None
 - Extend list method to include new fields
-- Update config tests to cover new fields
+- Update existing tests, add new tests for new fields
 
 ### Success Criteria
 
-- Config has commit_guard and use_git fields
-- Defaults are commit_guard true and use_git None
-- Config commands work for new fields
-- Serialization roundtrip preserves values
-- Tests pass for get, set, list operations
+- Config struct has two new fields
+- Defaults match spec (commit_guard true, use_git None)
+- Get/set/list commands work for new fields
+- Roundtrip serialization preserves values
+- Tests follow existing patterns in src/config.rs
 
 **Commit Point:** `feat(config): add commit_guard and use_git toggles`
 
 ---
 
-## Step 5: Add Config-Based Rule Skipping
-
-### Goal
-Skip require_commits rules when commit_guard disabled or git unavailable.
-
-### Step 5.a: Write Tests
-
-Describe test strategy for config integration:
-- Test commit_guard false skips all require_commits rules
-- Test git unavailable skips require_commits rules
-- Test use_git false overrides detected repo
-- Test use_git true enables rule even without detected repo
-- Test other rule types unaffected by commit_guard setting
-
-### Step 5.b: Implement
-
-Update evaluate_require_commits in src/rules/evaluator.rs:
-- Load config from state_dir at evaluation time
-- Check commit_guard config field and return None early if false
-- Check use_git override and git_info from state
-- Return None if git unavailable and not overridden
-- Continue with commit check logic if config allows
-- Update function signature to accept state_dir parameter if needed
-- Thread state_dir through from engine call site
-
-### Success Criteria
-
-- Config commit_guard false bypasses rule
-- Git unavailable bypasses rule gracefully
-- use_git override respected in both directions
-- Other rules unaffected by commit_guard
-- Tests verify all config combinations
-
-**Commit Point:** `feat(rules): integrate commit_guard config with evaluation`
-
----
-
-## Step 6: Add Force Flag to CLI
+## Step 5: Add Force Flag to CLI
 
 ### Goal
 Support force bypass for all rules or specific rule types.
 
-### Step 6.a: Write Tests
+### Step 5.a: Write Tests
 
 Describe test strategy for force flag:
-- Test force without argument bypasses all rules
+- Test force with no argument bypasses all rules
 - Test force with require_commits bypasses only that type
 - Test force with phase_timeout bypasses only that type
-- Test unspecified rules still evaluated when force selective
-- Test invalid rule type name handled gracefully
+- Test non-matching rules still evaluated
+- Test multiple rules with selective force
 
-### Step 6.b: Implement
+CLI parsing tests in main or commands module. Integration via engine tests.
 
-Update Commands enum in src/main.rs:
-- Add force field to Next subcommand with Option Option String type
-- Document usage in help text with examples
-- Update handle_next function to pass force flag to transition logic
-- Update evaluate_transition or get_next_prompt to filter rules based on force flag
-- Add rule filtering logic before calling evaluate_rules
-- Filter by matching rule type name when force is Some specific type
+### Step 5.b: Implement
+
+Update CLI in src/main.rs:
+- Add force field to Next subcommand: Option<Option<String>>
+- Document in help text with examples
+- Pass force flag through commands::handle_next
+
+Update get_next_prompt in src/engine/mod.rs (line 174):
+- Add force_bypass optional parameter
+- Filter node.rules before calling evaluate_rules
+- If force_bypass is Some(None): skip all rules (empty vec)
+- If force_bypass is Some(Some(type)): filter out matching rule types
+- Match by stringifying rule type (require_commits, phase_timeout, etc)
+- Pass filtered rules to evaluate_rules
+
+Update evaluate_transition in src/commands/workflow/transitions.rs:
+- Pass force flag to get_next_prompt call
 
 ### Success Criteria
 
-- CLI accepts force flag with and without argument
-- Force without argument skips all rule evaluation
-- Force with type name filters out matching rules only
-- Help text shows usage examples
-- Tests verify all force flag combinations
+- CLI accepts --force and --force <type>
+- Force with no argument skips all rule evaluation
+- Force with type name filters specific rules only
+- Help text documents usage
+- Tests verify filtering logic works
+- Integration test demonstrates full flow
 
 **Commit Point:** `feat(cli): add force flag with selective rule bypass`
 
 ---
 
-## Step 7: Integration and Validation
+## Step 6: Integration and Validation
 
 ### Goal
-Ensure all components work together and validate workflows load correctly.
+Ensure all components work together end-to-end.
 
-### Step 7.a: Write Tests
+### Step 6.a: Write Tests
 
 Describe integration test strategy:
-- Test workflow validation rejects lookback_phases zero
-- Test workflow validation accepts lookback_phases one and higher
-- Test end-to-end transition with require_commits rule
-- Test manual workflow with rule in execution mode
-- Test config interaction with workflow rule
+- Workflow validation already works (RuleConfig::validate called on load)
+- Add engine test with require_commits rule in workflow YAML
+- Test hegel next blocks without commits
+- Test hegel next succeeds with commits
+- Test hegel next --force bypasses rule
+- Test config disable bypasses rule
 
-### Step 7.b: Implement
+### Step 6.b: Implement
 
-Update workflow validation in src/engine/mod.rs:
-- RequireCommits variant already validated by RuleConfig validate
-- Add integration test creating workflow YAML with require_commits rule
-- Test workflow load succeeds with valid lookback_phases
-- Test workflow load fails with zero lookback_phases
-- Verify error message format matches spec
-- Test hegel next with require_commits in real workflow
+Add integration tests in src/engine/mod.rs test module:
+- Create workflow YAML string with require_commits rule
+- Use existing test pattern from engine tests
+- Load workflow, verify validation catches lookback_phases 0
+- Create test with PhaseMetrics including git_commits
+- Verify transition logic respects rule
+- No implementation changes needed (already integrated)
 
 ### Success Criteria
 
-- Workflow validation catches invalid lookback_phases
-- Error messages clear and actionable
-- Integration test demonstrates full feature flow
-- Manual testing confirms CLI and config work end-to-end
-- All tests pass with no regressions
+- Workflow validation rejects invalid lookback_phases
+- Integration tests demonstrate full feature
+- Manual testing with real workflow succeeds
+- All cargo test passes
+- No regressions in existing workflows
 
 **Commit Point:** `test(rules): add integration tests for require_commits`
 
@@ -273,25 +282,28 @@ Update workflow validation in src/engine/mod.rs:
 
 ## Final Success Criteria
 
-Build succeeds: cargo build compiles all modified files
+Build succeeds: cargo build
 
-Tests pass: cargo test with no regressions
+Tests pass: cargo test (no regressions, all new tests pass)
 
-Modified files:
-- src/rules/types.rs - RequireCommits variant added
-- src/rules/evaluator.rs - Evaluation function implemented
+Modified files compile:
+- src/rules/types.rs - RequireCommits variant, context extended
+- src/rules/evaluator.rs - Evaluation function, context updates
 - src/config.rs - Two new config fields
-- src/engine/mod.rs - Context construction updated
-- src/main.rs - Force flag added to Next command
+- src/engine/mod.rs - Context construction, force filtering
+- src/main.rs - Force flag on Next command
+- src/commands/workflow/transitions.rs - Pass force to engine
 
-Integration verified:
-- Start execution workflow with require_commits rule
-- Transition blocks without commits
-- Commit made, transition succeeds
-- Force flag bypasses rule
-- Config disable skips rule
+Integration verified manually:
+- hegel config set commit_guard false (rule skipped)
+- hegel config set commit_guard true (rule enforced)
+- hegel next blocks without commits
+- Make commit, hegel next succeeds
+- hegel next --force bypasses rule
+- hegel next --force require_commits bypasses only that rule
 
-Documentation:
-- CLI help shows force flag usage
-- Config help mentions new fields
-- No README or CLAUDE.md updates in this phase
+Test helpers used (no new infrastructure):
+- test_phase_metrics_with(minimal) for phases
+- test_git_commit(timestamp) for commits
+- Existing time, cmd, edit, phase, ctx_* patterns
+- TempDir for filesystem tests
