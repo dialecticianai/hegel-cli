@@ -16,6 +16,7 @@ pub fn evaluate_rules(
             RuleConfig::RepeatedFileEdit { .. } => evaluate_repeated_file_edit(rule, context)?,
             RuleConfig::PhaseTimeout { .. } => evaluate_phase_timeout(rule, context)?,
             RuleConfig::TokenBudget { .. } => evaluate_token_budget(rule, context)?,
+            RuleConfig::RequireCommits { .. } => None, // Stub - implemented in Step 3
         };
 
         if violation.is_some() {

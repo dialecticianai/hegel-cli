@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 12:33
+**Last Updated**: 2025-11-09 13:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,291 | 12,783 | 30,074 |
-| **Comments** | 2,535 | - | 2,535 |
-| **Blank Lines** | 3,283 | - | 3,283 |
-| **Total Lines** | 23,109 | 12,783 | 35,892 |
-| **Files** | 97 | 69 | 166 |
+| **Lines** | 17,353 | 13,363 | 30,716 |
+| **Comments** | 2,538 | - | 2,538 |
+| **Blank Lines** | 3,292 | - | 3,292 |
+| **Total Lines** | 23,183 | 13,363 | 36,546 |
+| **Files** | 97 | 70 | 167 |
 
-**Documentation Ratio**: 0.74 lines of docs per line of code
+**Documentation Ratio**: 0.77 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            97           3283           2535          17291
+Rust                            97           3292           2538          17353
 Markdown                        15            144              0            439
 -------------------------------------------------------------------------------
-SUM:                           112           3427           2535          17730
+SUM:                           112           3436           2538          17792
 -------------------------------------------------------------------------------
 ```
 
@@ -106,10 +106,10 @@ SUM:                           112           3427           2535          17730
 | `metrics/mod.rs` | 914 | 372 | 542 | 59.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 259 | 102 | 157 | 60.6% | ✅ |
-| `rules/evaluator.rs` | 1,000 | 121 | 879 | 87.9% | ✅ |
+| `rules/evaluator.rs` | 1,001 | 122 | 879 | 87.8% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
-| `rules/types.rs` | 299 | 74 | 225 | 75.3% | ✅ |
+| `rules/types.rs` | 372 | 85 | 287 | 77.2% | ✅ |
 | `storage/archive/aggregation.rs` | 98 | 98 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
 | `storage/archive/mod.rs` | 348 | 160 | 188 | 54.0% | ✅ |
@@ -155,6 +155,8 @@ SUM:                           112           3427           2535          17730
 | `.ddd/feat/20251105-handlebars_templates/SPEC.md` | 366 |
 | `.ddd/feat/20251106-analyze_summary/PLAN.md` | 175 |
 | `.ddd/feat/20251106-analyze_summary/SPEC.md` | 215 |
+| `.ddd/feat/commit-guardrails/PLAN.md` | 307 |
+| `.ddd/feat/commit-guardrails/SPEC.md` | 375 |
 | `.ddd/feat/markdown-tree/PLAN.md` | 289 |
 | `.ddd/feat/markdown-tree/SPEC.md` | 308 |
 | `.ddd/feat/workflow-stash/PLAN.md` | 298 |
@@ -164,7 +166,6 @@ SUM:                           112           3427           2535          17730
 | `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
 | `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
 | `.ddd/reports/20251010-tui_dep_review.md` | 678 |
-| `.ddd/SPEC.md` | 102 |
 | `CLAUDE.md` | 194 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 218 |
@@ -219,7 +220,7 @@ SUM:                           112           3427           2535          17730
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.74 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.77 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

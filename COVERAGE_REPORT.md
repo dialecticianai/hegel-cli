@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-09 12:33
+**Last Updated**: 2025-11-09 13:25
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **81.59%** lines | **81.23%** regions | **82.01%** functions
+**Overall Coverage**: **81.64%** lines | **81.28%** regions | **82.09%** functions
 
 ## Summary
 
 ```
-TOTAL                                         20982              3938    81.23%        1112               200    82.01%       12715              2341    81.59%           0                 0         -
+TOTAL                                         21058              3943    81.28%        1117               200    82.09%       12764              2344    81.64%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -70,9 +70,9 @@ TOTAL                                         20982              3938    81.23% 
 | `src/metrics/mod.rs` | 84.74% | 84.08% | 69.57% | 🟡 Good |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `src/rules/evaluator.rs` | 98.43% | 97.74% | 96.15% | 🟢 Excellent |
+| `src/rules/evaluator.rs` | 98.29% | 97.65% | 96.15% | 🟢 Excellent |
 | `src/rules/interrupt.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `src/rules/types.rs` | 96.22% | 92.51% | 100.00% | 🟢 Excellent |
+| `src/rules/types.rs` | 96.14% | 93.05% | 100.00% | 🟢 Excellent |
 | `src/storage/archive/aggregation.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/storage/archive/builder.rs` | 98.25% | 96.38% | 77.78% | 🟢 Excellent |
 | `src/storage/archive/mod.rs` | 93.44% | 93.85% | 76.47% | 🟢 Excellent |
@@ -128,9 +128,9 @@ TOTAL                                         20982              3938    81.23% 
 - `src/metrics/hooks.rs` - 94.22%
 - `src/metrics/states.rs` - 100.00%
 - `src/metrics/transcript.rs` - 100.00%
-- `src/rules/evaluator.rs` - 98.43%
+- `src/rules/evaluator.rs` - 98.29%
 - `src/rules/interrupt.rs` - 100.00%
-- `src/rules/types.rs` - 96.22%
+- `src/rules/types.rs` - 96.14%
 - `src/storage/archive/aggregation.rs` - 100.00%
 - `src/storage/archive/builder.rs` - 98.25%
 - `src/storage/archive/mod.rs` - 93.44%
@@ -191,7 +191,7 @@ TOTAL                                         20982              3938    81.23% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 81.59% | ✅ Met |
+| Overall | ≥80% | 81.64% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

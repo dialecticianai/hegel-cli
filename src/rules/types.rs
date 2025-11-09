@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-/// Rule configuration enum with all four rule types
+/// Rule configuration enum with all rule types
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum RuleConfig {
@@ -23,6 +23,11 @@ pub enum RuleConfig {
     },
     TokenBudget {
         max_tokens: u64,
+    },
+    RequireCommits {
+        /// Number of phases to check for commits (including current)
+        /// Must be >= 1. Value of 999 acts as "check entire workflow history"
+        lookback_phases: usize,
     },
 }
 
@@ -68,6 +73,12 @@ impl RuleConfig {
             }
             RuleConfig::PhaseTimeout { .. } => Ok(()),
             RuleConfig::TokenBudget { .. } => Ok(()),
+            RuleConfig::RequireCommits { lookback_phases } => {
+                if *lookback_phases == 0 {
+                    anyhow::bail!("require_commits.lookback_phases must be >= 1");
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -295,5 +306,67 @@ window: 60
             window: 120,
         };
         assert!(rule.validate().is_ok());
+    }
+
+    // ========== RequireCommits Tests ==========
+
+    #[test]
+    fn test_deserialize_require_commits() {
+        let yaml = r#"
+type: require_commits
+lookback_phases: 2
+"#;
+        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+
+        match rule {
+            RuleConfig::RequireCommits { lookback_phases } => {
+                assert_eq!(lookback_phases, 2);
+            }
+            _ => panic!("Expected RequireCommits variant"),
+        }
+    }
+
+    #[test]
+    fn test_deserialize_require_commits_large_value() {
+        let yaml = r#"
+type: require_commits
+lookback_phases: 999
+"#;
+        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+
+        match rule {
+            RuleConfig::RequireCommits { lookback_phases } => {
+                assert_eq!(lookback_phases, 999);
+            }
+            _ => panic!("Expected RequireCommits variant"),
+        }
+    }
+
+    #[test]
+    fn test_validate_require_commits_valid() {
+        let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+        assert!(rule.validate().is_ok());
+
+        let rule = RuleConfig::RequireCommits {
+            lookback_phases: 999,
+        };
+        assert!(rule.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_require_commits_zero_fails() {
+        let rule = RuleConfig::RequireCommits { lookback_phases: 0 };
+        let result = rule.validate();
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("lookback_phases must be >= 1"));
+    }
+
+    #[test]
+    fn test_serialize_require_commits_roundtrip() {
+        let rule = RuleConfig::RequireCommits { lookback_phases: 5 };
+        let yaml = serde_yaml::to_string(&rule).unwrap();
+        let deserialized: RuleConfig = serde_yaml::from_str(&yaml).unwrap();
+        assert_eq!(rule, deserialized);
     }
 }
