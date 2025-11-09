@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 14:04
+**Last Updated**: 2025-11-09 16:00
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,861 | 13,366 | 31,227 |
-| **Comments** | 2,585 | - | 2,585 |
-| **Blank Lines** | 3,370 | - | 3,370 |
-| **Total Lines** | 23,816 | 13,366 | 37,182 |
+| **Lines** | 17,867 | 13,414 | 31,281 |
+| **Comments** | 2,587 | - | 2,587 |
+| **Blank Lines** | 3,372 | - | 3,372 |
+| **Total Lines** | 23,826 | 13,414 | 37,240 |
 | **Files** | 99 | 70 | 169 |
 
 **Documentation Ratio**: 0.75 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            99           3370           2585          17861
-Markdown                        15            144              0            439
+Rust                            99           3372           2587          17867
+Markdown                        15            147              0            451
 -------------------------------------------------------------------------------
-SUM:                           114           3514           2585          18300
+SUM:                           114           3519           2587          18318
 -------------------------------------------------------------------------------
 ```
 
@@ -56,7 +56,7 @@ SUM:                           114           3514           2585          18300
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/external_bin.rs` | 175 | 144 | 31 | 17.7% | ✅ |
+| `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
 | `commands/fork/cody.rs` | 48 | 21 | 27 | 56.2% | ✅ |
@@ -185,7 +185,7 @@ SUM:                           114           3514           2585          18300
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
 | `guides/LEXICON.md` | 84 |
-| `guides/PLAN_WRITING.md` | 171 |
+| `guides/PLAN_WRITING.md` | 181 |
 | `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 55 |
 | `guides/SPEC_WRITING.md` | 196 |
@@ -197,7 +197,7 @@ SUM:                           114           3514           2585          18300
 | `HEGEL_CLAUDE.md` | 349 |
 | `LOC_REPORT.md` | 241 |
 | `METRICS.md` | 258 |
-| `README.md` | 402 |
+| `README.md` | 425 |
 | `ROADMAP.md` | 348 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
@@ -210,7 +210,7 @@ SUM:                           114           3514           2585          18300
 | `src/metamodes/README.md` | 25 |
 | `src/metrics/README.md` | 34 |
 | `src/README.md` | 35 |
-| `src/rules/README.md` | 30 |
+| `src/rules/README.md` | 45 |
 | `src/storage/README.md` | 49 |
 | `src/test_helpers/README.md` | 122 |
 | `src/tui/README.md` | 32 |

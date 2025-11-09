@@ -102,6 +102,11 @@ impl ExternalNpmPackage {
                 cmd.env("HEGEL_SESSION_ID", session_id);
             }
 
+            // Pass through current working directory
+            if let Ok(cwd) = std::env::current_dir() {
+                cmd.env("HEGEL_IDE_CWD", cwd);
+            }
+
             let status = cmd
                 .status()
                 .with_context(|| format!("Failed to execute npm start for {}", self.name))?;
@@ -120,6 +125,11 @@ impl ExternalNpmPackage {
         // Pass through HEGEL_SESSION_ID if present
         if let Ok(session_id) = std::env::var("HEGEL_SESSION_ID") {
             cmd.env("HEGEL_SESSION_ID", session_id);
+        }
+
+        // Pass through current working directory
+        if let Ok(cwd) = std::env::current_dir() {
+            cmd.env("HEGEL_IDE_CWD", cwd);
         }
 
         let status = cmd
