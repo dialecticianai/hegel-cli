@@ -271,8 +271,7 @@ Add integration tests in src/engine/mod.rs test module:
 ### Success Criteria
 
 - Workflow validation rejects invalid lookback_phases
-- Integration tests demonstrate full feature
-- Manual testing with real workflow succeeds
+- Integration tests demonstrate full feature flow
 - All cargo test passes
 - No regressions in existing workflows
 
@@ -294,13 +293,12 @@ Modified files compile:
 - src/main.rs - Force flag on Next command
 - src/commands/workflow/transitions.rs - Pass force to engine
 
-Integration verified manually:
-- hegel config set commit_guard false (rule skipped)
-- hegel config set commit_guard true (rule enforced)
-- hegel next blocks without commits
-- Make commit, hegel next succeeds
-- hegel next --force bypasses rule
-- hegel next --force require_commits bypasses only that rule
+Integration verified via automated tests:
+- Config roundtrip tests verify commit_guard and use_git persistence
+- Rule evaluation tests verify commits required/skipped based on config
+- Engine tests verify workflow transitions block/allow based on commits
+- Force flag tests verify selective and full rule bypass
+- All verification agent-executable via cargo test
 
 Test helpers used (no new infrastructure):
 - test_phase_metrics_with(minimal) for phases
