@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 13:30
+**Last Updated**: 2025-11-09 13:36
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,389 | 13,364 | 30,753 |
+| **Lines** | 17,386 | 13,364 | 30,750 |
 | **Comments** | 2,542 | - | 2,542 |
-| **Blank Lines** | 3,303 | - | 3,303 |
-| **Total Lines** | 23,234 | 13,364 | 36,598 |
-| **Files** | 97 | 70 | 167 |
+| **Blank Lines** | 3,298 | - | 3,298 |
+| **Total Lines** | 23,226 | 13,364 | 36,590 |
+| **Files** | 99 | 70 | 169 |
 
 **Documentation Ratio**: 0.77 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            97           3303           2542          17389
+Rust                            99           3298           2542          17386
 Markdown                        15            144              0            439
 -------------------------------------------------------------------------------
-SUM:                           112           3447           2542          17828
+SUM:                           114           3442           2542          17825
 -------------------------------------------------------------------------------
 ```
 
@@ -106,9 +106,11 @@ SUM:                           112           3447           2542          17828
 | `metrics/mod.rs` | 914 | 372 | 542 | 59.3% | ⚠️ Large |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/transcript.rs` | 259 | 102 | 157 | 60.6% | ✅ |
-| `rules/evaluator.rs` | 1,043 | 122 | 921 | 88.3% | ✅ |
+| `rules/evaluator.rs` | 325 | 325 | 0 | 0.0% | ⚠️ Large |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
-| `rules/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
+| `rules/mod.rs` | 10 | 4 | 6 | 60.0% | ✅ |
+| `rules/tests/evaluator.rs` | 706 | 706 | 0 | 0.0% | ⚠️ Large |
+| `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 375 | 88 | 287 | 76.5% | ✅ |
 | `storage/archive/aggregation.rs` | 98 | 98 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
@@ -135,7 +137,7 @@ SUM:                           112           3447           2542          17828
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 11 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 13 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
