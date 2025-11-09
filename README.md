@@ -66,6 +66,15 @@ hegel config set code_map_style monolithic
 # Toggle auto-launching reflect GUI after doc generation
 hegel config set use_reflect_gui true
 hegel config set use_reflect_gui false
+
+# Control commit guardrails (default: true)
+hegel config set commit_guard true
+hegel config set commit_guard false
+
+# Override git repository detection (default: auto-detect)
+hegel config set use_git true
+hegel config set use_git false
+hegel config set use_git none  # Clear override, use auto-detect
 ```
 
 Configuration is persisted to `.hegel/config.toml`.
@@ -173,6 +182,20 @@ hegel abort
 **Guardrails:**
 - Cannot start a new workflow while one is active - must run `hegel abort` first
 - This prevents accidentally losing workflow progress
+- Rules may block transitions (e.g., require commits, token budgets, timeouts)
+
+**Bypassing rules:**
+
+Force phase advancement when rules would otherwise block:
+
+```bash
+# Skip all rules
+hegel next --force
+
+# Skip specific rule type
+hegel next --force require_commits
+hegel next --force phase_timeout
+```
 
 **Advanced usage:**
 
