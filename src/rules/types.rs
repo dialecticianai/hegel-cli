@@ -43,12 +43,15 @@ pub struct RuleViolation {
 /// Rule evaluation context for assessing violations
 #[derive(Debug, Clone)]
 pub struct RuleEvaluationContext<'a> {
-    /// TODO: Use for phase-specific rule evaluation
-    #[allow(dead_code)]
     pub current_phase: &'a str,
     pub phase_start_time: Option<&'a String>,
-    pub phase_metrics: Option<&'a crate::metrics::PhaseMetrics>,
+    /// All phase metrics for lookback operations
+    pub all_phase_metrics: &'a [crate::metrics::PhaseMetrics],
     pub hook_metrics: &'a crate::metrics::HookMetrics,
+    /// Configuration for rule behavior (commit_guard, use_git)
+    pub config: &'a crate::config::HegelConfig,
+    /// Git repository information
+    pub git_info: Option<&'a crate::storage::GitInfo>,
 }
 
 impl RuleConfig {

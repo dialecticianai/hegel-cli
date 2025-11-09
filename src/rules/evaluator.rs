@@ -158,16 +158,15 @@ mod tests {
 
     /// Create PhaseMetrics with sensible defaults
     ///
-    /// If duration_secs is 0 and you want a completed phase (not active),
-    /// the end_time will still be set to BASE_TIME (zero duration).
-    /// If you want an active phase, construct manually with end_time: None.
+    /// Creates a completed phase with known duration for testing.
+    /// Uses BASE_TIME as start, and BASE_TIME + duration_secs as end.
     fn phase(duration_secs: u64, input_tokens: u64, output_tokens: u64) -> PhaseMetrics {
         use crate::test_helpers::test_phase_metrics_with;
 
         PhaseMetrics {
             phase_name: "code".to_string(),
             start_time: BASE_TIME.to_string(),
-            end_time: Some(time(duration_secs as i64)),
+            end_time: Some(time(duration_secs as i64)), // Completed phase
             duration_seconds: duration_secs,
             token_metrics: TokenMetrics {
                 total_input_tokens: input_tokens,
@@ -182,6 +181,8 @@ mod tests {
 
     /// Create RuleEvaluationContext with commands
     fn ctx_with_cmds(commands: Vec<BashCommand>) -> RuleEvaluationContext<'static> {
+        use crate::config::HegelConfig;
+
         let hook_metrics = Box::leak(Box::new(HookMetrics {
             total_events: commands.len(),
             bash_commands: commands,
@@ -190,16 +191,23 @@ mod tests {
             session_end_time: None,
         }));
 
+        let config = Box::leak(Box::new(HegelConfig::default()));
+        let all_phase_metrics = Box::leak(Box::new([]));
+
         RuleEvaluationContext {
             current_phase: "code",
             phase_start_time: Some(Box::leak(Box::new(BASE_TIME.to_string()))),
-            phase_metrics: None,
+            all_phase_metrics,
             hook_metrics,
+            config,
+            git_info: None,
         }
     }
 
     /// Create RuleEvaluationContext with file edits
     fn ctx_with_edits(edits: Vec<FileModification>) -> RuleEvaluationContext<'static> {
+        use crate::config::HegelConfig;
+
         let hook_metrics = Box::leak(Box::new(HookMetrics {
             total_events: edits.len(),
             bash_commands: vec![],
@@ -208,24 +216,34 @@ mod tests {
             session_end_time: None,
         }));
 
+        let config = Box::leak(Box::new(HegelConfig::default()));
+        let all_phase_metrics = Box::leak(Box::new([]));
+
         RuleEvaluationContext {
             current_phase: "code",
             phase_start_time: Some(Box::leak(Box::new(BASE_TIME.to_string()))),
-            phase_metrics: None,
+            all_phase_metrics,
             hook_metrics,
+            config,
+            git_info: None,
         }
     }
 
     /// Create RuleEvaluationContext with phase metrics
     fn ctx_with_phase(phase: PhaseMetrics) -> RuleEvaluationContext<'static> {
-        let phase_ref = Box::leak(Box::new(phase));
+        use crate::config::HegelConfig;
+
+        let phase_vec = Box::leak(Box::new(vec![phase]));
         let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+        let config = Box::leak(Box::new(HegelConfig::default()));
 
         RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: Some(&phase_ref.start_time),
-            phase_metrics: Some(phase_ref),
+            phase_start_time: Some(&phase_vec[0].start_time),
+            all_phase_metrics: phase_vec.as_slice(),
             hook_metrics,
+            config,
+            git_info: None,
         }
     }
 
@@ -280,6 +298,8 @@ mod tests {
 
     #[test]
     fn test_evaluate_rules_short_circuit() {
+        use crate::config::HegelConfig;
+
         let hook_metrics = Box::leak(Box::new(HookMetrics {
             total_events: 15,
             bash_commands: vec![cmd("cargo build", 0); 5],
@@ -288,11 +308,16 @@ mod tests {
             session_end_time: None,
         }));
 
+        let config = Box::leak(Box::new(HegelConfig::default()));
+        let all_phase_metrics = Box::leak(Box::new([]));
+
         let context = RuleEvaluationContext {
             current_phase: "code",
             phase_start_time: Some(Box::leak(Box::new(BASE_TIME.to_string()))),
-            phase_metrics: None,
+            all_phase_metrics,
             hook_metrics,
+            config,
+            git_info: None,
         };
 
         let rules = vec![
@@ -703,23 +728,28 @@ mod tests {
     fn test_phase_timeout_active_phase_uses_current_time() {
         use chrono::Utc;
 
+        use crate::config::HegelConfig;
         use crate::test_helpers::test_phase_metrics_with;
 
         let start = (Utc::now() - chrono::Duration::seconds(700)).to_rfc3339();
-        let phase_ref = Box::leak(Box::new(PhaseMetrics {
+        let phase_vec = Box::leak(Box::new(vec![PhaseMetrics {
             phase_name: "code".to_string(),
             start_time: start.clone(),
             end_time: None,
             duration_seconds: 0,
             token_metrics: TokenMetrics::default(),
             ..test_phase_metrics_with(true)
-        }));
+        }]));
+
+        let config = Box::leak(Box::new(HegelConfig::default()));
 
         let context = RuleEvaluationContext {
             current_phase: "code",
-            phase_start_time: Some(&phase_ref.start_time),
-            phase_metrics: Some(phase_ref),
+            phase_start_time: Some(&phase_vec[0].start_time),
+            all_phase_metrics: phase_vec.as_slice(),
             hook_metrics: Box::leak(Box::new(HookMetrics::default())),
+            config,
+            git_info: None,
         };
 
         let rule = RuleConfig::PhaseTimeout { max_duration: 600 };
@@ -817,9 +847,15 @@ fn evaluate_token_budget(
         _ => return Ok(None),
     };
 
-    let phase_metrics = match context.phase_metrics {
+    // Find current phase in all_phase_metrics by name
+    let phase_metrics = context
+        .all_phase_metrics
+        .iter()
+        .find(|p| p.phase_name == context.current_phase);
+
+    let phase_metrics = match phase_metrics {
         Some(pm) => pm,
-        None => return Ok(None), // No phase metrics available
+        None => return Ok(None), // No matching phase metrics available
     };
 
     // Calculate total tokens (input + output, per SPEC cache tokens excluded)
@@ -864,9 +900,15 @@ fn evaluate_phase_timeout(
         _ => return Ok(None),
     };
 
-    let phase_metrics = match context.phase_metrics {
+    // Find current phase in all_phase_metrics by name
+    let phase_metrics = context
+        .all_phase_metrics
+        .iter()
+        .find(|p| p.phase_name == context.current_phase);
+
+    let phase_metrics = match phase_metrics {
         Some(pm) => pm,
-        None => return Ok(None), // No phase metrics available
+        None => return Ok(None), // No matching phase metrics available
     };
 
     // Calculate duration

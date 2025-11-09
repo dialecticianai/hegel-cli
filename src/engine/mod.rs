@@ -221,22 +221,28 @@ pub fn get_next_prompt(
 
     // Evaluate rules for resulting node (if any)
     let prompt = if !next_node_obj.rules.is_empty() {
+        use crate::config::HegelConfig;
         use crate::metrics::parse_unified_metrics;
         use crate::rules::{evaluate_rules, generate_interrupt_prompt, RuleEvaluationContext};
+        use crate::storage::FileStorage;
 
         let metrics = parse_unified_metrics(state_dir, false, None)?;
 
-        // Find current phase metrics (active phase where end_time is None)
-        let phase_metrics = metrics
-            .phase_metrics
-            .iter()
-            .find(|p| p.phase_name == new_state.current_node && p.end_time.is_none());
+        // Load config for rule behavior
+        let config = HegelConfig::load(state_dir)?;
+
+        // Load state to get git_info
+        let storage = FileStorage::new(state_dir)?;
+        let full_state = storage.load()?;
+        let git_info = full_state.git_info.as_ref();
 
         let context = RuleEvaluationContext {
             current_phase: &new_state.current_node,
             phase_start_time: new_state.phase_start_time.as_ref(),
-            phase_metrics,
+            all_phase_metrics: &metrics.phase_metrics,
             hook_metrics: &metrics.hook_metrics,
+            config: &config,
+            git_info,
         };
 
         if let Some(violation) = evaluate_rules(&next_node_obj.rules, &context)? {
