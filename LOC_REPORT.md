@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-08 19:04
+**Last Updated**: 2025-11-09 12:33
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,273 | 12,743 | 30,016 |
-| **Comments** | 2,530 | - | 2,530 |
+| **Lines** | 17,291 | 12,783 | 30,074 |
+| **Comments** | 2,535 | - | 2,535 |
 | **Blank Lines** | 3,283 | - | 3,283 |
-| **Total Lines** | 23,086 | 12,743 | 35,829 |
+| **Total Lines** | 23,109 | 12,783 | 35,892 |
 | **Files** | 97 | 69 | 166 |
 
 **Documentation Ratio**: 0.74 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            97           3283           2530          17273
+Rust                            97           3283           2535          17291
 Markdown                        15            144              0            439
 -------------------------------------------------------------------------------
-SUM:                           112           3427           2530          17712
+SUM:                           112           3427           2535          17730
 -------------------------------------------------------------------------------
 ```
 
@@ -69,7 +69,7 @@ SUM:                           112           3427           2530          17712
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/markdown.rs` | 476 | 384 | 92 | 19.3% | ⚠️ Large |
+| `commands/markdown.rs` | 495 | 403 | 92 | 18.6% | ⚠️ Large |
 | `commands/meta.rs` | 256 | 168 | 88 | 34.4% | ✅ |
 | `commands/mod.rs` | 39 | 39 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
@@ -96,7 +96,7 @@ SUM:                           112           3427           2530          17712
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 497 | 14 | 483 | 97.2% | ✅ |
+| `main.rs` | 501 | 14 | 487 | 97.2% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ⚠️ Large |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -194,8 +194,8 @@ SUM:                           112           3427           2530          17712
 | `HEGEL_CLAUDE.md` | 349 |
 | `LOC_REPORT.md` | 238 |
 | `METRICS.md` | 258 |
-| `README.md` | 398 |
-| `ROADMAP.md` | 312 |
+| `README.md` | 402 |
+| `ROADMAP.md` | 348 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |

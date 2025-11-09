@@ -318,14 +318,18 @@ enum Commands {
     ///   hegel md            Tree view with line counts
     ///   hegel md --json     JSON with full metadata
     ///   hegel md --no-ddd   Exclude DDD artifacts
+    ///   hegel md --ddd      Show only DDD artifacts
     #[command(visible_alias = "markdown")]
     Md {
         /// Output as JSON
         #[arg(long)]
         json: bool,
         /// Exclude DDD artifacts
-        #[arg(long)]
+        #[arg(long, conflicts_with = "ddd")]
         no_ddd: bool,
+        /// Show only DDD artifacts
+        #[arg(long, conflicts_with = "no_ddd")]
+        ddd: bool,
     },
 }
 
@@ -487,8 +491,8 @@ fn main() -> Result<()> {
         } => {
             commands::handle_fork(agent.as_deref(), prompt.as_deref(), &args)?;
         }
-        Commands::Md { json, no_ddd } => {
-            let args = commands::MarkdownArgs { json, no_ddd };
+        Commands::Md { json, no_ddd, ddd } => {
+            let args = commands::MarkdownArgs { json, no_ddd, ddd };
             commands::run_markdown(args)?;
         }
     }

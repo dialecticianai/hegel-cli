@@ -11,6 +11,7 @@ use crate::theme::Theme;
 pub struct MarkdownArgs {
     pub json: bool,
     pub no_ddd: bool,
+    pub ddd: bool,
 }
 
 /// File category classification
@@ -58,13 +59,13 @@ pub fn run_markdown(args: MarkdownArgs) -> Result<()> {
     }
 
     // Categorize files
-    let (ddd_files, regular_files) = categorize_files(files, args.no_ddd);
+    let (ddd_files, regular_files) = categorize_files(files, args.no_ddd, args.ddd);
 
     // Output based on mode
     if args.json {
-        output_json(&ddd_files, &regular_files, args.no_ddd)?;
+        output_json(&ddd_files, &regular_files, args.no_ddd, args.ddd)?;
     } else {
-        output_tree(&ddd_files, &regular_files, args.no_ddd)?;
+        output_tree(&ddd_files, &regular_files, args.no_ddd, args.ddd)?;
     }
 
     Ok(())
@@ -161,14 +162,24 @@ fn count_lines(path: &Path) -> Option<usize> {
 fn categorize_files(
     files: Vec<MarkdownFile>,
     no_ddd: bool,
+    ddd: bool,
 ) -> (Vec<MarkdownFile>, Vec<MarkdownFile>) {
     if no_ddd {
+        // Show only regular files
         let regular: Vec<_> = files
             .into_iter()
             .filter(|f| matches!(f.category, FileCategory::Regular))
             .collect();
         (vec![], regular)
+    } else if ddd {
+        // Show only DDD files
+        let ddd_files: Vec<_> = files
+            .into_iter()
+            .filter(|f| matches!(f.category, FileCategory::Ddd { .. }))
+            .collect();
+        (ddd_files, vec![])
     } else {
+        // Show both
         let mut ddd = Vec::new();
         let mut regular = Vec::new();
 
@@ -188,8 +199,9 @@ fn output_json(
     ddd_files: &[MarkdownFile],
     regular_files: &[MarkdownFile],
     no_ddd: bool,
+    ddd: bool,
 ) -> Result<()> {
-    let ddd_documents = if no_ddd {
+    let ddd_documents = if no_ddd || ddd_files.is_empty() {
         None
     } else {
         Some(
@@ -206,16 +218,20 @@ fn output_json(
         )
     };
 
-    let other_markdown = regular_files
-        .iter()
-        .map(|f| FileEntry {
-            path: f.path.display().to_string(),
-            lines: f.lines.unwrap_or(0),
-            size_bytes: f.size_bytes,
-            last_modified: f.last_modified.to_rfc3339(),
-            ephemeral: false,
-        })
-        .collect();
+    let other_markdown = if ddd {
+        vec![]
+    } else {
+        regular_files
+            .iter()
+            .map(|f| FileEntry {
+                path: f.path.display().to_string(),
+                lines: f.lines.unwrap_or(0),
+                size_bytes: f.size_bytes,
+                last_modified: f.last_modified.to_rfc3339(),
+                ephemeral: false,
+            })
+            .collect()
+    };
 
     let tree = MarkdownTree {
         ddd_documents,
@@ -233,14 +249,17 @@ fn output_tree(
     ddd_files: &[MarkdownFile],
     regular_files: &[MarkdownFile],
     no_ddd: bool,
+    ddd: bool,
 ) -> Result<()> {
     if !no_ddd && !ddd_files.is_empty() {
         println!("{}", Theme::header("DDD Documents:"));
         print_tree(ddd_files)?;
-        println!();
+        if !ddd && !regular_files.is_empty() {
+            println!();
+        }
     }
 
-    if !regular_files.is_empty() {
+    if !ddd && !regular_files.is_empty() {
         println!("{}", Theme::header("Other Markdown:"));
         print_tree(regular_files)?;
     }
