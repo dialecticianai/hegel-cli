@@ -82,6 +82,14 @@ enum Commands {
         /// Optional claim name (e.g., 'spec_complete', 'needs_refactor')
         /// If omitted, uses happy-path claim: {current}_complete
         claim: Option<String>,
+
+        /// Force bypass rules (all rules or specific type)
+        /// Examples:
+        ///   --force                  # Bypass all rules
+        ///   --force require_commits  # Bypass only commit checks
+        ///   --force phase_timeout    # Bypass only timeout rules
+        #[arg(long)]
+        force: Option<Option<String>>,
     },
     /// Go back to previous phase
     #[command(visible_alias = "previous")]
@@ -376,8 +384,8 @@ fn main() -> Result<()> {
         Commands::Guides { show_embedded } => {
             commands::list_guides(show_embedded.as_deref(), &storage)?;
         }
-        Commands::Next { claim } => {
-            commands::next_prompt(claim.as_deref(), &storage)?;
+        Commands::Next { claim, force } => {
+            commands::next_prompt(claim.as_deref(), force.as_ref(), &storage)?;
         }
         Commands::Prev => {
             commands::prev_prompt(&storage)?;

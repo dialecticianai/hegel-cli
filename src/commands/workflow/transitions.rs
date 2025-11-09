@@ -52,6 +52,7 @@ pub fn evaluate_transition(
     context: &WorkflowContext,
     claims: &HashSet<String>,
     storage: &FileStorage,
+    force_bypass: Option<&Option<String>>,
 ) -> Result<TransitionOutcome> {
     let current_node = &context.workflow_state.current_node;
     let workflow_mode = &context.workflow_state.mode;
@@ -62,6 +63,7 @@ pub fn evaluate_transition(
         &context.workflow_state,
         claims,
         storage.state_dir(),
+        force_bypass,
     )?;
 
     // If we transitioned to a different node within the workflow

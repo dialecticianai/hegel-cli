@@ -15,6 +15,14 @@ pub struct HegelConfig {
 
     /// Code map structure style: "monolithic" (single README section) or "hierarchical" (per-directory READMEs)
     pub code_map_style: String,
+
+    /// Global enable/disable for commit_guard rules
+    /// When false, all require_commits rules are ignored
+    pub commit_guard: bool,
+
+    /// Override git repository detection
+    /// When set, overrides state.git_info.has_repo detection
+    pub use_git: Option<bool>,
 }
 
 impl Default for HegelConfig {
@@ -22,6 +30,8 @@ impl Default for HegelConfig {
         Self {
             use_reflect_gui: true,                      // Default to on
             code_map_style: "hierarchical".to_string(), // Default to hierarchical
+            commit_guard: true,                         // Default to on
+            use_git: None,                              // Default to auto-detect
         }
     }
 }
@@ -62,6 +72,12 @@ impl HegelConfig {
         match key {
             "use_reflect_gui" => Some(self.use_reflect_gui.to_string()),
             "code_map_style" => Some(self.code_map_style.clone()),
+            "commit_guard" => Some(self.commit_guard.to_string()),
+            "use_git" => Some(
+                self.use_git
+                    .map(|v| v.to_string())
+                    .unwrap_or_else(|| "(not set)".to_string()),
+            ),
             _ => None,
         }
     }
@@ -83,6 +99,20 @@ impl HegelConfig {
                 }
                 self.code_map_style = value.to_string();
             }
+            "commit_guard" => {
+                self.commit_guard = value.parse().with_context(|| {
+                    format!("Invalid boolean value for commit_guard: {}", value)
+                })?;
+            }
+            "use_git" => {
+                if value.is_empty() || value == "none" || value == "(not set)" {
+                    self.use_git = None;
+                } else {
+                    self.use_git = Some(value.parse().with_context(|| {
+                        format!("Invalid boolean value for use_git: {}", value)
+                    })?);
+                }
+            }
             _ => anyhow::bail!("Unknown config key: {}", key),
         }
         Ok(())
@@ -96,6 +126,13 @@ impl HegelConfig {
                 self.use_reflect_gui.to_string(),
             ),
             ("code_map_style".to_string(), self.code_map_style.clone()),
+            ("commit_guard".to_string(), self.commit_guard.to_string()),
+            (
+                "use_git".to_string(),
+                self.use_git
+                    .map(|v| v.to_string())
+                    .unwrap_or_else(|| "(not set)".to_string()),
+            ),
         ]
     }
 }
@@ -125,6 +162,8 @@ mod tests {
         let original = HegelConfig {
             use_reflect_gui: false,
             code_map_style: "monolithic".to_string(),
+            commit_guard: false,
+            use_git: Some(true),
         };
 
         original.save(temp_dir.path()).unwrap();
@@ -132,6 +171,8 @@ mod tests {
 
         assert!(!loaded.use_reflect_gui);
         assert_eq!(loaded.code_map_style, "monolithic");
+        assert!(!loaded.commit_guard);
+        assert_eq!(loaded.use_git, Some(true));
     }
 
     #[test]

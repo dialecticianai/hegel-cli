@@ -18,12 +18,12 @@ fn start(storage: &FileStorage) {
 
 /// Advance workflow with next (None = implicit happy path)
 fn next(storage: &FileStorage) {
-    next_prompt(None, storage).unwrap();
+    next_prompt(None, None, storage).unwrap();
 }
 
 /// Advance workflow with custom claim
 fn next_with(claim: &str, storage: &FileStorage) {
-    next_prompt(Some(claim), storage).unwrap();
+    next_prompt(Some(claim), None, storage).unwrap();
 }
 
 /// Load and assert current state

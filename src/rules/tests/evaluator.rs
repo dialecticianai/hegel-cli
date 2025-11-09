@@ -1,7 +1,11 @@
 use crate::config::HegelConfig;
-use crate::metrics::{BashCommand, FileModification, HookMetrics, PhaseMetrics, TokenMetrics};
+use crate::metrics::{
+    BashCommand, FileModification, GitCommit, HookMetrics, PhaseMetrics, TokenMetrics,
+};
 use crate::rules::evaluator::*;
 use crate::rules::types::{RuleConfig, RuleEvaluationContext};
+use crate::storage::GitInfo;
+use crate::test_helpers::test_git_commit;
 
 // ========== Test Helpers ==========
 
@@ -703,4 +707,213 @@ fn test_token_budget_only_input_tokens() {
     let result = evaluate_token_budget(&rule, &context).unwrap();
 
     assert!(result.is_some());
+}
+
+// ========== Require Commits Tests ==========
+
+/// Create context with multiple phases and optional config/git_info
+fn ctx_with_phases(
+    phases: Vec<PhaseMetrics>,
+    config: Option<HegelConfig>,
+    git_info: Option<GitInfo>,
+) -> RuleEvaluationContext<'static> {
+    let phase_vec = Box::leak(Box::new(phases));
+    let hook_metrics = Box::leak(Box::new(HookMetrics::default()));
+    let config = Box::leak(Box::new(config.unwrap_or_default()));
+    let git_info_leaked = git_info.map(|gi| Box::leak(Box::new(gi)) as &GitInfo);
+
+    RuleEvaluationContext {
+        current_phase: "code",
+        phase_start_time: phase_vec.first().map(|p| &p.start_time),
+        all_phase_metrics: phase_vec.as_slice(),
+        hook_metrics,
+        config,
+        git_info: git_info_leaked,
+    }
+}
+
+/// Create phase with git commits
+fn phase_with_commits(name: &str, commits: Vec<GitCommit>) -> PhaseMetrics {
+    use crate::test_helpers::test_phase_metrics_with;
+
+    PhaseMetrics {
+        phase_name: name.to_string(),
+        start_time: BASE_TIME.to_string(),
+        end_time: Some(time(3600)),
+        git_commits: commits,
+        ..test_phase_metrics_with(true)
+    }
+}
+
+#[test]
+fn test_require_commits_single_phase_with_commits() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![test_git_commit(BASE_TIME)]);
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // No violation
+}
+
+#[test]
+fn test_require_commits_single_phase_without_commits() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![]); // No commits
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_some());
+
+    let violation = result.unwrap();
+    assert_eq!(violation.rule_type, "Require Commits");
+    assert!(violation
+        .diagnostic
+        .contains("No commits found in last 1 phases"));
+    assert!(violation.suggestion.contains("--force require_commits"));
+}
+
+#[test]
+fn test_require_commits_lookback_two_phases() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 2 };
+
+    // First phase (spec) has no commits, second phase (code) has commits
+    let phases = vec![
+        phase_with_commits("spec", vec![]),
+        phase_with_commits("code", vec![test_git_commit(BASE_TIME)]),
+    ];
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(phases, None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // No violation - commit found in lookback window
+}
+
+#[test]
+fn test_require_commits_lookback_two_phases_no_commits() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 2 };
+
+    // Both phases have no commits
+    let phases = vec![
+        phase_with_commits("spec", vec![]),
+        phase_with_commits("code", vec![]),
+    ];
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(phases, None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_some());
+
+    let violation = result.unwrap();
+    assert!(violation
+        .diagnostic
+        .contains("No commits found in last 2 phases"));
+}
+
+#[test]
+fn test_require_commits_lookback_exceeds_available_phases() {
+    let rule = RuleConfig::RequireCommits {
+        lookback_phases: 999, // More than available phases
+    };
+
+    // Single phase with commit
+    let phase = phase_with_commits("code", vec![test_git_commit(BASE_TIME)]);
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // No violation - gracefully checks all available phases
+}
+
+#[test]
+fn test_require_commits_config_commit_guard_disabled() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![]); // No commits
+    let mut config = HegelConfig::default();
+    config.commit_guard = false; // Disable globally
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], Some(config), Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // Rule skipped due to config
+}
+
+#[test]
+fn test_require_commits_no_git_repo() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![]); // No commits
+    let git_info = GitInfo {
+        has_repo: false, // No git repo
+        current_branch: None,
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], None, Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // Rule skipped - no git repo
+}
+
+#[test]
+fn test_require_commits_use_git_override_disabled() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![]); // No commits
+    let mut config = HegelConfig::default();
+    config.use_git = Some(false); // Force disable git
+    let git_info = GitInfo {
+        has_repo: true,
+        current_branch: Some("main".to_string()),
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], Some(config), Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_none()); // Rule skipped - use_git override
+}
+
+#[test]
+fn test_require_commits_use_git_override_enabled() {
+    let rule = RuleConfig::RequireCommits { lookback_phases: 1 };
+
+    let phase = phase_with_commits("code", vec![]); // No commits
+    let mut config = HegelConfig::default();
+    config.use_git = Some(true); // Force enable git
+    let git_info = GitInfo {
+        has_repo: false, // Normally would skip
+        current_branch: None,
+        remote_url: None,
+    };
+    let context = ctx_with_phases(vec![phase], Some(config), Some(git_info));
+
+    let result = evaluate_require_commits(&rule, &context).unwrap();
+    assert!(result.is_some()); // Rule enforced despite has_repo=false
 }

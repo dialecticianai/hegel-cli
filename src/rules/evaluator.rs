@@ -16,7 +16,7 @@ pub fn evaluate_rules(
             RuleConfig::RepeatedFileEdit { .. } => evaluate_repeated_file_edit(rule, context)?,
             RuleConfig::PhaseTimeout { .. } => evaluate_phase_timeout(rule, context)?,
             RuleConfig::TokenBudget { .. } => evaluate_token_budget(rule, context)?,
-            RuleConfig::RequireCommits { .. } => None, // Stub - implemented in Step 3
+            RuleConfig::RequireCommits { .. } => evaluate_require_commits(rule, context)?,
         };
 
         if violation.is_some() {
@@ -25,6 +25,71 @@ pub fn evaluate_rules(
     }
 
     Ok(None) // No violations
+}
+
+/// Evaluate a require_commits rule
+pub(crate) fn evaluate_require_commits(
+    rule: &RuleConfig,
+    context: &RuleEvaluationContext,
+) -> Result<Option<RuleViolation>> {
+    let lookback_phases = match rule {
+        RuleConfig::RequireCommits { lookback_phases } => lookback_phases,
+        _ => return Ok(None),
+    };
+
+    // Check global config: if commit_guard is disabled, skip rule
+    if !context.config.commit_guard {
+        return Ok(None);
+    }
+
+    // Check git availability
+    // If use_git is explicitly false, skip rule
+    if context.config.use_git == Some(false) {
+        return Ok(None);
+    }
+
+    // If no git repo detected and use_git is not explicitly true, skip rule
+    if let Some(git_info) = context.git_info {
+        if !git_info.has_repo && context.config.use_git != Some(true) {
+            return Ok(None);
+        }
+    } else if context.config.use_git != Some(true) {
+        // No git_info and use_git not explicitly true, skip
+        return Ok(None);
+    }
+
+    // Find current phase index in all_phase_metrics
+    let current_idx = context
+        .all_phase_metrics
+        .iter()
+        .position(|p| p.phase_name == context.current_phase);
+
+    let current_idx = match current_idx {
+        Some(idx) => idx,
+        None => return Ok(None), // Current phase not found, skip gracefully
+    };
+
+    // Calculate lookback window
+    let start_idx = current_idx.saturating_sub(lookback_phases - 1);
+    let phases_to_check = &context.all_phase_metrics[start_idx..=current_idx];
+
+    // Collect all git_commits from phases in window
+    let all_commits: Vec<_> = phases_to_check
+        .iter()
+        .flat_map(|p| &p.git_commits)
+        .collect();
+
+    // If no commits found, return violation
+    if all_commits.is_empty() {
+        Ok(Some(RuleViolation {
+            rule_type: "Require Commits".to_string(),
+            diagnostic: format!("No commits found in last {} phases", lookback_phases),
+            suggestion: "Create a commit before advancing. Use `hegel next --force require_commits` to override.".to_string(),
+            recent_events: vec![],
+        }))
+    } else {
+        Ok(None) // Commits found, no violation
+    }
 }
 
 /// Evaluate a repeated_file_edit rule

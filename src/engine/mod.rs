@@ -176,6 +176,7 @@ pub fn get_next_prompt(
     state: &WorkflowState,
     claims: &HashSet<String>,
     state_dir: &Path,
+    force_bypass: Option<&Option<String>>,
 ) -> Result<(String, WorkflowState)> {
     let current = &state.current_node;
     let node = workflow
@@ -223,7 +224,9 @@ pub fn get_next_prompt(
     let prompt = if !next_node_obj.rules.is_empty() {
         use crate::config::HegelConfig;
         use crate::metrics::parse_unified_metrics;
-        use crate::rules::{evaluate_rules, generate_interrupt_prompt, RuleEvaluationContext};
+        use crate::rules::{
+            evaluate_rules, generate_interrupt_prompt, RuleConfig, RuleEvaluationContext,
+        };
         use crate::storage::FileStorage;
 
         let metrics = parse_unified_metrics(state_dir, false, None)?;
@@ -236,6 +239,36 @@ pub fn get_next_prompt(
         let full_state = storage.load()?;
         let git_info = full_state.git_info.as_ref();
 
+        // Filter rules based on force_bypass
+        let rules_to_evaluate: Vec<RuleConfig> = match force_bypass {
+            Some(None) => {
+                // --force with no argument: skip all rules
+                vec![]
+            }
+            Some(Some(rule_type)) => {
+                // --force <type>: filter out matching rule type
+                next_node_obj
+                    .rules
+                    .iter()
+                    .filter(|rule| {
+                        let type_name = match rule {
+                            RuleConfig::RepeatedCommand { .. } => "repeated_command",
+                            RuleConfig::RepeatedFileEdit { .. } => "repeated_file_edit",
+                            RuleConfig::PhaseTimeout { .. } => "phase_timeout",
+                            RuleConfig::TokenBudget { .. } => "token_budget",
+                            RuleConfig::RequireCommits { .. } => "require_commits",
+                        };
+                        type_name != rule_type.as_str()
+                    })
+                    .cloned()
+                    .collect()
+            }
+            None => {
+                // No force: evaluate all rules
+                next_node_obj.rules.clone()
+            }
+        };
+
         let context = RuleEvaluationContext {
             current_phase: &new_state.current_node,
             phase_start_time: new_state.phase_start_time.as_ref(),
@@ -245,7 +278,7 @@ pub fn get_next_prompt(
             git_info,
         };
 
-        if let Some(violation) = evaluate_rules(&next_node_obj.rules, &context)? {
+        if let Some(violation) = evaluate_rules(&rules_to_evaluate, &context)? {
             // Interrupt REPLACES normal prompt
             generate_interrupt_prompt(&violation)
         } else {
@@ -495,7 +528,7 @@ nodes:
         let claims = HashSet::from(["spec_complete".to_string()]);
 
         let (prompt, new_state) =
-            get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
         assert_eq!(new_state.current_node, "plan");
         assert_eq!(new_state.history, vec!["spec", "plan"]);
         assert_eq!(prompt, "Write PLAN.md");
@@ -517,7 +550,7 @@ nodes:
         let claims = HashSet::from(["wrong_claim".to_string()]);
 
         let (prompt, new_state) =
-            get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
         assert_eq!(new_state.current_node, "spec");
         assert_eq!(new_state.history, vec!["spec"]);
         assert_eq!(prompt, "Write SPEC.md");
@@ -562,7 +595,7 @@ nodes:
         ] {
             let claims = HashSet::from([claim.to_string()]);
             let (_, new_state) =
-                get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+                get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
             state = new_state;
             assert_eq!(state.current_node, expected_node);
         }
@@ -621,7 +654,7 @@ nodes:
         ] {
             let claims = HashSet::from([claim.to_string()]);
             let (_, new_state) =
-                get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+                get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
             state = new_state;
             assert_eq!(state.current_node, expected_node);
         }
@@ -654,7 +687,8 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::from(["option_b".to_string(), "option_c".to_string()]);
 
-        let (_, new_state) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+        let (_, new_state) =
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
         assert_eq!(new_state.current_node, "path_b");
     }
 
@@ -673,7 +707,7 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::from(["go".to_string()]);
 
-        let result = get_next_prompt(&workflow, &state, &claims, temp_dir.path());
+        let result = get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None);
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("Next node not found"));
@@ -792,7 +826,8 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::new();
 
-        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+        let (prompt, _) =
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
         assert_eq!(prompt, "Normal prompt");
     }
 
@@ -811,7 +846,7 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::new();
 
-        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
+        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir, None).unwrap();
         assert_eq!(prompt, "Normal prompt");
     }
 
@@ -848,7 +883,7 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::new();
 
-        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
+        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir, None).unwrap();
 
         // Should return interrupt prompt, not normal prompt
         assert!(prompt.contains("⚠️"));
@@ -876,7 +911,7 @@ nodes:
         let state = init_state(&workflow);
         let claims = HashSet::new();
 
-        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir).unwrap();
+        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, &state_dir, None).unwrap();
 
         // Should return first rule violation only (token budget, not timeout)
         // This test verifies short-circuit behavior at integration level
@@ -901,7 +936,7 @@ nodes:
         let claims = HashSet::from(["spec_complete".to_string()]);
 
         let (prompt, new_state) =
-            get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
         assert_eq!(new_state.current_node, "plan");
         assert_eq!(prompt, "Write PLAN.md");
     }
@@ -1060,7 +1095,7 @@ nodes:
         claims.insert("next".to_string());
 
         let (prompt, new_state) =
-            get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
 
         // Verify transition happened
         assert_eq!(new_state.current_node, "hbs_node");
@@ -1100,9 +1135,227 @@ nodes:
         // Get next prompt
         let temp_dir = TempDir::new().unwrap();
         let claims = HashSet::new();
-        let (prompt, _) = get_next_prompt(&workflow, &state, &claims, temp_dir.path()).unwrap();
+        let (prompt, _) =
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
 
         // Verify we got the Handlebars template (not rendered yet - that happens in render_node_prompt)
         assert_eq!(prompt, "{{> code_map}}");
+    }
+
+    #[test]
+    fn test_require_commits_rule_validation_rejects_zero() {
+        use crate::rules::RuleConfig;
+
+        // Test validation directly on RuleConfig
+        let rule = RuleConfig::RequireCommits { lookback_phases: 0 };
+
+        let result = rule.validate();
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("require_commits.lookback_phases must be >= 1"));
+    }
+
+    // Note: Full end-to-end integration test for require_commits rule blocking
+    // is covered by manual testing. The rule evaluation logic is thoroughly
+    // tested in src/rules/tests/evaluator.rs. This engine-level test focuses
+    // on the positive case (with commits) and force bypass functionality.
+
+    #[test]
+    fn test_require_commits_rule_allows_with_commits() {
+        use crate::test_helpers::*;
+        use std::fs;
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create hooks and states files
+        create_hooks_file(&[]);
+        create_states_file(&[]);
+
+        // Manually create phase metrics file with git commits
+        let metrics_path = temp_dir.path().join("phase_metrics.jsonl");
+        let phase_json = serde_json::json!({
+            "phase_name": "code",
+            "start_time": "2025-01-01T10:00:00Z".to_string(),
+            "end_time": "2025-01-01T10:00:00Z".to_string(),
+            "duration_seconds": 100,
+            "token_metrics": {
+                "total_input_tokens": 0,
+                "total_output_tokens": 0,
+                "total_cache_creation_tokens": 0,
+                "total_cache_read_tokens": 0,
+                "assistant_turns": 0
+            },
+            "git_commits": [{
+                "hash": "abc123",
+                "author": "test@example.com",
+                "timestamp": "2025-01-01T10:00:00Z".to_string(),
+                "message": "test commit",
+                "files_changed": 1,
+                "insertions": 10,
+                "deletions": 5
+            }]
+        });
+        fs::write(&metrics_path, serde_json::to_string(&phase_json).unwrap()).unwrap();
+
+        let yaml = r#"
+name: test
+mode: test
+start_node: code
+nodes:
+  code:
+    prompt: "Write code"
+    rules:
+      - type: require_commits
+        lookback_phases: 1
+    transitions:
+      - when: code_complete
+        to: review
+  review:
+    prompt: "Review"
+    transitions: []
+"#;
+        let workflow = load_workflow_from_str(yaml).unwrap();
+        let mut state = init_state(&workflow);
+        state.phase_start_time = Some("2025-01-01T10:00:00Z".to_string());
+
+        let claims = HashSet::from(["code_complete".to_string()]);
+        let (prompt, new_state) =
+            get_next_prompt(&workflow, &state, &claims, temp_dir.path(), None).unwrap();
+
+        // Should transition to review node
+        assert_eq!(new_state.current_node, "review");
+        assert_eq!(prompt, "Review");
+    }
+
+    #[test]
+    fn test_require_commits_force_bypass_all() {
+        use crate::storage::{GitInfo, State};
+        use crate::test_helpers::*;
+        use std::fs;
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create empty hooks and states files
+        create_hooks_file(&[]);
+        create_states_file(&[]);
+
+        // Create git_info indicating we have a git repo
+        let state_obj = State {
+            workflow: None,
+            workflow_state: None,
+            session_metadata: None,
+            cumulative_totals: None,
+            git_info: Some(GitInfo {
+                has_repo: true,
+                current_branch: Some("main".to_string()),
+                remote_url: None,
+            }),
+        };
+        fs::write(
+            temp_dir.path().join("state.json"),
+            serde_json::to_string(&state_obj).unwrap(),
+        )
+        .unwrap();
+
+        let yaml = r#"
+name: test
+mode: test
+start_node: code
+nodes:
+  code:
+    prompt: "Write code"
+    rules:
+      - type: require_commits
+        lookback_phases: 1
+    transitions:
+      - when: code_complete
+        to: review
+  review:
+    prompt: "Review"
+    transitions: []
+"#;
+        let workflow = load_workflow_from_str(yaml).unwrap();
+        let state = init_state(&workflow);
+
+        let claims = HashSet::from(["code_complete".to_string()]);
+        let force_bypass: Option<String> = None; // --force with no argument
+        let (prompt, new_state) = get_next_prompt(
+            &workflow,
+            &state,
+            &claims,
+            temp_dir.path(),
+            Some(&force_bypass),
+        )
+        .unwrap();
+
+        // Should transition despite no commits (force bypass)
+        assert_eq!(new_state.current_node, "review");
+        assert_eq!(prompt, "Review");
+    }
+
+    #[test]
+    fn test_require_commits_force_bypass_specific() {
+        use crate::storage::{GitInfo, State};
+        use crate::test_helpers::*;
+        use std::fs;
+
+        let temp_dir = TempDir::new().unwrap();
+
+        // Create empty hooks and states files
+        create_hooks_file(&[]);
+        create_states_file(&[]);
+
+        // Create git_info indicating we have a git repo
+        let state_obj = State {
+            workflow: None,
+            workflow_state: None,
+            session_metadata: None,
+            cumulative_totals: None,
+            git_info: Some(GitInfo {
+                has_repo: true,
+                current_branch: Some("main".to_string()),
+                remote_url: None,
+            }),
+        };
+        fs::write(
+            temp_dir.path().join("state.json"),
+            serde_json::to_string(&state_obj).unwrap(),
+        )
+        .unwrap();
+
+        let yaml = r#"
+name: test
+mode: test
+start_node: code
+nodes:
+  code:
+    prompt: "Write code"
+    rules:
+      - type: require_commits
+        lookback_phases: 1
+    transitions:
+      - when: code_complete
+        to: review
+  review:
+    prompt: "Review"
+    transitions: []
+"#;
+        let workflow = load_workflow_from_str(yaml).unwrap();
+        let state = init_state(&workflow);
+
+        let claims = HashSet::from(["code_complete".to_string()]);
+        let force_bypass: Option<String> = Some("require_commits".to_string()); // --force require_commits
+        let (prompt, new_state) = get_next_prompt(
+            &workflow,
+            &state,
+            &claims,
+            temp_dir.path(),
+            Some(&force_bypass),
+        )
+        .unwrap();
+
+        // Should transition despite no commits (force bypass specific rule)
+        assert_eq!(new_state.current_node, "review");
+        assert_eq!(prompt, "Review");
     }
 }

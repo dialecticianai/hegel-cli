@@ -68,7 +68,7 @@ fn test_evaluate_intra_workflow_transition() {
 
     let context = load_workflow_context(&storage).unwrap();
     let claims = claim("spec_complete", true);
-    let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+    let outcome = evaluate_transition(&context, &claims, &storage, None).unwrap();
 
     match outcome {
         TransitionOutcome::IntraWorkflow {
@@ -88,7 +88,7 @@ fn test_evaluate_stay_at_current_node() {
 
     let context = load_workflow_context(&storage).unwrap();
     let claims = claim("wrong_claim", true);
-    let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+    let outcome = evaluate_transition(&context, &claims, &storage, None).unwrap();
 
     match outcome {
         TransitionOutcome::Stay { current_node, .. } => {
@@ -108,7 +108,7 @@ fn test_evaluate_inter_workflow_transition_research_to_discovery() {
 
     let context = load_workflow_context(&storage).unwrap();
     let claims = claim("done_complete", true);
-    let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+    let outcome = evaluate_transition(&context, &claims, &storage, None).unwrap();
 
     match outcome {
         TransitionOutcome::InterWorkflow {
@@ -137,7 +137,7 @@ fn test_evaluate_ambiguous_discovery_done_in_learning_mode() {
 
     let context = load_workflow_context(&storage).unwrap();
     let claims = claim("done_complete", true);
-    let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+    let outcome = evaluate_transition(&context, &claims, &storage, None).unwrap();
 
     match outcome {
         TransitionOutcome::Ambiguous { options } => {
@@ -157,7 +157,7 @@ fn test_evaluate_stay_at_done_no_meta_mode() {
 
     let context = load_workflow_context(&storage).unwrap();
     let claims = claim("done_complete", true);
-    let outcome = evaluate_transition(&context, &claims, &storage).unwrap();
+    let outcome = evaluate_transition(&context, &claims, &storage, None).unwrap();
 
     match outcome {
         TransitionOutcome::Stay { current_node, .. } => {

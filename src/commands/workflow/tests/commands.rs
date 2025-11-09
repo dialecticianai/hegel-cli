@@ -69,7 +69,7 @@ fn test_next_prompt_no_matching_transition() {
 #[test]
 fn test_next_prompt_no_workflow_loaded() {
     let (_tmp, storage) = setup_workflow_env();
-    let result = next_prompt(Some(r#"{"spec_complete": true}"#), &storage);
+    let result = next_prompt(Some(r#"{"spec_complete": true}"#), None, &storage);
     assert!(
         result.is_err()
             && result

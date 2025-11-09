@@ -122,7 +122,11 @@ pub fn start_workflow(
 }
 
 /// Core workflow advancement logic used by next, repeat, and restart
-fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()> {
+fn advance_workflow(
+    claim_alias: ClaimAlias,
+    storage: &FileStorage,
+    force_bypass: Option<&Option<String>>,
+) -> Result<()> {
     // Load workflow context
     let mut context = load_workflow_context(storage)?;
 
@@ -130,7 +134,7 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
     let claims = claim_alias.to_claims(&context.workflow_state.current_node)?;
 
     // Evaluate transition
-    let outcome = evaluate_transition(&context, &claims, storage)?;
+    let outcome = evaluate_transition(&context, &claims, storage, force_bypass)?;
 
     // Execute transition
     execute_transition(outcome, &mut context, storage)?;
@@ -138,12 +142,16 @@ fn advance_workflow(claim_alias: ClaimAlias, storage: &FileStorage) -> Result<()
     Ok(())
 }
 
-pub fn next_prompt(claim_str: Option<&str>, storage: &FileStorage) -> Result<()> {
+pub fn next_prompt(
+    claim_str: Option<&str>,
+    force_bypass: Option<&Option<String>>,
+    storage: &FileStorage,
+) -> Result<()> {
     let claim_alias = match claim_str {
         Some(name) => ClaimAlias::Custom(name.to_string()),
         None => ClaimAlias::Next,
     };
-    advance_workflow(claim_alias, storage)
+    advance_workflow(claim_alias, storage, force_bypass)
 }
 
 pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
@@ -253,7 +261,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
 }
 
 pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
-    advance_workflow(ClaimAlias::Restart, storage)
+    advance_workflow(ClaimAlias::Restart, storage, None)
 }
 
 pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
