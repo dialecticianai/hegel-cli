@@ -15,9 +15,9 @@ Core implementation of Hegel CLI. Six-layer architecture for Dialectic-Driven De
 
 ```
 src/
-├── main.rs              CLI entry point (clap parser, state directory resolution, command routing)
+├── main.rs              CLI entry point (clap parser with --force flag, state directory resolution, command routing)
 ├── lib.rs               Library interface (exposes modules for hegel-pm and external tools)
-├── config.rs            User configuration (load/save .hegel/config.toml, code_map_style, use_reflect_gui)
+├── config.rs            User configuration (code_map_style, use_reflect_gui, commit_guard, use_git)
 ├── embedded.rs          Compile-time bundled resources (workflows, guides via include_str!)
 ├── theme.rs             Terminal color theme (semantic styling for success/error/warning, metrics)
 │
