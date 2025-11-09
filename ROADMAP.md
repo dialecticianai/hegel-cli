@@ -265,6 +265,42 @@ hegel start discovery exploration->synthesis  # Custom sequences
 - State injection into Claude context (current phase, workflow, history)
 - Integration with existing hook system for telemetry
 
+### 2.6 Granular Activity Filtering for Cowboy Detection
+
+**Goal:** Improve cowboy workflow detection to exclude workflow control commands and capture only real development activity.
+
+**Current behavior (temporary):**
+- Cowboy workflows created only when git commits OR uncommitted changes exist
+- All bash commands/file modifications without git evidence are ignored
+- Prevents false positives from `hegel next`/`hegel start` commands
+
+**Desired behavior:**
+- Capture bash commands and file modifications that represent actual work
+- Exclude workflow control commands (`hegel next`, `hegel start`, `hegel prev`, etc.)
+- Exclude meta commands (`git status`, `ls`, `cat`, etc.)
+- Include productive commands (`cargo build`, `npm install`, editing code files, etc.)
+
+**Implementation approach:**
+1. Create allowlist/blocklist for command patterns
+   - Block: `hegel *`, `git status`, `git log`, `git diff`, `ls`, `cat`, `grep`, etc.
+   - Allow: Build commands, test commands, package management, code generation
+2. Filter bash commands and file modifications by these patterns
+3. Create cowboy workflows when:
+   - Git commits exist in gap, OR
+   - Uncommitted changes exist, OR
+   - Non-excluded bash/file activity exists
+4. Re-enable currently ignored tests: `test_detect_cowboy_with_bash_activity`, `test_cowboy_with_file_modifications`
+
+**Why it matters:**
+- Current approach is too conservative - misses legitimate cowboy work sessions
+- LLM agents do significant work via bash commands and file edits before committing
+- Need to capture this activity without false positives from workflow navigation
+
+**Complexity:**
+- Requires heuristics for "productive" vs "meta" commands
+- Different projects may have different productive command patterns
+- Configuration may be needed for custom command classification
+
 ---
 
 ## Phase 3: Experimental Features
