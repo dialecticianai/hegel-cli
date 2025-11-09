@@ -18,7 +18,7 @@ It works like a state machine: start a workflow, move through phases, see your h
 
 The tool implements the Dialectic Driven Development paradigm with three modes: research for learning new domains, discovery for prototyping ideas, and execution for shipping features. The philosophy? Build clarity first—robust specs make code generation fast and reliable. Feels slower upfront, but you skip the costly flailing later.
 
-**Want to learn more?** Join us on [Discord](https://discord.gg/eVGgHAcMGY) to discuss DDD and Hegel with the community, or check out [the DDD book](https://dialecticianai.github.io/ddd-book/) for the full methodology.
+**Want to learn more?** Join us on [Discord](https://discord.gg/YFB4Fy6bh8) to discuss DDD and Hegel with the community, or check out [the DDD book](https://dialecticianai.github.io/ddd-book/) for the full methodology.
 
 <p align="center">
   <img src="hegel_experience.png" alt="Hegel Experience" width="800">
