@@ -4,6 +4,7 @@ mod transitions;
 
 use anyhow::{Context, Result};
 use colored::Colorize;
+use std::path::PathBuf;
 
 use crate::engine::{init_state, load_workflow};
 use crate::storage::{FileStorage, State};
@@ -29,13 +30,11 @@ pub fn start_workflow(
     let existing_state = storage.load()?;
 
     // Check if there's already an active workflow
-    if let Some(existing_ws) = &existing_state.workflow_state {
-        if let Some(existing_workflow_value) = &existing_state.workflow {
-            // Deserialize workflow to check if at terminal node
-            let existing_workflow: crate::engine::Workflow =
-                serde_yaml::from_value(existing_workflow_value.clone())
-                    .context("Failed to deserialize existing workflow")?;
-
+    if let Some(existing_ws) = &existing_state.workflow {
+        // Load existing workflow from YAML file
+        let existing_workflow_path =
+            PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", existing_ws.mode));
+        if let Ok(existing_workflow) = load_workflow(&existing_workflow_path) {
             // Allow starting new workflow if current is at a terminal node
             if !existing_workflow.is_terminal_node(&existing_ws.current_node) {
                 anyhow::bail!(
@@ -50,7 +49,7 @@ pub fn start_workflow(
 
     // Preserve existing meta-mode if set (optional - only needed for inter-workflow transitions)
     let existing_meta_mode = existing_state
-        .workflow_state
+        .workflow
         .as_ref()
         .and_then(|ws| ws.meta_mode.clone());
 
@@ -99,8 +98,7 @@ pub fn start_workflow(
 
     // Store state (preserve session_metadata and cumulative_totals from existing state)
     let state = State {
-        workflow: Some(serde_yaml::to_value(&workflow)?),
-        workflow_state: Some(workflow_state.clone()),
+        workflow: Some(workflow_state.clone()),
         session_metadata: existing_state.session_metadata,
         cumulative_totals: existing_state.cumulative_totals,
         git_info: existing_state.git_info,
@@ -161,7 +159,6 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     // Clear workflow fields but keep session_metadata and cumulative_totals
     let cleared_state = State {
         workflow: None,
-        workflow_state: None,
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
         git_info: state.git_info,
@@ -177,15 +174,13 @@ pub fn abort_workflow(storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
 
     // Check if there's an active workflow
-    if state.workflow.is_none() {
-        println!("No active workflow to abort.");
-        return Ok(());
-    }
-
-    let workflow_state = state
-        .workflow_state
-        .as_ref()
-        .context("No workflow state found")?;
+    let workflow_state = match state.workflow.as_ref() {
+        Some(ws) => ws,
+        None => {
+            println!("No active workflow to abort.");
+            return Ok(());
+        }
+    };
 
     println!(
         "{}",
@@ -214,19 +209,16 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     // Load current state
     let state = storage.load()?;
 
-    let workflow_yaml = state
+    let workflow_state = state
         .workflow
         .as_ref()
-        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
+        .context("No workflow state found. Run 'hegel start <workflow>' first.")?;
 
-    let workflow_state = state
-        .workflow_state
-        .as_ref()
-        .context("No workflow state found")?;
-
-    // Parse workflow from stored YAML value
-    let workflow: crate::engine::Workflow =
-        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+    // Load workflow from YAML file based on mode
+    let workflow_path =
+        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow = crate::engine::load_workflow(&workflow_path)
+        .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
     // Get current node prompt
     let current_node = &workflow_state.current_node;
@@ -270,19 +262,16 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
     // Load current state
     let state = storage.load()?;
 
-    let workflow_yaml = state
-        .workflow
-        .as_ref()
-        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
-
     let mut workflow_state = state
-        .workflow_state
+        .workflow
         .clone()
-        .context("No workflow state found")?;
+        .context("No workflow state found. Run 'hegel start <workflow>' first.")?;
 
-    // Parse workflow from stored YAML value
-    let workflow: crate::engine::Workflow =
-        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+    // Load workflow from YAML file based on mode
+    let workflow_path =
+        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow = crate::engine::load_workflow(&workflow_path)
+        .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
     // Validate we can go back
     if workflow_state.history.len() <= 1 {
@@ -317,8 +306,7 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
 
     // Persist state
     let updated_state = State {
-        workflow: Some(serde_yaml::to_value(&workflow)?),
-        workflow_state: Some(workflow_state.clone()),
+        workflow: Some(workflow_state.clone()),
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
         git_info: state.git_info,
@@ -377,7 +365,7 @@ pub fn stash_workflow(message: Option<String>, storage: &FileStorage) -> Result<
 
     println!(
         "Saved working directory to stash@{{0}}: {}/{}{}",
-        stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+        stash.workflow.mode, stash.workflow.current_node, msg_display
     );
 
     Ok(())
@@ -422,11 +410,7 @@ pub fn list_stashes(storage: &FileStorage) -> Result<()> {
 
         println!(
             "stash@{{{}}}: {}/{}{}  ({})",
-            stash.index,
-            stash.workflow_state.mode,
-            stash.workflow_state.current_node,
-            msg_display,
-            time_ago
+            stash.index, stash.workflow.mode, stash.workflow.current_node, msg_display, time_ago
         );
     }
 
@@ -442,8 +426,8 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     if state.workflow.is_some() {
         anyhow::bail!(
             "Cannot restore stash: active workflow at '{}/{}'. Run 'hegel abort' or 'hegel stash' first.",
-            state.workflow_state.as_ref().map(|ws| ws.mode.as_str()).unwrap_or("unknown"),
-            state.workflow_state.as_ref().map(|ws| ws.current_node.as_str()).unwrap_or("unknown")
+            state.workflow.as_ref().map(|ws| ws.mode.as_str()).unwrap_or("unknown"),
+            state.workflow.as_ref().map(|ws| ws.current_node.as_str()).unwrap_or("unknown")
         );
     }
 
@@ -452,8 +436,7 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
 
     // Restore state
     let restored = State {
-        workflow: stash.workflow,
-        workflow_state: Some(stash.workflow_state.clone()),
+        workflow: Some(stash.workflow.clone()),
         session_metadata: state.session_metadata,
         cumulative_totals: state.cumulative_totals,
         git_info: state.git_info,
@@ -471,18 +454,21 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
 
     println!(
         "Restored stash@{{{}}}: {}/{}{}",
-        index, stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+        index, stash.workflow.mode, stash.workflow.current_node, msg_display
     );
     println!();
 
     // Get workflow to display prompt
-    let workflow: crate::engine::Workflow =
-        serde_yaml::from_value(restored.workflow.context("No workflow in restored state")?)?;
+    let workflow_state = restored.workflow.context("No workflow in restored state")?;
+    let workflow_path =
+        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow = load_workflow(&workflow_path)
+        .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
     let node = workflow
         .nodes
-        .get(&stash.workflow_state.current_node)
-        .with_context(|| format!("Node not found: {}", stash.workflow_state.current_node))?;
+        .get(&stash.workflow.current_node)
+        .with_context(|| format!("Node not found: {}", stash.workflow.current_node))?;
 
     let prompt_text = if !node.prompt_hbs.is_empty() {
         &node.prompt_hbs
@@ -491,10 +477,10 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     };
 
     display_workflow_prompt(
-        &stash.workflow_state.current_node,
-        &stash.workflow_state.mode,
+        &stash.workflow.current_node,
+        &stash.workflow.mode,
         prompt_text,
-        stash.workflow_state.is_handlebars,
+        stash.workflow.is_handlebars,
         storage,
     )?;
 
@@ -518,7 +504,7 @@ pub fn drop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
 
     println!(
         "Dropped stash@{{{}}}: {}/{}{}",
-        index, stash.workflow_state.mode, stash.workflow_state.current_node, msg_display
+        index, stash.workflow.mode, stash.workflow.current_node, msg_display
     );
 
     Ok(())

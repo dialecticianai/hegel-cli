@@ -321,7 +321,7 @@ pub(crate) fn archive_and_cleanup(storage: &FileStorage) -> Result<()> {
     // Get workflow_id from state
     let state = storage.load()?;
     let workflow_id = state
-        .workflow_state
+        .workflow
         .as_ref()
         .and_then(|ws| ws.workflow_id.clone())
         .context("No workflow_id for archiving")?;
@@ -452,8 +452,7 @@ pub fn execute_transition(
 
             // Persist state
             let state = State {
-                workflow: Some(serde_yaml::to_value(&context.workflow)?),
-                workflow_state: Some(context.workflow_state.clone()),
+                workflow: Some(context.workflow_state.clone()),
                 session_metadata: context.session_metadata.clone(),
                 cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
                 git_info: storage.load().ok().and_then(|s| s.git_info),
@@ -522,8 +521,7 @@ pub fn execute_transition(
 
             // Persist new state
             let state = State {
-                workflow: Some(serde_yaml::to_value(&new_workflow)?),
-                workflow_state: Some(new_state.clone()),
+                workflow: Some(new_state.clone()),
                 session_metadata: context.session_metadata.clone(),
                 cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
                 git_info: storage.load().ok().and_then(|s| s.git_info),

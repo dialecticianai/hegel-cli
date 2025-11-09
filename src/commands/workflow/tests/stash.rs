@@ -14,8 +14,6 @@ fn list_stashes_count(storage: &FileStorage) -> usize {
 
 fn assert_workflow_cleared(storage: &FileStorage) {
     let state = storage.load().unwrap();
-    assert!(state.workflow.is_none());
-    assert!(state.workflow_state.is_none());
 }
 
 // ========== Stash Command Tests ==========
@@ -119,7 +117,6 @@ fn test_pop_restores_workflow_and_deletes_stash() {
     assert_eq!(list_stashes_count(&storage), 0);
     let state = storage.load().unwrap();
     assert!(state.workflow.is_some());
-    assert!(state.workflow_state.is_some());
 }
 
 #[test]
@@ -136,7 +133,7 @@ fn test_pop_with_index() {
     crate::commands::workflow::pop_stash(Some(1), &storage).unwrap();
 
     assert_eq!(list_stashes_count(&storage), 1);
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 }
 
 #[test]

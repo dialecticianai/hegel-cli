@@ -25,7 +25,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
 
     // Check if already in a workflow
-    if let Some(workflow_state) = &state.workflow_state {
+    if let Some(workflow_state) = &state.workflow {
         // Allow changing meta-mode if at a terminal node or no workflow active
         if !is_terminal(&workflow_state.current_node) {
             anyhow::bail!(
@@ -45,8 +45,7 @@ fn declare_meta_mode(name: &str, storage: &FileStorage) -> Result<()> {
     // Create initial dummy workflow state with just meta-mode
     // This allows start_workflow to find the meta-mode when it loads state
     let initial_state = crate::storage::State {
-        workflow: None,
-        workflow_state: Some(crate::storage::WorkflowState {
+        workflow: Some(crate::storage::WorkflowState {
             current_node: String::new(),
             mode: String::new(),
             history: vec![],
@@ -84,7 +83,7 @@ fn show_meta_mode_status(storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
 
     let workflow_state = state
-        .workflow_state
+        .workflow
         .as_ref()
         .context("No workflow active. Run 'hegel meta <name>' to declare a meta-mode.")?;
 
@@ -186,7 +185,7 @@ mod tests {
 
         // Should have started discovery workflow
         let state = storage.load().unwrap();
-        let workflow_state = state.workflow_state.unwrap();
+        let workflow_state = state.workflow.unwrap();
         assert_eq!(workflow_state.mode, "discovery");
         assert_eq!(workflow_state.meta_mode.unwrap().name, "standard");
     }

@@ -43,7 +43,7 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
     }
 }
 
-/// Create a State for testing with optional workflow_state
+/// Create a State for testing with workflow state
 ///
 /// # Example
 /// ```ignore
@@ -51,8 +51,7 @@ pub fn test_workflow_state(node: &str, mode: &str, history: &[&str]) -> Workflow
 /// ```
 pub fn test_state(node: &str, mode: &str, history: &[&str]) -> State {
     State {
-        workflow: None,
-        workflow_state: Some(test_workflow_state(node, mode, history)),
+        workflow: Some(test_workflow_state(node, mode, history)),
         session_metadata: None,
         cumulative_totals: None,
         git_info: None,
@@ -61,7 +60,7 @@ pub fn test_state(node: &str, mode: &str, history: &[&str]) -> State {
 
 /// Assert that a loaded workflow state matches expected values
 pub fn assert_state_eq(state: &State, node: &str, mode: &str, history: &[&str]) {
-    let ws = state.workflow_state.as_ref().unwrap();
+    let ws = state.workflow.as_ref().unwrap();
     assert_eq!(ws.current_node, node);
     assert_eq!(ws.mode, mode);
     assert_eq!(ws.history, history);

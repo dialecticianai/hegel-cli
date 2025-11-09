@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::config::HegelConfig;
 use crate::engine::{render_prompt, Workflow};
@@ -18,19 +18,17 @@ pub struct WorkflowContext {
 pub fn load_workflow_context(storage: &FileStorage) -> Result<WorkflowContext> {
     let state = storage.load()?;
 
-    let workflow_yaml = state
+    let workflow_state = state
         .workflow
         .as_ref()
-        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?;
-
-    let workflow_state = state
-        .workflow_state
-        .as_ref()
-        .context("No workflow state found")?
+        .context("No workflow loaded. Run 'hegel start <workflow>' first.")?
         .clone();
 
-    let workflow: Workflow =
-        serde_yaml::from_value(workflow_yaml.clone()).context("Failed to parse stored workflow")?;
+    // Load workflow from YAML file based on mode
+    let workflow_path =
+        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow = crate::engine::load_workflow(&workflow_path)
+        .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
     Ok(WorkflowContext {
         workflow,

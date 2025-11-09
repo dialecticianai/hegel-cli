@@ -9,10 +9,9 @@ fn test_start_workflow_success() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     let state = get_state(&storage);
-    assert!(state.workflow.is_some());
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 
-    let wf_id = state.workflow_state.unwrap().workflow_id.unwrap();
+    let wf_id = state.workflow.unwrap().workflow_id.unwrap();
     use chrono::DateTime;
     assert!(DateTime::parse_from_rfc3339(&wf_id).is_ok());
 }
@@ -34,7 +33,7 @@ fn test_start_workflow_missing_file() {
 fn test_start_workflow_with_custom_start_node() {
     let (_tmp, storage) = setup_workflow_env();
     start_workflow("test_workflow", Some("plan"), &storage).unwrap();
-    assert_at(&storage, "plan", "test_mode", &["plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["plan"]);
 }
 
 #[test]
@@ -55,7 +54,7 @@ fn test_next_prompt_successful_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next_with("spec_complete", &storage);
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 }
 
 #[test]
@@ -63,7 +62,7 @@ fn test_next_prompt_no_matching_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next_with("wrong_claim", &storage);
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 }
 
 #[test]
@@ -86,23 +85,13 @@ fn test_next_prompt_multiple_transitions() {
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         2
     );
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         3
     );
 }
@@ -114,17 +103,17 @@ fn test_prev_prompt_successful_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next(&storage); // spec -> plan
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     prev_prompt(&storage).unwrap();
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 }
 
 #[test]
 fn test_prev_prompt_at_start_fails() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 
     let result = prev_prompt(&storage);
     assert!(result.is_err());
@@ -137,13 +126,7 @@ fn test_prev_prompt_at_start_fails() {
 fn test_prev_prompt_no_workflow_loaded() {
     let (_tmp, storage) = setup_workflow_env();
     let result = prev_prompt(&storage);
-    assert!(
-        result.is_err()
-            && result
-                .unwrap_err()
-                .to_string()
-                .contains("No workflow loaded")
-    );
+    assert!(result.is_err() && result.unwrap_err().to_string().contains("No workflow"));
 }
 
 #[test]
@@ -151,17 +134,17 @@ fn test_prev_prompt_multiple_transitions() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next(&storage); // spec -> plan
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     prev_prompt(&storage).unwrap(); // plan -> spec
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 
     // Go forward again and back again to test it multiple times
     next(&storage); // spec -> plan
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     prev_prompt(&storage).unwrap(); // plan -> spec
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 }
 
 #[test]
@@ -169,13 +152,13 @@ fn test_prev_then_next() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next(&storage); // spec -> plan
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     prev_prompt(&storage).unwrap(); // plan -> spec
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 
     next(&storage); // spec -> plan (should work again)
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 }
 
 #[test]
@@ -212,7 +195,7 @@ fn test_show_status_after_transitions() {
     start(&storage);
     next_with("spec_complete", &storage);
     assert!(show_status(&storage).is_ok());
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 }
 
 // ========== reset_workflow Tests ==========
@@ -224,7 +207,7 @@ fn test_reset_workflow_clears_state() {
     assert!(get_state(&storage).workflow.is_some());
     reset_workflow(&storage).unwrap();
     let state = get_state(&storage);
-    assert!(state.workflow.is_none() && state.workflow_state.is_none());
+    assert!(state.workflow.is_none());
 }
 
 #[test]
@@ -251,8 +234,6 @@ fn test_reset_workflow_preserves_session_metadata() {
     reset_workflow(&storage).unwrap();
 
     let state = get_state(&storage);
-    assert!(state.workflow.is_none());
-    assert!(state.workflow_state.is_none());
     assert!(state.session_metadata.is_some());
     assert_eq!(state.session_metadata.unwrap().session_id, "test-session");
 }
@@ -264,7 +245,7 @@ fn test_reset_then_start_new_workflow() {
     next_with("spec_complete", &storage);
     reset_workflow(&storage).unwrap();
     start(&storage);
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
 }
 
 // ========== Integration Tests ==========
@@ -275,17 +256,11 @@ fn test_full_workflow_cycle() {
     start(&storage);
     let state = get_state(&storage);
 
-    assert!(state.workflow.is_some());
-    assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 1);
+    assert_eq!(state.workflow.as_ref().unwrap().history.len(), 1);
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         2
     );
 }
@@ -301,7 +276,7 @@ fn test_next_prompt_logs_state_transition() {
     assert_eq!(event["from_node"], "spec");
     assert_eq!(event["to_node"], "plan");
     assert_eq!(event["phase"], "plan");
-    assert_eq!(event["mode"], "test_mode");
+    assert_eq!(event["mode"], "test_workflow");
 }
 
 #[test]
@@ -336,7 +311,7 @@ fn test_state_transition_includes_workflow_id() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     let workflow_id = get_state(&storage)
-        .workflow_state
+        .workflow
         .as_ref()
         .unwrap()
         .workflow_id
@@ -361,13 +336,7 @@ fn test_continue_with_active_workflow_returns_current_node_prompt() {
 fn test_continue_with_no_workflow_loaded_returns_error() {
     let (_tmp, storage) = setup_workflow_env();
     let result = repeat_prompt(&storage);
-    assert!(
-        result.is_err()
-            && result
-                .unwrap_err()
-                .to_string()
-                .contains("No workflow loaded")
-    );
+    assert!(result.is_err() && result.unwrap_err().to_string().contains("No workflow"));
 }
 
 #[test]
@@ -385,8 +354,8 @@ fn test_continue_does_not_change_workflow_state() {
     repeat_prompt(&storage).unwrap();
     let state_after = get_state(&storage);
 
-    assert_state_eq(&state_before, "spec", "test_mode", &["spec"]);
-    assert_state_eq(&state_after, "spec", "test_mode", &["spec"]);
+    assert_state_eq(&state_before, "spec", "test_workflow", &["spec"]);
+    assert_state_eq(&state_after, "spec", "test_workflow", &["spec"]);
 }
 
 #[test]
@@ -404,7 +373,7 @@ fn test_next_prompt_implicit_happy_path() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next(&storage);
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 }
 
 #[test]
@@ -414,23 +383,13 @@ fn test_next_prompt_implicit_multiple_transitions() {
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         2
     );
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         3
     );
 }
@@ -440,10 +399,10 @@ fn test_restart_workflow_returns_to_spec() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next(&storage);
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     restart_workflow(&storage).unwrap();
-    assert_at(&storage, "spec", "test_mode", &["spec", "plan", "spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec", "plan", "spec"]);
 }
 
 #[test]

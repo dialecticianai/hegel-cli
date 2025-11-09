@@ -12,7 +12,7 @@ fn test_next_prompt_logs_state_transition() {
     assert_eq!(event["from_node"], "spec");
     assert_eq!(event["to_node"], "plan");
     assert_eq!(event["phase"], "plan");
-    assert_eq!(event["mode"], "test_mode");
+    assert_eq!(event["mode"], "test_workflow");
 }
 
 #[test]
@@ -47,7 +47,7 @@ fn test_state_transition_includes_workflow_id() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     let workflow_id = get_state(&storage)
-        .workflow_state
+        .workflow
         .as_ref()
         .unwrap()
         .workflow_id
@@ -183,7 +183,7 @@ fn test_execute_intra_workflow_transition() {
 
     execute_transition(outcome, &mut context, &storage).unwrap();
 
-    assert_at(&storage, "plan", "test_mode", &["spec", "plan"]);
+    assert_at(&storage, "plan", "test_workflow", &["spec", "plan"]);
 
     let event = first_transition(&storage);
     assert_eq!(event["from_node"], "spec");
@@ -203,7 +203,7 @@ fn test_execute_stay_no_state_change() {
 
     execute_transition(outcome, &mut context, &storage).unwrap();
 
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
     assert_eq!(transition_count(&storage), 0);
 }
 
@@ -226,11 +226,11 @@ fn test_execute_inter_workflow_transition() {
     execute_transition(outcome, &mut context, &storage).unwrap();
 
     let state = get_state(&storage);
-    assert_eq!(state.workflow_state.as_ref().unwrap().mode, "discovery");
-    assert_eq!(state.workflow_state.as_ref().unwrap().current_node, "spec");
+    assert_eq!(state.workflow.as_ref().unwrap().mode, "discovery");
+    assert_eq!(state.workflow.as_ref().unwrap().current_node, "spec");
     assert_eq!(
         state
-            .workflow_state
+            .workflow
             .as_ref()
             .unwrap()
             .meta_mode
@@ -269,7 +269,7 @@ fn test_execute_ambiguous_no_state_change() {
 
     execute_transition(outcome, &mut context, &storage).unwrap();
 
-    assert_at(&storage, "spec", "test_mode", &["spec"]);
+    assert_at(&storage, "spec", "test_workflow", &["spec"]);
     assert_eq!(transition_count(&storage), 0);
 }
 
@@ -293,7 +293,7 @@ fn test_transition_to_done_archives_workflow() {
 
     // Verify archive has correct workflow data
     let archive = &archives[0];
-    assert_eq!(archive.mode, "test_mode");
+    assert_eq!(archive.mode, "test_workflow");
     assert!(archive.phases.len() > 0);
 
     // Verify logs deleted

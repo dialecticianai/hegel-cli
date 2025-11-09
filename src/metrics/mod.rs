@@ -525,7 +525,6 @@ mod tests {
         };
         let state = State {
             workflow: None,
-            workflow_state: None,
             session_metadata: Some(session),
             cumulative_totals: None,
             git_info: None,

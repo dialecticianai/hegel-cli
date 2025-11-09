@@ -9,7 +9,7 @@ use tempfile::TempDir;
 /// Test workflow YAML - simple 3-node workflow for testing
 #[allow(dead_code)] // Reserved for engine tests (see test_helpers/README.md)
 pub const TEST_WORKFLOW_YAML: &str = r#"
-mode: test_mode
+mode: test_workflow
 start_node: spec
 nodes:
   spec:

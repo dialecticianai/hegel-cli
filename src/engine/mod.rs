@@ -1245,7 +1245,6 @@ nodes:
         // Create git_info indicating we have a git repo
         let state_obj = State {
             workflow: None,
-            workflow_state: None,
             session_metadata: None,
             cumulative_totals: None,
             git_info: Some(GitInfo {
@@ -1311,7 +1310,6 @@ nodes:
         // Create git_info indicating we have a git repo
         let state_obj = State {
             workflow: None,
-            workflow_state: None,
             session_metadata: None,
             cumulative_totals: None,
             git_info: Some(GitInfo {

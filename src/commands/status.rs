@@ -80,7 +80,7 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
     }
 
     // Show workflow status if active
-    if state.workflow.is_none() || state.workflow_state.is_none() {
+    if state.workflow.is_none() || state.workflow.is_none() {
         println!("{}", Theme::secondary("No active workflow"));
         println!(
             "Start a workflow with: {}",
@@ -89,7 +89,7 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
         return Ok(());
     }
 
-    let workflow_state = state.workflow_state.as_ref().unwrap();
+    let workflow_state = state.workflow.as_ref().unwrap();
 
     // Check if we're in a terminal state (done or aborted)
     let in_terminal_state = is_terminal(&workflow_state.current_node);

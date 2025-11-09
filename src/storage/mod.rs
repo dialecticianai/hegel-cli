@@ -49,13 +49,12 @@ pub struct WorkflowState {
     pub is_handlebars: bool,
 }
 
-/// Complete state including workflow definition and current state
+/// Complete state including workflow state (not definition - that lives in YAML files)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct State {
+    /// Current workflow state (current node, history, etc.) - NOT the workflow definition
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub workflow: Option<serde_yaml::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub workflow_state: Option<WorkflowState>,
+    pub workflow: Option<WorkflowState>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_metadata: Option<SessionMetadata>,
     /// Cumulative totals across all archived workflows
@@ -73,8 +72,7 @@ pub struct StashEntry {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     pub timestamp: String,
-    pub workflow: Option<serde_yaml::Value>,
-    pub workflow_state: WorkflowState,
+    pub workflow: WorkflowState, // Workflow state (not definition - that lives in YAML files)
 }
 
 /// File-based state storage
@@ -220,7 +218,6 @@ impl FileStorage {
         if !state_file.exists() {
             return Ok(State {
                 workflow: None,
-                workflow_state: None,
                 session_metadata: None,
                 cumulative_totals: None,
                 git_info: None,
@@ -373,10 +370,7 @@ impl FileStorage {
             .as_ref()
             .context("No active workflow to stash")?;
 
-        let workflow_state = state
-            .workflow_state
-            .as_ref()
-            .context("No active workflow to stash")?;
+        let workflow_state = workflow; // Already checked above
 
         // Create stash directory if needed
         let stash_dir = self.state_dir.join("stashes");
@@ -393,8 +387,7 @@ impl FileStorage {
             index: 0, // Placeholder, will be reindexed
             message,
             timestamp: timestamp.clone(),
-            workflow: Some(workflow.clone()),
-            workflow_state: workflow_state.clone(),
+            workflow: workflow_state.clone(),
         };
 
         // Write stash file
@@ -409,7 +402,6 @@ impl FileStorage {
         // Clear workflow state (preserve session metadata and other global fields)
         let cleared_state = State {
             workflow: None,
-            workflow_state: None,
             session_metadata: state.session_metadata,
             cumulative_totals: state.cumulative_totals,
             git_info: state.git_info,
@@ -645,7 +637,6 @@ mod tests {
 
         let state = storage.load().unwrap();
         assert!(state.workflow.is_none());
-        assert!(state.workflow_state.is_none());
     }
 
     #[test]
@@ -736,7 +727,7 @@ mod tests {
             .unwrap();
         storage.clear().unwrap();
         let loaded = storage.load().unwrap();
-        assert!(loaded.workflow.is_none() && loaded.workflow_state.is_none());
+        assert!(loaded.workflow.is_none() && loaded.workflow.is_none());
     }
 
     // ========== State Directory Resolution Tests ==========
@@ -1001,15 +992,13 @@ mod tests {
     }
 
     fn stash_with_message(storage: &FileStorage, message: &str) {
-        let mut state = test_state("plan", "discovery", &["spec", "plan"]);
-        state.workflow = Some(minimal_workflow());
+        let state = test_state("plan", "discovery", &["spec", "plan"]);
         storage.save(&state).unwrap();
         storage.save_stash(Some(message.to_string())).unwrap();
     }
 
     fn stash_without_message(storage: &FileStorage) {
-        let mut state = test_state("code", "execution", &["spec", "plan", "code"]);
-        state.workflow = Some(minimal_workflow());
+        let state = test_state("code", "execution", &["spec", "plan", "code"]);
         storage.save(&state).unwrap();
         storage.save_stash(None).unwrap();
     }
@@ -1027,8 +1016,7 @@ mod tests {
     #[test]
     fn test_save_stash_creates_file_and_clears_state() {
         let (_tmp, storage) = test_storage();
-        let mut state = test_state("spec", "discovery", &["spec"]);
-        state.workflow = Some(minimal_workflow());
+        let state = test_state("spec", "discovery", &["spec"]);
         storage.save(&state).unwrap();
 
         storage.save_stash(Some("test stash".to_string())).unwrap();
@@ -1036,7 +1024,7 @@ mod tests {
         assert_eq!(stash_count(&storage), 1);
 
         let loaded = storage.load().unwrap();
-        assert!(loaded.workflow_state.is_none());
+        assert!(loaded.workflow.is_none());
         assert!(loaded.workflow.is_none());
     }
 
@@ -1078,16 +1066,15 @@ mod tests {
     #[test]
     fn test_save_stash_preserves_workflow_state() {
         let (_tmp, storage) = test_storage();
-        let mut state = test_state("plan", "discovery", &["spec", "plan"]);
-        state.workflow = Some(minimal_workflow());
+        let state = test_state("plan", "discovery", &["spec", "plan"]);
         storage.save(&state).unwrap();
 
         storage.save_stash(None).unwrap();
 
         let stashes = storage.list_stashes().unwrap();
-        assert_eq!(stashes[0].workflow_state.current_node, "plan");
-        assert_eq!(stashes[0].workflow_state.mode, "discovery");
-        assert_eq!(stashes[0].workflow_state.history, vec!["spec", "plan"]);
+        assert_eq!(stashes[0].workflow.current_node, "plan");
+        assert_eq!(stashes[0].workflow.mode, "discovery");
+        assert_eq!(stashes[0].workflow.history, vec!["spec", "plan"]);
     }
 
     #[test]
@@ -1219,8 +1206,7 @@ mod tests {
     fn test_stash_and_restore_preserves_state_exactly() {
         let (_tmp, storage) = test_storage();
 
-        let mut original = test_state("code", "execution", &["spec", "plan", "code"]);
-        original.workflow = Some(minimal_workflow());
+        let original = test_state("code", "execution", &["spec", "plan", "code"]);
         storage.save(&original).unwrap();
         storage
             .save_stash(Some("round trip test".to_string()))
@@ -1229,8 +1215,7 @@ mod tests {
         let stash = storage.load_stash(0).unwrap();
 
         let restored = State {
-            workflow: stash.workflow,
-            workflow_state: Some(stash.workflow_state),
+            workflow: Some(stash.workflow),
             session_metadata: None,
             cumulative_totals: None,
             git_info: None,

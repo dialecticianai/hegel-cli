@@ -39,23 +39,23 @@ fn get_state(storage: &FileStorage) -> State {
 /// Manually set current node (for testing completion scenarios)
 fn set_node(storage: &FileStorage, node: &str) {
     let mut state = storage.load().unwrap();
-    let mut ws = state.workflow_state.clone().unwrap();
+    let mut ws = state.workflow.clone().unwrap();
     ws.current_node = node.to_string();
     if !ws.history.contains(&node.to_string()) {
         ws.history.push(node.to_string());
     }
-    state.workflow_state = Some(ws);
+    state.workflow = Some(ws);
     storage.save(&state).unwrap();
 }
 
 /// Set meta-mode on current state
 fn set_meta_mode(storage: &FileStorage, meta_mode_name: &str) {
     let mut state = storage.load().unwrap();
-    let mut ws = state.workflow_state.clone().unwrap();
+    let mut ws = state.workflow.clone().unwrap();
     ws.meta_mode = Some(crate::storage::MetaMode {
         name: meta_mode_name.to_string(),
     });
-    state.workflow_state = Some(ws);
+    state.workflow = Some(ws);
     storage.save(&state).unwrap();
 }
 

@@ -9,17 +9,11 @@ fn test_full_workflow_cycle() {
     start(&storage);
     let state = get_state(&storage);
 
-    assert!(state.workflow.is_some());
-    assert_eq!(state.workflow_state.as_ref().unwrap().history.len(), 1);
+    assert_eq!(state.workflow.as_ref().unwrap().history.len(), 1);
 
     next(&storage);
     assert_eq!(
-        get_state(&storage)
-            .workflow_state
-            .as_ref()
-            .unwrap()
-            .history
-            .len(),
+        get_state(&storage).workflow.as_ref().unwrap().history.len(),
         2
     );
 }
@@ -36,7 +30,7 @@ fn test_next_at_research_done_auto_transitions_to_discovery() {
 
     next(&storage);
 
-    let ws = get_state(&storage).workflow_state.unwrap();
+    let ws = get_state(&storage).workflow.unwrap();
     assert_eq!(ws.mode, "discovery");
     assert_eq!(ws.current_node, "spec");
     assert_eq!(ws.meta_mode.unwrap().name, "learning");
@@ -57,7 +51,7 @@ fn test_next_at_discovery_done_shows_ambiguous_options() {
 
     next(&storage);
 
-    let ws = get_state(&storage).workflow_state.unwrap();
+    let ws = get_state(&storage).workflow.unwrap();
     assert_eq!(ws.mode, "discovery");
     assert_eq!(ws.current_node, "done");
     assert_eq!(transition_count(&storage), 0);
