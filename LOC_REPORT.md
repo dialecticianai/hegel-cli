@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 19:48
+**Last Updated**: 2025-11-10 12:01
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,310 | 13,419 | 31,729 |
-| **Comments** | 2,683 | - | 2,683 |
-| **Blank Lines** | 3,467 | - | 3,467 |
-| **Total Lines** | 24,460 | 13,419 | 37,879 |
-| **Files** | 104 | 70 | 174 |
+| **Lines** | 18,457 | 13,826 | 32,283 |
+| **Comments** | 2,727 | - | 2,727 |
+| **Blank Lines** | 3,502 | - | 3,502 |
+| **Total Lines** | 24,686 | 13,826 | 38,512 |
+| **Files** | 105 | 71 | 176 |
 
-**Documentation Ratio**: 0.73 lines of docs per line of code
+**Documentation Ratio**: 0.75 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           104           3467           2683          18310
+Rust                           105           3502           2727          18457
 Markdown                        15            147              0            451
 -------------------------------------------------------------------------------
-SUM:                           119           3614           2683          18761
+SUM:                           120           3649           2727          18908
 -------------------------------------------------------------------------------
 ```
 
@@ -79,14 +79,15 @@ SUM:                           119           3614           2683          18761
 | `commands/status.rs` | 140 | 140 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 79 | 79 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 703 | 18 | 685 | 97.4% | ✅ |
-| `commands/workflow/tests/commands.rs` | 419 | 419 | 0 | 0.0% | ✅ (infra) |
-| `commands/workflow/tests/integration.rs` | 58 | 58 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/mod.rs` | 70 | 70 | 0 | 0.0% | ✅ |
-| `commands/workflow/tests/node_flow.rs` | 137 | 137 | 0 | 0.0% | ✅ |
+| `commands/workflow/mod.rs` | 712 | 18 | 694 | 97.5% | ✅ |
+| `commands/workflow/tests/archiving_bug_repro.rs` | 172 | 172 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/commands.rs` | 430 | 430 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests/integration.rs` | 60 | 60 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/mod.rs` | 83 | 83 | 0 | 0.0% | ✅ |
+| `commands/workflow/tests/node_flow.rs` | 135 | 135 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/production.rs` | 65 | 65 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/stash.rs` | 209 | 209 | 0 | 0.0% | ⚠️ Large |
-| `commands/workflow/tests/transitions.rs` | 506 | 506 | 0 | 0.0% | ✅ (infra) |
+| `commands/workflow/tests/transitions.rs` | 514 | 514 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
@@ -95,7 +96,7 @@ SUM:                           119           3614           2683          18761
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 512 | 160 | 352 | 68.8% | ✅ |
-| `engine/mod.rs` | 1,362 | 305 | 1,057 | 77.6% | ⚠️ Large |
+| `engine/mod.rs` | 1,381 | 326 | 1,055 | 76.4% | ⚠️ Large |
 | `engine/template.rs` | 676 | 162 | 514 | 76.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
@@ -130,7 +131,7 @@ SUM:                           119           3614           2683          18761
 | `test_helpers/mod.rs` | 22 | 11 | 11 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 300 | 300 | 0 | 0.0% | ✅ (infra) |
+| `test_helpers/workflow.rs` | 294 | 294 | 0 | 0.0% | ✅ (infra) |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 403 | 166 | 237 | 58.8% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
@@ -175,12 +176,13 @@ SUM:                           119           3614           2683          18761
 | `.ddd/reports/20251010-tui_dep_review.md` | 678 |
 | `CLAUDE.md` | 194 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 218 |
+| `COVERAGE_REPORT.md` | 226 |
 | `docs/ADVANCED_TOOLS.md` | 112 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
 | `docs/GUARDRAILS.md` | 53 |
 | `docs/integrations/CLAUDE_CODE.md` | 91 |
+| `docs/ONBOARDING_STATE_METRICS.md` | 297 |
 | `docs/STATE.md` | 33 |
 | `guides/ARCHITECTURE_WRITING.md` | 258 |
 | `guides/CLAUDE_CUSTOMIZATION.md` | 312 |
@@ -203,7 +205,7 @@ SUM:                           119           3614           2683          18761
 | `LOC_REPORT.md` | 246 |
 | `METRICS.md` | 258 |
 | `README.md` | 425 |
-| `ROADMAP.md` | 348 |
+| `ROADMAP.md` | 450 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
@@ -227,7 +229,7 @@ SUM:                           119           3614           2683          18761
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.73 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.75 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

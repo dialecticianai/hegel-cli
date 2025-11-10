@@ -35,7 +35,109 @@
 
 ---
 
-## Phase 1: Incomplete Features (TODO Backlog)
+## Phase 1: State & Metrics System Improvements
+
+### 1.1 Invert Apply/Dry-Run Semantics (Priority 1)
+
+**Goal:** Make dry-run the default behavior, require explicit `--apply` flag to make changes.
+
+**Problem:** Current commands use `--dry-run` flag to preview changes, defaulting to applying them. This is dangerous for destructive operations (archive deletion, state migration, etc.). Safe-by-default is better UX.
+
+**Affected commands:**
+- `hegel analyze --fix-archives` (repairs archives, creates cowboys, removes duplicates)
+- `hegel archive --migrate` (migrates old logs to archives)
+- `hegel doctor` (state file health check and repair)
+
+**Current behavior:**
+```bash
+hegel analyze --fix-archives              # Applies changes immediately
+hegel analyze --fix-archives --dry-run    # Preview only
+```
+
+**Desired behavior:**
+```bash
+hegel analyze --fix-archives              # Preview only (dry-run default)
+hegel analyze --fix-archives --apply      # Actually apply changes
+```
+
+**Implementation:**
+- Invert flag semantics in `AnalyzeArgs`, `ArchiveArgs`, `DoctorArgs`
+- Update help text to clarify default is preview-only
+- Update all callsites to use `!args.apply` instead of `args.dry_run`
+- Add deprecation warning if `--dry-run` flag is used (guide users to new semantics)
+- Update tests to use `--apply` for actual mutations
+
+### 1.2 Unified Health Check and Auto-Repair (Priority 2)
+
+**Goal:** Make `hegel doctor` the one-stop command for detecting and fixing all state/metrics issues.
+
+**Current state:**
+- `hegel doctor` - State file health check + rescue corrupted state
+- `hegel analyze --fix-archives` - Archive repairs (git backfill, cowboy creation, duplicate removal)
+- `hegel archive --migrate` - Legacy log migration
+
+**Problem:** Functionality is fragmented across commands. Users don't know which command to run for which issue.
+
+**Desired behavior:**
+```bash
+hegel doctor                    # Detect all issues (state, archives, gaps)
+hegel doctor --apply            # Fix all detected issues automatically
+hegel doctor --verbose          # Show detailed issue breakdown
+```
+
+**What `hegel doctor` should detect and fix:**
+1. **State file issues** (existing):
+   - Corrupted state.json → rescue from backup
+   - Missing required fields → apply migrations
+   - Invalid workflow state → reset to clean state
+
+2. **Archive issues** (migrate from `analyze --fix-archives`):
+   - Missing git commits → backfill from git history
+   - Incomplete workflows → add aborted terminal nodes
+   - Duplicate cowboys → remove redundant archives
+   - Workflow gaps with activity → create synthetic cowboys
+   - Stale cumulative totals → rebuild from archives
+
+3. **Log migration** (migrate from `archive --migrate`):
+   - Detect old multi-workflow logs → migrate to archives
+   - Orphaned JSONL files → clean up or archive
+
+**Implementation approach:**
+1. **Extract reusable modules:**
+   - Move `src/analyze/repair.rs` logic to `src/doctor/repairs/archive_repair.rs`
+   - Move `src/commands/archive.rs` logic to `src/doctor/repairs/log_migration.rs`
+   - Create trait: `HealthCheck { detect(), fix(), name() }`
+
+2. **Unified detection system:**
+   ```rust
+   pub trait HealthCheck {
+       fn name(&self) -> &str;
+       fn detect(&self, storage: &FileStorage) -> Result<Vec<Issue>>;
+       fn fix(&self, storage: &FileStorage, issues: &[Issue]) -> Result<usize>;
+   }
+   ```
+
+3. **Doctor orchestration:**
+   - Run all health checks in sequence
+   - Collect and categorize issues
+   - Display unified report
+   - Apply fixes when `--apply` flag provided
+
+4. **Preserve existing commands:**
+   - `hegel analyze --fix-archives` → delegate to doctor repair modules
+   - `hegel archive --migrate` → delegate to doctor log migration
+   - Maintain backward compatibility, but suggest `hegel doctor` in output
+
+**Files to refactor:**
+- `src/analyze/repair.rs` → `src/doctor/repairs/archive_repair.rs`
+- `src/analyze/gap_detection.rs` → `src/doctor/repairs/gap_detection.rs`
+- `src/analyze/cleanup/` → `src/doctor/repairs/cleanup/` (or keep as-is, import from doctor)
+- `src/commands/archive.rs` → delegate to `src/doctor/repairs/log_migration.rs`
+- `src/commands/doctor/mod.rs` → orchestrate all health checks
+
+---
+
+## Phase 2: Incomplete Features (TODO Backlog)
 
 These features have partial implementations marked with `#[allow(dead_code)]` + TODO comments.
 
