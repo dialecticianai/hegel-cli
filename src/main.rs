@@ -2,6 +2,7 @@ mod adapters;
 mod analyze;
 mod commands;
 mod config;
+mod doctor;
 mod embedded;
 mod engine;
 mod guardrails;
@@ -155,6 +156,8 @@ enum Commands {
     },
     /// Archive workflow logs and metrics
     Archive(commands::archive::ArchiveArgs),
+    /// Check and repair state file health
+    Doctor(commands::DoctorArgs),
     /// Interactive TUI dashboard (real-time metrics)
     Top,
     /// AST-based code search and transformation (wraps ast-grep)
@@ -454,6 +457,9 @@ fn main() -> Result<()> {
         }
         Commands::Archive(args) => {
             commands::archive(args, &storage)?;
+        }
+        Commands::Doctor(args) => {
+            commands::doctor_command(args, &storage)?;
         }
         Commands::Top => {
             tui::run_tui(storage.state_dir())?;

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-09 18:32
+**Last Updated**: 2025-11-09 19:48
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 17,786 | 13,414 | 31,200 |
-| **Comments** | 2,589 | - | 2,589 |
-| **Blank Lines** | 3,367 | - | 3,367 |
-| **Total Lines** | 23,742 | 13,414 | 37,156 |
-| **Files** | 99 | 70 | 169 |
+| **Lines** | 18,310 | 13,419 | 31,729 |
+| **Comments** | 2,683 | - | 2,683 |
+| **Blank Lines** | 3,467 | - | 3,467 |
+| **Total Lines** | 24,460 | 13,419 | 37,879 |
+| **Files** | 104 | 70 | 174 |
 
-**Documentation Ratio**: 0.75 lines of docs per line of code
+**Documentation Ratio**: 0.73 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            99           3367           2589          17786
+Rust                           104           3467           2683          18310
 Markdown                        15            147              0            451
 -------------------------------------------------------------------------------
-SUM:                           114           3514           2589          18237
+SUM:                           119           3614           2683          18761
 -------------------------------------------------------------------------------
 ```
 
@@ -56,6 +56,8 @@ SUM:                           114           3514           2589          18237
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ⚠️ Large |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
+| `commands/doctor/mod.rs` | 259 | 0 | 259 | 100.0% | ✅ |
+| `commands/doctor/tests.rs` | 250 | 250 | 0 | 0.0% | ⚠️ Large |
 | `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
@@ -71,7 +73,7 @@ SUM:                           114           3514           2589          18237
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/markdown.rs` | 495 | 403 | 92 | 18.6% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
-| `commands/mod.rs` | 39 | 39 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 41 | 41 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
 | `commands/status.rs` | 140 | 140 | 0 | 0.0% | ✅ |
@@ -88,6 +90,9 @@ SUM:                           114           3514           2589          18237
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
+| `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
+| `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
+| `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 512 | 160 | 352 | 68.8% | ✅ |
 | `engine/mod.rs` | 1,362 | 305 | 1,057 | 77.6% | ⚠️ Large |
@@ -96,7 +101,7 @@ SUM:                           114           3514           2589          18237
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 509 | 14 | 495 | 97.2% | ✅ |
+| `main.rs` | 515 | 15 | 500 | 97.1% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ⚠️ Large |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -137,7 +142,7 @@ SUM:                           114           3514           2589          18237
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 13 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 14 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -195,7 +200,7 @@ SUM:                           114           3514           2589          18237
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 349 |
-| `LOC_REPORT.md` | 241 |
+| `LOC_REPORT.md` | 246 |
 | `METRICS.md` | 258 |
 | `README.md` | 425 |
 | `ROADMAP.md` | 348 |
@@ -222,7 +227,7 @@ SUM:                           114           3514           2589          18237
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.75 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.73 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

@@ -32,7 +32,7 @@ pub struct MetaMode {
 }
 
 /// Workflow state structure
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct WorkflowState {
     pub current_node: String,
     pub mode: String,
