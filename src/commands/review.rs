@@ -8,6 +8,9 @@ use std::path::Path;
 
 /// Handle review command - read or write reviews for a file
 pub fn handle_review(file_path: &Path, storage: &FileStorage) -> Result<()> {
+    // Resolve file path (handle optional .md extension)
+    let resolved_path = resolve_file_path(file_path)?;
+
     // Check if stdin is available and has data (write mode) or not (read mode)
     // We check is_terminal first - if it's a terminal, definitely read mode
     // If it's not a terminal (pipe), try to read to see if there's data
@@ -15,28 +18,44 @@ pub fn handle_review(file_path: &Path, storage: &FileStorage) -> Result<()> {
 
     if stdin_available {
         // Try write mode, but if there's no data, fall back to read mode
-        match write_reviews(file_path, storage) {
+        match write_reviews(&resolved_path, storage) {
             Ok(_) => {}
             Err(e) if e.to_string().contains("No valid review comments found") => {
                 // No data in stdin, treat as read mode
-                read_reviews_for_file(file_path, storage)?;
+                read_reviews_for_file(&resolved_path, storage)?;
             }
             Err(e) => return Err(e),
         }
     } else {
-        read_reviews_for_file(file_path, storage)?;
+        read_reviews_for_file(&resolved_path, storage)?;
     }
 
     Ok(())
 }
 
-/// Write mode: parse JSONL from stdin and save to reviews.json
-fn write_reviews(file_path: &Path, storage: &FileStorage) -> Result<()> {
-    // Validate file exists
-    if !file_path.exists() {
-        anyhow::bail!("File not found: {}", file_path.display());
+/// Resolve file path with optional .md extension
+/// Tries path as-is first, then with .md appended
+fn resolve_file_path(file_path: &Path) -> Result<std::path::PathBuf> {
+    // Try the path as-is
+    if file_path.exists() {
+        return Ok(file_path.to_path_buf());
     }
 
+    // Try with .md extension
+    let with_md = file_path.with_extension("md");
+    if with_md.exists() {
+        return Ok(with_md);
+    }
+
+    // Neither exists
+    anyhow::bail!(
+        "File not found: {} (also tried with .md extension)",
+        file_path.display()
+    )
+}
+
+/// Write mode: parse JSONL from stdin and save to reviews.json
+fn write_reviews(file_path: &Path, storage: &FileStorage) -> Result<()> {
     // Get project root
     let hegel_dir = storage.state_dir();
 
@@ -98,11 +117,6 @@ fn write_reviews(file_path: &Path, storage: &FileStorage) -> Result<()> {
 
 /// Read mode: display existing reviews as JSONL
 fn read_reviews_for_file(file_path: &Path, storage: &FileStorage) -> Result<()> {
-    // Validate file exists
-    if !file_path.exists() {
-        anyhow::bail!("File not found: {}", file_path.display());
-    }
-
     // Get project root
     let hegel_dir = storage.state_dir();
 

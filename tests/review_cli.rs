@@ -275,3 +275,54 @@ fn test_read_mode_empty_output() {
         "Should have empty output"
     );
 }
+
+// Path handling tests
+
+#[test]
+fn test_optional_md_extension() {
+    let (temp_dir, _test_file) = setup_test_project();
+    let hegel_dir = temp_dir.path().join(".hegel");
+
+    // Create a file without .md extension explicitly in the path
+    let file_without_ext = temp_dir.path().join("SPEC");
+    let file_with_ext = temp_dir.path().join("SPEC.md");
+    fs::write(&file_with_ext, "# Spec").unwrap();
+
+    // Should work with path without .md
+    let output = Command::new(env!("CARGO_BIN_EXE_hegel"))
+        .args(&[
+            "--state-dir",
+            hegel_dir.to_str().unwrap(),
+            "review",
+            file_without_ext.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+
+    assert!(output.status.success(), "Should resolve SPEC to SPEC.md");
+}
+
+#[test]
+fn test_file_not_found_error() {
+    let (temp_dir, _test_file) = setup_test_project();
+    let hegel_dir = temp_dir.path().join(".hegel");
+
+    let missing_file = temp_dir.path().join("MISSING.md");
+
+    let output = Command::new(env!("CARGO_BIN_EXE_hegel"))
+        .args(&[
+            "--state-dir",
+            hegel_dir.to_str().unwrap(),
+            "review",
+            missing_file.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+
+    assert!(!output.status.success(), "Should fail for missing file");
+    let err = stderr(&output);
+    assert!(
+        err.contains("File not found") || err.contains("MISSING"),
+        "Should have helpful error message"
+    );
+}
