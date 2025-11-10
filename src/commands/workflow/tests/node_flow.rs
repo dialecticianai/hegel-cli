@@ -127,8 +127,6 @@ nodes:
     transitions:
       - when: "learn_complete"
         to: done
-  done:
-    transitions: []
 "#;
 
     let workflow = load_workflow_from_str(yaml).unwrap();

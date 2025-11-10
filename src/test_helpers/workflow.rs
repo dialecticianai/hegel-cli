@@ -22,8 +22,6 @@ nodes:
     transitions:
       - when: plan_complete
         to: done
-  done:
-    transitions: []
 "#;
 
 // ========== Workflow Builder Helpers ==========
@@ -230,8 +228,6 @@ nodes:
     transitions:
       - when: study_complete
         to: done
-  done:
-    transitions: []
 "#,
     )
     .unwrap();
@@ -252,8 +248,6 @@ nodes:
     transitions:
       - when: plan_complete
         to: done
-  done:
-    transitions: []
 "#,
     )
     .unwrap();

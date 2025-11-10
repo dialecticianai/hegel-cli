@@ -54,5 +54,7 @@ fn test_next_at_discovery_done_shows_ambiguous_options() {
     let ws = get_state(&storage).workflow.unwrap();
     assert_eq!(ws.mode, "discovery");
     assert_eq!(ws.current_node, "done");
-    assert_eq!(transition_count(&storage), 0);
+    // Only the initial START -> spec transition from start_workflow()
+    // (Ambiguous doesn't log a transition)
+    assert_eq!(transition_count(&storage), 1);
 }

@@ -16,6 +16,3 @@ nodes:
     transitions:
       - when: "plan_complete"
         to: done
-
-  done:
-    transitions: []

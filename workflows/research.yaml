@@ -120,6 +120,3 @@ nodes:
     transitions:
       - when: "questions_complete"
         to: done
-
-  done:
-    transitions: []

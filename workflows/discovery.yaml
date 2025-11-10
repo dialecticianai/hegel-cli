@@ -157,6 +157,3 @@ nodes:
     transitions:
       - when: "readme_complete"
         to: done
-
-  done:
-    transitions: []

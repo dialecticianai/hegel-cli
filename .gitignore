@@ -29,3 +29,6 @@ Thumbs.db
 
 # Session handoff (ephemeral)
 HANDOFF.md
+
+# Local debugging tests (keep local, don't commit)
+src/commands/workflow/tests/archiving_bug_repro.rs

@@ -168,6 +168,3 @@ nodes:
     transitions:
       - when: "code_review_complete"
         to: done
-
-  done:
-    transitions: []

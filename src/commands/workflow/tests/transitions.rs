@@ -8,7 +8,12 @@ fn test_next_prompt_logs_state_transition() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
     next_with("spec_complete", &storage);
-    let event = first_transition(&storage);
+
+    // start() logs START -> spec, next() logs spec -> plan
+    assert_eq!(transition_count(&storage), 2);
+
+    // Check the second transition (spec -> plan)
+    let event = read_jsonl_line(&storage.state_dir().join("states.jsonl"), 1);
     assert_eq!(event["from_node"], "spec");
     assert_eq!(event["to_node"], "plan");
     assert_eq!(event["phase"], "plan");
@@ -20,26 +25,31 @@ fn test_next_prompt_logs_multiple_transitions() {
     use crate::storage::archive::read_archives;
 
     let (_tmp, storage) = setup_workflow_env();
-    start(&storage);
+    start(&storage); // Logs START -> spec (transition 0)
     next(&storage); // spec -> plan (transition 1)
 
-    // Before archiving, check 1 transition
-    assert_eq!(transition_count(&storage), 1);
+    // Before archiving, check 2 transitions (START -> spec, spec -> plan)
+    assert_eq!(transition_count(&storage), 2);
 
     next(&storage); // plan -> done (transition 2, triggers archiving)
 
     // After archiving, transitions should be in archive, not live log
     let archives = read_archives(storage.state_dir()).unwrap();
     assert_eq!(archives.len(), 1);
-    assert_eq!(archives[0].transitions.len(), 2); // Both transitions archived
+    assert_eq!(
+        archives[0].transitions.len(),
+        3,
+        "Should have 3 transitions: START -> spec, spec -> plan, plan -> done"
+    );
 }
 
 #[test]
 fn test_next_prompt_no_log_when_no_transition() {
     let (_tmp, storage) = setup_workflow_env();
-    start(&storage);
-    next_with("wrong_claim", &storage);
-    assert_eq!(transition_count(&storage), 0);
+    start(&storage); // Logs START -> spec
+    next_with("wrong_claim", &storage); // Wrong claim, no transition
+                                        // Only the initial START -> spec transition should be logged
+    assert_eq!(transition_count(&storage), 1);
 }
 
 #[test]
@@ -204,7 +214,8 @@ fn test_execute_stay_no_state_change() {
     execute_transition(outcome, &mut context, &storage).unwrap();
 
     assert_at(&storage, "spec", "test_workflow", &["spec"]);
-    assert_eq!(transition_count(&storage), 0);
+    // Only the initial START -> spec transition should be logged (no transition on Stay/Ambiguous)
+    assert_eq!(transition_count(&storage), 1);
 }
 
 #[test]
@@ -270,7 +281,8 @@ fn test_execute_ambiguous_no_state_change() {
     execute_transition(outcome, &mut context, &storage).unwrap();
 
     assert_at(&storage, "spec", "test_workflow", &["spec"]);
-    assert_eq!(transition_count(&storage), 0);
+    // Only the initial START -> spec transition should be logged (no transition on Stay/Ambiguous)
+    assert_eq!(transition_count(&storage), 1);
 }
 
 // ========== Workflow Archiving Tests ==========

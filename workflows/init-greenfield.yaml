@@ -123,6 +123,3 @@ nodes:
     transitions:
       - when: git_init_complete
         to: done
-
-  done:
-    transitions: []

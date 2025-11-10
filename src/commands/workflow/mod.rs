@@ -105,6 +105,15 @@ pub fn start_workflow(
     };
     storage.save(&state)?;
 
+    // Log initial state transition (START -> first node)
+    // This ensures the first phase gets captured in archives
+    storage.log_state_transition(
+        "START",
+        current_node,
+        &workflow_state.mode,
+        workflow_state.workflow_id.as_deref(),
+    )?;
+
     // Display output
     println!("{}", Theme::success("Workflow started").bold());
     println!();

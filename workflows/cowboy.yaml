@@ -20,6 +20,3 @@ nodes:
     transitions:
       - when: ride_complete
         to: done
-
-  done:
-    transitions: []

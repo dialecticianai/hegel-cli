@@ -2,6 +2,7 @@ use super::*;
 use crate::test_helpers::*;
 
 // Submodules
+mod archiving_bug_repro;
 mod commands;
 mod integration;
 mod node_flow;
@@ -64,7 +65,19 @@ fn transition_count(storage: &FileStorage) -> usize {
     count_jsonl_lines(&storage.state_dir().join("states.jsonl"))
 }
 
-/// Get first transition from states.jsonl
+/// Get first non-START transition from states.jsonl
+///
+/// Since start_workflow() logs an initial START -> first_node transition,
+/// this helper skips that and returns the first "real" workflow transition.
+/// For tests that need the START transition, use read_jsonl_line directly.
 fn first_transition(storage: &FileStorage) -> serde_json::Value {
-    read_jsonl_line(&storage.state_dir().join("states.jsonl"), 0)
+    let path = storage.state_dir().join("states.jsonl");
+    let first = read_jsonl_line(&path, 0);
+
+    // If the first transition is from START, return the second one
+    if first["from_node"] == "START" {
+        read_jsonl_line(&path, 1)
+    } else {
+        first
+    }
 }

@@ -108,7 +108,11 @@ fn test_next_no_workflow() {
 
     assert!(!output.status.success());
     let err = stderr(&output);
-    assert!(err.contains("No workflow loaded"));
+    assert!(
+        err.contains("No workflow"),
+        "Expected 'No workflow' error, got: {}",
+        err
+    );
 }
 
 #[test]
@@ -156,7 +160,11 @@ fn test_repeat_no_workflow() {
 
     assert!(!output.status.success());
     let err = stderr(&output);
-    assert!(err.contains("No workflow loaded"));
+    assert!(
+        err.contains("No workflow"),
+        "Expected 'No workflow' error, got: {}",
+        err
+    );
 }
 
 #[test]

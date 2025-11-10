@@ -229,6 +229,3 @@ nodes:
     transitions:
       - when: git_commit_complete
         to: done
-
-  done:
-    transitions: []

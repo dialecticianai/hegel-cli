@@ -123,8 +123,29 @@ impl Workflow {
 
 /// Load workflow definition from YAML string
 pub fn load_workflow_from_str(content: &str) -> Result<Workflow> {
-    let workflow: Workflow =
+    let mut workflow: Workflow =
         serde_yaml::from_str(content).with_context(|| "Failed to parse workflow YAML")?;
+
+    // Reject workflows with explicit "done" nodes - these are now implicit
+    if workflow.nodes.contains_key("done") {
+        anyhow::bail!(
+            "Workflow validation failed: 'done' nodes are implicit and should not be defined in YAML. \
+             Remove the 'done' node from your workflow definition - it will be auto-injected."
+        );
+    }
+
+    // Auto-inject implicit "done" terminal node
+    workflow.nodes.insert(
+        "done".to_string(),
+        Node {
+            prompt: String::new(),
+            prompt_hbs: String::new(),
+            summary: String::new(),
+            transitions: vec![],
+            rules: vec![],
+        },
+    );
+
     workflow.validate()?;
     Ok(workflow)
 }
@@ -335,7 +356,6 @@ mod tests {
                 "plan",
                 node("Write PLAN.md", vec![transition("plan_complete", "done")]),
             )
-            .with_node("done", node("", vec![]))
             .build();
 
         let workflow_path = create_test_workflow_file(
@@ -347,10 +367,17 @@ mod tests {
 
         assert_eq!(workflow.mode, "discovery");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 3);
+        assert_eq!(
+            workflow.nodes.len(),
+            3,
+            "Should have 2 explicit nodes + 1 implicit done node"
+        );
         assert!(workflow.nodes.contains_key("spec"));
         assert!(workflow.nodes.contains_key("plan"));
-        assert!(workflow.nodes.contains_key("done"));
+        assert!(
+            workflow.nodes.contains_key("done"),
+            "Done node should be auto-injected"
+        );
     }
 
     #[test]
@@ -384,7 +411,6 @@ mod tests {
                     vec![transition("refactor_complete", "code")],
                 ),
             )
-            .with_node("done", node("", vec![]))
             .build();
 
         let workflow_path = create_test_workflow_file(
@@ -396,7 +422,11 @@ mod tests {
 
         assert_eq!(workflow.mode, "execution");
         assert_eq!(workflow.start_node, "spec");
-        assert_eq!(workflow.nodes.len(), 5);
+        assert_eq!(
+            workflow.nodes.len(),
+            5,
+            "Should have 4 explicit nodes + 1 implicit done node"
+        );
 
         let review_node = &workflow.nodes["review"];
         assert_eq!(review_node.transitions.len(), 2);

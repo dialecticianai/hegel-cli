@@ -49,13 +49,46 @@ if [ "$BUMP_VERSION" = true ]; then
     # Update Cargo.lock to reflect new version
     cargo update -p hegel --quiet
 
-    # If there's a staged commit, amend it with the version bump
+    # Check if we should amend the last commit or leave changes staged
     if git rev-parse HEAD >/dev/null 2>&1; then
-        # Check if we have a previous commit to amend
+        # Check if we have a previous commit to potentially amend
         if git log -1 --oneline >/dev/null 2>&1; then
-            echo "📝 Amending last commit with version bump..."
+            # Only amend if:
+            # 1. There are no unstaged changes
+            # 2. HEAD has not been pushed to remote
+
+            CAN_AMEND=true
+
+            # Check for unstaged changes
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+                CAN_AMEND=false
+                echo "⚠️  Unstaged changes detected, skipping commit amend"
+            fi
+
+            # Check if HEAD has been pushed
+            if [ "$CAN_AMEND" = true ]; then
+                CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+                if [ -n "$CURRENT_BRANCH" ]; then
+                    REMOTE_BRANCH=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "")
+
+                    if [ -n "$REMOTE_BRANCH" ]; then
+                        # Check if HEAD is already pushed
+                        if git merge-base --is-ancestor HEAD "$REMOTE_BRANCH" 2>/dev/null; then
+                            CAN_AMEND=false
+                            echo "⚠️  HEAD already pushed to remote, skipping commit amend"
+                        fi
+                    fi
+                fi
+            fi
+
+            # Amend if safe, otherwise just stage
             git add Cargo.toml
-            git commit --amend --no-edit --no-verify
+            if [ "$CAN_AMEND" = true ]; then
+                echo "📝 Amending last commit with version bump..."
+                git commit --amend --no-edit --no-verify
+            else
+                echo "📝 Version bump staged (run 'git commit' manually)"
+            fi
         fi
     fi
 

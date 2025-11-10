@@ -225,7 +225,7 @@ fn test_workflow_def_migration_check_large_file() {
 #[test]
 fn test_workflow_def_migration_migrate() {
     // Test migration preserves state
-    let (_temp_dir, storage) = test_storage_with_files(None, None);
+    let (_temp_dir, storage) = setup_workflow_env();
 
     let original_state = State {
         workflow: Some(WorkflowState {
