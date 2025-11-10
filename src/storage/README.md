@@ -15,6 +15,8 @@ storage/
 │
 ├── log_cleanup.rs       JSONL log maintenance and cleanup utilities
 │
+├── reviews.rs           Reviews management for .hegel/reviews.json (types, I/O, project detection)
+│
 └── archive/             Workflow archive storage with pre-computed aggregates
     ├── mod.rs           Core types (WorkflowArchive, PhaseArchive, TokenTotals) + I/O (read/write_archive)
     ├── builder.rs       Archive construction (WorkflowArchive::from_metrics)
