@@ -342,6 +342,17 @@ enum Commands {
         #[arg(long, conflicts_with = "no_ddd")]
         ddd: bool,
     },
+    /// Manage reviews for files
+    ///
+    /// Write mode (stdin present): Save reviews to .hegel/reviews.json
+    ///   echo '{"timestamp":"...","file":"...","selection":{...},"text":"...","comment":"..."}' | hegel review path/to/file.md
+    ///
+    /// Read mode (no stdin): Display reviews as JSONL
+    ///   hegel review path/to/file.md
+    Review {
+        /// File path (absolute or relative, .md extension optional)
+        file_path: std::path::PathBuf,
+    },
 }
 
 fn main() -> Result<()> {
@@ -508,6 +519,9 @@ fn main() -> Result<()> {
         Commands::Md { json, no_ddd, ddd } => {
             let args = commands::MarkdownArgs { json, no_ddd, ddd };
             commands::run_markdown(args)?;
+        }
+        Commands::Review { file_path } => {
+            commands::handle_review(&file_path, &storage)?;
         }
     }
 

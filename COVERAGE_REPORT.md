@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-10 18:08
+**Last Updated**: 2025-11-10 18:44
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **80.57%** lines | **80.25%** regions | **80.91%** functions
+**Overall Coverage**: **80.59%** lines | **80.27%** regions | **80.92%** functions
 
 ## Summary
 
 ```
-TOTAL                                         21545              4256    80.25%        1126               215    80.91%       13170              2559    80.57%           0                 0         -
+TOTAL                                         21555              4252    80.27%        1127               215    80.92%       13176              2557    80.59%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -49,6 +49,7 @@ TOTAL                                         21545              4256    80.25% 
 | `src/commands/meta.rs` | 64.88% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 60.53% | 47.62% | 75.00% | 🟠 Moderate |
+| `src/commands/review.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/status.rs` | 44.83% | 37.42% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 97.92% | 93.15% | 75.00% | 🟢 Excellent |
@@ -64,7 +65,7 @@ TOTAL                                         21545              4256    80.25% 
 | `src/engine/template.rs` | 97.25% | 96.88% | 97.50% | 🟢 Excellent |
 | `src/guardrails/parser.rs` | 97.78% | 97.65% | 83.33% | 🟢 Excellent |
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
-| `src/main.rs` | 47.62% | 34.84% | 100.00% | 🟠 Moderate |
+| `src/main.rs` | 50.47% | 38.05% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 57.91% | 60.68% | 75.00% | 🟠 Moderate |
 | `src/metrics/cowboy.rs` | 100.00% | 99.42% | 100.00% | 🟢 Excellent |
@@ -119,6 +120,7 @@ TOTAL                                         21545              4256    80.25% 
 - `src/commands/git.rs` - 100.00%
 - `src/commands/hook.rs` - 96.64%
 - `src/commands/init.rs` - 93.44%
+- `src/commands/review.rs` - 100.00%
 - `src/commands/workflow/claims.rs` - 100.00%
 - `src/commands/workflow/context.rs` - 97.92%
 - `src/engine/handlebars.rs` - 98.31%
@@ -182,7 +184,7 @@ TOTAL                                         21545              4256    80.25% 
 - `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 62.50%
 - `src/doctor/rescue.rs` - 51.35%
-- `src/main.rs` - 47.62%
+- `src/main.rs` - 50.47%
 - `src/metrics/aggregation.rs` - 57.91%
 
 ### 🔴 Needs Work (<40% lines)
@@ -201,7 +203,7 @@ TOTAL                                         21545              4256    80.25% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 80.57% | ✅ Met |
+| Overall | ≥80% | 80.59% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

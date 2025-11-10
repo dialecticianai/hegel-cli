@@ -14,6 +14,7 @@ mod markdown;
 mod meta;
 mod pm;
 mod reflect;
+mod review;
 mod status;
 mod workflow;
 mod wrapped;
@@ -33,6 +34,7 @@ pub use markdown::{run_markdown, MarkdownArgs};
 pub use meta::meta_mode;
 pub use pm::run_pm;
 pub use reflect::run_reflect;
+pub use review::handle_review;
 pub use status::show_status;
 pub use workflow::{
     abort_workflow, drop_stash, list_guides, list_stashes, list_workflows, next_prompt, pop_stash,
