@@ -430,14 +430,16 @@ pub fn list_stashes(storage: &FileStorage) -> Result<()> {
 pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     let index = index.unwrap_or(0);
 
-    // Check for active workflow
+    // Check for active workflow (ignore if at terminal node)
     let state = storage.load()?;
-    if state.workflow.is_some() {
-        anyhow::bail!(
-            "Cannot restore stash: active workflow at '{}/{}'. Run 'hegel abort' or 'hegel stash' first.",
-            state.workflow.as_ref().map(|ws| ws.mode.as_str()).unwrap_or("unknown"),
-            state.workflow.as_ref().map(|ws| ws.current_node.as_str()).unwrap_or("unknown")
-        );
+    if let Some(ref workflow_state) = state.workflow {
+        if !crate::engine::is_terminal(&workflow_state.current_node) {
+            anyhow::bail!(
+                "Cannot restore stash: active workflow at '{}/{}'. Run 'hegel abort' or 'hegel stash' first.",
+                workflow_state.mode,
+                workflow_state.current_node
+            );
+        }
     }
 
     // Load stash

@@ -150,6 +150,31 @@ fn test_pop_with_active_workflow_fails() {
 }
 
 #[test]
+fn test_pop_with_terminal_node_succeeds() {
+    let (_tmp, storage) = setup_workflow_env();
+    start(&storage);
+    stash_active_workflow(&storage, Some("stashed"));
+
+    // Start new workflow and advance to terminal "done" node
+    start(&storage);
+    next(&storage); // spec -> plan
+    next(&storage); // plan -> done
+
+    // Verify we're at done node
+    let state = storage.load().unwrap();
+    assert_eq!(state.workflow.as_ref().unwrap().current_node, "done");
+
+    // Should be able to pop stash even though workflow is Some
+    let result = crate::commands::workflow::pop_stash(None, &storage);
+    assert!(result.is_ok());
+
+    // Verify stash was restored
+    let state = storage.load().unwrap();
+    assert_eq!(state.workflow.as_ref().unwrap().current_node, "spec");
+    assert_eq!(list_stashes_count(&storage), 0);
+}
+
+#[test]
 fn test_pop_invalid_index_fails() {
     let (_tmp, storage) = setup_workflow_env();
     start(&storage);
