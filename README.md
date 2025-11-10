@@ -388,7 +388,10 @@ hegel-cli/
 │   │   ├── mod.rs       # Workflow definitions and routing
 │   │   ├── handlebars.rs  # Handlebars template engine
 │   │   └── template.rs  # Markdown template engine (legacy)
-│   └── storage/         # File-based state persistence
+│   ├── storage/         # File-based state persistence
+│   │   ├── reviews.rs   # Review management for .hegel/reviews.json (exported for hegel-mirror)
+│   │   └── archive/     # Workflow metrics archiving
+│   └── lib.rs           # Library exports for external tools
 ├── workflows/           # YAML workflow definitions
 └── guides/              # Writing guides and templates
     ├── *.md             # Markdown guides
