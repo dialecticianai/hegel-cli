@@ -102,18 +102,30 @@ pub fn detect_project_type() -> ProjectType {
 
 /// Compute relative path from project root to file
 pub fn compute_relative_path(project_root: &Path, file_path: &Path) -> Result<String> {
-    // Get parent of .hegel directory (project root)
-    let root = project_root.parent().context("Invalid project root path")?;
+    // Canonicalize project root (.hegel directory) to handle symlinks
+    let canonical_hegel = project_root
+        .canonicalize()
+        .context("Failed to canonicalize project root")?;
 
-    // Make file_path absolute if it isn't already
+    // Get parent of .hegel directory (project root)
+    let root = canonical_hegel
+        .parent()
+        .context("Invalid project root path")?;
+
+    // Make file_path absolute and canonical
     let abs_file = if file_path.is_absolute() {
         file_path.to_path_buf()
     } else {
         std::env::current_dir()?.join(file_path)
     };
 
+    // Canonicalize for consistent path comparison
+    let canonical_file = abs_file
+        .canonicalize()
+        .with_context(|| format!("Failed to canonicalize file path: {}", abs_file.display()))?;
+
     // Compute relative path
-    let rel_path = abs_file
+    let rel_path = canonical_file
         .strip_prefix(root)
         .context("File is not within project root")?;
 
