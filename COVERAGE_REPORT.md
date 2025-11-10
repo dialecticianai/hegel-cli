@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-10 12:06
+**Last Updated**: 2025-11-10 17:09
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **80.39%** lines | **80.06%** regions | **80.86%** functions
+**Overall Coverage**: **80.60%** lines | **80.28%** regions | **81.03%** functions
 
 ## Summary
 
 ```
-TOTAL                                         21247              4236    80.06%        1113               213    80.86%       13001              2549    80.39%           0                 0         -
+TOTAL                                         21557              4252    80.28%        1128               214    81.03%       13172              2556    80.60%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -83,6 +83,7 @@ TOTAL                                         21247              4236    80.06% 
 | `src/storage/archive/validation.rs` | 94.44% | 94.12% | 100.00% | 🟢 Excellent |
 | `src/storage/log_cleanup.rs` | 75.00% | 73.08% | 33.33% | 🟡 Good |
 | `src/storage/mod.rs` | 92.21% | 92.39% | 76.15% | 🟢 Excellent |
+| `src/storage/reviews.rs` | 95.91% | 94.84% | 93.33% | 🟢 Excellent |
 | `src/test_helpers/archive.rs` | 94.12% | 92.31% | 85.71% | 🟢 Excellent |
 | `src/test_helpers/fixtures.rs` | 80.00% | 77.78% | 33.33% | 🟡 Good |
 | `src/test_helpers/jsonl.rs` | 97.22% | 98.55% | 100.00% | 🟢 Excellent |
@@ -140,6 +141,7 @@ TOTAL                                         21247              4236    80.06% 
 - `src/storage/archive/mod.rs` - 93.44%
 - `src/storage/archive/validation.rs` - 94.44%
 - `src/storage/mod.rs` - 92.21%
+- `src/storage/reviews.rs` - 95.91%
 - `src/test_helpers/archive.rs` - 94.12%
 - `src/test_helpers/jsonl.rs` - 97.22%
 - `src/test_helpers/metrics.rs` - 100.00%
@@ -199,7 +201,7 @@ TOTAL                                         21247              4236    80.06% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 80.39% | ✅ Met |
+| Overall | ≥80% | 80.60% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

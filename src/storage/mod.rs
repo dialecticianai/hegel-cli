@@ -1,5 +1,6 @@
 pub mod archive;
 pub mod log_cleanup;
+pub mod reviews;
 
 use anyhow::{Context, Result};
 use fs2::FileExt;

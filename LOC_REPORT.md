@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-10 12:06
+**Last Updated**: 2025-11-10 17:09
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,514 | 13,828 | 32,342 |
-| **Comments** | 2,727 | - | 2,727 |
-| **Blank Lines** | 3,502 | - | 3,502 |
-| **Total Lines** | 24,743 | 13,828 | 38,571 |
-| **Files** | 105 | 71 | 176 |
+| **Lines** | 18,753 | 14,194 | 32,947 |
+| **Comments** | 2,746 | - | 2,746 |
+| **Blank Lines** | 3,559 | - | 3,559 |
+| **Total Lines** | 25,058 | 14,194 | 39,252 |
+| **Files** | 106 | 73 | 179 |
 
-**Documentation Ratio**: 0.75 lines of docs per line of code
+**Documentation Ratio**: 0.76 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           105           3502           2727          18514
+Rust                           106           3559           2746          18753
 Markdown                        15            147              0            451
 -------------------------------------------------------------------------------
-SUM:                           120           3649           2727          18965
+SUM:                           121           3706           2746          19204
 -------------------------------------------------------------------------------
 ```
 
@@ -123,7 +123,8 @@ SUM:                           120           3649           2727          18965
 | `storage/archive/mod.rs` | 348 | 160 | 188 | 54.0% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `storage/mod.rs` | 1,226 | 586 | 640 | 52.2% | ✅ (infra) |
+| `storage/mod.rs` | 1,227 | 587 | 640 | 52.2% | ✅ (infra) |
+| `storage/reviews.rs` | 314 | 155 | 159 | 50.6% | ✅ |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -167,6 +168,8 @@ SUM:                           120           3649           2727          18965
 | `.ddd/feat/commit-guardrails/SPEC.md` | 375 |
 | `.ddd/feat/markdown-tree/PLAN.md` | 289 |
 | `.ddd/feat/markdown-tree/SPEC.md` | 308 |
+| `.ddd/feat/reviews-module/PLAN.md` | 133 |
+| `.ddd/feat/reviews-module/SPEC.md` | 231 |
 | `.ddd/feat/workflow-stash/PLAN.md` | 298 |
 | `.ddd/feat/workflow-stash/SPEC.md` | 293 |
 | `.ddd/PLAN.md` | 210 |
@@ -176,7 +179,7 @@ SUM:                           120           3649           2727          18965
 | `.ddd/reports/20251010-tui_dep_review.md` | 678 |
 | `CLAUDE.md` | 194 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 226 |
+| `COVERAGE_REPORT.md` | 228 |
 | `docs/ADVANCED_TOOLS.md` | 112 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
@@ -229,7 +232,7 @@ SUM:                           120           3649           2727          18965
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.75 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.76 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
