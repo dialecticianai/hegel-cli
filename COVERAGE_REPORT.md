@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-10 19:53
+**Last Updated**: 2025-11-10 20:48
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **78.98%** lines | **78.51%** regions | **79.37%** functions
+**Overall Coverage**: **78.26%** lines | **77.44%** regions | **78.48%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19713              4237    78.51%        1047               216    79.37%       12103              2544    78.98%           0                 0         -
+TOTAL                                         18758              4231    77.44%         999               215    78.48%       11685              2540    78.26%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -83,7 +83,7 @@ TOTAL                                         19713              4237    78.51% 
 | `src/storage/archive/mod.rs` | 93.44% | 93.85% | 76.47% | 🟢 Excellent |
 | `src/storage/archive/validation.rs` | 94.44% | 94.12% | 100.00% | 🟢 Excellent |
 | `src/storage/log_cleanup.rs` | 75.00% | 73.08% | 33.33% | 🟡 Good |
-| `src/storage/mod.rs` | 92.21% | 92.39% | 76.15% | 🟢 Excellent |
+| `src/storage/mod.rs` | 84.09% | 80.40% | 59.02% | 🟡 Good |
 | `src/storage/reviews.rs` | 95.56% | 93.75% | 87.50% | 🟢 Excellent |
 | `src/test_helpers/archive.rs` | 94.12% | 92.31% | 85.71% | 🟢 Excellent |
 | `src/test_helpers/fixtures.rs` | 80.00% | 77.78% | 33.33% | 🟡 Good |
@@ -141,7 +141,6 @@ TOTAL                                         19713              4237    78.51% 
 - `src/storage/archive/builder.rs` - 98.25%
 - `src/storage/archive/mod.rs` - 93.44%
 - `src/storage/archive/validation.rs` - 94.44%
-- `src/storage/mod.rs` - 92.21%
 - `src/storage/reviews.rs` - 95.56%
 - `src/test_helpers/archive.rs` - 94.12%
 - `src/test_helpers/jsonl.rs` - 97.22%
@@ -166,6 +165,7 @@ TOTAL                                         19713              4237    78.51% 
 - `src/doctor/migrations.rs` - 82.98%
 - `src/embedded.rs` - 82.79%
 - `src/storage/log_cleanup.rs` - 75.00%
+- `src/storage/mod.rs` - 84.09%
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 86.36%
 - `src/theme.rs` - 85.71%
@@ -203,7 +203,7 @@ TOTAL                                         19713              4237    78.51% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 78.98% | ⏳ In Progress |
+| Overall | ≥80% | 78.26% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

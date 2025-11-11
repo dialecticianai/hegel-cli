@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-10 19:53
+**Last Updated**: 2025-11-10 20:48
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,883 | 14,809 | 33,692 |
+| **Lines** | 18,884 | 14,810 | 33,694 |
 | **Comments** | 2,791 | - | 2,791 |
 | **Blank Lines** | 3,590 | - | 3,590 |
-| **Total Lines** | 25,264 | 14,809 | 40,073 |
-| **Files** | 113 | 76 | 189 |
+| **Total Lines** | 25,265 | 14,810 | 40,075 |
+| **Files** | 115 | 76 | 191 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           113           3590           2791          18883
+Rust                           115           3590           2791          18884
 Markdown                        15            147              0            454
 -------------------------------------------------------------------------------
-SUM:                           128           3737           2791          19337
+SUM:                           130           3737           2791          19338
 -------------------------------------------------------------------------------
 ```
 
@@ -130,8 +130,10 @@ SUM:                           128           3737           2791          19337
 | `storage/archive/mod.rs` | 348 | 160 | 188 | 54.0% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `storage/mod.rs` | 1,227 | 587 | 640 | 52.2% | ✅ (infra) |
+| `storage/mod.rs` | 603 | 587 | 16 | 2.7% | ✅ (infra) |
 | `storage/reviews.rs` | 326 | 167 | 159 | 48.8% | ✅ |
+| `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
+| `storage/tests/storage.rs` | 624 | 624 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -151,7 +153,7 @@ SUM:                           128           3737           2791          19337
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 19 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 20 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -215,7 +217,7 @@ SUM:                           128           3737           2791          19337
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 349 |
-| `LOC_REPORT.md` | 260 |
+| `LOC_REPORT.md` | 261 |
 | `METRICS.md` | 258 |
 | `README.md` | 460 |
 | `ROADMAP.md` | 450 |
