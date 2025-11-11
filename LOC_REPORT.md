@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-10 18:53
+**Last Updated**: 2025-11-10 19:02
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,882 | 14,577 | 33,459 |
+| **Lines** | 18,882 | 14,578 | 33,460 |
 | **Comments** | 2,789 | - | 2,789 |
 | **Blank Lines** | 3,590 | - | 3,590 |
-| **Total Lines** | 25,261 | 14,577 | 39,838 |
+| **Total Lines** | 25,261 | 14,578 | 39,839 |
 | **Files** | 107 | 75 | 182 |
 
 **Documentation Ratio**: 0.77 lines of docs per line of code
@@ -25,9 +25,9 @@
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 Rust                           107           3590           2789          18882
-Markdown                        15            147              0            453
+Markdown                        15            147              0            454
 -------------------------------------------------------------------------------
-SUM:                           122           3737           2789          19335
+SUM:                           122           3737           2789          19336
 -------------------------------------------------------------------------------
 ```
 
@@ -216,7 +216,7 @@ SUM:                           122           3737           2789          19335
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
 | `src/commands/fork/README.md` | 30 |
-| `src/commands/README.md` | 45 |
+| `src/commands/README.md` | 46 |
 | `src/commands/workflow/README.md` | 34 |
 | `src/engine/README.md` | 38 |
 | `src/guardrails/README.md` | 34 |
