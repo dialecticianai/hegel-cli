@@ -327,6 +327,7 @@ pub fn get_next_prompt(
 #[cfg(test)]
 mod tests {
     mod handlebars;
+    mod template;
 
     use super::*;
     use tempfile::TempDir;
