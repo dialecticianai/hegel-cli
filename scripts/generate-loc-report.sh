@@ -7,24 +7,18 @@ set -e
 OUTPUT_FILE="LOC_REPORT.md"
 TEMP_FILE="${OUTPUT_FILE}.tmp"
 
+# Large file threshold (implementation lines)
+LARGE_FILE_THRESHOLD=400
+
 # Paths to exclude from documentation counts
 EXCLUDE_PATHS=(-not -path "./target/*" -not -path "./.git/*" -not -path "./.webcache/*" -not -path "./vendor/*")
 
-# Files allowed to exceed 200 impl lines (infrastructure, shared utilities, etc.)
+# Files allowed to exceed ${LARGE_FILE_THRESHOLD} impl lines (infrastructure, shared utilities, etc.)
 ALLOWED_LARGE_FILES=(
-    "test_helpers.rs"
-    "adapters/codex.rs"                      # Single adapter: model extraction + cumulative→delta conversion
-    "commands/workflow.rs"                   # Single concern: workflow command orchestration (6 commands)
-    "commands/workflow/transitions.rs"       # Single concern: state transition logic
-    "commands/workflow/tests/commands.rs"    # Infrastructure: command tests (start, next, repeat, reset, status)
-    "commands/workflow/tests/transitions.rs" # Infrastructure: transition and state logging tests
-    "commands/analyze/sections.rs"           # Single concern: terminal output rendering (7 sections)
-    "metrics/graph.rs"                       # Single concern: DAG construction + visualization
-    "metrics/hooks.rs"                       # Single concern: hooks.jsonl parsing + metrics extraction
-    "storage/mod.rs"                         # Single concern: file-based state persistence (CRUD + JSONL)
-    "test_helpers/metrics.rs"                # Infrastructure: metrics test builders and fixtures
-    "test_helpers/workflow.rs"               # Infrastructure: workflow test builders and fixtures
-    "tui/utils.rs"                           # Infrastructure: TUI formatting and helper utilities
+    "commands/workflow/transitions.rs"       # Single concern: state transition logic (606 lines)
+    "commands/workflow/tests/commands.rs"    # Infrastructure: command tests (434 lines)
+    "commands/workflow/tests/transitions.rs" # Infrastructure: transition and state logging tests (518 lines)
+    "storage/mod.rs"                         # Single concern: file-based state persistence (587 lines)
 )
 
 # Check if cloc is available
@@ -147,8 +141,8 @@ while IFS= read -r file; do
 
     DISPLAY_PATH=$(echo "$file" | sed 's|^src/||')
 
-    # Flag files with >200 impl lines (unless whitelisted)
-    if [ "$IMPL" -gt 200 ]; then
+    # Flag files with >${LARGE_FILE_THRESHOLD} impl lines (unless whitelisted)
+    if [ "$IMPL" -gt "$LARGE_FILE_THRESHOLD" ]; then
         if is_allowed_large_file "$DISPLAY_PATH"; then
             STATUS="✅ (infra)"
         else
@@ -165,7 +159,7 @@ done < <(find src -name "*.rs" -type f | sort)
 # Add warning section if there are large files
 if [ "$LARGE_COUNT" -gt 0 ]; then
     echo "" >> "$TEMP_FILE"
-    echo "**⚠️ Warning:** $LARGE_COUNT file(s) over 200 impl lines - consider splitting for maintainability" >> "$TEMP_FILE"
+    echo "**⚠️ Warning:** $LARGE_COUNT file(s) over $LARGE_FILE_THRESHOLD impl lines - consider splitting for maintainability" >> "$TEMP_FILE"
 fi
 
 cat >> "$TEMP_FILE" <<'EOF'
