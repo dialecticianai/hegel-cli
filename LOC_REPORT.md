@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-10 20:48
+**Last Updated**: 2025-11-10 20:57
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,884 | 14,810 | 33,694 |
+| **Lines** | 18,875 | 14,812 | 33,687 |
 | **Comments** | 2,791 | - | 2,791 |
-| **Blank Lines** | 3,590 | - | 3,590 |
-| **Total Lines** | 25,265 | 14,810 | 40,075 |
-| **Files** | 115 | 76 | 191 |
+| **Blank Lines** | 3,580 | - | 3,580 |
+| **Total Lines** | 25,246 | 14,812 | 40,058 |
+| **Files** | 119 | 76 | 195 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           115           3590           2791          18884
+Rust                           119           3580           2791          18875
 Markdown                        15            147              0            454
 -------------------------------------------------------------------------------
-SUM:                           130           3737           2791          19338
+SUM:                           134           3727           2791          19329
 -------------------------------------------------------------------------------
 ```
 
@@ -97,11 +97,15 @@ SUM:                           130           3737           2791          19338
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 159 | 159 | 0 | 0.0% | ✅ |
-| `engine/mod.rs` | 1,395 | 326 | 1,069 | 76.6% | ⚠️ Large |
+| `engine/mod.rs` | 335 | 326 | 9 | 2.7% | ⚠️ Large |
 | `engine/template.rs` | 161 | 161 | 0 | 0.0% | ✅ |
 | `engine/tests/handlebars.rs` | 351 | 351 | 0 | 0.0% | ⚠️ Large |
-| `engine/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
+| `engine/tests/integration.rs` | 365 | 365 | 0 | 0.0% | ⚠️ Large |
+| `engine/tests/mod.rs` | 6 | 6 | 0 | 0.0% | ✅ |
+| `engine/tests/navigation.rs` | 204 | 204 | 0 | 0.0% | ⚠️ Large |
+| `engine/tests/rules.rs` | 258 | 258 | 0 | 0.0% | ⚠️ Large |
 | `engine/tests/template.rs` | 514 | 514 | 0 | 0.0% | ⚠️ Large |
+| `engine/tests/workflow.rs` | 210 | 210 | 0 | 0.0% | ⚠️ Large |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
@@ -153,7 +157,7 @@ SUM:                           130           3737           2791          19338
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ (infra) |
 
-**⚠️ Warning:** 20 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 24 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -217,7 +221,7 @@ SUM:                           130           3737           2791          19338
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 349 |
-| `LOC_REPORT.md` | 261 |
+| `LOC_REPORT.md` | 263 |
 | `METRICS.md` | 258 |
 | `README.md` | 460 |
 | `ROADMAP.md` | 450 |
