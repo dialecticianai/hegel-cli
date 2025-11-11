@@ -8,7 +8,7 @@
 
 Keep your AI coding sessions on track with structured workflows. Hegel guides you and your AI assistant through development cycles—from research to exploration to production delivery.
 
-**Built for AI agents, great for humans too.** Think of it as a swiss army knife for orchestrating AI development: workflow guardrails, activity tracking, safety checks, document review, and more.
+**Built for AI agents, great for humans too.** Think of it as a swiss army knife for orchestrating AI development: workflow guardrails, activity tracking, safety checks, document review (GUI and CLI), and more.
 
 ## Overview
 
@@ -308,6 +308,38 @@ Other Markdown:
     ├── SPEC_WRITING.md (187 lines)
     └── PLAN_WRITING.md (145 lines)
 ```
+
+### Managing Document Reviews
+
+Read and write reviews for files stored in `.hegel/reviews.json`:
+
+```bash
+# Write reviews from JSONL (one ReviewComment per line)
+echo '{"timestamp":"...","file":"...","selection":{...},"text":"...","comment":"..."}' | hegel review path/to/file.md
+
+# Read reviews as JSONL
+hegel review path/to/file.md
+
+# Extension is optional (.md auto-appended if needed)
+hegel review SPEC     # Works for SPEC.md
+```
+
+**Write mode** (stdin present):
+- Parses JSONL input as ReviewComment objects
+- Appends to existing reviews in `.hegel/reviews.json`
+- Outputs success JSON: `{"file":"relative/path","comments":N}`
+
+**Read mode** (no stdin):
+- Outputs all reviews for file as JSONL
+- Empty output if no reviews exist
+- Flattens comments across all review sessions
+
+**Path handling:**
+- Accepts absolute or relative paths
+- Optional `.md` extension (tries both variants)
+- Clear error if file not found
+
+**See [ADVANCED_TOOLS.md](docs/ADVANCED_TOOLS.md) for `hegel reflect` GUI-based review workflow.**
 
 ### Resetting State
 
