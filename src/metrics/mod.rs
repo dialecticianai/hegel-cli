@@ -372,6 +372,8 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
 
 #[cfg(test)]
 mod tests {
+    mod git;
+
     use super::*;
     use crate::test_helpers::*;
     use tempfile::TempDir;

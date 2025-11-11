@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-10 19:02
+**Last Updated**: 2025-11-10 19:30
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **80.60%** lines | **80.28%** regions | **80.76%** functions
+**Overall Coverage**: **80.40%** lines | **80.09%** regions | **80.65%** functions
 
 ## Summary
 
 ```
-TOTAL                                         21721              4284    80.28%        1133               218    80.76%       13262              2573    80.60%           0                 0         -
+TOTAL                                         21377              4257    80.09%        1116               216    80.65%       13018              2552    80.40%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -69,7 +69,7 @@ TOTAL                                         21721              4284    80.28% 
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
 | `src/metrics/aggregation.rs` | 57.91% | 60.68% | 75.00% | 🟠 Moderate |
 | `src/metrics/cowboy.rs` | 100.00% | 99.42% | 100.00% | 🟢 Excellent |
-| `src/metrics/git.rs` | 92.45% | 91.68% | 95.45% | 🟢 Excellent |
+| `src/metrics/git.rs` | 91.89% | 87.59% | 100.00% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
 | `src/metrics/mod.rs` | 84.71% | 84.06% | 69.57% | 🟡 Good |
@@ -93,7 +93,7 @@ TOTAL                                         21721              4284    80.28% 
 | `src/test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/test_helpers/workflow.rs` | 86.36% | 81.66% | 87.50% | 🟡 Good |
 | `src/theme.rs` | 85.71% | 85.94% | 81.82% | 🟡 Good |
-| `src/tui/app.rs` | 87.66% | 87.68% | 87.50% | 🟡 Good |
+| `src/tui/app.rs` | 88.94% | 88.83% | 91.67% | 🟡 Good |
 | `src/tui/mod.rs` | 11.36% | 13.70% | 16.67% | 🔴 Needs Work |
 | `src/tui/tabs/events.rs` | 90.24% | 87.10% | 100.00% | 🟢 Excellent |
 | `src/tui/tabs/files.rs` | 83.93% | 80.37% | 100.00% | 🟡 Good |
@@ -129,7 +129,7 @@ TOTAL                                         21721              4284    80.28% 
 - `src/guardrails/types.rs` - 94.38%
 - `src/metamodes/mod.rs` - 99.29%
 - `src/metrics/cowboy.rs` - 100.00%
-- `src/metrics/git.rs` - 92.45%
+- `src/metrics/git.rs` - 91.89%
 - `src/metrics/graph.rs` - 90.06%
 - `src/metrics/hooks.rs` - 94.22%
 - `src/metrics/states.rs` - 100.00%
@@ -170,7 +170,7 @@ TOTAL                                         21721              4284    80.28% 
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 86.36%
 - `src/theme.rs` - 85.71%
-- `src/tui/app.rs` - 87.66%
+- `src/tui/app.rs` - 88.94%
 - `src/tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
@@ -203,7 +203,7 @@ TOTAL                                         21721              4284    80.28% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 80.60% | ✅ Met |
+| Overall | ≥80% | 80.40% | ✅ Met |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
