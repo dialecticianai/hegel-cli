@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-10 19:41
+**Last Updated**: 2025-11-10 19:53
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **79.58%** lines | **79.06%** regions | **79.66%** functions
+**Overall Coverage**: **78.98%** lines | **78.51%** regions | **79.37%** functions
 
 ## Summary
 
 ```
-TOTAL                                         20230              4237    79.06%        1062               216    79.66%       12456              2544    79.58%           0                 0         -
+TOTAL                                         19713              4237    78.51%        1047               216    79.37%       12103              2544    78.98%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -72,7 +72,7 @@ TOTAL                                         20230              4237    79.06% 
 | `src/metrics/git.rs` | 91.89% | 87.59% | 100.00% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
 | `src/metrics/hooks.rs` | 94.22% | 93.69% | 89.47% | 🟢 Excellent |
-| `src/metrics/mod.rs` | 84.71% | 84.06% | 69.57% | 🟡 Good |
+| `src/metrics/mod.rs` | 58.13% | 57.05% | 12.50% | 🟠 Moderate |
 | `src/metrics/states.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/metrics/transcript.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/rules/evaluator.rs` | 93.63% | 90.70% | 88.24% | 🟢 Excellent |
@@ -165,7 +165,6 @@ TOTAL                                         20230              4237    79.06% 
 - `src/config.rs` - 76.47%
 - `src/doctor/migrations.rs` - 82.98%
 - `src/embedded.rs` - 82.79%
-- `src/metrics/mod.rs` - 84.71%
 - `src/storage/log_cleanup.rs` - 75.00%
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 86.36%
@@ -186,6 +185,7 @@ TOTAL                                         20230              4237    79.06% 
 - `src/doctor/rescue.rs` - 51.35%
 - `src/main.rs` - 50.47%
 - `src/metrics/aggregation.rs` - 57.91%
+- `src/metrics/mod.rs` - 58.13%
 
 ### 🔴 Needs Work (<40% lines)
 - `src/analyze/cleanup/git.rs` - 0.00%
@@ -203,7 +203,7 @@ TOTAL                                         20230              4237    79.06% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 79.58% | ⏳ In Progress |
+| Overall | ≥80% | 78.98% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
