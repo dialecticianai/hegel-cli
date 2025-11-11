@@ -11,8 +11,19 @@ The engine is the core workflow orchestrator. It loads YAML workflow definitions
 ```
 engine/
 ├── mod.rs               Workflow/Node/Transition structs, load_workflow, init_state, get_next_prompt, render_prompt (dual-engine router)
+│
 ├── handlebars.rs        Handlebars template engine (partials, eq helper, HandlebarsContext wrapping)
-└── template.rs          Markdown template rendering ({{UPPERCASE}} guides, {{templates/name}} includes, {{var}} context, recursive expansion)
+│
+├── template.rs          Markdown template rendering ({{UPPERCASE}} guides, {{templates/name}} includes, {{var}} context, recursive expansion)
+│
+└── tests/               Engine module test suite
+    ├── mod.rs           Test module exports
+    ├── handlebars.rs    Handlebars engine tests (partial registration, rendering, eq helper, routing)
+    ├── template.rs      Markdown template tests (guide injection, template includes, variable substitution, validation)
+    ├── workflow.rs      Workflow loading and initialization tests (YAML parsing, validation, state creation)
+    ├── navigation.rs    Workflow navigation tests (state transitions, get_next_prompt, claims evaluation)
+    ├── rules.rs         Rules integration tests (node rules field, rule evaluation, terminal nodes)
+    └── integration.rs   End-to-end integration tests (Handlebars workflows, require_commits rule, force bypass)
 ```
 
 ## Key Concepts
