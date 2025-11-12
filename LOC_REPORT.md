@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-12 18:17
+**Last Updated**: 2025-11-12 18:38
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 19,055 | 14,839 | 33,894 |
-| **Comments** | 2,806 | - | 2,806 |
-| **Blank Lines** | 3,613 | - | 3,613 |
-| **Total Lines** | 25,474 | 14,839 | 40,313 |
+| **Lines** | 19,197 | 14,839 | 34,036 |
+| **Comments** | 2,827 | - | 2,827 |
+| **Blank Lines** | 3,634 | - | 3,634 |
+| **Total Lines** | 25,658 | 14,839 | 40,497 |
 | **Files** | 119 | 76 | 195 |
 
-**Documentation Ratio**: 0.78 lines of docs per line of code
+**Documentation Ratio**: 0.77 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           119           3613           2806          19055
+Rust                           119           3634           2827          19197
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           134           3760           2806          19524
+SUM:                           134           3781           2827          19666
 -------------------------------------------------------------------------------
 ```
 
@@ -76,7 +76,7 @@ SUM:                           134           3760           2806          19524
 | `commands/mod.rs` | 43 | 43 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 120 | 95 | 25 | 20.8% | ✅ |
-| `commands/review.rs` | 323 | 149 | 174 | 53.9% | ✅ |
+| `commands/review.rs` | 498 | 231 | 267 | 53.6% | ✅ |
 | `commands/status.rs` | 140 | 140 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 79 | 79 | 0 | 0.0% | ✅ |
@@ -110,7 +110,7 @@ SUM:                           134           3760           2806          19524
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 529 | 15 | 514 | 97.2% | ✅ |
+| `main.rs` | 538 | 15 | 523 | 97.2% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ✅ |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -248,7 +248,7 @@ SUM:                           134           3760           2806          19524
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.78 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.77 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

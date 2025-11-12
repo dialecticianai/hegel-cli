@@ -4,19 +4,22 @@ use crate::storage::reviews::{
 use crate::storage::FileStorage;
 use anyhow::{Context, Result};
 use std::io::{self, BufRead, IsTerminal};
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::thread;
+use std::time::Duration;
 
-/// Handle review command - read or write reviews for a file
-pub fn handle_review(file_path: &Path, storage: &FileStorage) -> Result<()> {
-    // Resolve file path (handle optional .md extension)
-    let resolved_path = resolve_file_path(file_path)?;
-
-    // Check if stdin is available and has data (write mode) or not (read mode)
-    // We check is_terminal first - if it's a terminal, definitely read mode
-    // If it's not a terminal (pipe), try to read to see if there's data
+/// Handle review command - read or write reviews for files
+pub fn handle_review(file_paths: &[PathBuf], storage: &FileStorage, immediate: bool) -> Result<()> {
+    // Check if stdin is available and has data (write mode)
     let stdin_available = !io::stdin().is_terminal();
 
     if stdin_available {
+        // Write mode - only works with single file for now
+        if file_paths.len() != 1 {
+            anyhow::bail!("Write mode only supports a single file");
+        }
+        let resolved_path = resolve_file_path(&file_paths[0])?;
+
         // Try write mode, but if there's no data, fall back to read mode
         match write_reviews(&resolved_path, storage) {
             Ok(_) => {}
@@ -26,8 +29,24 @@ pub fn handle_review(file_path: &Path, storage: &FileStorage) -> Result<()> {
             }
             Err(e) => return Err(e),
         }
+        return Ok(());
+    }
+
+    // Read mode - resolve all file paths
+    let resolved_paths: Vec<PathBuf> = file_paths
+        .iter()
+        .map(|p| resolve_file_path(p))
+        .collect::<Result<Vec<_>>>()?;
+
+    if immediate {
+        // Immediate mode - return existing reviews
+        for path in &resolved_paths {
+            read_reviews_for_file(path, storage)?;
+        }
     } else {
-        read_reviews_for_file(&resolved_path, storage)?;
+        // Polling mode - wait for new reviews
+        let start_time = chrono::Utc::now();
+        poll_for_reviews(&resolved_paths, storage, &start_time, POLL_TIMEOUT_SECS)?;
     }
 
     Ok(())
@@ -147,12 +166,77 @@ fn read_reviews_for_file(file_path: &Path, storage: &FileStorage) -> Result<()> 
     Ok(())
 }
 
+// Polling configuration
+const POLL_INTERVAL_MS: u64 = 200;
+const POLL_TIMEOUT_SECS: u64 = 300; // 5 minutes
+
+/// Poll for new reviews with timestamps after start_time
+fn poll_for_reviews(
+    file_paths: &[PathBuf],
+    storage: &FileStorage,
+    start_time: &chrono::DateTime<chrono::Utc>,
+    timeout_secs: u64,
+) -> Result<()> {
+    let hegel_dir = storage.state_dir();
+    let timeout = Duration::from_secs(timeout_secs);
+    let poll_start = std::time::Instant::now();
+
+    // Compute relative paths for all files
+    let relative_paths: Vec<String> = file_paths
+        .iter()
+        .map(|p| compute_relative_path(hegel_dir, p))
+        .collect::<Result<Vec<_>>>()?;
+
+    loop {
+        // Check timeout
+        if poll_start.elapsed() > timeout {
+            anyhow::bail!("Timeout waiting for reviews after {} seconds", timeout_secs);
+        }
+
+        // Load current reviews
+        let reviews = read_hegel_reviews(hegel_dir).context("Failed to read reviews")?;
+
+        // Check each file for new reviews
+        let mut found_reviews = Vec::new();
+        for (path, relative_path) in file_paths.iter().zip(&relative_paths) {
+            if let Some(entries) = reviews.get(relative_path) {
+                // Look for entries with timestamp > start_time
+                for entry in entries {
+                    if let Ok(entry_time) = chrono::DateTime::parse_from_rfc3339(&entry.timestamp) {
+                        if entry_time.with_timezone(&chrono::Utc) > *start_time {
+                            // Found new review for this file
+                            found_reviews.push((path, entry));
+                            break; // Only need one review per file
+                        }
+                    }
+                }
+            }
+        }
+
+        // If we found reviews for all files, output and exit
+        if found_reviews.len() == file_paths.len() {
+            for (_path, entry) in found_reviews {
+                for comment in &entry.comments {
+                    let json = serde_json::to_string(comment)?;
+                    println!("{}", json);
+                }
+            }
+            return Ok(());
+        }
+
+        // Sleep before next poll
+        thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::storage::reviews::{Position, ReviewComment, SelectionRange};
     use crate::test_helpers::*;
     use std::fs;
+    use std::thread;
+    use std::time::Duration;
 
     fn test_review_comment(file: &str, text: &str, comment: &str) -> ReviewComment {
         ReviewComment {
@@ -319,5 +403,96 @@ mod tests {
         assert_eq!(loaded["spec.md"][0].comments.len(), 2);
         assert_eq!(loaded["spec.md"][0].comments[0].comment, "comment 1");
         assert_eq!(loaded["spec.md"][0].comments[1].comment, "comment 2");
+    }
+
+    #[test]
+    fn test_poll_for_reviews_finds_new_review() {
+        let (_temp_dir, storage) = test_storage();
+        let test_file = storage.state_dir().parent().unwrap().join("test.md");
+        fs::write(&test_file, "content").unwrap();
+
+        let start_time = chrono::Utc::now();
+
+        // Spawn thread to write review after a short delay
+        let hegel_dir = storage.state_dir().to_path_buf();
+        thread::spawn(move || {
+            thread::sleep(Duration::from_millis(100));
+            // Write review with timestamp after start_time
+            let comment = ReviewComment {
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                session_id: Some("test".to_string()),
+                file: "test.md".to_string(),
+                selection: SelectionRange {
+                    start: Position { line: 1, col: 0 },
+                    end: Position { line: 1, col: 5 },
+                },
+                text: "text".to_string(),
+                comment: "new review".to_string(),
+            };
+            let entry = crate::storage::reviews::HegelReviewEntry {
+                comments: vec![comment],
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                session_id: Some("test".to_string()),
+            };
+            let mut reviews = std::collections::HashMap::new();
+            reviews.insert("test.md".to_string(), vec![entry]);
+            crate::storage::reviews::write_hegel_reviews(&hegel_dir, &reviews).unwrap();
+        });
+
+        // Poll for new reviews - should find the one written above
+        let result = poll_for_reviews(&[test_file.clone()], &storage, &start_time, 2);
+        if let Err(e) = &result {
+            eprintln!("Poll error: {}", e);
+        }
+        assert!(result.is_ok(), "Expected success but got: {:?}", result);
+    }
+
+    #[test]
+    fn test_poll_for_reviews_timeout() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("test.md");
+        fs::write(&test_file, "content").unwrap();
+
+        let start_time = chrono::Utc::now();
+
+        // Poll with very short timeout - should timeout
+        let result = poll_for_reviews(&[test_file.clone()], &storage, &start_time, 1);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("Timeout"));
+    }
+
+    #[test]
+    fn test_poll_ignores_old_reviews() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("old.md");
+        fs::write(&test_file, "content").unwrap();
+
+        // Write review with old timestamp
+        let old_comment = ReviewComment {
+            timestamp: "2020-01-01T00:00:00Z".to_string(),
+            session_id: Some("old".to_string()),
+            file: "old.md".to_string(),
+            selection: SelectionRange {
+                start: Position { line: 1, col: 0 },
+                end: Position { line: 1, col: 5 },
+            },
+            text: "old".to_string(),
+            comment: "old review".to_string(),
+        };
+        let entry = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![old_comment],
+            timestamp: "2020-01-01T00:00:00Z".to_string(),
+            session_id: Some("old".to_string()),
+        };
+        let mut reviews = std::collections::HashMap::new();
+        reviews.insert("old.md".to_string(), vec![entry]);
+        crate::storage::reviews::write_hegel_reviews(storage.state_dir(), &reviews).unwrap();
+
+        let start_time = chrono::Utc::now();
+
+        // Poll with short timeout - should timeout because review is too old
+        let result = poll_for_reviews(&[test_file.clone()], &storage, &start_time, 1);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("Timeout"));
     }
 }

@@ -347,11 +347,17 @@ enum Commands {
     /// Write mode (stdin present): Save reviews to .hegel/reviews.json
     ///   echo '{"timestamp":"...","file":"...","selection":{...},"text":"...","comment":"..."}' | hegel review path/to/file.md
     ///
-    /// Read mode (no stdin): Display reviews as JSONL
-    ///   hegel review path/to/file.md
+    /// Read mode (no stdin):
+    ///   Default: Poll for new reviews (blocks until reviews appear or timeout)
+    ///     hegel review file1.md file2.md
+    ///   Immediate: Return existing reviews immediately
+    ///     hegel review --immediate file.md
     Review {
-        /// File path (absolute or relative, .md extension optional)
-        file_path: std::path::PathBuf,
+        /// File paths (absolute or relative, .md extension optional)
+        file_paths: Vec<std::path::PathBuf>,
+        /// Return existing reviews immediately without polling
+        #[arg(long, alias = "no-wait")]
+        immediate: bool,
     },
 }
 
@@ -520,8 +526,11 @@ fn main() -> Result<()> {
             let args = commands::MarkdownArgs { json, no_ddd, ddd };
             commands::run_markdown(args)?;
         }
-        Commands::Review { file_path } => {
-            commands::handle_review(&file_path, &storage)?;
+        Commands::Review {
+            file_paths,
+            immediate,
+        } => {
+            commands::handle_review(&file_paths, &storage, immediate)?;
         }
     }
 
