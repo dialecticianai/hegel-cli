@@ -311,35 +311,18 @@ Other Markdown:
 
 ### Managing Document Reviews
 
-Read and write reviews for files stored in `.hegel/reviews.json`:
+Hegel provides two tools for reviewing Markdown documents:
 
 ```bash
-# Write reviews from JSONL (one ReviewComment per line)
-echo '{"timestamp":"...","file":"...","selection":{...},"text":"...","comment":"..."}' | hegel review path/to/file.md
+# GUI review (interactive, select text and comment)
+hegel reflect SPEC.md PLAN.md
 
-# Read reviews as JSONL
-hegel review path/to/file.md
-
-# Extension is optional (.md auto-appended if needed)
-hegel review SPEC     # Works for SPEC.md
+# CLI review (read/write reviews.json, poll for IDE integration)
+hegel review file.md
+hegel review --immediate file.md
 ```
 
-**Write mode** (stdin present):
-- Parses JSONL input as ReviewComment objects
-- Appends to existing reviews in `.hegel/reviews.json`
-- Outputs success JSON: `{"file":"relative/path","comments":N}`
-
-**Read mode** (no stdin):
-- Outputs all reviews for file as JSONL
-- Empty output if no reviews exist
-- Flattens comments across all review sessions
-
-**Path handling:**
-- Accepts absolute or relative paths
-- Optional `.md` extension (tries both variants)
-- Clear error if file not found
-
-**See [ADVANCED_TOOLS.md](docs/ADVANCED_TOOLS.md) for `hegel reflect` GUI-based review workflow.**
+**See [MD_REVIEW.md](docs/MD_REVIEW.md) for complete documentation on `hegel reflect` (GUI) and `hegel review` (CLI).**
 
 ### Resetting State
 

@@ -25,7 +25,7 @@ commands/
 │
 ├── astq.rs              AST-grep wrapper (builds from vendor/, LLM-friendly feedback)
 ├── reflect.rs           Mirror GUI launcher (finds binary, passes files for review)
-├── review.rs            Review file management (read/write reviews.json via JSONL)
+├── review.rs            Review file management (poll/read/write reviews.json)
 ├── pm.rs                Project manager dashboard launcher (wraps hegel-pm binary)
 ├── ide.rs               Hegel IDE launcher (wraps hegel-ide Electron app)
 ├── markdown.rs          Markdown file tree visualization (categorizes DDD vs regular docs)

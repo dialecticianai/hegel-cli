@@ -19,29 +19,9 @@ hegel astq --help
 
 ## Markdown Document Review
 
-Launch ephemeral GUI for reviewing Markdown artifacts:
-
-```bash
-# Single file review
-hegel reflect SPEC.md
-
-# Multiple files
-hegel reflect SPEC.md PLAN.md
-
-# With output directory
-hegel reflect SPEC.md --out-dir .reviews/
-
-# Headless mode (testing)
-hegel reflect SPEC.md --headless
-```
-
-**Powered by [mirror](https://github.com/dialecticianai/hegel-mirror)**, a zero-friction Markdown review UI. Requires `mirror` binary built and available (adjacent repo or in PATH).
-
-**Review workflow:**
-- Select text → comment → submit
-- Comments saved to `.ddd/<filename>.review.N`
-- Auto-exit on submit (like `git commit`)
-- Session ID passthrough via `HEGEL_SESSION_ID`
+**See [MD_REVIEW.md](MD_REVIEW.md) for complete documentation on:**
+- `hegel reflect` - GUI-based document review
+- `hegel review` - CLI-based review management with IDE integration
 
 ## Multi-Project Dashboard
 
