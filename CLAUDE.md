@@ -159,6 +159,8 @@
 
 ## Workflow Execution
 
+**Core workflows**: cowboy, discovery, execution, research, refactor (always available)
+
 **Commands**: `hegel start <workflow>` → `hegel next` → `hegel status` → `hegel restart|abort`
 
 **CRITICAL - Workflow Advancement Protocol**:

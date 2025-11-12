@@ -25,6 +25,9 @@ All rules visible and modifiable. State always inspectable. Transparency is a fe
 **Docs → Tests → Implementation → Learnings**
 The DDD cycle. Specification before code. Reflection after execution.
 
+**Red, green, refactor**
+Write failing tests first, then make them pass. TDD isn't a nicety, it's the workflow. Tests prove understanding before implementation.
+
 **Guardrails without AI**
 Deterministic rules, not LLM judgment. State-based enforcement. Interrupt, don't prevent.
 
@@ -45,6 +48,9 @@ Verbose tests compound as friction. Extract patterns early, compress aggressivel
 
 **Refactor early, not late**
 Human wisdom says wait for pain. LLM coding says wait for pattern. Token overhead is immediate cost, not future debt. Line count thresholds are literal constraints, not suggestions. Structure for reading efficiency, not writing comfort.
+
+**Never defer, never compromise**
+Don't suggest "living with it for now." All tech debt is unacceptable, no matter how minor. Fix it immediately or don't create it. "For now" becomes permanent.
 
 **Housekeeping before heroics**
 Automate the pattern before repeating it. Infrastructure investment pays immediately.
