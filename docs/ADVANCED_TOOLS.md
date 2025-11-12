@@ -17,12 +17,6 @@ hegel astq --help
 
 **Powered by [ast-grep](https://github.com/ast-grep/ast-grep)**, a fast AST-based search and rewrite tool. First run automatically builds from vendor.
 
-## Markdown Document Review
-
-**See [MD_REVIEW.md](MD_REVIEW.md) for complete documentation on:**
-- `hegel reflect` - GUI-based document review
-- `hegel review` - CLI-based review management with IDE integration
-
 ## Multi-Project Dashboard
 
 Manage multiple Hegel projects via web UI (no args) or CLI commands:
