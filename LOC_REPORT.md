@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-11 21:15
+**Last Updated**: 2025-11-12 18:17
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,916 | 14,831 | 33,747 |
-| **Comments** | 2,797 | - | 2,797 |
-| **Blank Lines** | 3,586 | - | 3,586 |
-| **Total Lines** | 25,299 | 14,831 | 40,130 |
+| **Lines** | 19,055 | 14,839 | 33,894 |
+| **Comments** | 2,806 | - | 2,806 |
+| **Blank Lines** | 3,613 | - | 3,613 |
+| **Total Lines** | 25,474 | 14,839 | 40,313 |
 | **Files** | 119 | 76 | 195 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           119           3586           2797          18916
+Rust                           119           3613           2806          19055
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           134           3733           2797          19385
+SUM:                           134           3760           2806          19524
 -------------------------------------------------------------------------------
 ```
 
@@ -76,7 +76,7 @@ SUM:                           134           3733           2797          19385
 | `commands/mod.rs` | 43 | 43 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 120 | 95 | 25 | 20.8% | ✅ |
-| `commands/review.rs` | 148 | 148 | 0 | 0.0% | ✅ |
+| `commands/review.rs` | 323 | 149 | 174 | 53.9% | ✅ |
 | `commands/status.rs` | 140 | 140 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 79 | 79 | 0 | 0.0% | ✅ |
@@ -193,7 +193,7 @@ SUM:                           134           3733           2797          19385
 | `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
 | `.ddd/refactor/20251110-test_extraction.md` | 193 |
 | `.ddd/reports/20251010-tui_dep_review.md` | 678 |
-| `CLAUDE.md` | 194 |
+| `CLAUDE.md` | 196 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 230 |
 | `docs/ADVANCED_TOOLS.md` | 112 |
@@ -210,7 +210,7 @@ SUM:                           134           3733           2797          19385
 | `guides/KICKOFF_WRITING.md` | 96 |
 | `guides/KNOWLEDGE_CAPTURE.md` | 345 |
 | `guides/LEARNINGS_WRITING.md` | 96 |
-| `guides/LEXICON.md` | 84 |
+| `guides/LEXICON.md` | 90 |
 | `guides/PLAN_WRITING.md` | 181 |
 | `guides/QUESTION_TRACKING.md` | 397 |
 | `guides/README_WRITING.md` | 55 |

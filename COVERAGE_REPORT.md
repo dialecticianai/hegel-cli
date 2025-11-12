@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-11 21:15
+**Last Updated**: 2025-11-12 18:17
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **76.57%** lines | **75.56%** regions | **77.23%** functions
+**Overall Coverage**: **76.82%** lines | **75.94%** regions | **77.44%** functions
 
 ## Summary
 
 ```
-TOTAL                                         17585              4298    75.56%         966               220    77.23%       10971              2571    76.57%           0                 0         -
+TOTAL                                         17860              4298    75.94%         975               220    77.44%       11093              2571    76.82%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -49,7 +49,7 @@ TOTAL                                         17585              4298    75.56% 
 | `src/commands/meta.rs` | 64.88% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 31.94% | 22.56% | 33.33% | 🔴 Needs Work |
-| `src/commands/review.rs` | 81.48% | 81.99% | 66.67% | 🟡 Good |
+| `src/commands/review.rs` | 92.61% | 93.35% | 86.67% | 🟢 Excellent |
 | `src/commands/status.rs` | 44.83% | 37.42% | 50.00% | 🟠 Moderate |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 97.92% | 93.15% | 75.00% | 🟢 Excellent |
@@ -120,6 +120,7 @@ TOTAL                                         17585              4298    75.56% 
 - `src/commands/git.rs` - 100.00%
 - `src/commands/hook.rs` - 96.64%
 - `src/commands/init.rs` - 93.44%
+- `src/commands/review.rs` - 92.61%
 - `src/commands/workflow/claims.rs` - 100.00%
 - `src/commands/workflow/context.rs` - 97.92%
 - `src/engine/handlebars.rs` - 94.25%
@@ -157,7 +158,6 @@ TOTAL                                         17585              4298    75.56% 
 - `src/analyze/gap_detection.rs` - 86.03%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
-- `src/commands/review.rs` - 81.48%
 - `src/commands/workflow/transitions.rs` - 71.32%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/config.rs` - 76.47%
@@ -203,7 +203,7 @@ TOTAL                                         17585              4298    75.56% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 76.57% | ⏳ In Progress |
+| Overall | ≥80% | 76.82% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -146,3 +146,178 @@ fn read_reviews_for_file(file_path: &Path, storage: &FileStorage) -> Result<()> 
     // If no reviews for file, output nothing (empty output)
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::storage::reviews::{Position, ReviewComment, SelectionRange};
+    use crate::test_helpers::*;
+    use std::fs;
+
+    fn test_review_comment(file: &str, text: &str, comment: &str) -> ReviewComment {
+        ReviewComment {
+            timestamp: "2025-01-01T00:00:00Z".to_string(),
+            session_id: Some("test-session".to_string()),
+            file: file.to_string(),
+            selection: SelectionRange {
+                start: Position { line: 1, col: 0 },
+                end: Position { line: 1, col: 10 },
+            },
+            text: text.to_string(),
+            comment: comment.to_string(),
+        }
+    }
+
+    #[test]
+    fn test_resolve_file_path_exact_match() {
+        let (temp_dir, _storage) = test_storage();
+        let test_file = temp_dir.path().join("test.md");
+        fs::write(&test_file, "test content").unwrap();
+
+        let resolved = resolve_file_path(&test_file).unwrap();
+        assert_eq!(resolved, test_file);
+    }
+
+    #[test]
+    fn test_resolve_file_path_adds_md_extension() {
+        let (temp_dir, _storage) = test_storage();
+        let test_file = temp_dir.path().join("test.md");
+        fs::write(&test_file, "test content").unwrap();
+
+        let path_without_ext = temp_dir.path().join("test");
+        let resolved = resolve_file_path(&path_without_ext).unwrap();
+        assert_eq!(resolved, test_file);
+    }
+
+    #[test]
+    fn test_resolve_file_path_not_found() {
+        let (temp_dir, _storage) = test_storage();
+        let nonexistent = temp_dir.path().join("nonexistent.md");
+
+        let result = resolve_file_path(&nonexistent);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("File not found"));
+    }
+
+    #[test]
+    fn test_write_reviews_creates_entry() {
+        let (_temp_dir, storage) = test_storage();
+
+        // Create test comment and write directly via storage layer
+        // Note: Testing write_reviews() directly would require mocking stdin
+        let comment = test_review_comment("test.md", "selected", "test comment");
+        let mut reviews = crate::storage::reviews::read_hegel_reviews(storage.state_dir()).unwrap();
+        let entry = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![comment.clone()],
+            timestamp: chrono::Utc::now().to_rfc3339(),
+            session_id: None,
+        };
+        reviews
+            .entry("test.md".to_string())
+            .or_insert_with(Vec::new)
+            .push(entry);
+        crate::storage::reviews::write_hegel_reviews(storage.state_dir(), &reviews).unwrap();
+
+        // Verify written
+        let loaded = crate::storage::reviews::read_hegel_reviews(storage.state_dir()).unwrap();
+        assert!(loaded.contains_key("test.md"));
+        assert_eq!(loaded["test.md"][0].comments[0].comment, "test comment");
+    }
+
+    #[test]
+    fn test_read_reviews_for_nonexistent_file() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("test.md");
+        fs::write(&test_file, "test content").unwrap();
+
+        // Read reviews for file with no reviews - should succeed with empty output
+        let result = read_reviews_for_file(&test_file, &storage);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_read_reviews_for_file_with_reviews() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("test.md");
+        fs::write(&test_file, "test content").unwrap();
+
+        // Write review directly via storage layer
+        let comment = test_review_comment("test.md", "selected text", "needs improvement");
+        let entry = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![comment],
+            timestamp: "2025-01-01T00:00:00Z".to_string(),
+            session_id: Some("test-session".to_string()),
+        };
+        let mut reviews = std::collections::HashMap::new();
+        reviews.insert("test.md".to_string(), vec![entry]);
+        crate::storage::reviews::write_hegel_reviews(storage.state_dir(), &reviews).unwrap();
+
+        // Read reviews - should output JSONL (testing via storage layer)
+        let loaded = crate::storage::reviews::read_hegel_reviews(storage.state_dir()).unwrap();
+        assert!(loaded.contains_key("test.md"));
+        assert_eq!(loaded["test.md"][0].comments.len(), 1);
+        assert_eq!(
+            loaded["test.md"][0].comments[0].comment,
+            "needs improvement"
+        );
+    }
+
+    #[test]
+    fn test_read_reviews_multiple_entries() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("doc.md");
+        fs::write(&test_file, "content").unwrap();
+
+        // Create two separate review sessions
+        let comment1 = test_review_comment("doc.md", "line 1", "first review");
+        let comment2 = test_review_comment("doc.md", "line 2", "second review");
+
+        let entry1 = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![comment1],
+            timestamp: "2025-01-01T00:00:00Z".to_string(),
+            session_id: Some("session-1".to_string()),
+        };
+
+        let entry2 = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![comment2],
+            timestamp: "2025-01-01T01:00:00Z".to_string(),
+            session_id: Some("session-2".to_string()),
+        };
+
+        let mut reviews = std::collections::HashMap::new();
+        reviews.insert("doc.md".to_string(), vec![entry1, entry2]);
+        crate::storage::reviews::write_hegel_reviews(storage.state_dir(), &reviews).unwrap();
+
+        // Verify both entries are stored
+        let loaded = crate::storage::reviews::read_hegel_reviews(storage.state_dir()).unwrap();
+        assert_eq!(loaded["doc.md"].len(), 2);
+        assert_eq!(loaded["doc.md"][0].comments[0].comment, "first review");
+        assert_eq!(loaded["doc.md"][1].comments[0].comment, "second review");
+    }
+
+    #[test]
+    fn test_read_reviews_multiple_comments_per_entry() {
+        let (temp_dir, storage) = test_storage();
+        let test_file = temp_dir.path().join("spec.md");
+        fs::write(&test_file, "spec content").unwrap();
+
+        let comment1 = test_review_comment("spec.md", "section 1", "comment 1");
+        let comment2 = test_review_comment("spec.md", "section 2", "comment 2");
+
+        let entry = crate::storage::reviews::HegelReviewEntry {
+            comments: vec![comment1, comment2],
+            timestamp: "2025-01-01T00:00:00Z".to_string(),
+            session_id: Some("test-session".to_string()),
+        };
+
+        let mut reviews = std::collections::HashMap::new();
+        reviews.insert("spec.md".to_string(), vec![entry]);
+        crate::storage::reviews::write_hegel_reviews(storage.state_dir(), &reviews).unwrap();
+
+        // Verify multiple comments in single entry
+        let loaded = crate::storage::reviews::read_hegel_reviews(storage.state_dir()).unwrap();
+        assert_eq!(loaded["spec.md"][0].comments.len(), 2);
+        assert_eq!(loaded["spec.md"][0].comments[0].comment, "comment 1");
+        assert_eq!(loaded["spec.md"][0].comments[1].comment, "comment 2");
+    }
+}
