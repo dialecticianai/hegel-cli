@@ -33,6 +33,7 @@ git2 = "0.19"
 glob = "0.3"
 hegel-ast-grep = { path = "crates/hegel-ast-grep" }
 handlebars = "5.1"
+ureq = { version = "2.10", features = ["json"] }
 
 [dev-dependencies]
 tempfile = "3.8"

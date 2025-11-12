@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-10 21:00
+**Last Updated**: 2025-11-11 21:15
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 18,875 | 14,816 | 33,691 |
-| **Comments** | 2,791 | - | 2,791 |
-| **Blank Lines** | 3,580 | - | 3,580 |
-| **Total Lines** | 25,246 | 14,816 | 40,062 |
+| **Lines** | 18,916 | 14,831 | 33,747 |
+| **Comments** | 2,797 | - | 2,797 |
+| **Blank Lines** | 3,586 | - | 3,586 |
+| **Total Lines** | 25,299 | 14,831 | 40,130 |
 | **Files** | 119 | 76 | 195 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           119           3580           2791          18875
-Markdown                        15            147              0            454
+Rust                           119           3586           2797          18916
+Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           134           3727           2791          19329
+SUM:                           134           3733           2797          19385
 -------------------------------------------------------------------------------
 ```
 
@@ -75,7 +75,7 @@ SUM:                           134           3727           2791          19329
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 43 | 43 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
-| `commands/reflect.rs` | 67 | 42 | 25 | 37.3% | ✅ |
+| `commands/reflect.rs` | 120 | 95 | 25 | 20.8% | ✅ |
 | `commands/review.rs` | 148 | 148 | 0 | 0.0% | ✅ |
 | `commands/status.rs` | 140 | 140 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
@@ -231,13 +231,13 @@ SUM:                           134           3727           2791          19329
 | `src/commands/fork/README.md` | 30 |
 | `src/commands/README.md` | 46 |
 | `src/commands/workflow/README.md` | 34 |
-| `src/engine/README.md` | 38 |
+| `src/engine/README.md` | 49 |
 | `src/guardrails/README.md` | 34 |
 | `src/metamodes/README.md` | 25 |
 | `src/metrics/README.md` | 34 |
 | `src/README.md` | 35 |
 | `src/rules/README.md` | 45 |
-| `src/storage/README.md` | 51 |
+| `src/storage/README.md` | 55 |
 | `src/test_helpers/README.md` | 122 |
 | `src/tui/README.md` | 32 |
 | `TESTING.md` | 70 |
