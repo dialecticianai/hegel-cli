@@ -6,6 +6,40 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use tempfile::TempDir;
 
+// ========== Directory Change Guard ==========
+
+/// RAII guard for changing current directory in tests
+/// Restores original directory on drop (before TempDir cleanup)
+///
+/// Use this in tests that need to temporarily change directories to ensure
+/// the original directory is restored before temp directories are deleted.
+///
+/// # Example
+/// ```ignore
+/// let temp_dir = TempDir::new().unwrap();
+/// let _guard = DirGuard::new(temp_dir.path()).unwrap();
+/// // ... test code that relies on being in temp_dir ...
+/// // Guard automatically restores original directory on drop
+/// ```
+pub struct DirGuard {
+    original: PathBuf,
+}
+
+impl DirGuard {
+    pub fn new(new_dir: &std::path::Path) -> std::io::Result<Self> {
+        let original = std::env::current_dir()?;
+        std::env::set_current_dir(new_dir)?;
+        Ok(Self { original })
+    }
+}
+
+impl Drop for DirGuard {
+    fn drop(&mut self) {
+        // Restore original directory before temp directories are cleaned up
+        let _ = std::env::set_current_dir(&self.original);
+    }
+}
+
 /// Test workflow YAML - simple 3-node workflow for testing
 #[allow(dead_code)] // Reserved for engine tests (see test_helpers/README.md)
 pub const TEST_WORKFLOW_YAML: &str = r#"

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 17:56
+**Last Updated**: 2025-11-13 18:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,168 | 15,967 | 36,135 |
-| **Comments** | 2,974 | - | 2,974 |
-| **Blank Lines** | 3,816 | - | 3,816 |
-| **Total Lines** | 26,958 | 15,967 | 42,925 |
-| **Files** | 123 | 82 | 205 |
+| **Lines** | 20,191 | 16,017 | 36,208 |
+| **Comments** | 2,994 | - | 2,994 |
+| **Blank Lines** | 3,820 | - | 3,820 |
+| **Total Lines** | 27,005 | 16,017 | 43,022 |
+| **Files** | 123 | 83 | 206 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3816           2974          20168
-Markdown                        15            147              0            469
+Rust                           123           3820           2994          20191
+Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           138           3963           2974          20637
+SUM:                           139           3977           2994          20693
 -------------------------------------------------------------------------------
 ```
 
@@ -95,7 +95,7 @@ SUM:                           138           3963           2974          20637
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 518 | 283 | 235 | 45.4% | ✅ |
+| `ddd.rs` | 538 | 293 | 245 | 45.5% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -141,7 +141,7 @@ SUM:                           138           3963           2974          20637
 | `storage/mod.rs` | 687 | 671 | 16 | 2.3% | ✅ (infra) |
 | `storage/reviews.rs` | 288 | 141 | 147 | 51.0% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
-| `storage/tests/storage.rs` | 624 | 624 | 0 | 0.0% | ⚠️ Large |
+| `storage/tests/storage.rs` | 617 | 617 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -149,7 +149,7 @@ SUM:                           138           3963           2974          20637
 | `test_helpers/mod.rs` | 22 | 11 | 11 | 50.0% | ✅ |
 | `test_helpers/storage.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
-| `test_helpers/workflow.rs` | 294 | 294 | 0 | 0.0% | ✅ |
+| `test_helpers/workflow.rs` | 328 | 328 | 0 | 0.0% | ✅ |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
 | `tui/app.rs` | 403 | 166 | 237 | 58.8% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
@@ -202,7 +202,7 @@ SUM:                           138           3963           2974          20637
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 232 |
+| `COVERAGE_REPORT.md` | 238 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
@@ -229,28 +229,29 @@ SUM:                           138           3963           2974          20637
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 277 |
+| `LOC_REPORT.md` | 278 |
 | `METRICS.md` | 258 |
-| `README.md` | 446 |
+| `README.md` | 438 |
 | `ROADMAP.md` | 450 |
 | `scripts/oneoffs/README.md` | 58 |
 | `scripts/README.md` | 157 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
+| `src/commands/doctor/README.md` | 39 |
 | `src/commands/fork/README.md` | 30 |
-| `src/commands/README.md` | 46 |
+| `src/commands/README.md` | 48 |
 | `src/commands/workflow/README.md` | 34 |
 | `src/engine/README.md` | 49 |
 | `src/guardrails/README.md` | 34 |
 | `src/metamodes/README.md` | 25 |
 | `src/metrics/README.md` | 34 |
-| `src/README.md` | 35 |
+| `src/README.md` | 36 |
 | `src/rules/README.md` | 45 |
 | `src/storage/README.md` | 55 |
-| `src/test_helpers/README.md` | 122 |
+| `src/test_helpers/README.md` | 123 |
 | `src/tui/README.md` | 32 |
-| `TESTING.md` | 70 |
+| `TESTING.md` | 78 |
 
 ---
 

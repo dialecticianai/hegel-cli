@@ -186,12 +186,17 @@ pub fn validate_name_format(name: &str) -> Result<()> {
 
 /// Parse DDD artifacts from .ddd/ directory structure
 /// This doesn't re-scan - it parses existing directory/file names
-pub fn parse_ddd_structure() -> Result<DddScanResult> {
+///
+/// # Arguments
+/// * `root_dir` - Optional root directory (defaults to current directory)
+pub fn parse_ddd_structure_in(root_dir: Option<&std::path::Path>) -> Result<DddScanResult> {
     let mut artifacts = Vec::new();
     let mut issues = Vec::new();
 
+    let root = root_dir.unwrap_or_else(|| std::path::Path::new("."));
+
     // Parse feat/ directories
-    let feat_dir = PathBuf::from(".ddd/feat");
+    let feat_dir = root.join(".ddd/feat");
     if feat_dir.exists() {
         for entry in std::fs::read_dir(&feat_dir)? {
             let entry = entry?;
@@ -227,7 +232,7 @@ pub fn parse_ddd_structure() -> Result<DddScanResult> {
     }
 
     // Parse refactor/ files
-    let refactor_dir = PathBuf::from(".ddd/refactor");
+    let refactor_dir = root.join(".ddd/refactor");
     if refactor_dir.exists() {
         for entry in std::fs::read_dir(&refactor_dir)? {
             let entry = entry?;
@@ -253,7 +258,7 @@ pub fn parse_ddd_structure() -> Result<DddScanResult> {
     }
 
     // Parse report/ files
-    let report_dir = PathBuf::from(".ddd/report");
+    let report_dir = root.join(".ddd/report");
     if report_dir.exists() {
         for entry in std::fs::read_dir(&report_dir)? {
             let entry = entry?;
@@ -279,6 +284,11 @@ pub fn parse_ddd_structure() -> Result<DddScanResult> {
     }
 
     Ok(DddScanResult { artifacts, issues })
+}
+
+/// Parse DDD artifacts from .ddd/ in current directory
+pub fn parse_ddd_structure() -> Result<DddScanResult> {
+    parse_ddd_structure_in(None)
 }
 
 #[cfg(test)]
@@ -470,26 +480,36 @@ mod tests {
     }
 
     #[test]
-    #[serial_test::serial]
     fn test_parse_empty_ddd() {
-        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
-        let _guard = std::env::set_current_dir(&temp_dir);
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
 
-        let result = parse_ddd_structure().unwrap();
+        // Create .ddd directory structure (empty)
+        std::fs::create_dir_all(temp_dir.path().join(".ddd/feat")).unwrap();
+        std::fs::create_dir_all(temp_dir.path().join(".ddd/refactor")).unwrap();
+        std::fs::create_dir_all(temp_dir.path().join(".ddd/report")).unwrap();
+
+        let result = parse_ddd_structure_in(Some(temp_dir.path())).unwrap();
         assert_eq!(result.artifacts.len(), 0);
         assert_eq!(result.issues.len(), 0);
     }
 
     #[test]
-    #[serial_test::serial]
     fn test_parse_valid_feat() {
-        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
-        let _guard = std::env::set_current_dir(&temp_dir);
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
 
-        std::fs::create_dir_all(".ddd/feat/20251104-my-feature").unwrap();
-        std::fs::write(".ddd/feat/20251104-my-feature/SPEC.md", "test").unwrap();
+        // Create feat directory with SPEC.md
+        std::fs::create_dir_all(temp_dir.path().join(".ddd/feat/20251104-my-feature")).unwrap();
+        std::fs::write(
+            temp_dir
+                .path()
+                .join(".ddd/feat/20251104-my-feature/SPEC.md"),
+            "test",
+        )
+        .unwrap();
 
-        let result = parse_ddd_structure().unwrap();
+        let result = parse_ddd_structure_in(Some(temp_dir.path())).unwrap();
         assert_eq!(result.artifacts.len(), 1);
 
         if let DddArtifact::Feat(feat) = &result.artifacts[0] {
@@ -503,14 +523,14 @@ mod tests {
     }
 
     #[test]
-    #[serial_test::serial]
     fn test_parse_invalid_feat() {
-        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
-        let _guard = std::env::set_current_dir(&temp_dir);
+        use tempfile::TempDir;
+        let temp_dir = TempDir::new().unwrap();
 
-        std::fs::create_dir_all(".ddd/feat/my-feature").unwrap();
+        // Create feat directory with invalid name (missing date)
+        std::fs::create_dir_all(temp_dir.path().join(".ddd/feat/my-feature")).unwrap();
 
-        let result = parse_ddd_structure().unwrap();
+        let result = parse_ddd_structure_in(Some(temp_dir.path())).unwrap();
         assert_eq!(result.artifacts.len(), 0);
         assert_eq!(result.issues.len(), 1);
         assert_eq!(result.issues[0].issue_type, IssueType::InvalidFormat);

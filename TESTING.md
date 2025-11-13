@@ -63,9 +63,17 @@ If you need comments to explain what a test does, that’s a design failure: the
 
 **Decision point:** When implementation file exceeds 200 lines, split tests to their own module. This preserves the implementation's readability while allowing test infrastructure to grow.
 
+### Test Isolation: Directory Changes
+
+**Pass paths as parameters instead of changing directories.** Refactor functions to accept `Option<&Path>` if needed.
+
+If directory change is unavoidable, use `DirGuard` from `test_helpers` and mark the test `#[serial_test::serial]`.
+
+Never use bare `std::env::set_current_dir()` in tests.
+
 ### Outcome
 
-The result is a **self-explaining, self-verifying codebase**.  
-Every test both instructs and proves.  
-Every example is a runnable artifact of design intent.  
+The result is a **self-explaining, self-verifying codebase**.
+Every test both instructs and proves.
+Every example is a runnable artifact of design intent.
 Documentation ceases to drift, because the truth *is* the running system.

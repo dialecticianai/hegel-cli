@@ -36,9 +36,10 @@ Re-exports all public items from submodules for backwards compatibility. Tests c
 - ⚠️ `count_jsonl_lines()` - Reserved for future metrics validation tests
 
 ### `workflow.rs` - Workflow Builders and Setup
-**Purpose**: Build test workflows, setup workflow environments, create test claims.
+**Purpose**: Build test workflows, setup workflow environments, directory change guard.
 
 **Exports**:
+- `DirGuard` - RAII guard for safe directory changes (use with `#[serial_test::serial]`)
 - `WorkflowBuilder` - Fluent builder for test workflows
 - `node()` - Create test Node with prompt (prompt_hbs empty by default)
 - `transition()` - Create test Transition

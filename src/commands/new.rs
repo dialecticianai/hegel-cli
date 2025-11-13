@@ -148,15 +148,15 @@ fn determine_index(date: &str) -> Result<Option<usize>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::DirGuard;
     use serial_test::serial;
-    use std::env;
     use tempfile::TempDir;
 
     #[test]
     #[serial]
     fn test_create_feat_basic() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/feat").unwrap();
 
         let result = create_feat("my-feature");
@@ -172,7 +172,7 @@ mod tests {
     #[serial]
     fn test_create_feat_with_auto_index() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/feat").unwrap();
 
         // Create first feat
@@ -189,7 +189,7 @@ mod tests {
     #[serial]
     fn test_create_feat_duplicate_error() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/feat").unwrap();
 
         create_feat("my-feature").unwrap();
@@ -202,7 +202,7 @@ mod tests {
     #[serial]
     fn test_create_feat_invalid_name() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/feat").unwrap();
 
         let result = create_feat("Invalid_Name");
@@ -213,7 +213,7 @@ mod tests {
     #[serial]
     fn test_create_refactor_outputs_path() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/refactor").unwrap();
 
         let result = create_refactor("my-refactor");
@@ -228,7 +228,7 @@ mod tests {
     #[serial]
     fn test_create_report_outputs_path() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/report").unwrap();
 
         let result = create_report("my-report");
@@ -251,7 +251,7 @@ mod tests {
     #[serial]
     fn test_determine_index_with_existing() {
         let temp = TempDir::new().unwrap();
-        env::set_current_dir(temp.path()).unwrap();
+        let _guard = DirGuard::new(temp.path()).unwrap();
         fs::create_dir_all(".ddd/feat").unwrap();
 
         // Create artifacts with specific date

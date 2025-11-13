@@ -220,12 +220,11 @@ fn test_find_project_root_in_parent_dir() {
 }
 
 #[test]
+#[serial_test::serial]
 fn test_find_project_root_not_found() {
     // Create temp dir WITHOUT .hegel
     let temp_dir = TempDir::new().unwrap();
-
-    let original_dir = std::env::current_dir().unwrap();
-    std::env::set_current_dir(temp_dir.path()).unwrap();
+    let _guard = DirGuard::new(temp_dir.path()).unwrap();
 
     // Should error with helpful message
     let result = FileStorage::find_project_root();
@@ -233,12 +232,10 @@ fn test_find_project_root_not_found() {
     let err_msg = result.unwrap_err().to_string();
     assert!(err_msg.contains("No .hegel directory found"));
     assert!(err_msg.contains("current or parent directories"));
-
-    // Restore original directory
-    std::env::set_current_dir(original_dir).unwrap();
 }
 
 #[test]
+#[serial_test::serial]
 fn test_find_project_root_stops_at_first_hegel() {
     // Create nested structure with multiple .hegel dirs
     // temp/.hegel and temp/project/.hegel
@@ -255,17 +252,13 @@ fn test_find_project_root_stops_at_first_hegel() {
     std::fs::create_dir(&subdir).unwrap();
 
     // From project/src, should find project/.hegel (closest one)
-    let original_dir = std::env::current_dir().unwrap();
-    std::env::set_current_dir(&subdir).unwrap();
+    let _guard = DirGuard::new(&subdir).unwrap();
 
     let found = FileStorage::find_project_root().unwrap();
     assert_eq!(
         found.canonicalize().unwrap(),
         inner_hegel.canonicalize().unwrap()
     );
-
-    // Restore original directory
-    std::env::set_current_dir(original_dir).unwrap();
 }
 
 // ========== Round-trip Tests ==========
