@@ -37,7 +37,8 @@ pub use reflect::run_reflect;
 pub use review::handle_review;
 pub use status::show_status;
 pub use workflow::{
-    abort_workflow, drop_stash, list_guides, list_stashes, list_workflows, next_prompt, pop_stash,
-    prev_prompt, repeat_prompt, reset_workflow, restart_workflow, start_workflow, stash_workflow,
+    abort_workflow, done_prompt, drop_stash, list_guides, list_stashes, list_workflows,
+    next_prompt, pop_stash, prev_prompt, repeat_prompt, reset_workflow, restart_workflow,
+    start_workflow, stash_workflow,
 };
 pub use wrapped::run_wrapped_command;

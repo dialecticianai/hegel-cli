@@ -166,6 +166,9 @@ Hegel provides ergonomic commands for common workflow transitions:
 # Happy path: advance to next phase
 hegel next
 
+# Advance and assert reaches 'done' phase (useful for scripts/CI)
+hegel done
+
 # Go back to previous phase (undo accidental advancement)
 hegel prev
 

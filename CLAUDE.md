@@ -163,13 +163,14 @@
 
 **Core workflows**: cowboy, discovery, execution, research, refactor (always available)
 
-**Commands**: `hegel start <workflow>` → `hegel next` → `hegel status` → `hegel restart|abort`
+**Commands**: `hegel start <workflow>` → `hegel next` / `hegel done` → `hegel status` → `hegel restart|abort`
 
 **CRITICAL - Workflow Advancement Protocol**:
 - **NEVER run `hegel next` autonomously** - only the user decides when to advance
 - When phase work is complete, **suggest** advancing: "Ready to run `hegel next`?"
 - Wait for user approval (e.g., "SGTM", "yes", "go ahead")
 - User controls workflow pacing, not the agent
+- Use `hegel done` instead of `hegel next` to assert workflow reaches done phase (fails with error if not)
 
 **Templates**: `{{GUIDE_NAME}}` required (error if missing), `{{?guide_name}}` optional
 

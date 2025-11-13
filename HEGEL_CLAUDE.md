@@ -38,6 +38,7 @@ hegel meta                      # View current meta-mode
 hegel start <workflow> [node]   # Load workflow (optionally at specific node)
 hegel status                    # Show current state
 hegel next                      # Advance to next phase (auto-infers completion claim)
+hegel done                      # Advance and assert reaches 'done' phase (error if not)
 hegel restart                   # Return to SPEC phase (restart cycle, keep same workflow)
 hegel repeat                    # Re-display current prompt
 hegel abort                     # Abandon workflow entirely (required before starting new one)

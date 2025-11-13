@@ -129,11 +129,12 @@ pub fn start_workflow(
 }
 
 /// Core workflow advancement logic used by next, repeat, and restart
+/// Returns the current node after the transition
 fn advance_workflow(
     claim_alias: ClaimAlias,
     storage: &FileStorage,
     force_bypass: Option<&Option<String>>,
-) -> Result<()> {
+) -> Result<String> {
     // Load workflow context
     let mut context = load_workflow_context(storage)?;
 
@@ -146,19 +147,43 @@ fn advance_workflow(
     // Execute transition
     execute_transition(outcome, &mut context, storage)?;
 
-    Ok(())
+    // Return the current node after transition
+    Ok(context.workflow_state.current_node.clone())
 }
 
 pub fn next_prompt(
     claim_str: Option<&str>,
     force_bypass: Option<&Option<String>>,
     storage: &FileStorage,
-) -> Result<()> {
+) -> Result<String> {
     let claim_alias = match claim_str {
         Some(name) => ClaimAlias::Custom(name.to_string()),
         None => ClaimAlias::Next,
     };
     advance_workflow(claim_alias, storage, force_bypass)
+}
+
+pub fn done_prompt(
+    claim_str: Option<&str>,
+    force_bypass: Option<&Option<String>>,
+    storage: &FileStorage,
+) -> Result<String> {
+    // Advance the workflow and get the resulting node
+    let claim_alias = match claim_str {
+        Some(name) => ClaimAlias::Custom(name.to_string()),
+        None => ClaimAlias::Next,
+    };
+    let current_node = advance_workflow(claim_alias, storage, force_bypass)?;
+
+    // Verify we're in the done phase
+    if current_node != "done" {
+        anyhow::bail!(
+            "Expected workflow to reach 'done' phase, but it's at '{}' instead",
+            current_node
+        );
+    }
+
+    Ok(current_node)
 }
 
 pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
@@ -261,7 +286,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     Ok(())
 }
 
-pub fn restart_workflow(storage: &FileStorage) -> Result<()> {
+pub fn restart_workflow(storage: &FileStorage) -> Result<String> {
     advance_workflow(ClaimAlias::Restart, storage, None)
 }
 

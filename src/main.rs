@@ -92,6 +92,19 @@ enum Commands {
         #[arg(long)]
         force: Option<Option<String>>,
     },
+    /// Advance to next phase and assert it reaches the done phase
+    ///
+    /// Like 'hegel next' but returns an error if the workflow doesn't
+    /// advance to the 'done' phase. Useful for scripting and CI pipelines.
+    Done {
+        /// Optional claim name (e.g., 'spec_complete', 'needs_refactor')
+        /// If omitted, uses happy-path claim: {current}_complete
+        claim: Option<String>,
+
+        /// Force bypass rules (all rules or specific type)
+        #[arg(long)]
+        force: Option<Option<String>>,
+    },
     /// Go back to previous phase
     #[command(visible_alias = "previous")]
     Prev,
@@ -406,6 +419,9 @@ fn main() -> Result<()> {
         }
         Commands::Next { claim, force } => {
             commands::next_prompt(claim.as_deref(), force.as_ref(), &storage)?;
+        }
+        Commands::Done { claim, force } => {
+            commands::done_prompt(claim.as_deref(), force.as_ref(), &storage)?;
         }
         Commands::Prev => {
             commands::prev_prompt(&storage)?;
