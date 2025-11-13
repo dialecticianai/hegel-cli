@@ -184,6 +184,103 @@ pub fn validate_name_format(name: &str) -> Result<()> {
     Ok(())
 }
 
+/// Parse DDD artifacts from .ddd/ directory structure
+/// This doesn't re-scan - it parses existing directory/file names
+pub fn parse_ddd_structure() -> Result<DddScanResult> {
+    let mut artifacts = Vec::new();
+    let mut issues = Vec::new();
+
+    // Parse feat/ directories
+    let feat_dir = PathBuf::from(".ddd/feat");
+    if feat_dir.exists() {
+        for entry in std::fs::read_dir(&feat_dir)? {
+            let entry = entry?;
+            if !entry.file_type()?.is_dir() {
+                continue;
+            }
+
+            let dir_name = entry.file_name().to_string_lossy().to_string();
+
+            match parse_feat_name(&dir_name) {
+                Ok((date, index, name)) => {
+                    let dir_path = entry.path();
+                    let spec_exists = dir_path.join("SPEC.md").exists();
+                    let plan_exists = dir_path.join("PLAN.md").exists();
+
+                    artifacts.push(DddArtifact::Feat(FeatArtifact {
+                        date,
+                        index,
+                        name,
+                        spec_exists,
+                        plan_exists,
+                    }));
+                }
+                Err(_) => {
+                    issues.push(ValidationIssue {
+                        path: entry.path(),
+                        issue_type: IssueType::InvalidFormat,
+                        suggested_fix: format!("Rename {} to YYYYMMDD[-N]-name format", dir_name),
+                    });
+                }
+            }
+        }
+    }
+
+    // Parse refactor/ files
+    let refactor_dir = PathBuf::from(".ddd/refactor");
+    if refactor_dir.exists() {
+        for entry in std::fs::read_dir(&refactor_dir)? {
+            let entry = entry?;
+            if !entry.file_type()?.is_file() {
+                continue;
+            }
+
+            let file_name = entry.file_name().to_string_lossy().to_string();
+
+            match parse_single_file_name(&file_name) {
+                Ok((date, name)) => {
+                    artifacts.push(DddArtifact::Refactor(RefactorArtifact { date, name }));
+                }
+                Err(_) => {
+                    issues.push(ValidationIssue {
+                        path: entry.path(),
+                        issue_type: IssueType::InvalidFormat,
+                        suggested_fix: format!("Rename {} to YYYYMMDD-name.md format", file_name),
+                    });
+                }
+            }
+        }
+    }
+
+    // Parse report/ files
+    let report_dir = PathBuf::from(".ddd/report");
+    if report_dir.exists() {
+        for entry in std::fs::read_dir(&report_dir)? {
+            let entry = entry?;
+            if !entry.file_type()?.is_file() {
+                continue;
+            }
+
+            let file_name = entry.file_name().to_string_lossy().to_string();
+
+            match parse_single_file_name(&file_name) {
+                Ok((date, name)) => {
+                    artifacts.push(DddArtifact::Report(ReportArtifact { date, name }));
+                }
+                Err(_) => {
+                    issues.push(ValidationIssue {
+                        path: entry.path(),
+                        issue_type: IssueType::InvalidFormat,
+                        suggested_fix: format!("Rename {} to YYYYMMDD-name.md format", file_name),
+                    });
+                }
+            }
+        }
+    }
+
+    Ok(DddScanResult { artifacts, issues })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -370,5 +467,52 @@ mod tests {
     #[test]
     fn test_validate_name_format_uppercase() {
         assert!(validate_name_format("My-Feature").is_err());
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_parse_empty_ddd() {
+        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
+        let _guard = std::env::set_current_dir(&temp_dir);
+
+        let result = parse_ddd_structure().unwrap();
+        assert_eq!(result.artifacts.len(), 0);
+        assert_eq!(result.issues.len(), 0);
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_parse_valid_feat() {
+        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
+        let _guard = std::env::set_current_dir(&temp_dir);
+
+        std::fs::create_dir_all(".ddd/feat/20251104-my-feature").unwrap();
+        std::fs::write(".ddd/feat/20251104-my-feature/SPEC.md", "test").unwrap();
+
+        let result = parse_ddd_structure().unwrap();
+        assert_eq!(result.artifacts.len(), 1);
+
+        if let DddArtifact::Feat(feat) = &result.artifacts[0] {
+            assert_eq!(feat.date, "20251104");
+            assert_eq!(feat.name, "my-feature");
+            assert!(feat.spec_exists);
+            assert!(!feat.plan_exists);
+        } else {
+            panic!("Expected Feat artifact");
+        }
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_parse_invalid_feat() {
+        let (temp_dir, _storage) = crate::test_helpers::setup_workflow_env();
+        let _guard = std::env::set_current_dir(&temp_dir);
+
+        std::fs::create_dir_all(".ddd/feat/my-feature").unwrap();
+
+        let result = parse_ddd_structure().unwrap();
+        assert_eq!(result.artifacts.len(), 0);
+        assert_eq!(result.issues.len(), 1);
+        assert_eq!(result.issues[0].issue_type, IssueType::InvalidFormat);
     }
 }

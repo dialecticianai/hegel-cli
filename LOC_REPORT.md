@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 17:25
+**Last Updated**: 2025-11-13 17:31
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 19,493 | 15,832 | 35,325 |
-| **Comments** | 2,878 | - | 2,878 |
-| **Blank Lines** | 3,699 | - | 3,699 |
-| **Total Lines** | 26,070 | 15,832 | 41,902 |
-| **Files** | 120 | 81 | 201 |
+| **Lines** | 19,611 | 15,963 | 35,574 |
+| **Comments** | 2,883 | - | 2,883 |
+| **Blank Lines** | 3,720 | - | 3,720 |
+| **Total Lines** | 26,214 | 15,963 | 42,177 |
+| **Files** | 120 | 82 | 202 |
 
 **Documentation Ratio**: 0.81 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           120           3699           2878          19493
+Rust                           120           3720           2883          19611
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           135           3846           2878          19962
+SUM:                           135           3867           2883          20080
 -------------------------------------------------------------------------------
 ```
 
@@ -92,7 +92,7 @@ SUM:                           135           3846           2878          19962
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 374 | 186 | 188 | 50.3% | ✅ |
+| `ddd.rs` | 518 | 283 | 235 | 45.4% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -188,6 +188,7 @@ SUM:                           135           3846           2878          19962
 | `.ddd/feat/20251110-1-review-cli/SPEC.md` | 249 |
 | `.ddd/feat/20251110-2-reviews-module/PLAN.md` | 133 |
 | `.ddd/feat/20251110-2-reviews-module/SPEC.md` | 231 |
+| `.ddd/feat/20251113-ddd-artifact-management/HANDOFF.md` | 126 |
 | `.ddd/feat/20251113-ddd-artifact-management/PLAN.md` | 332 |
 | `.ddd/feat/20251113-ddd-artifact-management/SPEC.md` | 376 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
@@ -225,7 +226,7 @@ SUM:                           135           3846           2878          19962
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 268 |
+| `LOC_REPORT.md` | 273 |
 | `METRICS.md` | 258 |
 | `README.md` | 446 |
 | `ROADMAP.md` | 450 |
