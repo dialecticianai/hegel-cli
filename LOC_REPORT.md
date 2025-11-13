@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 17:31
+**Last Updated**: 2025-11-13 17:40
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 19,611 | 15,963 | 35,574 |
-| **Comments** | 2,883 | - | 2,883 |
-| **Blank Lines** | 3,720 | - | 3,720 |
-| **Total Lines** | 26,214 | 15,963 | 42,177 |
+| **Lines** | 19,785 | 15,964 | 35,749 |
+| **Comments** | 2,905 | - | 2,905 |
+| **Blank Lines** | 3,740 | - | 3,740 |
+| **Total Lines** | 26,430 | 15,964 | 42,394 |
 | **Files** | 120 | 82 | 202 |
 
 **Documentation Ratio**: 0.81 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           120           3720           2883          19611
+Rust                           120           3740           2905          19785
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           135           3867           2883          20080
+SUM:                           135           3887           2905          20254
 -------------------------------------------------------------------------------
 ```
 
@@ -71,7 +71,7 @@ SUM:                           135           3867           2883          20080
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/markdown.rs` | 495 | 403 | 92 | 18.6% | ⚠️ Large |
+| `commands/markdown.rs` | 711 | 582 | 129 | 18.1% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 44 | 44 | 0 | 0.0% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
@@ -226,7 +226,7 @@ SUM:                           135           3867           2883          20080
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 273 |
+| `LOC_REPORT.md` | 274 |
 | `METRICS.md` | 258 |
 | `README.md` | 446 |
 | `ROADMAP.md` | 450 |

@@ -4,6 +4,7 @@ use ignore::WalkBuilder;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
+use crate::ddd::{parse_ddd_structure, DddArtifact};
 use crate::theme::Theme;
 
 /// Arguments for the markdown command
@@ -37,6 +38,8 @@ struct MarkdownTree {
     #[serde(skip_serializing_if = "Option::is_none")]
     ddd_documents: Option<Vec<FileEntry>>,
     other_markdown: Vec<FileEntry>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    validation_issues: Option<Vec<ValidationIssueEntry>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -46,6 +49,13 @@ struct FileEntry {
     size_bytes: u64,
     last_modified: String,
     ephemeral: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ValidationIssueEntry {
+    path: String,
+    issue_type: String,
+    suggested_fix: String,
 }
 
 /// Execute the markdown tree command
@@ -233,9 +243,33 @@ fn output_json(
             .collect()
     };
 
+    // Get validation issues from DDD scan
+    let validation_issues = if !no_ddd {
+        parse_ddd_structure().ok().and_then(|scan_result| {
+            if scan_result.issues.is_empty() {
+                None
+            } else {
+                Some(
+                    scan_result
+                        .issues
+                        .iter()
+                        .map(|issue| ValidationIssueEntry {
+                            path: issue.path.display().to_string(),
+                            issue_type: format!("{:?}", issue.issue_type),
+                            suggested_fix: issue.suggested_fix.clone(),
+                        })
+                        .collect(),
+                )
+            }
+        })
+    } else {
+        None
+    };
+
     let tree = MarkdownTree {
         ddd_documents,
         other_markdown,
+        validation_issues,
     };
 
     let json = serde_json::to_string_pretty(&tree)?;
@@ -251,9 +285,11 @@ fn output_tree(
     no_ddd: bool,
     ddd: bool,
 ) -> Result<()> {
+    let mut has_issues = false;
+
     if !no_ddd && !ddd_files.is_empty() {
         println!("{}", Theme::header("DDD Documents:"));
-        print_tree(ddd_files)?;
+        has_issues = print_tree(ddd_files)?;
         if !ddd && !regular_files.is_empty() {
             println!();
         }
@@ -264,18 +300,42 @@ fn output_tree(
         print_tree(regular_files)?;
     }
 
+    // Show footer warning if issues found
+    if has_issues {
+        println!();
+        println!(
+            "{} Run hegel doctor to fix malformed artifacts",
+            Theme::warning("⚠️")
+        );
+    }
+
     Ok(())
 }
 
 /// Print tree structure for a list of files
-fn print_tree(files: &[MarkdownFile]) -> Result<()> {
+/// Returns true if any validation issues were found
+fn print_tree(files: &[MarkdownFile]) -> Result<bool> {
     // Build tree structure
     let tree = build_tree_structure(files);
 
-    // Render tree
+    // Render tree and check for issues
+    let has_issues = check_for_issues(&tree);
     render_tree_node(&tree, "", true);
 
-    Ok(())
+    Ok(has_issues)
+}
+
+/// Check if tree contains any validation issues
+fn check_for_issues(node: &TreeNode) -> bool {
+    if node.is_malformed {
+        return true;
+    }
+    for child in &node.children {
+        if check_for_issues(child) {
+            return true;
+        }
+    }
+    false
 }
 
 /// Tree node structure
@@ -285,6 +345,12 @@ struct TreeNode {
     is_file: bool,
     lines: Option<usize>,
     ephemeral: bool,
+    /// For feat directories: whether SPEC.md exists
+    spec_exists: Option<bool>,
+    /// For feat directories: whether PLAN.md exists
+    plan_exists: Option<bool>,
+    /// Whether this artifact has validation issues
+    is_malformed: bool,
     children: Vec<TreeNode>,
 }
 
@@ -295,6 +361,9 @@ fn build_tree_structure(files: &[MarkdownFile]) -> TreeNode {
         is_file: false,
         lines: None,
         ephemeral: false,
+        spec_exists: None,
+        plan_exists: None,
+        is_malformed: false,
         children: Vec::new(),
     };
 
@@ -321,6 +390,9 @@ fn build_tree_structure(files: &[MarkdownFile]) -> TreeNode {
                         } else {
                             false
                         },
+                        spec_exists: None,
+                        plan_exists: None,
+                        is_malformed: false,
                         children: Vec::new(),
                     });
                     current.children.len() - 1
@@ -333,7 +405,75 @@ fn build_tree_structure(files: &[MarkdownFile]) -> TreeNode {
     // Sort children alphabetically
     sort_tree(&mut root);
 
+    // Attach DDD metadata (only if .ddd/ exists)
+    if PathBuf::from(".ddd").exists() {
+        if let Ok(scan_result) = parse_ddd_structure() {
+            attach_ddd_metadata(&mut root, &scan_result);
+        }
+    }
+
     root
+}
+
+/// Attach DDD metadata to tree nodes
+fn attach_ddd_metadata(node: &mut TreeNode, scan_result: &crate::ddd::DddScanResult) {
+    // Create a map of malformed paths for quick lookup
+    let malformed_paths: std::collections::HashSet<PathBuf> = scan_result
+        .issues
+        .iter()
+        .map(|issue| issue.path.clone())
+        .collect();
+
+    // Recursively traverse and attach metadata
+    attach_ddd_metadata_recursive(
+        node,
+        Path::new(""),
+        &scan_result.artifacts,
+        &malformed_paths,
+    );
+}
+
+/// Recursively attach DDD metadata to tree nodes
+fn attach_ddd_metadata_recursive(
+    node: &mut TreeNode,
+    current_path: &Path,
+    artifacts: &[DddArtifact],
+    malformed_paths: &std::collections::HashSet<PathBuf>,
+) {
+    let node_path = if current_path.as_os_str().is_empty() {
+        PathBuf::from(&node.name)
+    } else {
+        current_path.join(&node.name)
+    };
+
+    // Check if this path is malformed
+    for malformed_path in malformed_paths {
+        // Compare just the file/dir name for malformed checks
+        if node_path.ends_with(malformed_path) || &node_path == malformed_path {
+            node.is_malformed = true;
+            break;
+        }
+    }
+
+    // Check if this is a feat directory and attach SPEC/PLAN metadata
+    if !node.is_file {
+        for artifact in artifacts {
+            if let DddArtifact::Feat(feat) = artifact {
+                let feat_dir_name = feat.dir_name();
+                // Match if the node name equals the feat directory name
+                if node.name == feat_dir_name {
+                    node.spec_exists = Some(feat.spec_exists);
+                    node.plan_exists = Some(feat.plan_exists);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Recurse into children
+    for child in &mut node.children {
+        attach_ddd_metadata_recursive(child, &node_path, artifacts, malformed_paths);
+    }
 }
 
 /// Sort tree nodes alphabetically
@@ -377,20 +517,59 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
             String::new()
         };
 
+        let warning_str = if node.is_malformed {
+            format!(" {}", Theme::warning("⚠️"))
+        } else {
+            String::new()
+        };
+
         println!(
-            "{}{}{}{}{}",
+            "{}{}{}{}{}{}",
             Theme::secondary(prefix),
             Theme::secondary(connector),
             node.name,
             lines_str,
-            ephemeral_str
+            ephemeral_str,
+            warning_str
         );
     } else {
+        // For directories, check if it's a feat directory with SPEC/PLAN metadata
+        let feat_metadata = if node.spec_exists.is_some() || node.plan_exists.is_some() {
+            let spec_indicator = match node.spec_exists {
+                Some(true) => "SPEC ✓",
+                Some(false) => "SPEC ✗",
+                None => "",
+            };
+            let plan_indicator = match node.plan_exists {
+                Some(true) => "PLAN ✓",
+                Some(false) => "PLAN ✗",
+                None => "",
+            };
+            if !spec_indicator.is_empty() || !plan_indicator.is_empty() {
+                format!(
+                    "  {}",
+                    Theme::metric_value(format!("{} {}", spec_indicator, plan_indicator))
+                )
+            } else {
+                String::new()
+            }
+        } else {
+            String::new()
+        };
+
+        let warning_str = if node.is_malformed {
+            format!(" {}", Theme::warning("⚠️"))
+        } else {
+            String::new()
+        };
+
         println!(
-            "{}{}{}",
+            "{}{}{}{}{}",
             Theme::secondary(prefix),
             Theme::secondary(connector),
-            Theme::secondary(&format!("{}/", node.name))
+            Theme::secondary(&format!("{}/", node.name)),
+            feat_metadata,
+            warning_str
         );
 
         let new_prefix = format!("{}{}", prefix, child_prefix);
@@ -404,6 +583,43 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_attach_ddd_metadata_to_feat_directory() {
+        use crate::ddd::{DddArtifact, DddScanResult, FeatArtifact};
+
+        // Create a tree node for a feat directory
+        let mut node = TreeNode {
+            name: "20251104-1-test-feature".to_string(),
+            is_file: false,
+            lines: None,
+            ephemeral: false,
+            spec_exists: None,
+            plan_exists: None,
+            is_malformed: false,
+            children: Vec::new(),
+        };
+
+        // Create scan result with a matching artifact
+        let scan_result = DddScanResult {
+            artifacts: vec![DddArtifact::Feat(FeatArtifact {
+                date: "20251104".to_string(),
+                index: Some(1),
+                name: "test-feature".to_string(),
+                spec_exists: true,
+                plan_exists: false,
+            })],
+            issues: Vec::new(),
+        };
+
+        // Attach metadata
+        attach_ddd_metadata(&mut node, &scan_result);
+
+        // Verify metadata was attached
+        assert_eq!(node.spec_exists, Some(true));
+        assert_eq!(node.plan_exists, Some(false));
+        assert!(!node.is_malformed);
+    }
 
     #[test]
     fn test_is_markdown_file() {
