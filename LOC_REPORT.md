@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 17:51
+**Last Updated**: 2025-11-13 17:56
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,153 | 15,966 | 36,119 |
+| **Lines** | 20,168 | 15,967 | 36,135 |
 | **Comments** | 2,974 | - | 2,974 |
-| **Blank Lines** | 3,815 | - | 3,815 |
-| **Total Lines** | 26,942 | 15,966 | 42,908 |
-| **Files** | 122 | 82 | 204 |
+| **Blank Lines** | 3,816 | - | 3,816 |
+| **Total Lines** | 26,958 | 15,967 | 42,925 |
+| **Files** | 123 | 82 | 205 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           122           3815           2974          20153
+Rust                           123           3816           2974          20168
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           137           3962           2974          20622
+SUM:                           138           3963           2974          20637
 -------------------------------------------------------------------------------
 ```
 
@@ -57,8 +57,9 @@ SUM:                           137           3962           2974          20622
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/doctor/fix_ddd.rs` | 204 | 204 | 0 | 0.0% | ✅ |
-| `commands/doctor/mod.rs` | 268 | 0 | 268 | 100.0% | ✅ |
-| `commands/doctor/tests.rs` | 251 | 251 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
+| `commands/doctor/mod.rs` | 41 | 0 | 41 | 100.0% | ✅ |
+| `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
 | `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
@@ -168,18 +169,18 @@ SUM:                           137           3962           2974          20622
 
 | File | Lines |
 |------|-------|
-| `.ddd/feat/20251104-1-non_phase_commits/PLAN.md` | 374 |
-| `.ddd/feat/20251104-1-non_phase_commits/SPEC.md` | 383 |
-| `.ddd/feat/20251104-2-done_node_refactor/PLAN.md` | 84 |
-| `.ddd/feat/20251104-2-done_node_refactor/SPEC.md` | 80 |
-| `.ddd/feat/20251104-3-git_commit_metrics/PLAN.md` | 402 |
-| `.ddd/feat/20251104-3-git_commit_metrics/SPEC.md` | 545 |
-| `.ddd/feat/20251104-4-log_retention/PLAN.md` | 535 |
-| `.ddd/feat/20251104-4-log_retention/SPEC.md` | 366 |
-| `.ddd/feat/20251105-handlebars_templates/PLAN.md` | 273 |
-| `.ddd/feat/20251105-handlebars_templates/SPEC.md` | 366 |
-| `.ddd/feat/20251106-analyze_summary/PLAN.md` | 175 |
-| `.ddd/feat/20251106-analyze_summary/SPEC.md` | 215 |
+| `.ddd/feat/20251104-1-non-phase-commits/PLAN.md` | 374 |
+| `.ddd/feat/20251104-1-non-phase-commits/SPEC.md` | 383 |
+| `.ddd/feat/20251104-2-done-node-refactor/PLAN.md` | 84 |
+| `.ddd/feat/20251104-2-done-node-refactor/SPEC.md` | 80 |
+| `.ddd/feat/20251104-3-git-commit-metrics/PLAN.md` | 402 |
+| `.ddd/feat/20251104-3-git-commit-metrics/SPEC.md` | 545 |
+| `.ddd/feat/20251104-4-log-retention/PLAN.md` | 535 |
+| `.ddd/feat/20251104-4-log-retention/SPEC.md` | 366 |
+| `.ddd/feat/20251105-handlebars-templates/PLAN.md` | 273 |
+| `.ddd/feat/20251105-handlebars-templates/SPEC.md` | 366 |
+| `.ddd/feat/20251106-analyze-summary/PLAN.md` | 175 |
+| `.ddd/feat/20251106-analyze-summary/SPEC.md` | 215 |
 | `.ddd/feat/20251107-workflow-stash/PLAN.md` | 298 |
 | `.ddd/feat/20251107-workflow-stash/SPEC.md` | 293 |
 | `.ddd/feat/20251108-markdown-tree/PLAN.md` | 289 |
@@ -193,12 +194,12 @@ SUM:                           137           3962           2974          20622
 | `.ddd/feat/20251113-ddd-artifact-management/HANDOFF.md` | 126 |
 | `.ddd/feat/20251113-ddd-artifact-management/PLAN.md` | 332 |
 | `.ddd/feat/20251113-ddd-artifact-management/SPEC.md` | 376 |
-| `.ddd/refactor/20251104-large_files.md` | 261 |
-| `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
-| `.ddd/refactor/20251106-gap_detection_test_coverage.md` | 210 |
-| `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
-| `.ddd/refactor/20251110-test_extraction.md` | 193 |
-| `.ddd/report/20251010-tui_dep_review.md` | 678 |
+| `.ddd/refactor/20251104-large-files.md` | 261 |
+| `.ddd/refactor/20251105-workflow-graph-grouping.md` | 104 |
+| `.ddd/refactor/20251106-gap-detection-test-coverage.md` | 210 |
+| `.ddd/refactor/20251106-multi-session-token-attribution.md` | 370 |
+| `.ddd/refactor/20251110-test-extraction.md` | 193 |
+| `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
 | `COVERAGE_REPORT.md` | 232 |
@@ -228,7 +229,7 @@ SUM:                           137           3962           2974          20622
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 276 |
+| `LOC_REPORT.md` | 277 |
 | `METRICS.md` | 258 |
 | `README.md` | 446 |
 | `ROADMAP.md` | 450 |

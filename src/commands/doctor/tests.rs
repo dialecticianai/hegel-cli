@@ -5,7 +5,6 @@ use crate::test_helpers::*;
 
 fn default_args() -> DoctorArgs {
     DoctorArgs {
-        dry_run: false,
         apply: false,
         verbose: false,
         json: false,
@@ -84,9 +83,8 @@ fn test_doctor_dry_run() {
     // Sleep briefly to ensure timestamp would change if file was modified
     std::thread::sleep(std::time::Duration::from_millis(10));
 
-    // Run doctor in dry-run mode
-    let mut args = default_args();
-    args.dry_run = true;
+    // Run doctor in detection mode (without --apply)
+    let args = default_args(); // apply = false by default
 
     let result = doctor_command(args, &storage);
     assert!(result.is_ok());
