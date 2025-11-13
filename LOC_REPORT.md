@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-12 20:56
+**Last Updated**: 2025-11-13 17:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 19,203 | 14,899 | 34,102 |
-| **Comments** | 2,855 | - | 2,855 |
-| **Blank Lines** | 3,637 | - | 3,637 |
-| **Total Lines** | 25,695 | 14,899 | 40,594 |
-| **Files** | 119 | 77 | 196 |
+| **Lines** | 19,493 | 15,832 | 35,325 |
+| **Comments** | 2,878 | - | 2,878 |
+| **Blank Lines** | 3,699 | - | 3,699 |
+| **Total Lines** | 26,070 | 15,832 | 41,902 |
+| **Files** | 120 | 81 | 201 |
 
-**Documentation Ratio**: 0.78 lines of docs per line of code
+**Documentation Ratio**: 0.81 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           119           3637           2855          19203
+Rust                           120           3699           2878          19493
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           134           3784           2855          19672
+SUM:                           135           3846           2878          19962
 -------------------------------------------------------------------------------
 ```
 
@@ -92,6 +92,7 @@ SUM:                           134           3784           2855          19672
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
+| `ddd.rs` | 374 | 186 | 188 | 50.3% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -110,7 +111,7 @@ SUM:                           134           3784           2855          19672
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 559 | 15 | 544 | 97.3% | ✅ |
+| `main.rs` | 560 | 16 | 544 | 97.1% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ✅ |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -177,25 +178,27 @@ SUM:                           134           3784           2855          19672
 | `.ddd/feat/20251105-handlebars_templates/SPEC.md` | 366 |
 | `.ddd/feat/20251106-analyze_summary/PLAN.md` | 175 |
 | `.ddd/feat/20251106-analyze_summary/SPEC.md` | 215 |
-| `.ddd/feat/commit-guardrails/PLAN.md` | 307 |
-| `.ddd/feat/commit-guardrails/SPEC.md` | 375 |
-| `.ddd/feat/markdown-tree/PLAN.md` | 289 |
-| `.ddd/feat/markdown-tree/SPEC.md` | 308 |
-| `.ddd/feat/review-cli/PLAN.md` | 121 |
-| `.ddd/feat/review-cli/SPEC.md` | 249 |
-| `.ddd/feat/reviews-module/PLAN.md` | 133 |
-| `.ddd/feat/reviews-module/SPEC.md` | 231 |
-| `.ddd/feat/workflow-stash/PLAN.md` | 298 |
-| `.ddd/feat/workflow-stash/SPEC.md` | 293 |
-| `.ddd/PLAN.md` | 210 |
+| `.ddd/feat/20251107-workflow-stash/PLAN.md` | 298 |
+| `.ddd/feat/20251107-workflow-stash/SPEC.md` | 293 |
+| `.ddd/feat/20251108-markdown-tree/PLAN.md` | 289 |
+| `.ddd/feat/20251108-markdown-tree/SPEC.md` | 308 |
+| `.ddd/feat/20251109-commit-guardrails/PLAN.md` | 307 |
+| `.ddd/feat/20251109-commit-guardrails/SPEC.md` | 375 |
+| `.ddd/feat/20251110-1-review-cli/PLAN.md` | 121 |
+| `.ddd/feat/20251110-1-review-cli/SPEC.md` | 249 |
+| `.ddd/feat/20251110-2-reviews-module/PLAN.md` | 133 |
+| `.ddd/feat/20251110-2-reviews-module/SPEC.md` | 231 |
+| `.ddd/feat/20251113-ddd-artifact-management/PLAN.md` | 332 |
+| `.ddd/feat/20251113-ddd-artifact-management/SPEC.md` | 376 |
 | `.ddd/refactor/20251104-large_files.md` | 261 |
 | `.ddd/refactor/20251105-workflow_graph_grouping.md` | 104 |
+| `.ddd/refactor/20251106-gap_detection_test_coverage.md` | 210 |
 | `.ddd/refactor/20251106-multi_session_token_attribution.md` | 370 |
 | `.ddd/refactor/20251110-test_extraction.md` | 193 |
-| `.ddd/reports/20251010-tui_dep_review.md` | 678 |
-| `CLAUDE.md` | 199 |
+| `.ddd/report/20251010-tui_dep_review.md` | 678 |
+| `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 230 |
+| `COVERAGE_REPORT.md` | 232 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
@@ -226,6 +229,8 @@ SUM:                           134           3784           2855          19672
 | `METRICS.md` | 258 |
 | `README.md` | 446 |
 | `ROADMAP.md` | 450 |
+| `scripts/oneoffs/README.md` | 58 |
+| `scripts/README.md` | 157 |
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
@@ -249,7 +254,7 @@ SUM:                           134           3784           2855          19672
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.78 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.81 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

@@ -2,6 +2,7 @@ mod adapters;
 mod analyze;
 mod commands;
 mod config;
+mod ddd;
 mod doctor;
 mod embedded;
 mod engine;
