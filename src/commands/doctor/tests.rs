@@ -6,6 +6,7 @@ use crate::test_helpers::*;
 fn default_args() -> DoctorArgs {
     DoctorArgs {
         dry_run: false,
+        apply: false,
         verbose: false,
         json: false,
     }

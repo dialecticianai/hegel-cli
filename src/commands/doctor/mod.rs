@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests;
 
+mod fix_ddd;
+
 use anyhow::Result;
 use clap::Args;
 use serde::Serialize;
@@ -16,6 +18,10 @@ pub struct DoctorArgs {
     #[arg(long)]
     pub dry_run: bool,
 
+    /// Apply fixes to malformed DDD artifacts
+    #[arg(long)]
+    pub apply: bool,
+
     /// Show verbose output
     #[arg(long, short)]
     pub verbose: bool,
@@ -26,6 +32,9 @@ pub struct DoctorArgs {
 }
 
 pub fn doctor_command(args: DoctorArgs, storage: &FileStorage) -> Result<()> {
+    // Check and fix DDD artifacts first
+    fix_ddd::check_and_fix_ddd(args.apply, args.json)?;
+
     let state_path = storage.state_dir().join("state.json");
 
     // Check if state.json exists

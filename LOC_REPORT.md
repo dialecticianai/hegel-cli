@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 17:40
+**Last Updated**: 2025-11-13 17:51
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 19,785 | 15,964 | 35,749 |
-| **Comments** | 2,905 | - | 2,905 |
-| **Blank Lines** | 3,740 | - | 3,740 |
-| **Total Lines** | 26,430 | 15,964 | 42,394 |
-| **Files** | 120 | 82 | 202 |
+| **Lines** | 20,153 | 15,966 | 36,119 |
+| **Comments** | 2,974 | - | 2,974 |
+| **Blank Lines** | 3,815 | - | 3,815 |
+| **Total Lines** | 26,942 | 15,966 | 42,908 |
+| **Files** | 122 | 82 | 204 |
 
-**Documentation Ratio**: 0.81 lines of docs per line of code
+**Documentation Ratio**: 0.79 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           120           3740           2905          19785
+Rust                           122           3815           2974          20153
 Markdown                        15            147              0            469
 -------------------------------------------------------------------------------
-SUM:                           135           3887           2905          20254
+SUM:                           137           3962           2974          20622
 -------------------------------------------------------------------------------
 ```
 
@@ -56,8 +56,9 @@ SUM:                           135           3887           2905          20254
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/doctor/mod.rs` | 259 | 0 | 259 | 100.0% | ✅ |
-| `commands/doctor/tests.rs` | 250 | 250 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_ddd.rs` | 204 | 204 | 0 | 0.0% | ✅ |
+| `commands/doctor/mod.rs` | 268 | 0 | 268 | 100.0% | ✅ |
+| `commands/doctor/tests.rs` | 251 | 251 | 0 | 0.0% | ✅ |
 | `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
 | `commands/fork/codex.rs` | 46 | 20 | 26 | 56.5% | ✅ |
@@ -73,7 +74,8 @@ SUM:                           135           3887           2905          20254
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
 | `commands/markdown.rs` | 711 | 582 | 129 | 18.1% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
-| `commands/mod.rs` | 44 | 44 | 0 | 0.0% | ✅ |
+| `commands/mod.rs` | 46 | 46 | 0 | 0.0% | ✅ |
+| `commands/new.rs` | 267 | 147 | 120 | 44.9% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 229 | 202 | 27 | 11.8% | ✅ |
 | `commands/review.rs` | 333 | 159 | 174 | 52.3% | ✅ |
@@ -111,7 +113,7 @@ SUM:                           135           3887           2905          20254
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
-| `main.rs` | 560 | 16 | 544 | 97.1% | ✅ |
+| `main.rs` | 589 | 16 | 573 | 97.3% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ✅ |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
@@ -226,7 +228,7 @@ SUM:                           135           3887           2905          20254
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 274 |
+| `LOC_REPORT.md` | 276 |
 | `METRICS.md` | 258 |
 | `README.md` | 446 |
 | `ROADMAP.md` | 450 |
@@ -255,7 +257,7 @@ SUM:                           135           3887           2905          20254
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.81 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.79 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

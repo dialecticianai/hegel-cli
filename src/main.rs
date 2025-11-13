@@ -359,6 +359,19 @@ enum Commands {
         #[arg(long, conflicts_with = "no_ddd")]
         ddd: bool,
     },
+    /// Create new DDD artifact with auto-dated naming
+    ///
+    /// Examples:
+    ///   hegel new feat my-feature      Creates .ddd/feat/YYYYMMDD-my-feature/
+    ///   hegel new refactor cleanup     Outputs path .ddd/refactor/YYYYMMDD-cleanup.md
+    ///   hegel new report analysis      Outputs path .ddd/report/YYYYMMDD-analysis.md
+    New {
+        /// Artifact type (feat, refactor, report)
+        #[arg(value_parser = ["feat", "refactor", "report"])]
+        artifact_type: String,
+        /// Artifact name (lowercase-with-hyphens)
+        name: String,
+    },
     /// Manage reviews for files
     ///
     /// Write mode (stdin present): Save reviews to .hegel/reviews.json
@@ -550,6 +563,22 @@ fn main() -> Result<()> {
         Commands::Md { json, no_ddd, ddd } => {
             let args = commands::MarkdownArgs { json, no_ddd, ddd };
             commands::run_markdown(args)?;
+        }
+        Commands::New {
+            artifact_type,
+            name,
+        } => {
+            let artifact_type = match artifact_type.as_str() {
+                "feat" => commands::ArtifactType::Feat,
+                "refactor" => commands::ArtifactType::Refactor,
+                "report" => commands::ArtifactType::Report,
+                _ => unreachable!("clap should prevent this"),
+            };
+            let args = commands::NewArgs {
+                artifact_type,
+                name,
+            };
+            commands::run_new(args)?;
         }
         Commands::Review { file_paths } => {
             commands::handle_review(&file_paths, &storage)?;
