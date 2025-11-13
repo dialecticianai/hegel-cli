@@ -81,11 +81,24 @@ pub struct FileStorage {
     state_dir: PathBuf,
     workflows_dir: Option<PathBuf>,
     guides_dir: Option<PathBuf>,
+    /// Whether state_dir was explicitly provided (vs auto-detected)
+    explicit_state_dir: bool,
 }
 
 impl FileStorage {
     /// Create a new FileStorage instance
     pub fn new<P: AsRef<Path>>(state_dir: P) -> Result<Self> {
+        Self::new_with_explicit(state_dir, false)
+    }
+
+    /// Create a new FileStorage instance with explicit state-dir flag
+    ///
+    /// When `explicit_state_dir` is true, path resolution uses CWD as root (for test isolation).
+    /// When false, path resolution uses auto-detected project root.
+    pub fn new_with_explicit<P: AsRef<Path>>(
+        state_dir: P,
+        explicit_state_dir: bool,
+    ) -> Result<Self> {
         let state_dir = state_dir.as_ref().to_path_buf();
         fs::create_dir_all(&state_dir)
             .with_context(|| format!("Failed to create state directory: {:?}", state_dir))?;
@@ -93,6 +106,7 @@ impl FileStorage {
             state_dir,
             workflows_dir: None,
             guides_dir: None,
+            explicit_state_dir,
         })
     }
 
@@ -110,6 +124,7 @@ impl FileStorage {
             state_dir,
             workflows_dir: workflows_dir.map(|p| p.as_ref().to_path_buf()),
             guides_dir: guides_dir.map(|p| p.as_ref().to_path_buf()),
+            explicit_state_dir: true, // Tests use explicit temp directories
         })
     }
 
@@ -153,6 +168,75 @@ impl FileStorage {
         self.save(&state)?;
 
         Ok(())
+    }
+
+    /// Compute relative path from project root (or CWD) to file
+    ///
+    /// When `explicit_state_dir` is true (state-dir was explicitly provided):
+    /// - Uses CWD as root for path resolution (for test isolation)
+    ///
+    /// When `explicit_state_dir` is false (state-dir was auto-detected):
+    /// - Uses project root (parent of .hegel) as root
+    /// - Canonicalizes paths for consistent comparison
+    pub fn compute_relative_path(&self, file_path: &Path) -> Result<String> {
+        if self.explicit_state_dir {
+            // Explicit state-dir: use CWD as root
+            let cwd = std::env::current_dir().context("Failed to get current working directory")?;
+
+            // Make file_path absolute if needed
+            let abs_file = if file_path.is_absolute() {
+                file_path.to_path_buf()
+            } else {
+                cwd.join(file_path)
+            };
+
+            // Canonicalize for consistent path handling
+            let canonical_file = abs_file.canonicalize().with_context(|| {
+                format!("Failed to canonicalize file path: {}", abs_file.display())
+            })?;
+
+            // Try to strip CWD prefix, fall back to absolute path if outside CWD
+            let canonical_cwd = cwd
+                .canonicalize()
+                .context("Failed to canonicalize current working directory")?;
+
+            match canonical_file.strip_prefix(&canonical_cwd) {
+                Ok(rel_path) => Ok(rel_path.to_string_lossy().to_string()),
+                Err(_) => {
+                    // File is outside CWD, use absolute path as key
+                    Ok(canonical_file.to_string_lossy().to_string())
+                }
+            }
+        } else {
+            // Auto-detected state-dir: use project root as root
+            let canonical_hegel = self
+                .state_dir
+                .canonicalize()
+                .context("Failed to canonicalize project root")?;
+
+            // Get parent of .hegel directory (project root)
+            let root = canonical_hegel
+                .parent()
+                .context("Invalid project root path")?;
+
+            // Make file_path absolute and canonical
+            let abs_file = if file_path.is_absolute() {
+                file_path.to_path_buf()
+            } else {
+                std::env::current_dir()?.join(file_path)
+            };
+
+            let canonical_file = abs_file.canonicalize().with_context(|| {
+                format!("Failed to canonicalize file path: {}", abs_file.display())
+            })?;
+
+            // Compute relative path
+            let rel_path = canonical_file
+                .strip_prefix(root)
+                .context("File is not within project root")?;
+
+            Ok(rel_path.to_string_lossy().to_string())
+        }
     }
 
     /// Find .hegel directory by walking up from given starting path (like git)

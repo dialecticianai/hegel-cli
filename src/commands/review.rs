@@ -1,5 +1,5 @@
 use crate::storage::reviews::{
-    compute_relative_path, read_hegel_reviews, write_hegel_reviews, HegelReviewEntry, ReviewComment,
+    read_hegel_reviews, write_hegel_reviews, HegelReviewEntry, ReviewComment,
 };
 use crate::storage::FileStorage;
 use anyhow::{Context, Result};
@@ -78,8 +78,8 @@ fn write_reviews(file_path: &Path, storage: &FileStorage) -> Result<()> {
     // Get project root
     let hegel_dir = storage.state_dir();
 
-    // Compute relative path (handles canonicalization internally)
-    let relative_path = compute_relative_path(hegel_dir, file_path).with_context(|| {
+    // Compute relative path (uses CWD for explicit state-dir, project root otherwise)
+    let relative_path = storage.compute_relative_path(file_path).with_context(|| {
         format!(
             "Failed to compute relative path for {}",
             file_path.display()
@@ -139,8 +139,8 @@ fn read_reviews_for_file(file_path: &Path, storage: &FileStorage) -> Result<()> 
     // Get project root
     let hegel_dir = storage.state_dir();
 
-    // Compute relative path (handles canonicalization internally)
-    let relative_path = compute_relative_path(hegel_dir, file_path).with_context(|| {
+    // Compute relative path (uses CWD for explicit state-dir, project root otherwise)
+    let relative_path = storage.compute_relative_path(file_path).with_context(|| {
         format!(
             "Failed to compute relative path for {}",
             file_path.display()
@@ -181,10 +181,10 @@ fn poll_for_reviews(
     let timeout = Duration::from_secs(timeout_secs);
     let poll_start = std::time::Instant::now();
 
-    // Compute relative paths for all files
+    // Compute relative paths for all files (uses CWD for explicit state-dir, project root otherwise)
     let relative_paths: Vec<String> = file_paths
         .iter()
-        .map(|p| compute_relative_path(hegel_dir, p))
+        .map(|p| storage.compute_relative_path(p))
         .collect::<Result<Vec<_>>>()?;
 
     loop {

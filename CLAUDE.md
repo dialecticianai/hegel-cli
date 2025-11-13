@@ -30,6 +30,8 @@
 
 **Refactor early, not late** - Structure for reading efficiency, not writing comfort. 200+ line files trigger immediate split.
 
+**We're a team** - Not "I'll do this for you." We're working together. Collaborative framing, not service language.
+
 ---
 
 ## HANDOFF.md Protocol

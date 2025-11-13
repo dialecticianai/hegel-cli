@@ -36,6 +36,8 @@ pub struct Position {
 }
 
 impl ReviewComment {
+    /// Helper constructor for tests - auto-generates timestamp
+    #[cfg(test)]
     pub fn new(
         file: String,
         session_id: Option<String>,
@@ -78,58 +80,30 @@ pub struct HegelReviewEntry {
 /// Map of filename to review entries for Hegel projects
 pub type HegelReviewsMap = HashMap<String, Vec<HegelReviewEntry>>;
 
-/// Project type detection for routing review storage
+/// Review storage type detection - determines where reviews are saved
+/// TODO: Implement standalone (non-Hegel) project support with sidecar .review.N files
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-pub enum ProjectType {
+pub enum ReviewStorageType {
     /// Hegel project detected - use .hegel/reviews.json
     Hegel { root: PathBuf },
     /// Standalone project - use sidecar .review.N files (not yet implemented)
     Standalone,
 }
 
-/// Detect if given path (or current working directory) is within a Hegel project
-pub fn detect_project_type_from(start_path: Option<PathBuf>) -> ProjectType {
+/// Detect review storage type from given path (or current working directory)
+#[allow(dead_code)]
+pub fn detect_review_storage_type_from(start_path: Option<PathBuf>) -> ReviewStorageType {
     match FileStorage::find_project_root_from(start_path) {
-        Ok(hegel_dir) => ProjectType::Hegel { root: hegel_dir },
-        Err(_) => ProjectType::Standalone,
+        Ok(hegel_dir) => ReviewStorageType::Hegel { root: hegel_dir },
+        Err(_) => ReviewStorageType::Standalone,
     }
 }
 
-/// Detect if current working directory is within a Hegel project
-pub fn detect_project_type() -> ProjectType {
-    detect_project_type_from(None)
-}
-
-/// Compute relative path from project root to file
-pub fn compute_relative_path(project_root: &Path, file_path: &Path) -> Result<String> {
-    // Canonicalize project root (.hegel directory) to handle symlinks
-    let canonical_hegel = project_root
-        .canonicalize()
-        .context("Failed to canonicalize project root")?;
-
-    // Get parent of .hegel directory (project root)
-    let root = canonical_hegel
-        .parent()
-        .context("Invalid project root path")?;
-
-    // Make file_path absolute and canonical
-    let abs_file = if file_path.is_absolute() {
-        file_path.to_path_buf()
-    } else {
-        std::env::current_dir()?.join(file_path)
-    };
-
-    // Canonicalize for consistent path comparison
-    let canonical_file = abs_file
-        .canonicalize()
-        .with_context(|| format!("Failed to canonicalize file path: {}", abs_file.display()))?;
-
-    // Compute relative path
-    let rel_path = canonical_file
-        .strip_prefix(root)
-        .context("File is not within project root")?;
-
-    Ok(rel_path.to_string_lossy().to_string())
+/// Detect review storage type from current working directory
+#[allow(dead_code)]
+pub fn detect_review_storage_type() -> ReviewStorageType {
+    detect_review_storage_type_from(None)
 }
 
 /// Read existing .hegel/reviews.json or return empty map
@@ -181,15 +155,15 @@ mod tests {
     fn test_detect_hegel_project() {
         let (temp_dir, hegel_dir) = test_hegel_project();
 
-        let project_type = detect_project_type_from(Some(temp_dir.path().to_path_buf()));
+        let storage_type = detect_review_storage_type_from(Some(temp_dir.path().to_path_buf()));
 
-        match project_type {
-            ProjectType::Hegel { root } => {
+        match storage_type {
+            ReviewStorageType::Hegel { root } => {
                 let root_canonical = root.canonicalize().unwrap();
                 let expected_canonical = hegel_dir.canonicalize().unwrap();
                 assert_eq!(root_canonical, expected_canonical);
             }
-            ProjectType::Standalone => {
+            ReviewStorageType::Standalone => {
                 panic!("Expected Hegel project to be detected");
             }
         }
@@ -199,21 +173,9 @@ mod tests {
     fn test_detect_standalone_project() {
         let temp_dir = TempDir::new().unwrap();
 
-        let project_type = detect_project_type_from(Some(temp_dir.path().to_path_buf()));
+        let storage_type = detect_review_storage_type_from(Some(temp_dir.path().to_path_buf()));
 
-        assert_eq!(project_type, ProjectType::Standalone);
-    }
-
-    #[test]
-    fn test_compute_relative_path() {
-        let (temp_dir, hegel_dir) = test_hegel_project();
-
-        let file_path = temp_dir.path().join("src").join("test.md");
-        fs::create_dir_all(file_path.parent().unwrap()).unwrap();
-        fs::write(&file_path, "test").unwrap();
-
-        let relative = compute_relative_path(&hegel_dir, &file_path).unwrap();
-        assert_eq!(relative, "src/test.md");
+        assert_eq!(storage_type, ReviewStorageType::Standalone);
     }
 
     #[test]
