@@ -18,6 +18,7 @@ src/
 ├── main.rs              CLI entry point (clap parser with --force flag, state directory resolution, command routing)
 ├── lib.rs               Library interface (exposes modules for hegel-pm and external tools)
 ├── config.rs            User configuration (code_map_style, use_reflect_gui, commit_guard, use_git)
+├── ddd.rs               DDD artifact management (parsing, validation, scanning for feat/refactor/report artifacts)
 ├── embedded.rs          Compile-time bundled resources (workflows, guides via include_str!)
 ├── theme.rs             Terminal color theme (semantic styling for success/error/warning, metrics)
 │

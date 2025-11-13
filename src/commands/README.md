@@ -14,6 +14,7 @@ commands/
 │
 ├── workflow/            Workflow orchestration commands (See workflow/README.md)
 ├── fork/                External agent orchestration (See fork/README.md)
+├── doctor/              State and artifact validation/repair (See doctor/README.md)
 ├── analyze/             Metrics analysis command entry point (delegates to src/analyze)
 │
 ├── init.rs              Project initialization (greenfield vs retrofit workflow detection)
@@ -28,7 +29,8 @@ commands/
 ├── review.rs            Review file management (poll/read/write reviews.json)
 ├── pm.rs                Project manager dashboard launcher (wraps hegel-pm binary)
 ├── ide.rs               Hegel IDE launcher (wraps hegel-ide Electron app)
-├── markdown.rs          Markdown file tree visualization (categorizes DDD vs regular docs)
+├── markdown.rs          Markdown file tree visualization with DDD artifact metadata (SPEC/PLAN indicators, validation warnings)
+├── new.rs               DDD artifact creation with auto-dating (feat/refactor/report)
 │
 ├── git.rs               Git wrapper with guardrails (delegates to wrapped.rs)
 ├── wrapped.rs           Generic command wrapper (guardrails evaluation, audit logging)

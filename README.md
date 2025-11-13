@@ -274,43 +274,35 @@ Shows:
 
 ### Viewing Markdown Files
 
-Visualize all markdown files in your project with categorization:
+Visualize all markdown files in your project:
 
 ```bash
-# Tree view with line counts
-hegel md
-
-# JSON output with full metadata
-hegel md --json
-
-# Exclude DDD artifacts (.ddd/, toys/, HANDOFF.md)
-hegel md --no-ddd
+hegel md                  # Tree view with line counts
+hegel md --ddd            # Show only DDD artifacts
+hegel md --json           # JSON with metadata
+hegel md --no-ddd         # Exclude DDD artifacts
 ```
 
-**Categorization:**
-- **DDD Documents**: Files in `.ddd/`, `toys/`, and `HANDOFF.md` (ephemeral)
-- **Other Markdown**: All other `.md` files in the project
+Shows SPEC ✓/✗ and PLAN ✓/✗ for feat directories, ⚠️ for malformed artifacts.
 
-**Features:**
-- Respects `.gitignore` rules (except HANDOFF.md is always shown)
-- Themed tree output with line counts
-- JSON mode includes file size, timestamps, and metadata
-- Scans from current directory
+### Creating DDD Artifacts
 
-**Example output:**
+```bash
+hegel new feat my-feature           # Creates .ddd/feat/YYYYMMDD-my-feature/
+hegel new refactor cleanup          # Outputs path to .ddd/refactor/YYYYMMDD-cleanup.md
+hegel new report analysis           # Outputs path to .ddd/report/YYYYMMDD-analysis.md
 ```
-DDD Documents:
-├── .ddd/
-│   ├── SPEC.md (142 lines)
-│   └── PLAN.md (89 lines)
-└── HANDOFF.md (23 lines) [ephemeral]
 
-Other Markdown:
-├── README.md (234 lines)
-└── guides/
-    ├── SPEC_WRITING.md (187 lines)
-    └── PLAN_WRITING.md (145 lines)
+Names must be `lowercase-with-hyphens`. Auto-indexes duplicates on same day.
+
+### Checking Project Health
+
+```bash
+hegel doctor              # Detect issues (no changes)
+hegel doctor --apply      # Fix automatically
 ```
+
+Validates state.json schema and DDD artifact naming. Repairs underscore names with `git mv`.
 
 ### Managing Document Reviews
 
