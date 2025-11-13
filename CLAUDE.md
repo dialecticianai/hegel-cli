@@ -74,7 +74,15 @@
 
 ## Critical Patterns
 
-**Code search: hegel astq > grep**: ALWAYS use `hegel astq -l rust -p 'identifier' src/` for code search, NOT grep/rg. Why:
+**Code discovery protocol: README first, then targeted reads**: ALWAYS start with code maps, NEVER with code search:
+1. **Start with code maps**: Read `src/**/README.md` files to understand architecture and module structure
+2. **Targeted file reads**: Based on code maps, read entire relevant source files using Read tool
+3. **Code search last resort**: Only use `hegel astq` for specific identifier lookups after understanding context
+- **WRONG**: Search for `struct Foo` to understand how feature works
+- **RIGHT**: Read `src/commands/README.md` → Read `src/commands/foo.rs` → Understand full context
+- Code maps provide the "table of contents" - always start there
+
+**Code search: hegel astq > grep**: When searching IS appropriate, use `hegel astq -l rust -p 'identifier' src/`, NOT grep/rg. Why:
 - AST-aware: finds only actual code usage, ignores comments/strings/docs
 - Context-aware: understands Rust syntax structure
 - Agent-friendly: provides "No matches found" feedback vs silent failure
