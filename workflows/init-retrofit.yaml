@@ -1,5 +1,5 @@
 # Retrofit initialization workflow - add DDD to existing project
-mode: init
+mode: init-retrofit
 start_node: detect_existing
 
 nodes:

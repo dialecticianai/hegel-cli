@@ -1,5 +1,5 @@
 # Greenfield initialization workflow - scaffold new DDD project
-mode: init
+mode: init-greenfield
 start_node: customize_claude
 
 nodes:
