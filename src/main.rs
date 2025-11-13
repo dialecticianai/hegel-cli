@@ -184,18 +184,21 @@ enum Commands {
     /// Launch ephemeral Markdown review UI (wraps mirror)
     ///
     /// Workflow:
-    ///   1. Mirror GUI launches
-    ///   2. User selects text → adds comment → submits
-    ///   3. Review saved to .ddd/<filename>.review.N (JSONL format)
-    ///   4. Mirror exits (ephemeral, no persistent state)
+    ///   Default: Poll for new reviews (blocks until reviews appear or timeout)
+    ///     hegel reflect file1.md file2.md
+    ///   Immediate: Launch GUI and return immediately
+    ///     hegel reflect --immediate file.md
     ///
-    /// Read reviews with: cat .ddd/SPEC.review.1 | jq -r '.comment'
+    /// Read reviews with: hegel review file.md
     Reflect {
         /// Markdown files to review
         files: Vec<std::path::PathBuf>,
         /// Output directory for review files
         #[arg(long)]
         out_dir: Option<std::path::PathBuf>,
+        /// Return immediately without polling for reviews
+        #[arg(long, alias = "no-wait")]
+        immediate: bool,
         /// Emit JSON with review file paths on exit
         #[arg(long)]
         json: bool,
@@ -347,17 +350,11 @@ enum Commands {
     /// Write mode (stdin present): Save reviews to .hegel/reviews.json
     ///   echo '{"timestamp":"...","file":"...","selection":{...},"text":"...","comment":"..."}' | hegel review path/to/file.md
     ///
-    /// Read mode (no stdin):
-    ///   Default: Poll for new reviews (blocks until reviews appear or timeout)
+    /// Read mode (no stdin): Return existing reviews as JSONL
     ///     hegel review file1.md file2.md
-    ///   Immediate: Return existing reviews immediately
-    ///     hegel review --immediate file.md
     Review {
         /// File paths (absolute or relative, .md extension optional)
         file_paths: Vec<std::path::PathBuf>,
-        /// Return existing reviews immediately without polling
-        #[arg(long, alias = "no-wait")]
-        immediate: bool,
     },
 }
 
@@ -490,10 +487,18 @@ fn main() -> Result<()> {
         Commands::Reflect {
             files,
             out_dir,
+            immediate,
             json,
             headless,
         } => {
-            commands::run_reflect(&files, out_dir.as_deref(), json, headless)?;
+            commands::run_reflect(
+                &files,
+                out_dir.as_deref(),
+                &storage,
+                immediate,
+                json,
+                headless,
+            )?;
         }
         Commands::Pm { args } => {
             commands::run_pm(&args)?;
@@ -529,11 +534,8 @@ fn main() -> Result<()> {
             let args = commands::MarkdownArgs { json, no_ddd, ddd };
             commands::run_markdown(args)?;
         }
-        Commands::Review {
-            file_paths,
-            immediate,
-        } => {
-            commands::handle_review(&file_paths, &storage, immediate)?;
+        Commands::Review { file_paths } => {
+            commands::handle_review(&file_paths, &storage)?;
         }
     }
 
