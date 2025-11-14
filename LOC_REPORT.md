@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-14 11:09
+**Last Updated**: 2025-11-14 11:11
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,430 | 16,017 | 36,447 |
-| **Comments** | 3,021 | - | 3,021 |
-| **Blank Lines** | 3,847 | - | 3,847 |
-| **Total Lines** | 27,298 | 16,017 | 43,315 |
+| **Lines** | 20,454 | 16,017 | 36,471 |
+| **Comments** | 3,027 | - | 3,027 |
+| **Blank Lines** | 3,851 | - | 3,851 |
+| **Total Lines** | 27,332 | 16,017 | 43,349 |
 | **Files** | 123 | 83 | 206 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3847           3021          20430
+Rust                           123           3851           3027          20454
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4004           3021          20932
+SUM:                           139           4008           3027          20956
 -------------------------------------------------------------------------------
 ```
 
@@ -56,7 +56,7 @@ SUM:                           139           4004           3021          20932
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/doctor/fix_ddd.rs` | 242 | 242 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_ddd.rs` | 276 | 276 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
 | `commands/doctor/mod.rs` | 41 | 0 | 41 | 100.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-14 11:09
+**Last Updated**: 2025-11-14 11:11
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **74.93%** lines | **74.41%** regions | **76.82%** functions
+**Overall Coverage**: **74.82%** lines | **74.29%** regions | **76.82%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19509              4992    74.41%        1070               248    76.82%       12146              3045    74.93%           0                 0         -
+TOTAL                                         19542              5025    74.29%        1070               248    76.82%       12164              3063    74.82%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -30,7 +30,7 @@ TOTAL                                         19509              4992    74.41% 
 | `src/commands/archive.rs` | 43.35% | 47.54% | 50.00% | 🟠 Moderate |
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
 | `src/commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
-| `src/commands/doctor/fix_ddd.rs` | 5.26% | 4.52% | 12.50% | 🔴 Needs Work |
+| `src/commands/doctor/fix_ddd.rs` | 4.71% | 3.94% | 12.50% | 🔴 Needs Work |
 | `src/commands/doctor/fix_state.rs` | 32.20% | 25.00% | 100.00% | 🔴 Needs Work |
 | `src/commands/doctor/mod.rs` | 90.00% | 81.82% | 100.00% | 🟢 Excellent |
 | `src/commands/doctor/tests.rs` | 99.44% | 99.25% | 100.00% | 🟢 Excellent |
@@ -199,7 +199,7 @@ TOTAL                                         19509              4992    74.41% 
 - `src/analyze/sections.rs` - 30.21%
 - `src/analyze/totals.rs` - 0.00%
 - `src/commands/astq.rs` - 17.78%
-- `src/commands/doctor/fix_ddd.rs` - 5.26%
+- `src/commands/doctor/fix_ddd.rs` - 4.71%
 - `src/commands/doctor/fix_state.rs` - 32.20%
 - `src/commands/external_bin.rs` - 37.86%
 - `src/commands/markdown.rs` - 32.03%
@@ -211,7 +211,7 @@ TOTAL                                         19509              4992    74.41% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 74.93% | ⏳ In Progress |
+| Overall | ≥80% | 74.82% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

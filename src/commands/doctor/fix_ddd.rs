@@ -64,10 +64,44 @@ fn suggest_fix(issue: &ValidationIssue) -> Result<Option<(PathBuf, String)>> {
     // Build new name based on issue type
     let new_name = match issue.issue_type {
         IssueType::InvalidFormat | IssueType::MissingDate => {
-            // The file already has underscores instead of hyphens in the name
-            // Just replace underscores with hyphens to match the spec
-            // For example: "20251104-1-non_phase_commits" -> "20251104-1-non-phase-commits"
-            file_name.replace('_', "-").to_string()
+            // Determine if this is a feat directory or refactor/report file
+            let is_feat_dir = issue.path.to_string_lossy().contains("/.ddd/feat/");
+            let is_refactor = issue.path.to_string_lossy().contains("/.ddd/refactor/");
+            let is_report = issue.path.to_string_lossy().contains("/.ddd/report/");
+
+            if is_feat_dir {
+                // Feat directory missing date prefix
+                // Example: "markdown-review" -> "20251110-markdown-review"
+                let name = file_name.replace('_', "-");
+
+                // Check if there are other feats on this date to determine if we need an index
+                use crate::ddd::parse_ddd_structure;
+                let scan_result = parse_ddd_structure()?;
+
+                let mut same_date_count = 0;
+                for artifact in &scan_result.artifacts {
+                    if let crate::ddd::DddArtifact::Feat(feat) = artifact {
+                        if feat.date == git_date {
+                            same_date_count += 1;
+                        }
+                    }
+                }
+
+                // If there are other feats on this date, add index
+                if same_date_count > 0 {
+                    format!("{}-{}-{}", git_date, same_date_count + 1, name)
+                } else {
+                    format!("{}-{}", git_date, name)
+                }
+            } else if is_refactor || is_report {
+                // File with underscores or other formatting issues
+                // Just replace underscores with hyphens
+                // Example: "20251107-e2e-performance-LEARNINGS.md" (has uppercase, already has date)
+                file_name.replace('_', "-").to_string()
+            } else {
+                // Unknown path type
+                return Ok(None);
+            }
         }
         IssueType::MissingIndex => {
             // Determine the index for this artifact
