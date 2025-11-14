@@ -580,7 +580,12 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
             let indicators: Vec<String> = node
                 .artifact_files
                 .iter()
-                .map(|file_meta| {
+                .filter_map(|file_meta| {
+                    // Skip optional files that don't exist
+                    if !file_meta.required && !file_meta.exists {
+                        return None;
+                    }
+
                     // Look up line count from children
                     let lines = node
                         .children
@@ -592,23 +597,38 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
                         .name
                         .strip_suffix(".md")
                         .unwrap_or(&file_meta.name);
-                    let check_mark = if file_meta.exists { "✓" } else { "✗" };
 
-                    if let Some(line_count) = lines {
+                    // Build colored output
+                    let check_mark_colored = if file_meta.exists {
+                        Theme::success("✓")
+                    } else {
+                        Theme::error("✗")
+                    };
+
+                    let result = if let Some(line_count) = lines {
                         format!(
-                            "{} ({} lines) {}",
-                            file_name_without_ext, line_count, check_mark
+                            "{} {} {}",
+                            file_name_without_ext,
+                            Theme::metric_value(&format!("({} lines)", line_count)),
+                            check_mark_colored
                         )
                     } else if file_meta.exists {
-                        format!("{} (? lines) {}", file_name_without_ext, check_mark)
+                        format!(
+                            "{} {} {}",
+                            file_name_without_ext,
+                            Theme::metric_value("(? lines)"),
+                            check_mark_colored
+                        )
                     } else {
-                        format!("{} {}", file_name_without_ext, check_mark)
-                    }
+                        format!("{} {}", file_name_without_ext, check_mark_colored)
+                    };
+
+                    Some(result)
                 })
                 .collect();
 
             if !indicators.is_empty() {
-                format!("  {}", Theme::metric_value(indicators.join(" ")))
+                format!("  {}", indicators.join(" "))
             } else {
                 String::new()
             }

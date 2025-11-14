@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-14 11:28
+**Last Updated**: 2025-11-14 12:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,632 | 16,017 | 36,649 |
-| **Comments** | 3,034 | - | 3,034 |
-| **Blank Lines** | 3,878 | - | 3,878 |
-| **Total Lines** | 27,544 | 16,017 | 43,561 |
+| **Lines** | 20,647 | 16,017 | 36,664 |
+| **Comments** | 3,036 | - | 3,036 |
+| **Blank Lines** | 3,881 | - | 3,881 |
+| **Total Lines** | 27,564 | 16,017 | 43,581 |
 | **Files** | 123 | 83 | 206 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3878           3034          20632
+Rust                           123           3881           3036          20647
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4035           3034          21134
+SUM:                           139           4038           3036          21149
 -------------------------------------------------------------------------------
 ```
 
@@ -73,7 +73,7 @@ SUM:                           139           4035           3034          21134
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/markdown.rs` | 786 | 653 | 133 | 16.9% | ⚠️ Large |
+| `commands/markdown.rs` | 806 | 673 | 133 | 16.5% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `commands/new.rs` | 332 | 212 | 120 | 36.1% | ✅ |
