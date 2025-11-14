@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-14 11:11
+**Last Updated**: 2025-11-14 11:24
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **74.82%** lines | **74.29%** regions | **76.82%** functions
+**Overall Coverage**: **74.79%** lines | **74.29%** regions | **76.43%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19542              5025    74.29%        1070               248    76.82%       12164              3063    74.82%           0                 0         -
+TOTAL                                         19596              5038    74.29%        1086               256    76.43%       12215              3079    74.79%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -30,11 +30,11 @@ TOTAL                                         19542              5025    74.29% 
 | `src/commands/archive.rs` | 43.35% | 47.54% | 50.00% | 🟠 Moderate |
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
 | `src/commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
-| `src/commands/doctor/fix_ddd.rs` | 4.71% | 3.94% | 12.50% | 🔴 Needs Work |
+| `src/commands/doctor/fix_ddd.rs` | 4.47% | 3.98% | 7.69% | 🔴 Needs Work |
 | `src/commands/doctor/fix_state.rs` | 32.20% | 25.00% | 100.00% | 🔴 Needs Work |
 | `src/commands/doctor/mod.rs` | 90.00% | 81.82% | 100.00% | 🟢 Excellent |
 | `src/commands/doctor/tests.rs` | 99.44% | 99.25% | 100.00% | 🟢 Excellent |
-| `src/commands/external_bin.rs` | 37.86% | 32.28% | 37.50% | 🔴 Needs Work |
+| `src/commands/external_bin.rs` | 33.98% | 27.85% | 37.50% | 🔴 Needs Work |
 | `src/commands/fork/amp.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/codex.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/cody.rs` | 100.00% | 98.41% | 100.00% | 🟢 Excellent |
@@ -60,7 +60,7 @@ TOTAL                                         19542              5025    74.29% 
 | `src/commands/workflow/transitions.rs` | 71.32% | 67.56% | 34.48% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 76.47% | 75.54% | 57.89% | 🟡 Good |
-| `src/ddd.rs` | 88.14% | 91.72% | 97.92% | 🟡 Good |
+| `src/ddd.rs` | 88.57% | 91.09% | 93.22% | 🟡 Good |
 | `src/doctor/migrations.rs` | 82.98% | 83.93% | 75.00% | 🟡 Good |
 | `src/doctor/rescue.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
@@ -167,7 +167,7 @@ TOTAL                                         19542              5025    74.29% 
 - `src/commands/workflow/transitions.rs` - 71.32%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/config.rs` - 76.47%
-- `src/ddd.rs` - 88.14%
+- `src/ddd.rs` - 88.57%
 - `src/doctor/migrations.rs` - 82.98%
 - `src/embedded.rs` - 82.79%
 - `src/engine/mod.rs` - 86.98%
@@ -199,9 +199,9 @@ TOTAL                                         19542              5025    74.29% 
 - `src/analyze/sections.rs` - 30.21%
 - `src/analyze/totals.rs` - 0.00%
 - `src/commands/astq.rs` - 17.78%
-- `src/commands/doctor/fix_ddd.rs` - 4.71%
+- `src/commands/doctor/fix_ddd.rs` - 4.47%
 - `src/commands/doctor/fix_state.rs` - 32.20%
-- `src/commands/external_bin.rs` - 37.86%
+- `src/commands/external_bin.rs` - 33.98%
 - `src/commands/markdown.rs` - 32.03%
 - `src/commands/reflect.rs` - 19.55%
 - `src/doctor/rescue.rs` - 0.00%
@@ -211,7 +211,7 @@ TOTAL                                         19542              5025    74.29% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 74.82% | ⏳ In Progress |
+| Overall | ≥80% | 74.79% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

@@ -43,114 +43,111 @@ fn is_tracked(path: &PathBuf) -> Result<bool> {
     Ok(output.status.success() && !output.stdout.is_empty())
 }
 
+/// Artifact type for path classification
+enum ArtifactKind {
+    Feat,
+    Refactor,
+    Report,
+}
+
+/// Determine artifact kind from path
+fn classify_artifact(path: &PathBuf) -> Option<ArtifactKind> {
+    let path_str = path.to_string_lossy();
+
+    // Check for feat directory (multiple possible path formats)
+    if path_str.contains("/.ddd/feat/")
+        || path_str.contains("\\.ddd\\feat\\")
+        || path_str.contains(".ddd/feat/")
+        || path_str.contains(".ddd\\feat\\")
+    {
+        return Some(ArtifactKind::Feat);
+    }
+
+    // Check for refactor/report files
+    if path_str.contains("/refactor/") || path_str.contains("\\refactor\\") {
+        return Some(ArtifactKind::Refactor);
+    }
+    if path_str.contains("/report/") || path_str.contains("\\report\\") {
+        return Some(ArtifactKind::Report);
+    }
+
+    None
+}
+
+/// Fix InvalidFormat for feat directory (add date prefix and optional index)
+fn fix_feat_dir(file_name: &str, git_date: &str) -> Result<String> {
+    use crate::ddd::{parse_ddd_structure, DddArtifact};
+
+    let name = file_name.replace('_', "-");
+    let scan_result = parse_ddd_structure()?;
+
+    // Count existing feats on this date
+    let same_date_count = scan_result
+        .artifacts
+        .iter()
+        .filter_map(|a| match a {
+            DddArtifact::Feat(f) if f.date == git_date => Some(f),
+            _ => None,
+        })
+        .count();
+
+    // Add index if there are other feats on this date
+    Ok(if same_date_count > 0 {
+        format!("{}-{}-{}", git_date, same_date_count + 1, name)
+    } else {
+        format!("{}-{}", git_date, name)
+    })
+}
+
+/// Fix InvalidFormat for refactor/report file (normalize formatting)
+fn fix_file_artifact(file_name: &str) -> String {
+    file_name.replace('_', "-").to_lowercase()
+}
+
 /// Suggest a fix for a validation issue
 fn suggest_fix(issue: &ValidationIssue) -> Result<Option<(PathBuf, String)>> {
-    // Get git date for the artifact
-    let git_date = match lookup_git_date(&issue.path)? {
-        Some(date) => date,
-        None => {
-            // Can't fix without a date
-            return Ok(None);
-        }
-    };
+    // If target_name is pre-computed (e.g., MissingIndex), use it
+    if let Some(target_name) = &issue.target_name {
+        let new_path = issue.path.parent().unwrap().join(target_name);
+        return Ok(Some((new_path, target_name.clone())));
+    }
 
-    // Extract the name from the path
+    // Only InvalidFormat/MissingDate need dynamic fixes
+    if !matches!(
+        issue.issue_type,
+        IssueType::InvalidFormat | IssueType::MissingDate
+    ) {
+        return Ok(None);
+    }
+
+    // Get file name
     let file_name = issue
         .path
         .file_name()
         .and_then(|n| n.to_str())
         .ok_or_else(|| anyhow::anyhow!("Invalid path"))?;
 
-    // Build new name based on issue type
-    let new_name = match issue.issue_type {
-        IssueType::InvalidFormat | IssueType::MissingDate => {
-            // Determine if this is a feat directory or refactor/report file
-            let is_feat_dir = issue.path.to_string_lossy().contains("/.ddd/feat/");
-            let is_refactor = issue.path.to_string_lossy().contains("/.ddd/refactor/");
-            let is_report = issue.path.to_string_lossy().contains("/.ddd/report/");
+    // Determine artifact kind
+    let kind = classify_artifact(&issue.path).ok_or_else(|| {
+        anyhow::anyhow!("Unknown artifact type for path: {}", issue.path.display())
+    })?;
 
-            if is_feat_dir {
-                // Feat directory missing date prefix
-                // Example: "markdown-review" -> "20251110-markdown-review"
-                let name = file_name.replace('_', "-");
-
-                // Check if there are other feats on this date to determine if we need an index
-                use crate::ddd::parse_ddd_structure;
-                let scan_result = parse_ddd_structure()?;
-
-                let mut same_date_count = 0;
-                for artifact in &scan_result.artifacts {
-                    if let crate::ddd::DddArtifact::Feat(feat) = artifact {
-                        if feat.date == git_date {
-                            same_date_count += 1;
-                        }
-                    }
-                }
-
-                // If there are other feats on this date, add index
-                if same_date_count > 0 {
-                    format!("{}-{}-{}", git_date, same_date_count + 1, name)
-                } else {
-                    format!("{}-{}", git_date, name)
-                }
-            } else if is_refactor || is_report {
-                // File with underscores or other formatting issues
-                // Just replace underscores with hyphens
-                // Example: "20251107-e2e-performance-LEARNINGS.md" (has uppercase, already has date)
-                file_name.replace('_', "-").to_string()
-            } else {
-                // Unknown path type
-                return Ok(None);
-            }
+    // Generate new name based on artifact kind
+    let new_name = match kind {
+        ArtifactKind::Feat => {
+            let git_date = lookup_git_date(&issue.path)?
+                .ok_or_else(|| anyhow::anyhow!("Cannot determine git date for feat directory"))?;
+            fix_feat_dir(file_name, &git_date)?
         }
-        IssueType::MissingIndex => {
-            // Determine the index for this artifact
-            // Parse the file name to get date and name
-            use crate::ddd::parse_single_file_name;
-            let (date, _index, name) = parse_single_file_name(file_name)?;
-
-            // Scan existing artifacts to determine the correct index
-            use crate::ddd::parse_ddd_structure;
-            let scan_result = parse_ddd_structure()?;
-
-            // Count artifacts of the same type on this date that come before this one alphabetically
-            let artifact_type = if issue.path.to_string_lossy().contains("/refactor/") {
-                "refactor"
-            } else if issue.path.to_string_lossy().contains("/report/") {
-                "report"
-            } else {
-                return Ok(None);
-            };
-
-            let mut same_date_artifacts: Vec<String> = Vec::new();
-            for artifact in &scan_result.artifacts {
-                match (artifact_type, artifact) {
-                    ("refactor", crate::ddd::DddArtifact::Refactor(r)) if r.date == date => {
-                        same_date_artifacts.push(r.name.clone());
-                    }
-                    ("report", crate::ddd::DddArtifact::Report(r)) if r.date == date => {
-                        same_date_artifacts.push(r.name.clone());
-                    }
-                    _ => {}
-                }
-            }
-
-            // Sort alphabetically and find position
-            same_date_artifacts.sort();
-            let position = same_date_artifacts
-                .iter()
-                .position(|n| n == &name)
-                .unwrap_or(0);
-
-            // Index is position + 1
-            let index = position + 1;
-            format!("{}-{}-{}.md", date, index, name)
-        }
+        ArtifactKind::Refactor | ArtifactKind::Report => fix_file_artifact(file_name),
     };
 
-    // Build new path
-    let new_path = issue.path.parent().unwrap().join(&new_name);
+    // Filter out no-op renames
+    if file_name == new_name {
+        return Ok(None);
+    }
 
+    let new_path = issue.path.parent().unwrap().join(&new_name);
     Ok(Some((new_path, new_name)))
 }
 

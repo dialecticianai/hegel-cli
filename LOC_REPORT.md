@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-14 11:11
+**Last Updated**: 2025-11-14 11:24
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,454 | 16,017 | 36,471 |
-| **Comments** | 3,027 | - | 3,027 |
-| **Blank Lines** | 3,851 | - | 3,851 |
-| **Total Lines** | 27,332 | 16,017 | 43,349 |
+| **Lines** | 20,504 | 16,017 | 36,521 |
+| **Comments** | 3,025 | - | 3,025 |
+| **Blank Lines** | 3,864 | - | 3,864 |
+| **Total Lines** | 27,393 | 16,017 | 43,410 |
 | **Files** | 123 | 83 | 206 |
 
 **Documentation Ratio**: 0.78 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3851           3027          20454
+Rust                           123           3864           3025          20504
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4008           3027          20956
+SUM:                           139           4021           3025          21006
 -------------------------------------------------------------------------------
 ```
 
@@ -56,7 +56,7 @@ SUM:                           139           4008           3027          20956
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/doctor/fix_ddd.rs` | 276 | 276 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_ddd.rs` | 273 | 273 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
 | `commands/doctor/mod.rs` | 41 | 0 | 41 | 100.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
@@ -95,7 +95,7 @@ SUM:                           139           4008           3027          20956
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 676 | 396 | 280 | 41.4% | ✅ |
+| `ddd.rs` | 740 | 460 | 280 | 37.8% | ⚠️ Large |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -161,7 +161,7 @@ SUM:                           139           4008           3027          20956
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
-**⚠️ Warning:** 5 file(s) over 400 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 6 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
