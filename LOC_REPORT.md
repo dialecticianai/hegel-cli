@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 18:25
+**Last Updated**: 2025-11-14 11:02
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,191 | 16,017 | 36,208 |
-| **Comments** | 2,994 | - | 2,994 |
-| **Blank Lines** | 3,820 | - | 3,820 |
-| **Total Lines** | 27,005 | 16,017 | 43,022 |
+| **Lines** | 20,248 | 16,017 | 36,265 |
+| **Comments** | 3,000 | - | 3,000 |
+| **Blank Lines** | 3,828 | - | 3,828 |
+| **Total Lines** | 27,076 | 16,017 | 43,093 |
 | **Files** | 123 | 83 | 206 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3820           2994          20191
+Rust                           123           3828           3000          20248
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           3977           2994          20693
+SUM:                           139           3985           3000          20750
 -------------------------------------------------------------------------------
 ```
 
@@ -73,7 +73,7 @@ SUM:                           139           3977           2994          20693
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 223 | 97 | 126 | 56.5% | ✅ |
-| `commands/markdown.rs` | 711 | 582 | 129 | 18.1% | ⚠️ Large |
+| `commands/markdown.rs` | 763 | 630 | 133 | 17.4% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `commands/new.rs` | 267 | 147 | 120 | 44.9% | ✅ |
@@ -95,7 +95,7 @@ SUM:                           139           3977           2994          20693
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 538 | 293 | 245 | 45.5% | ✅ |
+| `ddd.rs` | 557 | 312 | 245 | 44.0% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |

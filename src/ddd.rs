@@ -1,6 +1,13 @@
 use anyhow::{anyhow, Result};
 use std::path::PathBuf;
 
+/// Specification for an artifact file (e.g., SPEC.md, PLAN.md)
+#[derive(Debug, Clone, PartialEq)]
+pub struct ArtifactFileSpec {
+    pub name: &'static str,
+    pub required: bool,
+}
+
 /// Feature artifact with date, optional index, name, and file existence tracking
 #[derive(Debug, Clone, PartialEq)]
 pub struct FeatArtifact {
@@ -12,6 +19,18 @@ pub struct FeatArtifact {
 }
 
 impl FeatArtifact {
+    /// File specifications for feat artifacts
+    pub const FILES: &'static [ArtifactFileSpec] = &[
+        ArtifactFileSpec {
+            name: "SPEC.md",
+            required: true,
+        },
+        ArtifactFileSpec {
+            name: "PLAN.md",
+            required: true,
+        },
+    ];
+
     /// Generate directory name with optional index
     pub fn dir_name(&self) -> String {
         if let Some(idx) = self.index {

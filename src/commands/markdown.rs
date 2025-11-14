@@ -338,6 +338,14 @@ fn check_for_issues(node: &TreeNode) -> bool {
     false
 }
 
+/// Metadata for an artifact file within a directory
+#[derive(Debug, Clone)]
+struct ArtifactFileMeta {
+    pub name: String,
+    pub exists: bool,
+    pub required: bool,
+}
+
 /// Tree node structure
 #[derive(Debug)]
 struct TreeNode {
@@ -345,10 +353,8 @@ struct TreeNode {
     is_file: bool,
     lines: Option<usize>,
     ephemeral: bool,
-    /// For feat directories: whether SPEC.md exists
-    spec_exists: Option<bool>,
-    /// For feat directories: whether PLAN.md exists
-    plan_exists: Option<bool>,
+    /// For artifact directories: metadata about constituent files (e.g., SPEC.md, PLAN.md)
+    artifact_files: Vec<ArtifactFileMeta>,
     /// Whether this artifact has validation issues
     is_malformed: bool,
     children: Vec<TreeNode>,
@@ -361,8 +367,7 @@ fn build_tree_structure(files: &[MarkdownFile]) -> TreeNode {
         is_file: false,
         lines: None,
         ephemeral: false,
-        spec_exists: None,
-        plan_exists: None,
+        artifact_files: Vec::new(),
         is_malformed: false,
         children: Vec::new(),
     };
@@ -390,8 +395,7 @@ fn build_tree_structure(files: &[MarkdownFile]) -> TreeNode {
                         } else {
                             false
                         },
-                        spec_exists: None,
-                        plan_exists: None,
+                        artifact_files: Vec::new(),
                         is_malformed: false,
                         children: Vec::new(),
                     });
@@ -455,15 +459,30 @@ fn attach_ddd_metadata_recursive(
         }
     }
 
-    // Check if this is a feat directory and attach SPEC/PLAN metadata
+    // Check if this is a feat directory and attach artifact file metadata
     if !node.is_file {
         for artifact in artifacts {
             if let DddArtifact::Feat(feat) = artifact {
                 let feat_dir_name = feat.dir_name();
                 // Match if the node name equals the feat directory name
                 if node.name == feat_dir_name {
-                    node.spec_exists = Some(feat.spec_exists);
-                    node.plan_exists = Some(feat.plan_exists);
+                    // Populate artifact_files from FeatArtifact::FILES spec
+                    use crate::ddd::FeatArtifact;
+                    node.artifact_files = FeatArtifact::FILES
+                        .iter()
+                        .map(|spec| {
+                            let exists = match spec.name {
+                                "SPEC.md" => feat.spec_exists,
+                                "PLAN.md" => feat.plan_exists,
+                                _ => false,
+                            };
+                            ArtifactFileMeta {
+                                name: spec.name.to_string(),
+                                exists,
+                                required: spec.required,
+                            }
+                        })
+                        .collect();
                     break;
                 }
             }
@@ -533,23 +552,40 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
             warning_str
         );
     } else {
-        // For directories, check if it's a feat directory with SPEC/PLAN metadata
-        let feat_metadata = if node.spec_exists.is_some() || node.plan_exists.is_some() {
-            let spec_indicator = match node.spec_exists {
-                Some(true) => "SPEC ✓",
-                Some(false) => "SPEC ✗",
-                None => "",
-            };
-            let plan_indicator = match node.plan_exists {
-                Some(true) => "PLAN ✓",
-                Some(false) => "PLAN ✗",
-                None => "",
-            };
-            if !spec_indicator.is_empty() || !plan_indicator.is_empty() {
-                format!(
-                    "  {}",
-                    Theme::metric_value(format!("{} {}", spec_indicator, plan_indicator))
-                )
+        // For directories, check if it has artifact file metadata
+        let artifact_metadata = if !node.artifact_files.is_empty() {
+            let indicators: Vec<String> = node
+                .artifact_files
+                .iter()
+                .map(|file_meta| {
+                    // Look up line count from children
+                    let lines = node
+                        .children
+                        .iter()
+                        .find(|child| child.name == file_meta.name)
+                        .and_then(|child| child.lines);
+
+                    let file_name_without_ext = file_meta
+                        .name
+                        .strip_suffix(".md")
+                        .unwrap_or(&file_meta.name);
+                    let check_mark = if file_meta.exists { "✓" } else { "✗" };
+
+                    if let Some(line_count) = lines {
+                        format!(
+                            "{} ({} lines) {}",
+                            file_name_without_ext, line_count, check_mark
+                        )
+                    } else if file_meta.exists {
+                        format!("{} (? lines) {}", file_name_without_ext, check_mark)
+                    } else {
+                        format!("{} {}", file_name_without_ext, check_mark)
+                    }
+                })
+                .collect();
+
+            if !indicators.is_empty() {
+                format!("  {}", Theme::metric_value(indicators.join(" ")))
             } else {
                 String::new()
             }
@@ -568,12 +604,24 @@ fn render_tree_child(node: &TreeNode, prefix: &str, is_last: bool) {
             Theme::secondary(prefix),
             Theme::secondary(connector),
             Theme::secondary(&format!("{}/", node.name)),
-            feat_metadata,
+            artifact_metadata,
             warning_str
         );
 
+        // Filter out artifact files from children when rendering
+        let artifact_file_names: std::collections::HashSet<_> = node
+            .artifact_files
+            .iter()
+            .map(|f| f.name.as_str())
+            .collect();
+
         let new_prefix = format!("{}{}", prefix, child_prefix);
         for (i, child) in node.children.iter().enumerate() {
+            // Skip artifact files (they're shown inline with the directory)
+            if artifact_file_names.contains(child.name.as_str()) {
+                continue;
+            }
+
             let is_last_child = i == node.children.len() - 1;
             render_tree_child(child, &new_prefix, is_last_child);
         }
@@ -594,8 +642,7 @@ mod tests {
             is_file: false,
             lines: None,
             ephemeral: false,
-            spec_exists: None,
-            plan_exists: None,
+            artifact_files: Vec::new(),
             is_malformed: false,
             children: Vec::new(),
         };
@@ -616,8 +663,13 @@ mod tests {
         attach_ddd_metadata(&mut node, &scan_result);
 
         // Verify metadata was attached
-        assert_eq!(node.spec_exists, Some(true));
-        assert_eq!(node.plan_exists, Some(false));
+        assert_eq!(node.artifact_files.len(), 2);
+        assert_eq!(node.artifact_files[0].name, "SPEC.md");
+        assert!(node.artifact_files[0].exists);
+        assert!(node.artifact_files[0].required);
+        assert_eq!(node.artifact_files[1].name, "PLAN.md");
+        assert!(!node.artifact_files[1].exists);
+        assert!(node.artifact_files[1].required);
         assert!(!node.is_malformed);
     }
 
