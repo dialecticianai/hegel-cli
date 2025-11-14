@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-14 11:02
+**Last Updated**: 2025-11-14 11:09
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,248 | 16,017 | 36,265 |
-| **Comments** | 3,000 | - | 3,000 |
-| **Blank Lines** | 3,828 | - | 3,828 |
-| **Total Lines** | 27,076 | 16,017 | 43,093 |
+| **Lines** | 20,430 | 16,017 | 36,447 |
+| **Comments** | 3,021 | - | 3,021 |
+| **Blank Lines** | 3,847 | - | 3,847 |
+| **Total Lines** | 27,298 | 16,017 | 43,315 |
 | **Files** | 123 | 83 | 206 |
 
-**Documentation Ratio**: 0.79 lines of docs per line of code
+**Documentation Ratio**: 0.78 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3828           3000          20248
+Rust                           123           3847           3021          20430
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           3985           3000          20750
+SUM:                           139           4004           3021          20932
 -------------------------------------------------------------------------------
 ```
 
@@ -56,7 +56,7 @@ SUM:                           139           3985           3000          20750
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
-| `commands/doctor/fix_ddd.rs` | 204 | 204 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_ddd.rs` | 242 | 242 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
 | `commands/doctor/mod.rs` | 41 | 0 | 41 | 100.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
@@ -76,7 +76,7 @@ SUM:                           139           3985           3000          20750
 | `commands/markdown.rs` | 763 | 630 | 133 | 17.4% | ⚠️ Large |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 46 | 46 | 0 | 0.0% | ✅ |
-| `commands/new.rs` | 267 | 147 | 120 | 44.9% | ✅ |
+| `commands/new.rs` | 332 | 212 | 120 | 36.1% | ✅ |
 | `commands/pm.rs` | 30 | 15 | 15 | 50.0% | ✅ |
 | `commands/reflect.rs` | 229 | 202 | 27 | 11.8% | ✅ |
 | `commands/review.rs` | 333 | 159 | 174 | 52.3% | ✅ |
@@ -95,7 +95,7 @@ SUM:                           139           3985           3000          20750
 | `commands/workflow/transitions.rs` | 606 | 606 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 557 | 312 | 245 | 44.0% | ✅ |
+| `ddd.rs` | 676 | 396 | 280 | 41.4% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -196,8 +196,8 @@ SUM:                           139           3985           3000          20750
 | `.ddd/feat/20251113-ddd-artifact-management/SPEC.md` | 376 |
 | `.ddd/refactor/20251104-large-files.md` | 261 |
 | `.ddd/refactor/20251105-workflow-graph-grouping.md` | 104 |
-| `.ddd/refactor/20251106-gap-detection-test-coverage.md` | 210 |
-| `.ddd/refactor/20251106-multi-session-token-attribution.md` | 370 |
+| `.ddd/refactor/20251106-1-gap-detection-test-coverage.md` | 210 |
+| `.ddd/refactor/20251106-2-multi-session-token-attribution.md` | 370 |
 | `.ddd/refactor/20251110-test-extraction.md` | 193 |
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
@@ -259,7 +259,7 @@ SUM:                           139           3985           3000          20750
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.79 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.78 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

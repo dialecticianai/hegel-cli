@@ -80,14 +80,33 @@ fn create_refactor(name: &str) -> Result<()> {
     // Get today's date
     let today = Local::now().format("%Y%m%d").to_string();
 
-    // Build file name
-    let file_name = format!("{}-{}.md", today, name);
-    let file_path = PathBuf::from(".ddd/refactor").join(&file_name);
+    // Check if artifact with this name already exists today (any index or no index)
+    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
+        artifacts: Vec::new(),
+        issues: Vec::new(),
+    });
 
-    // Check for duplicates
-    if file_path.exists() {
-        bail!("Artifact already exists: {}", file_path.display());
+    for artifact in &scan_result.artifacts {
+        if let crate::ddd::DddArtifact::Refactor(refactor) = artifact {
+            if refactor.date == today && refactor.name == name {
+                bail!(
+                    "Artifact already exists: {}",
+                    refactor.file_path().display()
+                );
+            }
+        }
     }
+
+    // Check for existing refactor artifacts today to determine index
+    let index = determine_index_for_artifact(&today, "refactor")?;
+
+    // Build file name
+    let file_name = if let Some(idx) = index {
+        format!("{}-{}-{}.md", today, idx, name)
+    } else {
+        format!("{}-{}.md", today, name)
+    };
+    let file_path = PathBuf::from(".ddd/refactor").join(&file_name);
 
     // Output path (don't create file)
     println!("Write your document to: {}", file_path.display());
@@ -103,14 +122,30 @@ fn create_report(name: &str) -> Result<()> {
     // Get today's date
     let today = Local::now().format("%Y%m%d").to_string();
 
-    // Build file name
-    let file_name = format!("{}-{}.md", today, name);
-    let file_path = PathBuf::from(".ddd/report").join(&file_name);
+    // Check if artifact with this name already exists today (any index or no index)
+    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
+        artifacts: Vec::new(),
+        issues: Vec::new(),
+    });
 
-    // Check for duplicates
-    if file_path.exists() {
-        bail!("Artifact already exists: {}", file_path.display());
+    for artifact in &scan_result.artifacts {
+        if let crate::ddd::DddArtifact::Report(report) = artifact {
+            if report.date == today && report.name == name {
+                bail!("Artifact already exists: {}", report.file_path().display());
+            }
+        }
     }
+
+    // Check for existing report artifacts today to determine index
+    let index = determine_index_for_artifact(&today, "report")?;
+
+    // Build file name
+    let file_name = if let Some(idx) = index {
+        format!("{}-{}-{}.md", today, idx, name)
+    } else {
+        format!("{}-{}.md", today, name)
+    };
+    let file_path = PathBuf::from(".ddd/report").join(&file_name);
 
     // Output path (don't create file)
     println!("Write your document to: {}", file_path.display());
@@ -134,6 +169,36 @@ fn determine_index(date: &str) -> Result<Option<usize>> {
             if feat.date == date {
                 same_day_count += 1;
             }
+        }
+    }
+
+    // If there are already artifacts today, assign next index
+    if same_day_count > 0 {
+        Ok(Some(same_day_count + 1))
+    } else {
+        Ok(None)
+    }
+}
+
+/// Determine the index for a refactor or report artifact on a given date
+/// Returns None if this is the first artifact, Some(N) if there are existing artifacts
+fn determine_index_for_artifact(date: &str, artifact_type: &str) -> Result<Option<usize>> {
+    // Scan existing artifacts
+    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
+        artifacts: Vec::new(),
+        issues: Vec::new(),
+    });
+
+    // Count artifacts of this type with this date
+    let mut same_day_count = 0;
+    for artifact in &scan_result.artifacts {
+        let matches = match (artifact_type, artifact) {
+            ("refactor", crate::ddd::DddArtifact::Refactor(r)) => r.date == date,
+            ("report", crate::ddd::DddArtifact::Report(r)) => r.date == date,
+            _ => false,
+        };
+        if matches {
+            same_day_count += 1;
         }
     }
 

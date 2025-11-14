@@ -70,9 +70,47 @@ fn suggest_fix(issue: &ValidationIssue) -> Result<Option<(PathBuf, String)>> {
             file_name.replace('_', "-").to_string()
         }
         IssueType::MissingIndex => {
-            // For MissingIndex, this would need more complex logic
-            // to determine the correct index - skip for now
-            return Ok(None);
+            // Determine the index for this artifact
+            // Parse the file name to get date and name
+            use crate::ddd::parse_single_file_name;
+            let (date, _index, name) = parse_single_file_name(file_name)?;
+
+            // Scan existing artifacts to determine the correct index
+            use crate::ddd::parse_ddd_structure;
+            let scan_result = parse_ddd_structure()?;
+
+            // Count artifacts of the same type on this date that come before this one alphabetically
+            let artifact_type = if issue.path.to_string_lossy().contains("/refactor/") {
+                "refactor"
+            } else if issue.path.to_string_lossy().contains("/report/") {
+                "report"
+            } else {
+                return Ok(None);
+            };
+
+            let mut same_date_artifacts: Vec<String> = Vec::new();
+            for artifact in &scan_result.artifacts {
+                match (artifact_type, artifact) {
+                    ("refactor", crate::ddd::DddArtifact::Refactor(r)) if r.date == date => {
+                        same_date_artifacts.push(r.name.clone());
+                    }
+                    ("report", crate::ddd::DddArtifact::Report(r)) if r.date == date => {
+                        same_date_artifacts.push(r.name.clone());
+                    }
+                    _ => {}
+                }
+            }
+
+            // Sort alphabetically and find position
+            same_date_artifacts.sort();
+            let position = same_date_artifacts
+                .iter()
+                .position(|n| n == &name)
+                .unwrap_or(0);
+
+            // Index is position + 1
+            let index = position + 1;
+            format!("{}-{}-{}.md", date, index, name)
         }
     };
 

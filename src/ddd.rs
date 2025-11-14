@@ -46,17 +46,22 @@ impl FeatArtifact {
     }
 }
 
-/// Refactor artifact with date and name
+/// Refactor artifact with date, optional index, and name
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefactorArtifact {
     pub date: String,
+    pub index: Option<usize>,
     pub name: String,
 }
 
 impl RefactorArtifact {
     /// Generate file name with .md extension
     pub fn file_name(&self) -> String {
-        format!("{}-{}.md", self.date, self.name)
+        if let Some(idx) = self.index {
+            format!("{}-{}-{}.md", self.date, idx, self.name)
+        } else {
+            format!("{}-{}.md", self.date, self.name)
+        }
     }
 
     /// Generate full file path
@@ -67,17 +72,22 @@ impl RefactorArtifact {
     }
 }
 
-/// Report artifact with date and name
+/// Report artifact with date, optional index, and name
 #[derive(Debug, Clone, PartialEq)]
 pub struct ReportArtifact {
     pub date: String,
+    pub index: Option<usize>,
     pub name: String,
 }
 
 impl ReportArtifact {
     /// Generate file name with .md extension
     pub fn file_name(&self) -> String {
-        format!("{}-{}.md", self.date, self.name)
+        if let Some(idx) = self.index {
+            format!("{}-{}-{}.md", self.date, idx, self.name)
+        } else {
+            format!("{}-{}.md", self.date, self.name)
+        }
     }
 
     /// Generate full file path
@@ -117,13 +127,12 @@ pub struct DddScanResult {
     pub issues: Vec<ValidationIssue>,
 }
 
-/// Parse feat directory name (format: YYYYMMDD[-N]-name)
-pub fn parse_feat_name(name: &str) -> Result<(String, Option<usize>, String)> {
-    let parts: Vec<&str> = name.split('-').collect();
-
+/// Parse name with optional index (format: YYYYMMDD[-N]-name)
+/// Returns (date, index, name)
+fn parse_name_with_index(parts: &[&str]) -> Result<(String, Option<usize>, String)> {
     // Must have at least date and name
     if parts.len() < 2 {
-        return Err(anyhow!("Invalid feat name format: {}", name));
+        return Err(anyhow!("Invalid name format: need at least date and name"));
     }
 
     // First part must be date (8 digits)
@@ -146,26 +155,21 @@ pub fn parse_feat_name(name: &str) -> Result<(String, Option<usize>, String)> {
     Ok((date.to_string(), None, name))
 }
 
-/// Parse single file name (format: YYYYMMDD-name.md)
-pub fn parse_single_file_name(name: &str) -> Result<(String, String)> {
+/// Parse feat directory name (format: YYYYMMDD[-N]-name)
+pub fn parse_feat_name(name: &str) -> Result<(String, Option<usize>, String)> {
+    let parts: Vec<&str> = name.split('-').collect();
+    parse_name_with_index(&parts)
+}
+
+/// Parse single file name (format: YYYYMMDD[-N]-name.md)
+pub fn parse_single_file_name(name: &str) -> Result<(String, Option<usize>, String)> {
     // Remove .md extension
-    let name = name
+    let name_without_ext = name
         .strip_suffix(".md")
         .ok_or_else(|| anyhow!("File must have .md extension"))?;
 
-    let parts: Vec<&str> = name.split('-').collect();
-
-    if parts.len() < 2 {
-        return Err(anyhow!("Invalid file name format: {}", name));
-    }
-
-    let date = parts[0];
-    validate_date_format(date)?;
-
-    let name = parts[1..].join("-");
-    validate_name_format(&name)?;
-
-    Ok((date.to_string(), name))
+    let parts: Vec<&str> = name_without_ext.split('-').collect();
+    parse_name_with_index(&parts)
 }
 
 /// Validate date format (YYYYMMDD)
@@ -262,14 +266,21 @@ pub fn parse_ddd_structure_in(root_dir: Option<&std::path::Path>) -> Result<DddS
             let file_name = entry.file_name().to_string_lossy().to_string();
 
             match parse_single_file_name(&file_name) {
-                Ok((date, name)) => {
-                    artifacts.push(DddArtifact::Refactor(RefactorArtifact { date, name }));
+                Ok((date, index, name)) => {
+                    artifacts.push(DddArtifact::Refactor(RefactorArtifact {
+                        date,
+                        index,
+                        name,
+                    }));
                 }
                 Err(_) => {
                     issues.push(ValidationIssue {
                         path: entry.path(),
                         issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!("Rename {} to YYYYMMDD-name.md format", file_name),
+                        suggested_fix: format!(
+                            "Rename {} to YYYYMMDD[-N]-name.md format",
+                            file_name
+                        ),
                     });
                 }
             }
@@ -288,21 +299,94 @@ pub fn parse_ddd_structure_in(root_dir: Option<&std::path::Path>) -> Result<DddS
             let file_name = entry.file_name().to_string_lossy().to_string();
 
             match parse_single_file_name(&file_name) {
-                Ok((date, name)) => {
-                    artifacts.push(DddArtifact::Report(ReportArtifact { date, name }));
+                Ok((date, index, name)) => {
+                    artifacts.push(DddArtifact::Report(ReportArtifact { date, index, name }));
                 }
                 Err(_) => {
                     issues.push(ValidationIssue {
                         path: entry.path(),
                         issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!("Rename {} to YYYYMMDD-name.md format", file_name),
+                        suggested_fix: format!(
+                            "Rename {} to YYYYMMDD[-N]-name.md format",
+                            file_name
+                        ),
                     });
                 }
             }
         }
     }
 
+    // Detect missing indexes (multiple artifacts on same date without indexes)
+    detect_missing_indexes(&artifacts, &mut issues);
+
     Ok(DddScanResult { artifacts, issues })
+}
+
+/// Detect artifacts that need indexes (multiple artifacts on same date without indexes)
+fn detect_missing_indexes(artifacts: &[DddArtifact], issues: &mut Vec<ValidationIssue>) {
+    use std::collections::HashMap;
+
+    // Group refactor artifacts by date
+    let mut refactor_by_date: HashMap<String, Vec<&RefactorArtifact>> = HashMap::new();
+    for artifact in artifacts {
+        if let DddArtifact::Refactor(refactor) = artifact {
+            refactor_by_date
+                .entry(refactor.date.clone())
+                .or_default()
+                .push(refactor);
+        }
+    }
+
+    // Check for dates with multiple refactors but no indexes
+    for (date, refactors) in refactor_by_date {
+        if refactors.len() > 1 {
+            let has_any_index = refactors.iter().any(|r| r.index.is_some());
+            if !has_any_index {
+                // All refactors on this date need indexes
+                for refactor in refactors {
+                    issues.push(ValidationIssue {
+                        path: refactor.file_path(),
+                        issue_type: IssueType::MissingIndex,
+                        suggested_fix: format!(
+                            "Add index to disambiguate from other {} artifacts",
+                            date
+                        ),
+                    });
+                }
+            }
+        }
+    }
+
+    // Group report artifacts by date
+    let mut report_by_date: HashMap<String, Vec<&ReportArtifact>> = HashMap::new();
+    for artifact in artifacts {
+        if let DddArtifact::Report(report) = artifact {
+            report_by_date
+                .entry(report.date.clone())
+                .or_default()
+                .push(report);
+        }
+    }
+
+    // Check for dates with multiple reports but no indexes
+    for (date, reports) in report_by_date {
+        if reports.len() > 1 {
+            let has_any_index = reports.iter().any(|r| r.index.is_some());
+            if !has_any_index {
+                // All reports on this date need indexes
+                for report in reports {
+                    issues.push(ValidationIssue {
+                        path: report.file_path(),
+                        issue_type: IssueType::MissingIndex,
+                        suggested_fix: format!(
+                            "Add index to disambiguate from other {} artifacts",
+                            date
+                        ),
+                    });
+                }
+            }
+        }
+    }
 }
 
 /// Parse DDD artifacts from .ddd/ in current directory
@@ -357,9 +441,10 @@ mod tests {
     }
 
     #[test]
-    fn test_refactor_file_name() {
+    fn test_refactor_file_name_without_index() {
         let refactor = RefactorArtifact {
             date: "20251104".to_string(),
+            index: None,
             name: "large-files".to_string(),
         };
 
@@ -367,9 +452,21 @@ mod tests {
     }
 
     #[test]
+    fn test_refactor_file_name_with_index() {
+        let refactor = RefactorArtifact {
+            date: "20251104".to_string(),
+            index: Some(2),
+            name: "large-files".to_string(),
+        };
+
+        assert_eq!(refactor.file_name(), "20251104-2-large-files.md");
+    }
+
+    #[test]
     fn test_refactor_file_path() {
         let refactor = RefactorArtifact {
             date: "20251104".to_string(),
+            index: None,
             name: "large-files".to_string(),
         };
 
@@ -380,9 +477,10 @@ mod tests {
     }
 
     #[test]
-    fn test_report_file_name() {
+    fn test_report_file_name_without_index() {
         let report = ReportArtifact {
             date: "20251010".to_string(),
+            index: None,
             name: "tui-dep-review".to_string(),
         };
 
@@ -390,9 +488,21 @@ mod tests {
     }
 
     #[test]
+    fn test_report_file_name_with_index() {
+        let report = ReportArtifact {
+            date: "20251010".to_string(),
+            index: Some(1),
+            name: "tui-dep-review".to_string(),
+        };
+
+        assert_eq!(report.file_name(), "20251010-1-tui-dep-review.md");
+    }
+
+    #[test]
     fn test_report_file_path() {
         let report = ReportArtifact {
             date: "20251010".to_string(),
+            index: None,
             name: "tui-dep-review".to_string(),
         };
 
@@ -439,9 +549,18 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_single_file_valid() {
-        let (date, name) = parse_single_file_name("20251104-large-files.md").unwrap();
+    fn test_parse_single_file_without_index() {
+        let (date, index, name) = parse_single_file_name("20251104-large-files.md").unwrap();
         assert_eq!(date, "20251104");
+        assert_eq!(index, None);
+        assert_eq!(name, "large-files");
+    }
+
+    #[test]
+    fn test_parse_single_file_with_index() {
+        let (date, index, name) = parse_single_file_name("20251104-2-large-files.md").unwrap();
+        assert_eq!(date, "20251104");
+        assert_eq!(index, Some(2));
         assert_eq!(name, "large-files");
     }
 
