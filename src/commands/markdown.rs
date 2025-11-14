@@ -459,32 +459,55 @@ fn attach_ddd_metadata_recursive(
         }
     }
 
-    // Check if this is a feat directory and attach artifact file metadata
+    // Check if this is a feat/toy directory and attach artifact file metadata
     if !node.is_file {
         for artifact in artifacts {
-            if let DddArtifact::Feat(feat) = artifact {
-                let feat_dir_name = feat.dir_name();
-                // Match if the node name equals the feat directory name
-                if node.name == feat_dir_name {
-                    // Populate artifact_files from FeatArtifact::FILES spec
-                    use crate::ddd::FeatArtifact;
-                    node.artifact_files = FeatArtifact::FILES
-                        .iter()
-                        .map(|spec| {
-                            let exists = match spec.name {
-                                "SPEC.md" => feat.spec_exists,
-                                "PLAN.md" => feat.plan_exists,
-                                _ => false,
-                            };
-                            ArtifactFileMeta {
-                                name: spec.name.to_string(),
-                                exists,
-                                required: spec.required,
-                            }
-                        })
-                        .collect();
-                    break;
+            match artifact {
+                DddArtifact::Feat(feat) => {
+                    if node.name == feat.dir_name() {
+                        use crate::ddd::FeatArtifact;
+                        node.artifact_files = FeatArtifact::FILES
+                            .iter()
+                            .map(|spec| {
+                                let exists = match spec.name {
+                                    "SPEC.md" => feat.spec_exists,
+                                    "PLAN.md" => feat.plan_exists,
+                                    _ => false,
+                                };
+                                ArtifactFileMeta {
+                                    name: spec.name.to_string(),
+                                    exists,
+                                    required: spec.required,
+                                }
+                            })
+                            .collect();
+                        break;
+                    }
                 }
+                DddArtifact::Toy(toy) => {
+                    if node.name == toy.dir_name() {
+                        use crate::ddd::ToyArtifact;
+                        node.artifact_files = ToyArtifact::FILES
+                            .iter()
+                            .map(|spec| {
+                                let exists = match spec.name {
+                                    "SPEC.md" => toy.spec_exists,
+                                    "PLAN.md" => toy.plan_exists,
+                                    "LEARNINGS.md" => toy.learnings_exists,
+                                    "README.md" => toy.readme_exists,
+                                    _ => false,
+                                };
+                                ArtifactFileMeta {
+                                    name: spec.name.to_string(),
+                                    exists,
+                                    required: spec.required,
+                                }
+                            })
+                            .collect();
+                        break;
+                    }
+                }
+                _ => {}
             }
         }
     }

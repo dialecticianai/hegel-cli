@@ -96,12 +96,56 @@ impl ReportArtifact {
     }
 }
 
+/// Toy artifact with sequential number and name (format: toyN_name)
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToyArtifact {
+    pub number: usize,
+    pub name: String,
+    pub spec_exists: bool,
+    pub plan_exists: bool,
+    pub learnings_exists: bool,
+    pub readme_exists: bool,
+}
+
+impl ToyArtifact {
+    /// File specifications for toy artifacts
+    pub const FILES: &'static [ArtifactFileSpec] = &[
+        ArtifactFileSpec {
+            name: "SPEC.md",
+            required: true,
+        },
+        ArtifactFileSpec {
+            name: "PLAN.md",
+            required: true,
+        },
+        ArtifactFileSpec {
+            name: "LEARNINGS.md",
+            required: true,
+        },
+        ArtifactFileSpec {
+            name: "README.md",
+            required: false,
+        },
+    ];
+
+    /// Generate directory name (format: toyN_name)
+    pub fn dir_name(&self) -> String {
+        format!("toy{}_{}", self.number, self.name)
+    }
+
+    /// Generate full directory path
+    pub fn dir_path(&self) -> PathBuf {
+        PathBuf::from(".ddd").join("toys").join(self.dir_name())
+    }
+}
+
 /// DDD artifact enum wrapping all types
 #[derive(Debug, Clone, PartialEq)]
 pub enum DddArtifact {
     Feat(FeatArtifact),
     Refactor(RefactorArtifact),
     Report(ReportArtifact),
+    Toy(ToyArtifact),
 }
 
 /// Type of validation issue
@@ -172,6 +216,50 @@ pub fn parse_single_file_name(name: &str) -> Result<(String, Option<usize>, Stri
 
     let parts: Vec<&str> = name_without_ext.split('-').collect();
     parse_name_with_index(&parts)
+}
+
+/// Parse toy directory name (format: toyN_name, where name can have underscores)
+pub fn parse_toy_name(name: &str) -> Result<(usize, String)> {
+    // Must start with "toy"
+    if !name.starts_with("toy") {
+        return Err(anyhow!("Toy name must start with 'toy'"));
+    }
+
+    // Split on first underscore
+    let parts: Vec<&str> = name.splitn(2, '_').collect();
+    if parts.len() != 2 {
+        return Err(anyhow!("Invalid toy name format: {}", name));
+    }
+
+    // Parse number from "toyN" part
+    let number_str = &parts[0][3..]; // Skip "toy" prefix
+    let number = number_str
+        .parse::<usize>()
+        .map_err(|_| anyhow!("Invalid toy number: {}", number_str))?;
+
+    let toy_name = parts[1].to_string();
+
+    // Toy names can have underscores, so validate separately
+    if toy_name.is_empty() {
+        return Err(anyhow!("Toy name cannot be empty"));
+    }
+    if toy_name.starts_with('_') || toy_name.ends_with('_') {
+        return Err(anyhow!(
+            "Toy name cannot start or end with underscore: {}",
+            toy_name
+        ));
+    }
+    // Check that it only contains lowercase, digits, and underscores
+    for ch in toy_name.chars() {
+        if !ch.is_lowercase() && !ch.is_ascii_digit() && ch != '_' {
+            return Err(anyhow!(
+                "Toy name must be lowercase with underscores, got: {}",
+                toy_name
+            ));
+        }
+    }
+
+    Ok((number, toy_name))
 }
 
 /// Validate date format (YYYYMMDD)
@@ -314,6 +402,46 @@ pub fn parse_ddd_structure_in(root_dir: Option<&std::path::Path>) -> Result<DddS
                             "Rename {} to YYYYMMDD[-N]-name.md format",
                             file_name
                         ),
+                        target_name: None,
+                    });
+                }
+            }
+        }
+    }
+
+    // Parse toys/ directories
+    let toys_dir = root.join(".ddd/toys");
+    if toys_dir.exists() {
+        for entry in std::fs::read_dir(&toys_dir)? {
+            let entry = entry?;
+            if !entry.file_type()?.is_dir() {
+                continue;
+            }
+
+            let dir_name = entry.file_name().to_string_lossy().to_string();
+
+            match parse_toy_name(&dir_name) {
+                Ok((number, name)) => {
+                    let dir_path = entry.path();
+                    let spec_exists = dir_path.join("SPEC.md").exists();
+                    let plan_exists = dir_path.join("PLAN.md").exists();
+                    let learnings_exists = dir_path.join("LEARNINGS.md").exists();
+                    let readme_exists = dir_path.join("README.md").exists();
+
+                    artifacts.push(DddArtifact::Toy(ToyArtifact {
+                        number,
+                        name,
+                        spec_exists,
+                        plan_exists,
+                        learnings_exists,
+                        readme_exists,
+                    }));
+                }
+                Err(_) => {
+                    issues.push(ValidationIssue {
+                        path: entry.path(),
+                        issue_type: IssueType::InvalidFormat,
+                        suggested_fix: format!("Rename {} to toyN_name format", dir_name),
                         target_name: None,
                     });
                 }

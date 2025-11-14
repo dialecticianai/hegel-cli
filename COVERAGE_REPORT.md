@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-14 11:24
+**Last Updated**: 2025-11-14 11:28
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **74.79%** lines | **74.29%** regions | **76.43%** functions
+**Overall Coverage**: **74.24%** lines | **73.82%** regions | **76.08%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19596              5038    74.29%        1086               256    76.43%       12215              3079    74.79%           0                 0         -
+TOTAL                                         19719              5163    73.82%        1091               261    76.08%       12308              3170    74.24%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -47,10 +47,10 @@ TOTAL                                         19596              5038    74.29% 
 | `src/commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
 | `src/commands/ide.rs` | 62.50% | 58.33% | 50.00% | 🟠 Moderate |
 | `src/commands/init.rs` | 93.44% | 93.56% | 100.00% | 🟢 Excellent |
-| `src/commands/markdown.rs` | 32.03% | 30.32% | 43.18% | 🔴 Needs Work |
+| `src/commands/markdown.rs` | 30.63% | 29.03% | 42.22% | 🔴 Needs Work |
 | `src/commands/meta.rs` | 64.88% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/new.rs` | 73.81% | 80.65% | 68.42% | 🟡 Good |
-| `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
+| `src/commands/pm.rs` | 50.00% | 42.11% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 19.55% | 14.17% | 25.00% | 🔴 Needs Work |
 | `src/commands/review.rs` | 89.25% | 90.73% | 81.25% | 🟡 Good |
 | `src/commands/status.rs` | 44.83% | 37.42% | 50.00% | 🟠 Moderate |
@@ -60,7 +60,7 @@ TOTAL                                         19596              5038    74.29% 
 | `src/commands/workflow/transitions.rs` | 71.32% | 67.56% | 34.48% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 76.47% | 75.54% | 57.89% | 🟡 Good |
-| `src/ddd.rs` | 88.57% | 91.09% | 93.22% | 🟡 Good |
+| `src/ddd.rs` | 77.04% | 80.23% | 87.30% | 🟡 Good |
 | `src/doctor/migrations.rs` | 82.98% | 83.93% | 75.00% | 🟡 Good |
 | `src/doctor/rescue.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
 | `src/embedded.rs` | 82.79% | 75.56% | 50.00% | 🟡 Good |
@@ -167,7 +167,7 @@ TOTAL                                         19596              5038    74.29% 
 - `src/commands/workflow/transitions.rs` - 71.32%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/config.rs` - 76.47%
-- `src/ddd.rs` - 88.57%
+- `src/ddd.rs` - 77.04%
 - `src/doctor/migrations.rs` - 82.98%
 - `src/embedded.rs` - 82.79%
 - `src/engine/mod.rs` - 86.98%
@@ -185,7 +185,7 @@ TOTAL                                         19596              5038    74.29% 
 - `src/commands/fork/runtime.rs` - 44.20%
 - `src/commands/ide.rs` - 62.50%
 - `src/commands/meta.rs` - 64.88%
-- `src/commands/pm.rs` - 60.00%
+- `src/commands/pm.rs` - 50.00%
 - `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 60.51%
 - `src/main.rs` - 42.31%
@@ -202,7 +202,7 @@ TOTAL                                         19596              5038    74.29% 
 - `src/commands/doctor/fix_ddd.rs` - 4.47%
 - `src/commands/doctor/fix_state.rs` - 32.20%
 - `src/commands/external_bin.rs` - 33.98%
-- `src/commands/markdown.rs` - 32.03%
+- `src/commands/markdown.rs` - 30.63%
 - `src/commands/reflect.rs` - 19.55%
 - `src/doctor/rescue.rs` - 0.00%
 - `src/tui/mod.rs` - 11.36%
@@ -211,7 +211,7 @@ TOTAL                                         19596              5038    74.29% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 74.79% | ⏳ In Progress |
+| Overall | ≥80% | 74.24% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
