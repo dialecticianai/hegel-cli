@@ -133,8 +133,10 @@ fn test_clear_then_load_returns_empty_state() {
 // ========== State Directory Resolution Tests ==========
 
 #[test]
+#[serial_test::serial]
 fn test_resolve_state_dir_default() {
-    // When no CLI flag or env var, should find .hegel by walking up from cwd
+    // When no CLI flag or env var, should find .hegel by walking up from cwd.
+    // Serial: shares the global HEGEL_STATE_DIR env var with the tests below.
     let resolved = FileStorage::resolve_state_dir(None).unwrap();
     // Should find the project's .hegel directory
     assert!(resolved.exists());

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 16:15
+**Last Updated**: 2026-05-26 16:22
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,439 | 16,258 | 36,697 |
-| **Comments** | 3,027 | - | 3,027 |
+| **Lines** | 20,440 | 16,258 | 36,698 |
+| **Comments** | 3,028 | - | 3,028 |
 | **Blank Lines** | 3,845 | - | 3,845 |
-| **Total Lines** | 27,311 | 16,258 | 43,569 |
+| **Total Lines** | 27,313 | 16,258 | 43,571 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3845           3027          20439
+Rust                           123           3845           3028          20440
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4002           3027          20941
+SUM:                           139           4002           3028          20942
 -------------------------------------------------------------------------------
 ```
 
@@ -141,7 +141,7 @@ SUM:                           139           4002           3027          20941
 | `storage/mod.rs` | 710 | 694 | 16 | 2.3% | ✅ (infra) |
 | `storage/reviews.rs` | 288 | 141 | 147 | 51.0% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
-| `storage/tests/storage.rs` | 617 | 617 | 0 | 0.0% | ⚠️ Large |
+| `storage/tests/storage.rs` | 619 | 619 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
