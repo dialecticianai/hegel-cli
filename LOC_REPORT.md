@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 15:53
+**Last Updated**: 2026-05-26 15:55
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,504 | 16,258 | 36,762 |
-| **Comments** | 3,023 | - | 3,023 |
-| **Blank Lines** | 3,848 | - | 3,848 |
-| **Total Lines** | 27,375 | 16,258 | 43,633 |
+| **Lines** | 20,514 | 16,258 | 36,772 |
+| **Comments** | 3,029 | - | 3,029 |
+| **Blank Lines** | 3,846 | - | 3,846 |
+| **Total Lines** | 27,389 | 16,258 | 43,647 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3848           3023          20504
+Rust                           123           3846           3029          20514
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4005           3023          21006
+SUM:                           139           4003           3029          21016
 -------------------------------------------------------------------------------
 ```
 
@@ -122,7 +122,7 @@ SUM:                           139           4005           3023          21006
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ |
 | `metrics/mod.rs` | 361 | 356 | 5 | 1.4% | ✅ |
-| `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
+| `metrics/states.rs` | 128 | 24 | 104 | 81.2% | ✅ |
 | `metrics/tests/git.rs` | 337 | 337 | 0 | 0.0% | ✅ |
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
 | `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ⚠️ Large |
@@ -138,7 +138,7 @@ SUM:                           139           4005           3023          21006
 | `storage/archive/mod.rs` | 381 | 193 | 188 | 49.3% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `storage/mod.rs` | 687 | 671 | 16 | 2.3% | ✅ (infra) |
+| `storage/mod.rs` | 710 | 694 | 16 | 2.3% | ✅ (infra) |
 | `storage/reviews.rs` | 288 | 141 | 147 | 51.0% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `storage/tests/storage.rs` | 617 | 617 | 0 | 0.0% | ⚠️ Large |

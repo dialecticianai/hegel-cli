@@ -19,16 +19,7 @@ pub fn parse_states_file<P: AsRef<Path>>(states_path: P) -> Result<Vec<StateTran
     let content = fs::read_to_string(states_path.as_ref())
         .with_context(|| format!("Failed to read states file: {:?}", states_path.as_ref()))?;
 
-    let mut transitions = Vec::new();
-
-    for (line_num, line) in content.lines().enumerate() {
-        let event: StateTransitionEvent = serde_json::from_str(line).with_context(|| {
-            format!("Failed to parse state transition at line {}", line_num + 1)
-        })?;
-        transitions.push(event);
-    }
-
-    Ok(transitions)
+    crate::storage::parse_jsonl(&content, false, "state transition")
 }
 
 #[cfg(test)]

@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 15:53
+**Last Updated**: 2026-05-26 15:55
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **74.55%** lines | **73.99%** regions | **76.22%** functions
+**Overall Coverage**: **74.54%** lines | **73.98%** regions | **76.20%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19509              5074    73.99%        1085               258    76.22%       12179              3100    74.55%           0                 0         -
+TOTAL                                         19509              5076    73.98%        1084               258    76.20%       12183              3102    74.54%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -87,7 +87,7 @@ TOTAL                                         19509              5074    73.99% 
 | `src/storage/archive/mod.rs` | 90.34% | 91.46% | 75.00% | 🟢 Excellent |
 | `src/storage/archive/validation.rs` | 94.44% | 94.12% | 100.00% | 🟢 Excellent |
 | `src/storage/log_cleanup.rs` | 75.00% | 73.08% | 33.33% | 🟡 Good |
-| `src/storage/mod.rs` | 80.81% | 75.84% | 58.46% | 🟡 Good |
+| `src/storage/mod.rs` | 80.88% | 76.21% | 58.46% | 🟡 Good |
 | `src/storage/reviews.rs` | 96.08% | 96.27% | 92.31% | 🟢 Excellent |
 | `src/test_helpers/archive.rs` | 94.12% | 92.31% | 85.71% | 🟢 Excellent |
 | `src/test_helpers/fixtures.rs` | 80.00% | 77.78% | 33.33% | 🟡 Good |
@@ -173,7 +173,7 @@ TOTAL                                         19509              5074    73.99% 
 - `src/engine/mod.rs` - 86.98%
 - `src/metrics/aggregation.rs` - 77.88%
 - `src/storage/log_cleanup.rs` - 75.00%
-- `src/storage/mod.rs` - 80.81%
+- `src/storage/mod.rs` - 80.88%
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 87.29%
 - `src/theme.rs` - 85.71%
@@ -211,7 +211,7 @@ TOTAL                                         19509              5074    73.99% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 74.55% | ⏳ In Progress |
+| Overall | ≥80% | 74.54% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

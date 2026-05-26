@@ -4,11 +4,40 @@ pub mod reviews;
 
 use anyhow::{Context, Result};
 use fs2::FileExt;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+
+/// Parse JSONL content into a `Vec<T>`, skipping blank lines.
+///
+/// Read-side counterpart to [`FileStorage::append_jsonl`]. `what` names the
+/// record type for error messages (e.g. "state transition"). When
+/// `skip_errors` is true, malformed lines are silently skipped; otherwise the
+/// first malformed line aborts with a line-numbered error.
+pub fn parse_jsonl<T: DeserializeOwned>(
+    content: &str,
+    skip_errors: bool,
+    what: &str,
+) -> Result<Vec<T>> {
+    let mut records = Vec::new();
+    for (line_num, line) in content.lines().enumerate() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        match serde_json::from_str::<T>(line) {
+            Ok(record) => records.push(record),
+            Err(_) if skip_errors => {}
+            Err(e) => {
+                return Err(e)
+                    .with_context(|| format!("Failed to parse {} at line {}", what, line_num + 1));
+            }
+        }
+    }
+    Ok(records)
+}
 
 /// Session metadata structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -433,13 +462,7 @@ impl FileStorage {
         }
 
         let content = fs::read_to_string(&log_path)?;
-        let entries: Vec<CommandLogEntry> = content
-            .lines()
-            .filter(|line| !line.is_empty())
-            .map(|line| serde_json::from_str(line))
-            .collect::<Result<Vec<_>, _>>()?;
-
-        Ok(entries)
+        parse_jsonl(&content, false, "command log entry")
     }
 
     /// Save current workflow state as a stash
