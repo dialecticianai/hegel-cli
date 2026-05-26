@@ -77,6 +77,18 @@ pub struct Node {
     pub rules: Vec<crate::rules::RuleConfig>,
 }
 
+impl Node {
+    /// The prompt to render: the handlebars prompt if present, otherwise the
+    /// plain prompt. Validation guarantees a node never has both.
+    pub fn prompt_text(&self) -> &str {
+        if !self.prompt_hbs.is_empty() {
+            &self.prompt_hbs
+        } else {
+            &self.prompt
+        }
+    }
+}
+
 /// Complete workflow definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Workflow {
@@ -296,20 +308,10 @@ pub fn get_next_prompt(
             // Interrupt REPLACES normal prompt
             generate_interrupt_prompt(&violation)
         } else {
-            // Select prompt based on which field is present
-            if !next_node_obj.prompt_hbs.is_empty() {
-                next_node_obj.prompt_hbs.clone()
-            } else {
-                next_node_obj.prompt.clone()
-            }
+            next_node_obj.prompt_text().to_string()
         }
     } else {
-        // Select prompt based on which field is present
-        if !next_node_obj.prompt_hbs.is_empty() {
-            next_node_obj.prompt_hbs.clone()
-        } else {
-            next_node_obj.prompt.clone()
-        }
+        next_node_obj.prompt_text().to_string()
     };
 
     Ok((prompt, new_state))

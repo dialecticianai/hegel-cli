@@ -557,12 +557,7 @@ pub fn execute_transition(
                 .get(&to_node)
                 .with_context(|| format!("Node not found: {}", to_node))?;
 
-            // Select prompt based on which field is present
-            let prompt_text = if !node.prompt_hbs.is_empty() {
-                &node.prompt_hbs
-            } else {
-                &node.prompt
-            };
+            let prompt_text = node.prompt_text();
 
             display_workflow_prompt(
                 &to_node,

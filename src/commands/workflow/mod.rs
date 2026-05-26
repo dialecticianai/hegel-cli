@@ -267,11 +267,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
     println!();
 
     // Check if node has a prompt
-    let prompt_text = if !node.prompt_hbs.is_empty() {
-        &node.prompt_hbs
-    } else {
-        &node.prompt
-    };
+    let prompt_text = node.prompt_text();
 
     if prompt_text.is_empty() {
         println!("{}", Theme::secondary("(No prompt at this node)"));
@@ -366,11 +362,7 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
     println!();
 
     // Select prompt based on which field is present
-    let prompt_text = if !node.prompt_hbs.is_empty() {
-        &node.prompt_hbs
-    } else {
-        &node.prompt
-    };
+    let prompt_text = node.prompt_text();
 
     display_workflow_prompt(
         &to_node,
@@ -506,11 +498,7 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
         .get(&stash.workflow.current_node)
         .with_context(|| format!("Node not found: {}", stash.workflow.current_node))?;
 
-    let prompt_text = if !node.prompt_hbs.is_empty() {
-        &node.prompt_hbs
-    } else {
-        &node.prompt
-    };
+    let prompt_text = node.prompt_text();
 
     display_workflow_prompt(
         &stash.workflow.current_node,
