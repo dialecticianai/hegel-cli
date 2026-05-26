@@ -187,108 +187,20 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
 
     repaired_count += total_removed;
 
-    // Write debug log to file
-    use std::io::Write;
-    let mut debug_file = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("/tmp/hegel_repair_debug.log")?;
-
-    writeln!(
-        debug_file,
-        "\n=== REPAIR DEBUG SESSION {} ===",
-        chrono::Utc::now()
-    )?;
-    writeln!(debug_file, "DEBUG REPAIR: About to run gap detection")?;
-    writeln!(
-        debug_file,
-        "DEBUG REPAIR: archives.len() = {}",
-        archives.len()
-    )?;
-    writeln!(
-        debug_file,
-        "DEBUG REPAIR: total_removed = {}",
-        total_removed
-    )?;
-    writeln!(debug_file, "DEBUG REPAIR: dry_run = {}", dry_run)?;
-
-    // Print archive timeline
-    writeln!(debug_file, "DEBUG REPAIR: Archive timeline:")?;
-    for (i, archive) in archives.iter().enumerate() {
-        writeln!(
-            debug_file,
-            "  [{}] {} - mode={} synthetic={}",
-            i, archive.workflow_id, archive.mode, archive.is_synthetic
-        )?;
-    }
-
-    eprintln!("DEBUG REPAIR: About to run gap detection");
-    eprintln!("DEBUG REPAIR: archives.len() = {}", archives.len());
-    eprintln!("DEBUG REPAIR: total_removed = {}", total_removed);
-    eprintln!("DEBUG REPAIR: dry_run = {}", dry_run);
-
-    // Print archive timeline
-    eprintln!("DEBUG REPAIR: Archive timeline:");
-    for (i, archive) in archives.iter().enumerate() {
-        eprintln!(
-            "  [{}] {} - mode={} synthetic={}",
-            i, archive.workflow_id, archive.mode, archive.is_synthetic
-        );
-    }
-
     // Ensure exactly one cowboy per gap between non-synthetic workflows
     // Pass the in-memory archives which include repairs (even in dry-run mode)
     let (cowboys_created, _cowboys_removed) =
         super::gap_detection::ensure_cowboy_coverage(state_dir, &archives, None, dry_run)?;
     let synthetic_count = cowboys_created;
 
-    writeln!(
-        debug_file,
-        "DEBUG REPAIR: Gap detection returned synthetic_count = {}",
-        synthetic_count
-    )?;
-    eprintln!(
-        "DEBUG REPAIR: Gap detection returned synthetic_count = {}",
-        synthetic_count
-    );
-
     // NOW delete duplicate cowboy files and remove from archives vec (after gap detection)
     if !dry_run && total_removed > 0 {
-        writeln!(debug_file, "DEBUG REPAIR: Entering deletion phase")?;
-        eprintln!("DEBUG REPAIR: Entering deletion phase");
         for cleanup in &mut cleanups {
-            writeln!(
-                debug_file,
-                "DEBUG REPAIR: Calling post_process AGAIN for cleanup: {}",
-                cleanup.name()
-            )?;
-            eprintln!(
-                "DEBUG REPAIR: Calling post_process AGAIN for cleanup: {}",
-                cleanup.name()
-            );
             let to_remove = cleanup.post_process(&mut archives, state_dir, true)?; // Get indices again
-            writeln!(
-                debug_file,
-                "DEBUG REPAIR: Second post_process returned {} indices",
-                to_remove.len()
-            )?;
-            eprintln!(
-                "DEBUG REPAIR: Second post_process returned {} indices",
-                to_remove.len()
-            );
 
             // Delete files
             for &index in &to_remove {
                 let archive = &archives[index];
-                writeln!(
-                    debug_file,
-                    "DEBUG REPAIR: Deleting file for archive[{}]: {}",
-                    index, archive.workflow_id
-                )?;
-                eprintln!(
-                    "DEBUG REPAIR: Deleting file for archive[{}]: {}",
-                    index, archive.workflow_id
-                );
                 let archive_path = state_dir
                     .join("archive")
                     .join(format!("{}.json", archive.workflow_id));
@@ -299,24 +211,9 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
 
             // Remove from archives vec (in reverse to maintain indices)
             for &index in to_remove.iter().rev() {
-                writeln!(
-                    debug_file,
-                    "DEBUG REPAIR: Removing archive[{}] from vec",
-                    index
-                )?;
-                eprintln!("DEBUG REPAIR: Removing archive[{}] from vec", index);
                 archives.remove(index);
             }
         }
-        writeln!(
-            debug_file,
-            "DEBUG REPAIR: After deletion, archives.len() = {}",
-            archives.len()
-        )?;
-        eprintln!(
-            "DEBUG REPAIR: After deletion, archives.len() = {}",
-            archives.len()
-        );
     }
 
     // Output results

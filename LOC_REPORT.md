@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 15:55
+**Last Updated**: 2026-05-26 16:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,514 | 16,258 | 36,772 |
-| **Comments** | 3,029 | - | 3,029 |
-| **Blank Lines** | 3,846 | - | 3,846 |
-| **Total Lines** | 27,389 | 16,258 | 43,647 |
+| **Lines** | 20,420 | 16,258 | 36,678 |
+| **Comments** | 3,026 | - | 3,026 |
+| **Blank Lines** | 3,840 | - | 3,840 |
+| **Total Lines** | 27,286 | 16,258 | 43,544 |
 | **Files** | 123 | 84 | 207 |
 
-**Documentation Ratio**: 0.79 lines of docs per line of code
+**Documentation Ratio**: 0.80 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3846           3029          20514
+Rust                           123           3840           3026          20420
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4003           3029          21016
+SUM:                           139           3997           3026          20922
 -------------------------------------------------------------------------------
 ```
 
@@ -47,7 +47,7 @@ SUM:                           139           4003           3029          21016
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
 | `analyze/gap_detection.rs` | 365 | 365 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 8 | 6 | 2 | 25.0% | ✅ |
-| `analyze/repair.rs` | 362 | 362 | 0 | 0.0% | ✅ |
+| `analyze/repair.rs` | 259 | 259 | 0 | 0.0% | ✅ |
 | `analyze/sections.rs` | 370 | 370 | 0 | 0.0% | ✅ |
 | `analyze/tests/gap_detection.rs` | 346 | 346 | 0 | 0.0% | ✅ |
 | `analyze/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
@@ -260,7 +260,7 @@ SUM:                           139           4003           3029          21016
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.79 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.80 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
