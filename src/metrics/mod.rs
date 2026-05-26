@@ -254,13 +254,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 start_time: phase_archive.start_time.clone(),
                 end_time: phase_archive.end_time.clone(),
                 duration_seconds: phase_archive.duration_seconds,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: phase_archive.tokens.input,
-                    total_output_tokens: phase_archive.tokens.output,
-                    total_cache_creation_tokens: phase_archive.tokens.cache_creation,
-                    total_cache_read_tokens: phase_archive.tokens.cache_read,
-                    assistant_turns: phase_archive.tokens.assistant_turns,
-                },
+                token_metrics: TokenMetrics::from(&phase_archive.tokens),
                 bash_commands: vec![], // Archived as summaries, not individual commands
                 file_modifications: vec![], // Archived as summaries, not individual modifications
                 git_commits: phase_archive.git_commits.clone(),
@@ -324,11 +318,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
         }
 
         // Aggregate tokens from archive totals
-        unified.token_metrics.total_input_tokens += archive.totals.tokens.input;
-        unified.token_metrics.total_output_tokens += archive.totals.tokens.output;
-        unified.token_metrics.total_cache_creation_tokens += archive.totals.tokens.cache_creation;
-        unified.token_metrics.total_cache_read_tokens += archive.totals.tokens.cache_read;
-        unified.token_metrics.assistant_turns += archive.totals.tokens.assistant_turns;
+        unified.token_metrics += &TokenMetrics::from(&archive.totals.tokens);
     }
 
     // Add live phases

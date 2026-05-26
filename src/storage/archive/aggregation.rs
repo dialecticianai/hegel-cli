@@ -65,11 +65,7 @@ pub fn compute_totals(
 
     // Sum tokens across phases
     for phase in phases {
-        totals.tokens.input += phase.tokens.input;
-        totals.tokens.output += phase.tokens.output;
-        totals.tokens.cache_creation += phase.tokens.cache_creation;
-        totals.tokens.cache_read += phase.tokens.cache_read;
-        totals.tokens.assistant_turns += phase.tokens.assistant_turns;
+        totals.tokens += &phase.tokens;
     }
 
     // Count bash commands and files

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 15:51
+**Last Updated**: 2026-05-26 15:53
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,497 | 16,258 | 36,755 |
+| **Lines** | 20,504 | 16,258 | 36,762 |
 | **Comments** | 3,023 | - | 3,023 |
-| **Blank Lines** | 3,845 | - | 3,845 |
-| **Total Lines** | 27,365 | 16,258 | 43,623 |
+| **Blank Lines** | 3,848 | - | 3,848 |
+| **Total Lines** | 27,375 | 16,258 | 43,633 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3845           3023          20497
+Rust                           123           3848           3023          20504
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4002           3023          20999
+SUM:                           139           4005           3023          21006
 -------------------------------------------------------------------------------
 ```
 
@@ -51,7 +51,7 @@ SUM:                           139           4002           3023          20999
 | `analyze/sections.rs` | 370 | 370 | 0 | 0.0% | ✅ |
 | `analyze/tests/gap_detection.rs` | 346 | 346 | 0 | 0.0% | ✅ |
 | `analyze/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
-| `analyze/totals.rs` | 32 | 32 | 0 | 0.0% | ✅ |
+| `analyze/totals.rs` | 23 | 23 | 0 | 0.0% | ✅ |
 | `commands/analyze/mod.rs` | 363 | 111 | 252 | 69.4% | ✅ |
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
@@ -121,7 +121,7 @@ SUM:                           139           4002           3023          20999
 | `metrics/git.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ |
-| `metrics/mod.rs` | 371 | 366 | 5 | 1.3% | ✅ |
+| `metrics/mod.rs` | 361 | 356 | 5 | 1.4% | ✅ |
 | `metrics/states.rs` | 137 | 33 | 104 | 75.9% | ✅ |
 | `metrics/tests/git.rs` | 337 | 337 | 0 | 0.0% | ✅ |
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
@@ -133,9 +133,9 @@ SUM:                           139           4002           3023          20999
 | `rules/tests/evaluator.rs` | 919 | 919 | 0 | 0.0% | ⚠️ Large |
 | `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 375 | 88 | 287 | 76.5% | ✅ |
-| `storage/archive/aggregation.rs` | 98 | 98 | 0 | 0.0% | ✅ |
+| `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 348 | 160 | 188 | 54.0% | ✅ |
+| `storage/archive/mod.rs` | 381 | 193 | 188 | 49.3% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 687 | 671 | 16 | 2.3% | ✅ (infra) |

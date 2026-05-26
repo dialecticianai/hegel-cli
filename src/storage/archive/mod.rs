@@ -88,6 +88,39 @@ pub struct WorkflowTotals {
     pub git_commits: usize,
 }
 
+impl std::ops::AddAssign<&TokenTotals> for TokenTotals {
+    fn add_assign(&mut self, other: &TokenTotals) {
+        self.input += other.input;
+        self.output += other.output;
+        self.cache_creation += other.cache_creation;
+        self.cache_read += other.cache_read;
+        self.assistant_turns += other.assistant_turns;
+    }
+}
+
+impl std::ops::AddAssign<&WorkflowTotals> for WorkflowTotals {
+    fn add_assign(&mut self, other: &WorkflowTotals) {
+        self.tokens += &other.tokens;
+        self.bash_commands += other.bash_commands;
+        self.file_modifications += other.file_modifications;
+        self.unique_files += other.unique_files;
+        self.unique_commands += other.unique_commands;
+        self.git_commits += other.git_commits;
+    }
+}
+
+impl From<&TokenTotals> for crate::metrics::TokenMetrics {
+    fn from(t: &TokenTotals) -> Self {
+        crate::metrics::TokenMetrics {
+            total_input_tokens: t.input,
+            total_output_tokens: t.output,
+            total_cache_creation_tokens: t.cache_creation,
+            total_cache_read_tokens: t.cache_read,
+            assistant_turns: t.assistant_turns,
+        }
+    }
+}
+
 /// Write archive to disk with atomic operation
 pub fn write_archive(archive: &WorkflowArchive, state_dir: &Path) -> Result<()> {
     let archive_dir = state_dir.join("archive");
