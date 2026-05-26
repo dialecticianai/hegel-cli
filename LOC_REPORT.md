@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 18:53
+**Last Updated**: 2026-05-26 19:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,263 | 16,300 | 36,563 |
-| **Comments** | 3,007 | - | 3,007 |
-| **Blank Lines** | 3,817 | - | 3,817 |
-| **Total Lines** | 27,087 | 16,300 | 43,387 |
-| **Files** | 128 | 85 | 213 |
+| **Lines** | 20,284 | 16,310 | 36,594 |
+| **Comments** | 3,013 | - | 3,013 |
+| **Blank Lines** | 3,822 | - | 3,822 |
+| **Total Lines** | 27,119 | 16,310 | 43,429 |
+| **Files** | 133 | 85 | 218 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           128           3817           3007          20263
+Rust                           133           3822           3013          20284
 Markdown                        17            164              0            521
 -------------------------------------------------------------------------------
-SUM:                           145           3981           3007          20784
+SUM:                           150           3986           3013          20805
 -------------------------------------------------------------------------------
 ```
 
@@ -100,7 +100,12 @@ SUM:                           145           3981           3007          20784
 | `commands/workflow/transitions.rs` | 602 | 602 | 0 | 0.0% | ✅ (infra) |
 | `commands/wrapped.rs` | 129 | 68 | 61 | 47.3% | ✅ |
 | `config.rs` | 188 | 139 | 49 | 26.1% | ✅ |
-| `ddd.rs` | 842 | 562 | 280 | 33.3% | ⚠️ Large |
+| `ddd/index.rs` | 129 | 129 | 0 | 0.0% | ✅ |
+| `ddd/mod.rs` | 28 | 28 | 0 | 0.0% | ✅ |
+| `ddd/parse.rs` | 125 | 125 | 0 | 0.0% | ✅ |
+| `ddd/scan.rs` | 144 | 144 | 0 | 0.0% | ✅ |
+| `ddd/tests.rs` | 279 | 279 | 0 | 0.0% | ✅ |
+| `ddd/types.rs` | 169 | 169 | 0 | 0.0% | ✅ |
 | `doctor/migrations.rs` | 129 | 129 | 0 | 0.0% | ✅ |
 | `doctor/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
@@ -166,7 +171,7 @@ SUM:                           145           3981           3007          20784
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
-**⚠️ Warning:** 7 file(s) over 400 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 6 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
@@ -208,7 +213,7 @@ SUM:                           145           3981           3007          20784
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 248 |
+| `COVERAGE_REPORT.md` | 258 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
