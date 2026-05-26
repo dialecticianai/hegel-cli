@@ -15,6 +15,12 @@ use std::collections::HashMap;
 /// - conversation_id, generation_id, hook_event_name, workspace_roots
 pub struct CursorAdapter;
 
+impl Default for CursorAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CursorAdapter {
     pub fn new() -> Self {
         Self

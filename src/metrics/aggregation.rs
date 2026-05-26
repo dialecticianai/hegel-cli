@@ -40,9 +40,9 @@ pub fn build_phase_metrics(
             .bash_commands
             .iter()
             .filter(|cmd| {
-                cmd.timestamp.as_ref().map_or(false, |ts| {
-                    is_in_range(ts, &start_time, end_time.as_deref())
-                })
+                cmd.timestamp
+                    .as_ref()
+                    .is_some_and(|ts| is_in_range(ts, &start_time, end_time.as_deref()))
             })
             .cloned()
             .collect();
@@ -51,9 +51,10 @@ pub fn build_phase_metrics(
             .file_modifications
             .iter()
             .filter(|file_mod| {
-                file_mod.timestamp.as_ref().map_or(false, |ts| {
-                    is_in_range(ts, &start_time, end_time.as_deref())
-                })
+                file_mod
+                    .timestamp
+                    .as_ref()
+                    .is_some_and(|ts| is_in_range(ts, &start_time, end_time.as_deref()))
             })
             .cloned()
             .collect();
@@ -118,8 +119,8 @@ fn is_in_range(timestamp: &str, start: &str, end: Option<&str>) -> bool {
         chrono::DateTime::parse_from_rfc3339(start),
     ) {
         let after_start = ts >= start_ts;
-        let before_end = end.map_or(true, |e| {
-            chrono::DateTime::parse_from_rfc3339(e).map_or(false, |end_ts| ts < end_ts)
+        let before_end = end.is_none_or(|e| {
+            chrono::DateTime::parse_from_rfc3339(e).is_ok_and(|end_ts| ts < end_ts)
         });
         after_start && before_end
     } else {
@@ -146,9 +147,9 @@ pub fn aggregate_tokens_for_range(
     let mut total_matched = 0;
 
     // Debug: Check if we should output for this time range
-    let should_debug = debug_config.map_or(false, |cfg| cfg.overlaps(start_time, end_time));
+    let should_debug = debug_config.is_some_and(|cfg| cfg.overlaps(start_time, end_time));
 
-    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
+    if should_debug && !debug_config.is_some_and(|cfg| cfg.json_output) {
         eprintln!(
             "\n[DEBUG] Scanning {} transcript files for range {} to {}",
             transcript_files.len(),
@@ -159,7 +160,7 @@ pub fn aggregate_tokens_for_range(
 
     // Stream each transcript file
     for transcript_path in transcript_files {
-        if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+        if should_debug && debug_config.is_some_and(|cfg| cfg.verbose) {
             eprintln!("  Scanning file: {}", transcript_path.display());
         }
 
@@ -210,7 +211,7 @@ pub fn aggregate_tokens_for_range(
             }
         }
 
-        if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
+        if should_debug && debug_config.is_some_and(|cfg| cfg.verbose) {
             eprintln!("    Examined: {}, Matched: {}", file_examined, file_matched);
         }
 
@@ -218,7 +219,7 @@ pub fn aggregate_tokens_for_range(
         total_matched += file_matched;
     }
 
-    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
+    if should_debug && !debug_config.is_some_and(|cfg| cfg.json_output) {
         let total_tokens = total_metrics.total_input_tokens + total_metrics.total_output_tokens;
         eprintln!(
             "  Total: examined {} events across {} files, matched {}, attributed {} tokens",

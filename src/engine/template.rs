@@ -123,8 +123,7 @@ fn expand_guides(text: &str, guides_dir: &Path) -> Result<String> {
         }
 
         // Skip if it matches valid guide pattern (will be processed below)
-        if name.chars().next().map_or(false, |c| c.is_uppercase()) || name.starts_with("templates/")
-        {
+        if name.chars().next().is_some_and(|c| c.is_uppercase()) || name.starts_with("templates/") {
             continue;
         }
 

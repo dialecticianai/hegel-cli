@@ -170,7 +170,7 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
         let path = entry.path();
 
         // Only process .json files
-        if path.extension().map_or(false, |e| e == "json") {
+        if path.extension().is_some_and(|e| e == "json") {
             match fs::read_to_string(&path) {
                 Ok(content) => match serde_json::from_str::<WorkflowArchive>(&content) {
                     Ok(archive) => archives.push(archive),

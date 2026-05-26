@@ -28,7 +28,7 @@ use crate::storage::archive::{write_archive, WorkflowArchive};
 ///
 /// # Arguments
 /// * `git_commits` - Optional git commits to use. If `None`, reads from filesystem (production).
-///                   If `Some`, uses provided commits (testing).
+///   If `Some`, uses provided commits (testing).
 pub fn ensure_cowboy_coverage(
     state_dir: &Path,
     archives: &[WorkflowArchive],

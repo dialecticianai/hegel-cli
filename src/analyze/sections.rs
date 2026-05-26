@@ -27,18 +27,18 @@ pub fn render_brief(metrics: &UnifiedMetrics) {
     if metrics.token_metrics.assistant_turns > 0 {
         println!(
             "  Tokens: {} in, {} out ({} cache)",
-            Theme::highlight(&metrics.token_metrics.total_input_tokens.to_string()),
-            Theme::highlight(&metrics.token_metrics.total_output_tokens.to_string()),
-            Theme::secondary(&metrics.token_metrics.total_cache_read_tokens.to_string())
+            Theme::highlight(metrics.token_metrics.total_input_tokens.to_string()),
+            Theme::highlight(metrics.token_metrics.total_output_tokens.to_string()),
+            Theme::secondary(metrics.token_metrics.total_cache_read_tokens.to_string())
         );
     }
 
     // Activity
     println!(
         "  Activity: {} commands, {} files, {} commits",
-        Theme::highlight(&metrics.hook_metrics.bash_commands.len().to_string()),
-        Theme::highlight(&metrics.hook_metrics.file_modifications.len().to_string()),
-        Theme::highlight(&metrics.git_commits.len().to_string())
+        Theme::highlight(metrics.hook_metrics.bash_commands.len().to_string()),
+        Theme::highlight(metrics.hook_metrics.file_modifications.len().to_string()),
+        Theme::highlight(metrics.git_commits.len().to_string())
     );
 
     // Workflows
@@ -46,8 +46,8 @@ pub fn render_brief(metrics: &UnifiedMetrics) {
     let phase_count = metrics.phase_metrics.len();
     println!(
         "  Workflows: {} transitions, {} phases",
-        Theme::highlight(&transition_count.to_string()),
-        Theme::highlight(&phase_count.to_string())
+        Theme::highlight(transition_count.to_string()),
+        Theme::highlight(phase_count.to_string())
     );
 
     println!();

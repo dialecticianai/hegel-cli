@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 16:04
+**Last Updated**: 2026-05-26 16:15
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,420 | 16,258 | 36,678 |
+| **Lines** | 20,439 | 16,258 | 36,697 |
 | **Comments** | 3,027 | - | 3,027 |
-| **Blank Lines** | 3,841 | - | 3,841 |
-| **Total Lines** | 27,288 | 16,258 | 43,546 |
+| **Blank Lines** | 3,845 | - | 3,845 |
+| **Total Lines** | 27,311 | 16,258 | 43,569 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3841           3027          20420
+Rust                           123           3845           3027          20439
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           3998           3027          20922
+SUM:                           139           4002           3027          20941
 -------------------------------------------------------------------------------
 ```
 
@@ -37,12 +37,12 @@ SUM:                           139           3998           3027          20922
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `adapters/claude_code.rs` | 321 | 192 | 129 | 40.2% | ✅ |
-| `adapters/codex.rs` | 466 | 285 | 181 | 38.8% | ✅ |
-| `adapters/cursor.rs` | 307 | 157 | 150 | 48.9% | ✅ |
+| `adapters/claude_code.rs` | 327 | 198 | 129 | 39.4% | ✅ |
+| `adapters/codex.rs` | 472 | 291 | 181 | 38.3% | ✅ |
+| `adapters/cursor.rs` | 313 | 163 | 150 | 47.9% | ✅ |
 | `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
 | `analyze/cleanup/aborted.rs` | 159 | 61 | 98 | 61.6% | ✅ |
-| `analyze/cleanup/duplicate_cowboy.rs` | 263 | 158 | 105 | 39.9% | ✅ |
+| `analyze/cleanup/duplicate_cowboy.rs` | 269 | 164 | 105 | 39.0% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
 | `analyze/gap_detection.rs` | 365 | 365 | 0 | 0.0% | ✅ |
@@ -102,7 +102,7 @@ SUM:                           139           3998           3027          20922
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 159 | 159 | 0 | 0.0% | ✅ |
 | `engine/mod.rs` | 326 | 317 | 9 | 2.8% | ✅ |
-| `engine/template.rs` | 161 | 161 | 0 | 0.0% | ✅ |
+| `engine/template.rs` | 160 | 160 | 0 | 0.0% | ✅ |
 | `engine/tests/handlebars.rs` | 351 | 351 | 0 | 0.0% | ✅ |
 | `engine/tests/integration.rs` | 365 | 365 | 0 | 0.0% | ✅ |
 | `engine/tests/mod.rs` | 6 | 6 | 0 | 0.0% | ✅ |
@@ -116,7 +116,7 @@ SUM:                           139           3998           3027          20922
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
 | `main.rs` | 589 | 16 | 573 | 97.3% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
-| `metrics/aggregation.rs` | 294 | 234 | 60 | 20.4% | ✅ |
+| `metrics/aggregation.rs` | 295 | 235 | 60 | 20.3% | ✅ |
 | `metrics/cowboy.rs` | 178 | 95 | 83 | 46.6% | ✅ |
 | `metrics/git.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
@@ -127,7 +127,7 @@ SUM:                           139           3998           3027          20922
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
 | `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ⚠️ Large |
 | `metrics/transcript.rs` | 201 | 90 | 111 | 55.2% | ✅ |
-| `rules/evaluator.rs` | 390 | 390 | 0 | 0.0% | ✅ |
+| `rules/evaluator.rs` | 389 | 389 | 0 | 0.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 10 | 4 | 6 | 60.0% | ✅ |
 | `rules/tests/evaluator.rs` | 919 | 919 | 0 | 0.0% | ⚠️ Large |

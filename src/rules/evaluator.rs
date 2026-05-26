@@ -163,11 +163,10 @@ pub(crate) fn evaluate_repeated_file_edit(
             .map(|file_mod| {
                 format!(
                     "{}: {} ({})",
-                    file_mod
+                    &file_mod
                         .timestamp
                         .as_ref()
-                        .unwrap_or(&"unknown".to_string())[11..19]
-                        .to_string(),
+                        .unwrap_or(&"unknown".to_string())[11..19],
                     file_mod.file_path,
                     file_mod.tool
                 )
@@ -372,7 +371,7 @@ pub(crate) fn evaluate_repeated_command(
             .map(|cmd| {
                 format!(
                     "{}: {}",
-                    cmd.timestamp.as_ref().unwrap_or(&"unknown".to_string())[11..19].to_string(),
+                    &cmd.timestamp.as_ref().unwrap_or(&"unknown".to_string())[11..19],
                     cmd.command
                 )
             })

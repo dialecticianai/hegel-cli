@@ -14,7 +14,7 @@ where
     for item in items {
         let (key, timestamp) = key_fn(item);
         freq.entry(key)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(timestamp.unwrap_or_default());
     }
     freq

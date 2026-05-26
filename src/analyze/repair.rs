@@ -109,7 +109,7 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
                 println!(
                     "{} {}",
                     Theme::highlight(&archive.workflow_id),
-                    Theme::secondary(&format!("(needs: {})", repairs_needed.join(", ")))
+                    Theme::secondary(format!("(needs: {})", repairs_needed.join(", ")))
                 );
             }
 
@@ -169,13 +169,13 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
                         println!(
                             "{} {}",
                             Theme::highlight(&archives[index].workflow_id),
-                            Theme::secondary(&format!("({} - would be removed)", cleanup.name()))
+                            Theme::secondary(format!("({} - would be removed)", cleanup.name()))
                         );
                     } else {
                         println!(
                             "{} {}",
                             Theme::highlight(&archives[index].workflow_id),
-                            Theme::secondary(&format!("({} - removing)", cleanup.name()))
+                            Theme::secondary(format!("({} - removing)", cleanup.name()))
                         );
                     }
                 }
@@ -230,7 +230,7 @@ pub fn repair_archives(storage: &FileStorage, dry_run: bool, json: bool) -> Resu
         println!();
         println!(
             "{}",
-            Theme::success(&format!(
+            Theme::success(format!(
                 "Summary: {} archive(s) {} repair, {} cowboy workflow(s) {}",
                 repaired_count,
                 if dry_run { "need" } else { "repaired" },

@@ -104,7 +104,7 @@ pub fn parse_hooks_file<P: AsRef<Path>>(hooks_path: P) -> Result<HookMetrics> {
 
     let mut metrics = HookMetrics::default();
 
-    for (_line_num, line) in content.lines().enumerate() {
+    for line in content.lines() {
         // Skip empty lines
         if line.trim().is_empty() {
             continue;

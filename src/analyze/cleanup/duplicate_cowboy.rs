@@ -28,6 +28,12 @@ use super::ArchiveCleanup;
 /// complete metrics since it was created closest to the actual activity.
 pub struct DuplicateCowboyCleanup;
 
+impl Default for DuplicateCowboyCleanup {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DuplicateCowboyCleanup {
     pub fn new() -> Self {
         Self

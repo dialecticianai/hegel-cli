@@ -35,6 +35,12 @@ struct RawUsage {
     total_tokens: u64,
 }
 
+impl Default for CodexAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CodexAdapter {
     pub fn new() -> Self {
         Self {

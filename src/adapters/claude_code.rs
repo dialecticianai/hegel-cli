@@ -5,6 +5,12 @@ use std::path::{Path, PathBuf};
 /// Claude Code adapter - normalizes Claude Code hook events
 pub struct ClaudeCodeAdapter;
 
+impl Default for ClaudeCodeAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClaudeCodeAdapter {
     pub fn new() -> Self {
         Self

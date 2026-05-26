@@ -16,7 +16,7 @@ pub fn generate_interrupt_prompt(violation: &RuleViolation) -> String {
         for event in &violation.recent_events {
             prompt.push_str(&format!("- {}\n", event));
         }
-        prompt.push_str("\n");
+        prompt.push('\n');
     }
 
     // Suggestion

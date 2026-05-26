@@ -44,7 +44,7 @@ impl WorkflowDAG {
             if let Some(wid) = &transition.workflow_id {
                 workflow_transitions
                     .entry(wid.clone())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(transition.clone());
             }
         }
@@ -163,7 +163,7 @@ impl WorkflowDAG {
                 }
             }
 
-            output.push_str("└");
+            output.push('└');
             output.push_str(&"─".repeat(64));
             output.push_str("┘\n");
         }
