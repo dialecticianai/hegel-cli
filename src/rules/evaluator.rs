@@ -4,6 +4,13 @@ use regex::Regex;
 
 use super::types::{RuleConfig, RuleEvaluationContext, RuleViolation};
 
+/// Extract the `HH:MM:SS` time portion (chars 11..19) from an RFC3339
+/// timestamp, falling back to the whole string when it is too short (e.g. a
+/// missing-timestamp placeholder). Never panics on the slice.
+pub(crate) fn hhmmss(ts: &str) -> &str {
+    ts.get(11..19).unwrap_or(ts)
+}
+
 /// The phase metrics for the context's current phase, if present.
 fn current_phase_metrics<'a>(
     context: &'a RuleEvaluationContext,
@@ -181,10 +188,7 @@ pub(crate) fn evaluate_repeated_file_edit(
             .map(|file_mod| {
                 format!(
                     "{}: {} ({})",
-                    &file_mod
-                        .timestamp
-                        .as_ref()
-                        .unwrap_or(&"unknown".to_string())[11..19],
+                    hhmmss(file_mod.timestamp.as_deref().unwrap_or("unknown")),
                     file_mod.file_path,
                     file_mod.tool
                 )
@@ -282,7 +286,7 @@ pub(crate) fn evaluate_phase_timeout(
         let limit_minutes = max_duration / 60;
 
         let recent_events = vec![
-            format!("Phase start: {}", &phase_metrics.start_time[11..19]),
+            format!("Phase start: {}", hhmmss(&phase_metrics.start_time)),
             format!("Duration: {}m {}s", minutes, seconds),
             format!("Limit: {}m", limit_minutes),
         ];
@@ -339,7 +343,7 @@ pub(crate) fn evaluate_repeated_command(
             .map(|cmd| {
                 format!(
                     "{}: {}",
-                    &cmd.timestamp.as_ref().unwrap_or(&"unknown".to_string())[11..19],
+                    hhmmss(cmd.timestamp.as_deref().unwrap_or("unknown")),
                     cmd.command
                 )
             })

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 18:34
+**Last Updated**: 2026-05-26 18:46
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,253 | 16,269 | 36,522 |
-| **Comments** | 3,001 | - | 3,001 |
-| **Blank Lines** | 3,813 | - | 3,813 |
-| **Total Lines** | 27,067 | 16,269 | 43,336 |
-| **Files** | 128 | 84 | 212 |
+| **Lines** | 20,263 | 16,299 | 36,562 |
+| **Comments** | 3,007 | - | 3,007 |
+| **Blank Lines** | 3,817 | - | 3,817 |
+| **Total Lines** | 27,087 | 16,299 | 43,386 |
+| **Files** | 128 | 85 | 213 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           128           3813           3001          20253
-Markdown                        16            157              0            502
+Rust                           128           3817           3007          20263
+Markdown                        17            164              0            521
 -------------------------------------------------------------------------------
-SUM:                           144           3970           3001          20755
+SUM:                           145           3981           3007          20784
 -------------------------------------------------------------------------------
 ```
 
@@ -132,10 +132,10 @@ SUM:                           144           3970           3001          20755
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
 | `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ⚠️ Large |
 | `metrics/transcript.rs` | 201 | 90 | 111 | 55.2% | ✅ |
-| `rules/evaluator.rs` | 357 | 357 | 0 | 0.0% | ✅ |
+| `rules/evaluator.rs` | 361 | 361 | 0 | 0.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 10 | 4 | 6 | 60.0% | ✅ |
-| `rules/tests/evaluator.rs` | 919 | 919 | 0 | 0.0% | ⚠️ Large |
+| `rules/tests/evaluator.rs` | 935 | 935 | 0 | 0.0% | ⚠️ Large |
 | `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
@@ -235,7 +235,7 @@ SUM:                           144           3970           3001          20755
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 280 |
+| `LOC_REPORT.md` | 284 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |
@@ -246,7 +246,8 @@ SUM:                           144           3970           3001          20755
 | `src/analyze/README.md` | 28 |
 | `src/commands/doctor/README.md` | 39 |
 | `src/commands/fork/README.md` | 30 |
-| `src/commands/README.md` | 48 |
+| `src/commands/markdown/README.md` | 25 |
+| `src/commands/README.md` | 49 |
 | `src/commands/workflow/README.md` | 34 |
 | `src/engine/README.md` | 49 |
 | `src/guardrails/README.md` | 34 |

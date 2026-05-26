@@ -917,3 +917,19 @@ fn test_require_commits_use_git_override_enabled() {
     let result = evaluate_require_commits(&rule, &context).unwrap();
     assert!(result.is_some()); // Rule enforced despite has_repo=false
 }
+
+// ========== hhmmss time-formatting helper ==========
+
+#[test]
+fn test_hhmmss_extracts_time_from_rfc3339() {
+    assert_eq!(hhmmss("2025-01-01T10:30:00Z"), "10:30:00");
+    assert_eq!(hhmmss("2025-01-01T10:30:00+00:00"), "10:30:00");
+}
+
+#[test]
+fn test_hhmmss_short_input_does_not_panic() {
+    // Missing-timestamp placeholder and other short strings must not panic
+    // on the 11..19 slice; they fall back to returning the whole string.
+    assert_eq!(hhmmss("unknown"), "unknown");
+    assert_eq!(hhmmss(""), "");
+}
