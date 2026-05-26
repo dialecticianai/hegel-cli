@@ -11,10 +11,12 @@ Translates user intent (CLI invocations) into actions on the workflow state mach
 ```
 commands/
 ├── mod.rs               Public exports (command handlers, shared types)
+├── util.rs              Shared command helpers (resolve_file_path, is_markdown_file)
 │
 ├── workflow/            Workflow orchestration commands (See workflow/README.md)
 ├── fork/                External agent orchestration (See fork/README.md)
 ├── doctor/              State and artifact validation/repair (See doctor/README.md)
+├── markdown/            Markdown file tree with DDD artifact awareness (See markdown/README.md)
 ├── analyze/             Metrics analysis command entry point (delegates to src/analyze)
 │
 ├── init.rs              Project initialization (greenfield vs retrofit workflow detection)
@@ -29,7 +31,6 @@ commands/
 ├── review.rs            Review file management (poll/read/write reviews.json)
 ├── pm.rs                Project manager dashboard launcher (wraps hegel-pm binary)
 ├── ide.rs               Hegel IDE launcher (wraps hegel-ide Electron app)
-├── markdown.rs          Markdown file tree visualization with DDD artifact metadata (SPEC/PLAN indicators, validation warnings)
 ├── new.rs               DDD artifact creation with auto-dating (feat/refactor/report)
 │
 ├── git.rs               Git wrapper with guardrails (delegates to wrapped.rs)
@@ -43,6 +44,6 @@ commands/
 **Workflow Management**: `workflow/` (start, next, prev, repeat, restart, abort)
 **Meta-Mode**: `meta.rs` (declare learning/standard patterns)
 **Metrics**: `analyze/` (command entry - implementation lives in src/analyze)
-**External Tools**: `astq.rs`, `reflect.rs`, `review.rs`, `pm.rs`, `ide.rs`, `markdown.rs`, `fork/` (AST search, doc review, review management, PM dashboard, IDE, markdown visualization, agent delegation)
+**External Tools**: `astq.rs`, `reflect.rs`, `review.rs`, `pm.rs`, `ide.rs`, `markdown/`, `fork/` (AST search, doc review, review management, PM dashboard, IDE, markdown visualization, agent delegation)
 **Safety**: `wrapped.rs`, `git.rs` (command guardrails and audit logging)
 **Setup**: `init.rs`, `hooks_setup.rs` (project initialization, hook configuration)
