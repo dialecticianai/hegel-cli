@@ -8,6 +8,14 @@ pub struct ArtifactFileSpec {
     pub required: bool,
 }
 
+/// Build a `{date}[-{index}]-{name}{suffix}` artifact name.
+fn dated_name(date: &str, index: Option<usize>, name: &str, suffix: &str) -> String {
+    match index {
+        Some(idx) => format!("{}-{}-{}{}", date, idx, name, suffix),
+        None => format!("{}-{}{}", date, name, suffix),
+    }
+}
+
 /// Feature artifact with date, optional index, name, and file existence tracking
 #[derive(Debug, Clone, PartialEq)]
 pub struct FeatArtifact {
@@ -33,11 +41,7 @@ impl FeatArtifact {
 
     /// Generate directory name with optional index
     pub fn dir_name(&self) -> String {
-        if let Some(idx) = self.index {
-            format!("{}-{}-{}", self.date, idx, self.name)
-        } else {
-            format!("{}-{}", self.date, self.name)
-        }
+        dated_name(&self.date, self.index, &self.name, "")
     }
 
     /// Generate full directory path
@@ -57,11 +61,7 @@ pub struct RefactorArtifact {
 impl RefactorArtifact {
     /// Generate file name with .md extension
     pub fn file_name(&self) -> String {
-        if let Some(idx) = self.index {
-            format!("{}-{}-{}.md", self.date, idx, self.name)
-        } else {
-            format!("{}-{}.md", self.date, self.name)
-        }
+        dated_name(&self.date, self.index, &self.name, ".md")
     }
 
     /// Generate full file path
@@ -83,11 +83,7 @@ pub struct ReportArtifact {
 impl ReportArtifact {
     /// Generate file name with .md extension
     pub fn file_name(&self) -> String {
-        if let Some(idx) = self.index {
-            format!("{}-{}-{}.md", self.date, idx, self.name)
-        } else {
-            format!("{}-{}.md", self.date, self.name)
-        }
+        dated_name(&self.date, self.index, &self.name, ".md")
     }
 
     /// Generate full file path
@@ -297,6 +293,56 @@ pub fn validate_name_format(name: &str) -> Result<()> {
     Ok(())
 }
 
+/// Whether a scanned `.ddd/<subdir>` holds artifact directories or files.
+enum EntryKind {
+    Dir,
+    File,
+}
+
+/// Scan one `.ddd/<subdir>`, parsing each matching entry into an artifact.
+///
+/// `parse` returns `Some(artifact)` for a valid entry name (it receives the
+/// entry's path for any file-existence checks) or `None` for an unparseable
+/// name, which is recorded as an `InvalidFormat` issue suggesting `valid_fmt`.
+fn scan_artifact_dir(
+    root: &std::path::Path,
+    subdir: &str,
+    kind: EntryKind,
+    valid_fmt: &str,
+    artifacts: &mut Vec<DddArtifact>,
+    issues: &mut Vec<ValidationIssue>,
+    mut parse: impl FnMut(&str, &std::path::Path) -> Option<DddArtifact>,
+) -> Result<()> {
+    let dir = root.join(".ddd").join(subdir);
+    if !dir.exists() {
+        return Ok(());
+    }
+
+    for entry in std::fs::read_dir(&dir)? {
+        let entry = entry?;
+        let matches = match kind {
+            EntryKind::Dir => entry.file_type()?.is_dir(),
+            EntryKind::File => entry.file_type()?.is_file(),
+        };
+        if !matches {
+            continue;
+        }
+
+        let name = entry.file_name().to_string_lossy().to_string();
+        match parse(&name, &entry.path()) {
+            Some(artifact) => artifacts.push(artifact),
+            None => issues.push(ValidationIssue {
+                path: entry.path(),
+                issue_type: IssueType::InvalidFormat,
+                suggested_fix: format!("Rename {} to {}", name, valid_fmt),
+                target_name: None,
+            }),
+        }
+    }
+
+    Ok(())
+}
+
 /// Parse DDD artifacts from .ddd/ directory structure
 /// This doesn't re-scan - it parses existing directory/file names
 ///
@@ -308,146 +354,74 @@ pub fn parse_ddd_structure_in(root_dir: Option<&std::path::Path>) -> Result<DddS
 
     let root = root_dir.unwrap_or_else(|| std::path::Path::new("."));
 
-    // Parse feat/ directories
-    let feat_dir = root.join(".ddd/feat");
-    if feat_dir.exists() {
-        for entry in std::fs::read_dir(&feat_dir)? {
-            let entry = entry?;
-            if !entry.file_type()?.is_dir() {
-                continue;
-            }
+    scan_artifact_dir(
+        root,
+        "feat",
+        EntryKind::Dir,
+        "YYYYMMDD[-N]-name format",
+        &mut artifacts,
+        &mut issues,
+        |name, path| {
+            let (date, index, name) = parse_feat_name(name).ok()?;
+            Some(DddArtifact::Feat(FeatArtifact {
+                date,
+                index,
+                name,
+                spec_exists: path.join("SPEC.md").exists(),
+                plan_exists: path.join("PLAN.md").exists(),
+            }))
+        },
+    )?;
 
-            let dir_name = entry.file_name().to_string_lossy().to_string();
+    scan_artifact_dir(
+        root,
+        "refactor",
+        EntryKind::File,
+        "YYYYMMDD[-N]-name.md format",
+        &mut artifacts,
+        &mut issues,
+        |name, _| {
+            let (date, index, name) = parse_single_file_name(name).ok()?;
+            Some(DddArtifact::Refactor(RefactorArtifact {
+                date,
+                index,
+                name,
+            }))
+        },
+    )?;
 
-            match parse_feat_name(&dir_name) {
-                Ok((date, index, name)) => {
-                    let dir_path = entry.path();
-                    let spec_exists = dir_path.join("SPEC.md").exists();
-                    let plan_exists = dir_path.join("PLAN.md").exists();
+    scan_artifact_dir(
+        root,
+        "report",
+        EntryKind::File,
+        "YYYYMMDD[-N]-name.md format",
+        &mut artifacts,
+        &mut issues,
+        |name, _| {
+            let (date, index, name) = parse_single_file_name(name).ok()?;
+            Some(DddArtifact::Report(ReportArtifact { date, index, name }))
+        },
+    )?;
 
-                    artifacts.push(DddArtifact::Feat(FeatArtifact {
-                        date,
-                        index,
-                        name,
-                        spec_exists,
-                        plan_exists,
-                    }));
-                }
-                Err(_) => {
-                    issues.push(ValidationIssue {
-                        path: entry.path(),
-                        issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!("Rename {} to YYYYMMDD[-N]-name format", dir_name),
-                        target_name: None,
-                    });
-                }
-            }
-        }
-    }
-
-    // Parse refactor/ files
-    let refactor_dir = root.join(".ddd/refactor");
-    if refactor_dir.exists() {
-        for entry in std::fs::read_dir(&refactor_dir)? {
-            let entry = entry?;
-            if !entry.file_type()?.is_file() {
-                continue;
-            }
-
-            let file_name = entry.file_name().to_string_lossy().to_string();
-
-            match parse_single_file_name(&file_name) {
-                Ok((date, index, name)) => {
-                    artifacts.push(DddArtifact::Refactor(RefactorArtifact {
-                        date,
-                        index,
-                        name,
-                    }));
-                }
-                Err(_) => {
-                    issues.push(ValidationIssue {
-                        path: entry.path(),
-                        issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!(
-                            "Rename {} to YYYYMMDD[-N]-name.md format",
-                            file_name
-                        ),
-                        target_name: None,
-                    });
-                }
-            }
-        }
-    }
-
-    // Parse report/ files
-    let report_dir = root.join(".ddd/report");
-    if report_dir.exists() {
-        for entry in std::fs::read_dir(&report_dir)? {
-            let entry = entry?;
-            if !entry.file_type()?.is_file() {
-                continue;
-            }
-
-            let file_name = entry.file_name().to_string_lossy().to_string();
-
-            match parse_single_file_name(&file_name) {
-                Ok((date, index, name)) => {
-                    artifacts.push(DddArtifact::Report(ReportArtifact { date, index, name }));
-                }
-                Err(_) => {
-                    issues.push(ValidationIssue {
-                        path: entry.path(),
-                        issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!(
-                            "Rename {} to YYYYMMDD[-N]-name.md format",
-                            file_name
-                        ),
-                        target_name: None,
-                    });
-                }
-            }
-        }
-    }
-
-    // Parse toys/ directories
-    let toys_dir = root.join(".ddd/toys");
-    if toys_dir.exists() {
-        for entry in std::fs::read_dir(&toys_dir)? {
-            let entry = entry?;
-            if !entry.file_type()?.is_dir() {
-                continue;
-            }
-
-            let dir_name = entry.file_name().to_string_lossy().to_string();
-
-            match parse_toy_name(&dir_name) {
-                Ok((number, name)) => {
-                    let dir_path = entry.path();
-                    let spec_exists = dir_path.join("SPEC.md").exists();
-                    let plan_exists = dir_path.join("PLAN.md").exists();
-                    let learnings_exists = dir_path.join("LEARNINGS.md").exists();
-                    let readme_exists = dir_path.join("README.md").exists();
-
-                    artifacts.push(DddArtifact::Toy(ToyArtifact {
-                        number,
-                        name,
-                        spec_exists,
-                        plan_exists,
-                        learnings_exists,
-                        readme_exists,
-                    }));
-                }
-                Err(_) => {
-                    issues.push(ValidationIssue {
-                        path: entry.path(),
-                        issue_type: IssueType::InvalidFormat,
-                        suggested_fix: format!("Rename {} to toyN_name format", dir_name),
-                        target_name: None,
-                    });
-                }
-            }
-        }
-    }
+    scan_artifact_dir(
+        root,
+        "toys",
+        EntryKind::Dir,
+        "toyN_name format",
+        &mut artifacts,
+        &mut issues,
+        |name, path| {
+            let (number, name) = parse_toy_name(name).ok()?;
+            Some(DddArtifact::Toy(ToyArtifact {
+                number,
+                name,
+                spec_exists: path.join("SPEC.md").exists(),
+                plan_exists: path.join("PLAN.md").exists(),
+                learnings_exists: path.join("LEARNINGS.md").exists(),
+                readme_exists: path.join("README.md").exists(),
+            }))
+        },
+    )?;
 
     // Detect missing indexes (multiple artifacts on same date without indexes)
     detect_missing_indexes(&artifacts, &mut issues);
