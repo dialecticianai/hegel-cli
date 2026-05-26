@@ -39,6 +39,22 @@ pub fn parse_jsonl<T: DeserializeOwned>(
     Ok(records)
 }
 
+/// Serialize `value` as pretty JSON and write it atomically to `path`.
+///
+/// Writes to a temp sibling then renames into place, so a crash mid-write
+/// never leaves a partially-written file. Used for all single-document JSON
+/// persistence (state, archives, stashes, reviews).
+pub fn atomic_write_json<T: Serialize>(path: &Path, value: &T) -> Result<()> {
+    let temp_path = path.with_extension("tmp");
+    let content = serde_json::to_string_pretty(value)
+        .with_context(|| format!("Failed to serialize JSON for {:?}", path))?;
+    fs::write(&temp_path, content)
+        .with_context(|| format!("Failed to write temp file: {:?}", temp_path))?;
+    fs::rename(&temp_path, path)
+        .with_context(|| format!("Failed to rename into place: {:?}", path))?;
+    Ok(())
+}
+
 /// Session metadata structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionMetadata {
@@ -349,19 +365,7 @@ impl FileStorage {
 
     /// Save state to file (atomic write)
     pub fn save(&self, state: &State) -> Result<()> {
-        let state_file = self.state_dir.join("state.json");
-        let temp_file = self.state_dir.join("state.json.tmp");
-
-        let content =
-            serde_json::to_string_pretty(state).with_context(|| "Failed to serialize state")?;
-
-        fs::write(&temp_file, content)
-            .with_context(|| format!("Failed to write temp state file: {:?}", temp_file))?;
-
-        fs::rename(&temp_file, &state_file)
-            .with_context(|| format!("Failed to rename state file: {:?}", state_file))?;
-
-        Ok(())
+        atomic_write_json(&self.state_dir.join("state.json"), state)
     }
 
     /// Clear all state
@@ -499,10 +503,7 @@ impl FileStorage {
         };
 
         // Write stash file
-        let content = serde_json::to_string_pretty(&entry)
-            .with_context(|| "Failed to serialize stash entry")?;
-        fs::write(&stash_path, content)
-            .with_context(|| format!("Failed to write stash file: {:?}", stash_path))?;
+        atomic_write_json(&stash_path, &entry)?;
 
         // Reindex all stashes
         self.reindex_stashes()?;
@@ -633,8 +634,7 @@ impl FileStorage {
         // Update indices and rewrite files
         for (index, (path, mut stash)) in entries.into_iter().enumerate() {
             stash.index = index;
-            let content = serde_json::to_string_pretty(&stash)?;
-            fs::write(&path, content)?;
+            atomic_write_json(&path, &stash)?;
         }
 
         Ok(())

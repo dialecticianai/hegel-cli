@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 16:33
+**Last Updated**: 2026-05-26 16:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,425 | 16,258 | 36,683 |
-| **Comments** | 3,027 | - | 3,027 |
-| **Blank Lines** | 3,846 | - | 3,846 |
-| **Total Lines** | 27,298 | 16,258 | 43,556 |
+| **Lines** | 20,409 | 16,258 | 36,667 |
+| **Comments** | 3,031 | - | 3,031 |
+| **Blank Lines** | 3,839 | - | 3,839 |
+| **Total Lines** | 27,279 | 16,258 | 43,537 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3846           3027          20425
+Rust                           123           3839           3031          20409
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4003           3027          20927
+SUM:                           139           3996           3031          20911
 -------------------------------------------------------------------------------
 ```
 
@@ -135,11 +135,11 @@ SUM:                           139           4003           3027          20927
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 381 | 193 | 188 | 49.3% | ✅ |
+| `storage/archive/mod.rs` | 366 | 178 | 188 | 51.4% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 710 | 694 | 16 | 2.3% | ✅ (infra) |
-| `storage/reviews.rs` | 288 | 141 | 147 | 51.0% | ✅ |
+| `storage/reviews.rs` | 284 | 137 | 147 | 51.8% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `storage/tests/storage.rs` | 619 | 619 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |

@@ -134,22 +134,7 @@ pub fn write_archive(archive: &WorkflowArchive, state_dir: &Path) -> Result<()> 
         bail!("Archive already exists: {}", archive.workflow_id);
     }
 
-    // Atomic write: temp file + rename
-    let temp_path = archive_path.with_extension("tmp");
-    let json =
-        serde_json::to_string_pretty(archive).context("Failed to serialize archive to JSON")?;
-
-    fs::write(&temp_path, json)
-        .with_context(|| format!("Failed to write temp archive: {:?}", temp_path))?;
-
-    fs::rename(&temp_path, &archive_path).with_context(|| {
-        format!(
-            "Failed to rename archive: {:?} -> {:?}",
-            temp_path, archive_path
-        )
-    })?;
-
-    Ok(())
+    crate::storage::atomic_write_json(&archive_path, archive)
 }
 
 /// Read all archives from archive directory

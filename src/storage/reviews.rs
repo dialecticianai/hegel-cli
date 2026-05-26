@@ -132,11 +132,7 @@ pub fn write_hegel_reviews(hegel_dir: &Path, reviews: &HegelReviewsMap) -> Resul
     ))?;
 
     let reviews_path = hegel_dir.join("reviews.json");
-    let json =
-        serde_json::to_string_pretty(reviews).context("Failed to serialize reviews to JSON")?;
-
-    fs::write(&reviews_path, json)
-        .context(format!("Failed to write reviews.json: {:?}", reviews_path))
+    crate::storage::atomic_write_json(&reviews_path, reviews)
 }
 
 #[cfg(test)]
