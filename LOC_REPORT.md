@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 17:49
+**Last Updated**: 2026-05-26 18:29
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,244 | 16,261 | 36,505 |
-| **Comments** | 2,990 | - | 2,990 |
-| **Blank Lines** | 3,799 | - | 3,799 |
-| **Total Lines** | 27,033 | 16,261 | 43,294 |
+| **Lines** | 20,235 | 16,261 | 36,496 |
+| **Comments** | 2,991 | - | 2,991 |
+| **Blank Lines** | 3,800 | - | 3,800 |
+| **Total Lines** | 27,026 | 16,261 | 43,287 |
 | **Files** | 124 | 84 | 208 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           124           3799           2990          20244
+Rust                           124           3800           2991          20235
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           140           3956           2990          20746
+SUM:                           140           3957           2991          20737
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                           140           3956           2990          20746
 | `analyze/cleanup/duplicate_cowboy.rs` | 269 | 164 | 105 | 39.0% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
-| `analyze/gap_detection.rs` | 365 | 365 | 0 | 0.0% | ✅ |
+| `analyze/gap_detection.rs` | 358 | 358 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 8 | 6 | 2 | 25.0% | ✅ |
 | `analyze/repair.rs` | 259 | 259 | 0 | 0.0% | ✅ |
 | `analyze/sections.rs` | 370 | 370 | 0 | 0.0% | ✅ |

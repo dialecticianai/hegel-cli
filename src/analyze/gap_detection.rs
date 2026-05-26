@@ -20,6 +20,20 @@ use std::path::Path;
 
 use crate::storage::archive::{write_archive, WorkflowArchive};
 
+/// Remove a workflow's archive file if it exists (no-op in dry-run mode).
+fn remove_archive_file(state_dir: &Path, workflow_id: &str, dry_run: bool) -> Result<()> {
+    if dry_run {
+        return Ok(());
+    }
+    let archive_path = state_dir
+        .join("archive")
+        .join(format!("{}.json", workflow_id));
+    if archive_path.exists() {
+        std::fs::remove_file(&archive_path)?;
+    }
+    Ok(())
+}
+
 /// Ensures exactly one cowboy per gap between non-synthetic workflows that contains git activity
 ///
 /// Only creates cowboys for gaps with git commits. Removes cowboys from gaps without activity.
@@ -150,14 +164,7 @@ pub fn ensure_cowboy_coverage(
                             "DEBUG COWBOY_GAP_FILLER: Removing cowboy {} from gap with no activity",
                             cow.workflow_id
                         );
-                        if !dry_run {
-                            let archive_path = state_dir
-                                .join("archive")
-                                .join(format!("{}.json", cow.workflow_id));
-                            if archive_path.exists() {
-                                std::fs::remove_file(&archive_path)?;
-                            }
-                        }
+                        remove_archive_file(state_dir, &cow.workflow_id, dry_run)?;
                         cowboys_removed += 1;
                     }
                 }
@@ -217,14 +224,7 @@ pub fn ensure_cowboy_coverage(
                         "DEBUG COWBOY_GAP_FILLER: Removing duplicate/incorrect cowboy {}",
                         cow.workflow_id
                     );
-                    if !dry_run {
-                        let archive_path = state_dir
-                            .join("archive")
-                            .join(format!("{}.json", cow.workflow_id));
-                        if archive_path.exists() {
-                            std::fs::remove_file(&archive_path)?;
-                        }
-                    }
+                    remove_archive_file(state_dir, &cow.workflow_id, dry_run)?;
                     cowboys_removed += 1;
                 }
             }
@@ -238,14 +238,7 @@ pub fn ensure_cowboy_coverage(
                     "DEBUG COWBOY_GAP_FILLER: Removing incorrect cowboy {}",
                     cow.workflow_id
                 );
-                if !dry_run {
-                    let archive_path = state_dir
-                        .join("archive")
-                        .join(format!("{}.json", cow.workflow_id));
-                    if archive_path.exists() {
-                        std::fs::remove_file(&archive_path)?;
-                    }
-                }
+                remove_archive_file(state_dir, &cow.workflow_id, dry_run)?;
                 cowboys_removed += 1;
             }
 
