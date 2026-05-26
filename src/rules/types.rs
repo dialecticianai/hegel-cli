@@ -55,6 +55,17 @@ pub struct RuleEvaluationContext<'a> {
 }
 
 impl RuleConfig {
+    /// The snake_case type tag for this rule (matches the serde `type` field).
+    pub fn type_name(&self) -> &'static str {
+        match self {
+            RuleConfig::RepeatedCommand { .. } => "repeated_command",
+            RuleConfig::RepeatedFileEdit { .. } => "repeated_file_edit",
+            RuleConfig::PhaseTimeout { .. } => "phase_timeout",
+            RuleConfig::TokenBudget { .. } => "token_budget",
+            RuleConfig::RequireCommits { .. } => "require_commits",
+        }
+    }
+
     /// Validate regex patterns in rules (called at workflow load time)
     pub fn validate(&self) -> Result<()> {
         match self {

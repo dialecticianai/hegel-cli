@@ -273,16 +273,7 @@ pub fn get_next_prompt(
                 next_node_obj
                     .rules
                     .iter()
-                    .filter(|rule| {
-                        let type_name = match rule {
-                            RuleConfig::RepeatedCommand { .. } => "repeated_command",
-                            RuleConfig::RepeatedFileEdit { .. } => "repeated_file_edit",
-                            RuleConfig::PhaseTimeout { .. } => "phase_timeout",
-                            RuleConfig::TokenBudget { .. } => "token_budget",
-                            RuleConfig::RequireCommits { .. } => "require_commits",
-                        };
-                        type_name != rule_type.as_str()
-                    })
+                    .filter(|rule| rule.type_name() != rule_type.as_str())
                     .cloned()
                     .collect()
             }

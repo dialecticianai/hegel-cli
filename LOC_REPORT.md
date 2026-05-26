@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 16:03
+**Last Updated**: 2026-05-26 16:04
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -10,9 +10,9 @@
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
 | **Lines** | 20,420 | 16,258 | 36,678 |
-| **Comments** | 3,026 | - | 3,026 |
-| **Blank Lines** | 3,840 | - | 3,840 |
-| **Total Lines** | 27,286 | 16,258 | 43,544 |
+| **Comments** | 3,027 | - | 3,027 |
+| **Blank Lines** | 3,841 | - | 3,841 |
+| **Total Lines** | 27,288 | 16,258 | 43,546 |
 | **Files** | 123 | 84 | 207 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3840           3026          20420
+Rust                           123           3841           3027          20420
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           3997           3026          20922
+SUM:                           139           3998           3027          20922
 -------------------------------------------------------------------------------
 ```
 
@@ -101,7 +101,7 @@ SUM:                           139           3997           3026          20922
 | `doctor/rescue.rs` | 67 | 67 | 0 | 0.0% | ✅ |
 | `embedded.rs` | 145 | 125 | 20 | 13.8% | ✅ |
 | `engine/handlebars.rs` | 159 | 159 | 0 | 0.0% | ✅ |
-| `engine/mod.rs` | 335 | 326 | 9 | 2.7% | ✅ |
+| `engine/mod.rs` | 326 | 317 | 9 | 2.8% | ✅ |
 | `engine/template.rs` | 161 | 161 | 0 | 0.0% | ✅ |
 | `engine/tests/handlebars.rs` | 351 | 351 | 0 | 0.0% | ✅ |
 | `engine/tests/integration.rs` | 365 | 365 | 0 | 0.0% | ✅ |
@@ -132,7 +132,7 @@ SUM:                           139           3997           3026          20922
 | `rules/mod.rs` | 10 | 4 | 6 | 60.0% | ✅ |
 | `rules/tests/evaluator.rs` | 919 | 919 | 0 | 0.0% | ⚠️ Large |
 | `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
-| `rules/types.rs` | 375 | 88 | 287 | 76.5% | ✅ |
+| `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
 | `storage/archive/mod.rs` | 381 | 193 | 188 | 49.3% | ✅ |
