@@ -534,37 +534,36 @@ impl FileStorage {
     }
 
     /// List all stashes, sorted newest first
-    pub fn list_stashes(&self) -> Result<Vec<StashEntry>> {
+    /// Load all stash files as `(path, entry)` pairs, newest first.
+    /// Empty if the stash directory does not exist.
+    fn load_stash_entries(&self) -> Result<Vec<(PathBuf, StashEntry)>> {
         let stash_dir = self.state_dir.join("stashes");
-
-        // Return empty vector if directory doesn't exist
         if !stash_dir.exists() {
             return Ok(vec![]);
         }
 
-        // Read all stash files
         let mut entries = vec![];
         for entry in fs::read_dir(&stash_dir)? {
-            let entry = entry?;
-            let path = entry.path();
-
-            // Skip non-JSON files
-            if !path.extension().map(|e| e == "json").unwrap_or(false) {
-                continue;
+            let path = entry?.path();
+            if path.extension().is_some_and(|e| e == "json") {
+                let content = fs::read_to_string(&path)?;
+                let stash: StashEntry = serde_json::from_str(&content)
+                    .with_context(|| format!("Failed to parse stash file: {:?}", path))?;
+                entries.push((path, stash));
             }
-
-            // Parse stash entry
-            let content = fs::read_to_string(&path)?;
-            let stash: StashEntry = serde_json::from_str(&content)
-                .with_context(|| format!("Failed to parse stash file: {:?}", path))?;
-
-            entries.push(stash);
         }
 
         // Sort by timestamp descending (newest first)
-        entries.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-
+        entries.sort_by(|a, b| b.1.timestamp.cmp(&a.1.timestamp));
         Ok(entries)
+    }
+
+    pub fn list_stashes(&self) -> Result<Vec<StashEntry>> {
+        Ok(self
+            .load_stash_entries()?
+            .into_iter()
+            .map(|(_, stash)| stash)
+            .collect())
     }
 
     /// Load stash by index
@@ -575,11 +574,11 @@ impl FileStorage {
             anyhow::bail!("No stashes to restore");
         }
 
+        let max_index = stashes.len().saturating_sub(1);
         stashes
             .into_iter()
             .find(|s| s.index == index)
             .with_context(|| {
-                let max_index = self.list_stashes().unwrap().len().saturating_sub(1);
                 format!(
                     "Stash index {} not found. Available stashes: 0-{}",
                     index, max_index
@@ -591,19 +590,8 @@ impl FileStorage {
     pub fn delete_stash(&self, index: usize) -> Result<()> {
         let stash = self.load_stash(index)?;
 
-        // Find and delete the stash file
-        let stash_dir = self.state_dir.join("stashes");
-        for entry in fs::read_dir(&stash_dir)? {
-            let entry = entry?;
-            let path = entry.path();
-
-            if !path.extension().map(|e| e == "json").unwrap_or(false) {
-                continue;
-            }
-
-            let content = fs::read_to_string(&path)?;
-            let file_stash: StashEntry = serde_json::from_str(&content)?;
-
+        // Find and delete the matching stash file
+        for (path, file_stash) in self.load_stash_entries()? {
             if file_stash.timestamp == stash.timestamp {
                 fs::remove_file(&path)
                     .with_context(|| format!("Failed to delete stash file: {:?}", path))?;
@@ -619,33 +607,8 @@ impl FileStorage {
 
     /// Reindex all stashes to ensure sequential indices starting from 0
     fn reindex_stashes(&self) -> Result<()> {
-        let stash_dir = self.state_dir.join("stashes");
-
-        if !stash_dir.exists() {
-            return Ok(());
-        }
-
-        // Load all stashes and sort by timestamp
-        let mut entries = vec![];
-        for entry in fs::read_dir(&stash_dir)? {
-            let entry = entry?;
-            let path = entry.path();
-
-            if !path.extension().map(|e| e == "json").unwrap_or(false) {
-                continue;
-            }
-
-            let content = fs::read_to_string(&path)?;
-            let stash: StashEntry = serde_json::from_str(&content)?;
-
-            entries.push((path, stash));
-        }
-
-        // Sort by timestamp descending (newest first)
-        entries.sort_by(|a, b| b.1.timestamp.cmp(&a.1.timestamp));
-
-        // Update indices and rewrite files
-        for (index, (path, mut stash)) in entries.into_iter().enumerate() {
+        // Entries come back newest-first; assign indices in that order.
+        for (index, (path, mut stash)) in self.load_stash_entries()?.into_iter().enumerate() {
             stash.index = index;
             atomic_write_json(&path, &stash)?;
         }

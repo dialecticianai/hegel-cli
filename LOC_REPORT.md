@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 17:46
+**Last Updated**: 2026-05-26 17:49
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,263 | 16,261 | 36,524 |
-| **Comments** | 2,994 | - | 2,994 |
-| **Blank Lines** | 3,813 | - | 3,813 |
-| **Total Lines** | 27,070 | 16,261 | 43,331 |
+| **Lines** | 20,244 | 16,261 | 36,505 |
+| **Comments** | 2,990 | - | 2,990 |
+| **Blank Lines** | 3,799 | - | 3,799 |
+| **Total Lines** | 27,033 | 16,261 | 43,294 |
 | **Files** | 124 | 84 | 208 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           124           3813           2994          20263
+Rust                           124           3799           2990          20244
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           140           3970           2994          20765
+SUM:                           140           3956           2990          20746
 -------------------------------------------------------------------------------
 ```
 
@@ -139,7 +139,7 @@ SUM:                           140           3970           2994          20765
 | `storage/archive/mod.rs` | 366 | 178 | 188 | 51.4% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `storage/mod.rs` | 723 | 707 | 16 | 2.2% | ✅ (infra) |
+| `storage/mod.rs` | 686 | 670 | 16 | 2.3% | ✅ (infra) |
 | `storage/reviews.rs` | 284 | 137 | 147 | 51.8% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `storage/tests/storage.rs` | 619 | 619 | 0 | 0.0% | ⚠️ Large |
