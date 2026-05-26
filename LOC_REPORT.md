@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 16:56
+**Last Updated**: 2026-05-26 17:00
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,400 | 16,260 | 36,660 |
-| **Comments** | 3,022 | - | 3,022 |
-| **Blank Lines** | 3,840 | - | 3,840 |
-| **Total Lines** | 27,262 | 16,260 | 43,522 |
+| **Lines** | 20,361 | 16,261 | 36,622 |
+| **Comments** | 3,019 | - | 3,019 |
+| **Blank Lines** | 3,832 | - | 3,832 |
+| **Total Lines** | 27,212 | 16,261 | 43,473 |
 | **Files** | 124 | 84 | 208 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           124           3840           3022          20400
+Rust                           124           3832           3019          20361
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           140           3997           3022          20902
+SUM:                           140           3989           3019          20863
 -------------------------------------------------------------------------------
 ```
 
@@ -37,10 +37,10 @@ SUM:                           140           3997           3022          20902
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `adapters/claude_code.rs` | 327 | 198 | 129 | 39.4% | ✅ |
-| `adapters/codex.rs` | 472 | 291 | 181 | 38.3% | ✅ |
-| `adapters/cursor.rs` | 313 | 163 | 150 | 47.9% | ✅ |
-| `adapters/mod.rs` | 223 | 125 | 98 | 43.9% | ✅ |
+| `adapters/claude_code.rs` | 299 | 170 | 129 | 43.1% | ✅ |
+| `adapters/codex.rs` | 451 | 270 | 181 | 40.1% | ✅ |
+| `adapters/cursor.rs` | 290 | 140 | 150 | 51.7% | ✅ |
+| `adapters/mod.rs` | 245 | 147 | 98 | 40.0% | ✅ |
 | `analyze/cleanup/aborted.rs` | 159 | 61 | 98 | 61.6% | ✅ |
 | `analyze/cleanup/duplicate_cowboy.rs` | 269 | 164 | 105 | 39.0% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
@@ -231,7 +231,7 @@ SUM:                           140           3997           3022          20902
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 279 |
+| `LOC_REPORT.md` | 280 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |

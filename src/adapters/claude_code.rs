@@ -35,24 +35,16 @@ impl AgentAdapter for ClaudeCodeAdapter {
     }
 
     fn detect(&self) -> bool {
-        // Claude Code sets various environment variables:
-        // - CLAUDE_CODE_SESSION_ID (session-specific)
-        // - CLAUDE_CODE_TRANSCRIPT_PATH (session-specific)
-        // - CLAUDECODE=1 (always set)
-        std::env::var("CLAUDE_CODE_SESSION_ID").is_ok()
-            || std::env::var("CLAUDE_CODE_TRANSCRIPT_PATH").is_ok()
-            || std::env::var("CLAUDECODE").is_ok()
-            || {
-                // Fallback: check if we're in a Claude Code environment by looking for typical paths
-                let home = std::env::var("HOME").unwrap_or_default();
-                let claude_paths = [
-                    format!("{}/.config/claude", home),
-                    format!("{}/.claude", home),
-                ];
-                claude_paths
-                    .iter()
-                    .any(|p| std::path::Path::new(p).exists())
-            }
+        // Claude Code sets CLAUDE_CODE_SESSION_ID / CLAUDE_CODE_TRANSCRIPT_PATH
+        // (session-specific) and CLAUDECODE=1 (always); fall back to typical config dirs.
+        super::detect_via(
+            &[
+                "CLAUDE_CODE_SESSION_ID",
+                "CLAUDE_CODE_TRANSCRIPT_PATH",
+                "CLAUDECODE",
+            ],
+            &[".config/claude", ".claude"],
+        )
     }
 
     fn normalize(&self, input: serde_json::Value) -> Result<Option<CanonicalHookEvent>> {
@@ -62,41 +54,21 @@ impl AgentAdapter for ClaudeCodeAdapter {
             .context("Expected JSON object for Claude Code event")?;
 
         // Extract required fields
-        let session_id = obj
-            .get("session_id")
-            .and_then(|v| v.as_str())
-            .context("Missing session_id field")?
-            .to_string();
-
-        let hook_event_name = obj
-            .get("hook_event_name")
-            .and_then(|v| v.as_str())
-            .context("Missing hook_event_name field")?;
-
-        let event_type = Self::parse_event_type(hook_event_name);
+        let session_id = super::req_str(&input, "session_id")?;
+        let hook_event_name = super::req_str(&input, "hook_event_name")?;
+        let event_type = Self::parse_event_type(&hook_event_name);
 
         // Extract optional timestamp (will be injected later if missing)
-        let timestamp = obj
-            .get("timestamp")
-            .and_then(|v| v.as_str())
-            .map(String::from);
+        let timestamp = super::opt_str(&input, "timestamp");
 
         // Extract tool-specific fields
-        let tool_name = obj
-            .get("tool_name")
-            .and_then(|v| v.as_str())
-            .map(String::from);
-
+        let tool_name = super::opt_str(&input, "tool_name");
         let tool_input = obj.get("tool_input").cloned();
         let tool_response = obj.get("tool_response").cloned();
 
         // Extract context fields
-        let cwd = obj.get("cwd").and_then(|v| v.as_str()).map(String::from);
-
-        let transcript_path = obj
-            .get("transcript_path")
-            .and_then(|v| v.as_str())
-            .map(String::from);
+        let cwd = super::opt_str(&input, "cwd");
+        let transcript_path = super::opt_str(&input, "transcript_path");
 
         // Collect any extra fields
         let mut extra = std::collections::HashMap::new();

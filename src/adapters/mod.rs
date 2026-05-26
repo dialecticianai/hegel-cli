@@ -6,9 +6,31 @@ pub use claude_code::{list_transcript_files, ClaudeCodeAdapter};
 pub use codex::CodexAdapter;
 pub use cursor::CursorAdapter;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+/// Detect an agent from the environment: true if any of `env_vars` is set, or
+/// any of `home_subpaths` exists under `$HOME`.
+pub(crate) fn detect_via(env_vars: &[&str], home_subpaths: &[&str]) -> bool {
+    if env_vars.iter().any(|v| std::env::var(v).is_ok()) {
+        return true;
+    }
+    std::env::var("HOME").is_ok_and(|home| {
+        let home = std::path::PathBuf::from(home);
+        home_subpaths.iter().any(|p| home.join(p).exists())
+    })
+}
+
+/// Extract an optional string field (`value[key]` as a string).
+pub(crate) fn opt_str(value: &serde_json::Value, key: &str) -> Option<String> {
+    value.get(key).and_then(|v| v.as_str()).map(String::from)
+}
+
+/// Extract a required string field, erroring with the field name if absent.
+pub(crate) fn req_str(value: &serde_json::Value, key: &str) -> Result<String> {
+    opt_str(value, key).with_context(|| format!("Missing required field: {}", key))
+}
 
 /// Event type - normalized across all agents
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

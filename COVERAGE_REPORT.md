@@ -1,23 +1,23 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 16:56
+**Last Updated**: 2026-05-26 17:00
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.06%** lines | **74.45%** regions | **76.06%** functions
+**Overall Coverage**: **75.14%** lines | **74.51%** regions | **76.02%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19344              4943    74.45%        1086               260    76.06%       12076              3012    75.06%           0                 0         -
+TOTAL                                         19300              4920    74.51%        1080               259    76.02%       12029              2990    75.14%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `src/adapters/claude_code.rs` | 85.19% | 85.52% | 80.00% | 🟡 Good |
-| `src/adapters/codex.rs` | 93.51% | 93.96% | 88.57% | 🟢 Excellent |
-| `src/adapters/cursor.rs` | 92.52% | 92.61% | 90.00% | 🟢 Excellent |
-| `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
+| `src/adapters/claude_code.rs` | 89.42% | 88.92% | 83.33% | 🟡 Good |
+| `src/adapters/codex.rs` | 96.53% | 96.15% | 93.55% | 🟢 Excellent |
+| `src/adapters/cursor.rs` | 95.36% | 94.24% | 82.35% | 🟢 Excellent |
+| `src/adapters/mod.rs` | 92.86% | 92.67% | 91.30% | 🟢 Excellent |
 | `src/analyze/cleanup/aborted.rs` | 97.22% | 97.42% | 90.91% | 🟢 Excellent |
 | `src/analyze/cleanup/duplicate_cowboy.rs` | 68.67% | 66.05% | 42.86% | 🟠 Moderate |
 | `src/analyze/cleanup/git.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
@@ -110,9 +110,9 @@ TOTAL                                         19344              4943    74.45% 
 ## Coverage Tiers
 
 ### 🟢 Excellent (≥90% lines)
-- `src/adapters/codex.rs` - 93.51%
-- `src/adapters/cursor.rs` - 92.52%
-- `src/adapters/mod.rs` - 98.91%
+- `src/adapters/codex.rs` - 96.53%
+- `src/adapters/cursor.rs` - 95.36%
+- `src/adapters/mod.rs` - 92.86%
 - `src/analyze/cleanup/aborted.rs` - 97.22%
 - `src/commands/analyze/mod.rs` - 93.50%
 - `src/commands/config.rs` - 91.95%
@@ -161,7 +161,7 @@ TOTAL                                         19344              4943    74.45% 
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/adapters/claude_code.rs` - 85.19%
+- `src/adapters/claude_code.rs` - 89.42%
 - `src/analyze/gap_detection.rs` - 86.03%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
@@ -213,7 +213,7 @@ TOTAL                                         19344              4943    74.45% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.06% | ⏳ In Progress |
+| Overall | ≥80% | 75.14% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

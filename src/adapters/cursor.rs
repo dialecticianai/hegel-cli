@@ -61,50 +61,27 @@ impl AgentAdapter for CursorAdapter {
     }
 
     fn detect(&self) -> bool {
-        // Check for Cursor-specific env vars or config
-        if std::env::var("CURSOR_SESSION_ID").is_ok() {
-            return true;
-        }
-
-        // Check for ~/.cursor/hooks.json
-        if let Ok(home) = std::env::var("HOME") {
-            let cursor_config = std::path::PathBuf::from(home).join(".cursor/hooks.json");
-            if cursor_config.exists() {
-                return true;
-            }
-        }
-
-        false
+        super::detect_via(&["CURSOR_SESSION_ID"], &[".cursor/hooks.json"])
     }
 
     fn normalize(&self, input: serde_json::Value) -> Result<Option<CanonicalHookEvent>> {
         // Extract common fields
-        let hook_event_name = input
-            .get("hook_event_name")
-            .and_then(|h| h.as_str())
-            .ok_or_else(|| anyhow::anyhow!("Missing 'hook_event_name' field"))?;
-
-        let conversation_id = input
-            .get("conversation_id")
-            .and_then(|c| c.as_str())
-            .unwrap_or("unknown");
-
-        let generation_id = input
-            .get("generation_id")
-            .and_then(|g| g.as_str())
-            .unwrap_or("unknown");
+        let hook_event_name = super::req_str(&input, "hook_event_name")?;
+        let conversation_id =
+            super::opt_str(&input, "conversation_id").unwrap_or_else(|| "unknown".to_string());
 
         // Use generation_id as session_id (more granular than conversation_id)
-        let session_id = generation_id.to_string();
+        let session_id =
+            super::opt_str(&input, "generation_id").unwrap_or_else(|| "unknown".to_string());
 
         // Cursor doesn't provide timestamps in hook input, generate one
         let timestamp = chrono::Utc::now().to_rfc3339();
 
-        let event_type = Self::map_event_type(hook_event_name);
-        let tool_name = Self::extract_tool_name(hook_event_name, &input);
+        let event_type = Self::map_event_type(&hook_event_name);
+        let tool_name = Self::extract_tool_name(&hook_event_name, &input);
 
         // Extract tool input based on event type
-        let tool_input = match hook_event_name {
+        let tool_input = match hook_event_name.as_str() {
             "beforeShellExecution" => Some(serde_json::json!({
                 "command": input.get("command"),
                 "cwd": input.get("cwd"),
@@ -133,7 +110,7 @@ impl AgentAdapter for CursorAdapter {
 
         // Extract workspace roots and cwd
         let workspace_roots = input.get("workspace_roots");
-        let cwd = input.get("cwd").and_then(|c| c.as_str()).map(String::from);
+        let cwd = super::opt_str(&input, "cwd");
 
         // Build extra metadata
         let mut extra = HashMap::new();

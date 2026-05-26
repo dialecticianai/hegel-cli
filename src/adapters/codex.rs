@@ -153,37 +153,16 @@ impl AgentAdapter for CodexAdapter {
     }
 
     fn detect(&self) -> bool {
-        // Check CODEX_HOME env var
-        if std::env::var("CODEX_HOME").is_ok() {
-            return true;
-        }
-
-        // Check default Codex directory
-        if let Ok(home) = std::env::var("HOME") {
-            let codex_dir = std::path::PathBuf::from(home).join(".codex/sessions");
-            if codex_dir.exists() {
-                return true;
-            }
-        }
-
-        false
+        super::detect_via(&["CODEX_HOME"], &[".codex/sessions"])
     }
 
     fn normalize(&self, input: serde_json::Value) -> Result<Option<CanonicalHookEvent>> {
-        let event_type = input
-            .get("type")
-            .and_then(|t| t.as_str())
-            .ok_or_else(|| anyhow::anyhow!("Missing 'type' field"))?;
-
-        let timestamp = input
-            .get("timestamp")
-            .and_then(|t| t.as_str())
-            .ok_or_else(|| anyhow::anyhow!("Missing 'timestamp' field"))?
-            .to_string();
+        let event_type = super::req_str(&input, "type")?;
+        let timestamp = super::req_str(&input, "timestamp")?;
 
         let mut state = self.state.borrow_mut();
 
-        match event_type {
+        match event_type.as_str() {
             "turn_context" => {
                 // Update model context, don't emit event
                 if let Some(payload) = input.get("payload") {
