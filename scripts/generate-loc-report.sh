@@ -122,8 +122,16 @@ LARGE_COUNT=0
 while IFS= read -r file; do
     TOTAL=$(wc -l < "$file" | tr -d ' ')
 
-    # Find line where tests start
-    TEST_START=$(grep -n "^#\[cfg(test)\]" "$file" 2>/dev/null | head -1 | cut -d: -f1)
+    # Find line where the inline test module starts: a `#[cfg(test)]` attribute
+    # immediately followed by an inline `mod ... {`. This ignores
+    # `#[cfg(test)] pub use ...` re-exports and `mod tests;` declarations that
+    # point at an external test file (both of which previously caused impl lines
+    # to be miscounted as test lines).
+    TEST_START=$(awk '
+        armed && /^(pub )?mod .*\{/ { print cfgline; exit }
+        /^#\[cfg\(test\)\]/ { cfgline = NR; armed = 1; next }
+        { armed = 0 }
+    ' "$file")
 
     if [ -n "$TEST_START" ]; then
         IMPL=$((TEST_START - 1))
