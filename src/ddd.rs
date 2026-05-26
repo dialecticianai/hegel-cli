@@ -163,7 +163,7 @@ pub struct ValidationIssue {
 }
 
 /// Result of scanning DDD artifacts
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DddScanResult {
     pub artifacts: Vec<DddArtifact>,
     pub issues: Vec<ValidationIssue>,

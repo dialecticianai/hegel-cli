@@ -1,9 +1,10 @@
 use anyhow::{bail, Result};
 use chrono::Local;
 use std::fs;
-use std::path::PathBuf;
 
-use crate::ddd::parse_ddd_structure;
+use crate::ddd::{
+    parse_ddd_structure, DddArtifact, FeatArtifact, RefactorArtifact, ReportArtifact,
+};
 
 /// Arguments for the new command
 #[derive(Debug, Clone)]
@@ -30,42 +31,30 @@ pub fn run_new(args: NewArgs) -> Result<()> {
 
 /// Create a feat directory
 fn create_feat(name: &str) -> Result<()> {
-    // Validate name format
     crate::ddd::validate_name_format(name)?;
-
-    // Get today's date
     let today = Local::now().format("%Y%m%d").to_string();
 
-    // Check if artifact with this name already exists today (any index or no index)
-    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
-        artifacts: Vec::new(),
-        issues: Vec::new(),
-    });
-
+    // Reject a same-name artifact already created today (any index)
+    let scan_result = parse_ddd_structure().unwrap_or_default();
     for artifact in &scan_result.artifacts {
-        if let crate::ddd::DddArtifact::Feat(feat) = artifact {
+        if let DddArtifact::Feat(feat) = artifact {
             if feat.date == today && feat.name == name {
                 bail!("Artifact already exists: {}", feat.dir_path().display());
             }
         }
     }
 
-    // Check for existing artifacts today to determine index
-    let index = determine_index(&today)?;
+    let index = determine_index_for_artifact(&today, "feat")?;
+    let dir_path = FeatArtifact {
+        date: today,
+        index,
+        name: name.to_string(),
+        spec_exists: false,
+        plan_exists: false,
+    }
+    .dir_path();
 
-    // Build directory name
-    let dir_name = if let Some(idx) = index {
-        format!("{}-{}-{}", today, idx, name)
-    } else {
-        format!("{}-{}", today, name)
-    };
-
-    let dir_path = PathBuf::from(".ddd/feat").join(&dir_name);
-
-    // Create directory
     fs::create_dir_all(&dir_path)?;
-
-    // Output message
     println!("Created feature directory: {}", dir_path.display());
     println!("Write your planning documents to: {}", dir_path.display());
 
@@ -74,20 +63,12 @@ fn create_feat(name: &str) -> Result<()> {
 
 /// Create a refactor artifact (output path only)
 fn create_refactor(name: &str) -> Result<()> {
-    // Validate name format
     crate::ddd::validate_name_format(name)?;
-
-    // Get today's date
     let today = Local::now().format("%Y%m%d").to_string();
 
-    // Check if artifact with this name already exists today (any index or no index)
-    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
-        artifacts: Vec::new(),
-        issues: Vec::new(),
-    });
-
+    let scan_result = parse_ddd_structure().unwrap_or_default();
     for artifact in &scan_result.artifacts {
-        if let crate::ddd::DddArtifact::Refactor(refactor) = artifact {
+        if let DddArtifact::Refactor(refactor) = artifact {
             if refactor.date == today && refactor.name == name {
                 bail!(
                     "Artifact already exists: {}",
@@ -97,16 +78,13 @@ fn create_refactor(name: &str) -> Result<()> {
         }
     }
 
-    // Check for existing refactor artifacts today to determine index
     let index = determine_index_for_artifact(&today, "refactor")?;
-
-    // Build file name
-    let file_name = if let Some(idx) = index {
-        format!("{}-{}-{}.md", today, idx, name)
-    } else {
-        format!("{}-{}.md", today, name)
-    };
-    let file_path = PathBuf::from(".ddd/refactor").join(&file_name);
+    let file_path = RefactorArtifact {
+        date: today,
+        index,
+        name: name.to_string(),
+    }
+    .file_path();
 
     // Output path (don't create file)
     println!("Write your document to: {}", file_path.display());
@@ -116,36 +94,25 @@ fn create_refactor(name: &str) -> Result<()> {
 
 /// Create a report artifact (output path only)
 fn create_report(name: &str) -> Result<()> {
-    // Validate name format
     crate::ddd::validate_name_format(name)?;
-
-    // Get today's date
     let today = Local::now().format("%Y%m%d").to_string();
 
-    // Check if artifact with this name already exists today (any index or no index)
-    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
-        artifacts: Vec::new(),
-        issues: Vec::new(),
-    });
-
+    let scan_result = parse_ddd_structure().unwrap_or_default();
     for artifact in &scan_result.artifacts {
-        if let crate::ddd::DddArtifact::Report(report) = artifact {
+        if let DddArtifact::Report(report) = artifact {
             if report.date == today && report.name == name {
                 bail!("Artifact already exists: {}", report.file_path().display());
             }
         }
     }
 
-    // Check for existing report artifacts today to determine index
     let index = determine_index_for_artifact(&today, "report")?;
-
-    // Build file name
-    let file_name = if let Some(idx) = index {
-        format!("{}-{}-{}.md", today, idx, name)
-    } else {
-        format!("{}-{}.md", today, name)
-    };
-    let file_path = PathBuf::from(".ddd/report").join(&file_name);
+    let file_path = ReportArtifact {
+        date: today,
+        index,
+        name: name.to_string(),
+    }
+    .file_path();
 
     // Output path (don't create file)
     println!("Write your document to: {}", file_path.display());
@@ -156,53 +123,25 @@ fn create_report(name: &str) -> Result<()> {
 /// Determine the index for a feat artifact on a given date
 /// Returns None if this is the first artifact, Some(N) if there are existing artifacts
 fn determine_index(date: &str) -> Result<Option<usize>> {
-    // Scan existing artifacts
-    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
-        artifacts: Vec::new(),
-        issues: Vec::new(),
-    });
-
-    // Count feats with this date
-    let mut same_day_count = 0;
-    for artifact in &scan_result.artifacts {
-        if let crate::ddd::DddArtifact::Feat(feat) = artifact {
-            if feat.date == date {
-                same_day_count += 1;
-            }
-        }
-    }
-
-    // If there are already artifacts today, assign next index
-    if same_day_count > 0 {
-        Ok(Some(same_day_count + 1))
-    } else {
-        Ok(None)
-    }
+    determine_index_for_artifact(date, "feat")
 }
 
-/// Determine the index for a refactor or report artifact on a given date
-/// Returns None if this is the first artifact, Some(N) if there are existing artifacts
+/// Determine the next index for an artifact of `artifact_type` on `date`.
+/// Returns None if this is the first artifact, Some(N) if there are existing ones.
 fn determine_index_for_artifact(date: &str, artifact_type: &str) -> Result<Option<usize>> {
-    // Scan existing artifacts
-    let scan_result = parse_ddd_structure().unwrap_or_else(|_| crate::ddd::DddScanResult {
-        artifacts: Vec::new(),
-        issues: Vec::new(),
-    });
+    let scan_result = parse_ddd_structure().unwrap_or_default();
 
-    // Count artifacts of this type with this date
-    let mut same_day_count = 0;
-    for artifact in &scan_result.artifacts {
-        let matches = match (artifact_type, artifact) {
-            ("refactor", crate::ddd::DddArtifact::Refactor(r)) => r.date == date,
-            ("report", crate::ddd::DddArtifact::Report(r)) => r.date == date,
+    let same_day_count = scan_result
+        .artifacts
+        .iter()
+        .filter(|artifact| match (artifact_type, artifact) {
+            ("feat", DddArtifact::Feat(a)) => a.date == date,
+            ("refactor", DddArtifact::Refactor(a)) => a.date == date,
+            ("report", DddArtifact::Report(a)) => a.date == date,
             _ => false,
-        };
-        if matches {
-            same_day_count += 1;
-        }
-    }
+        })
+        .count();
 
-    // If there are already artifacts today, assign next index
     if same_day_count > 0 {
         Ok(Some(same_day_count + 1))
     } else {
@@ -227,8 +166,7 @@ mod tests {
         let result = create_feat("my-feature");
         assert!(result.is_ok());
 
-        let expected_path = PathBuf::from(".ddd/feat/20251113-my-feature");
-        // Date will vary, so just check directory was created
+        // Date will vary, so just check the directory was created
         let entries: Vec<_> = fs::read_dir(".ddd/feat").unwrap().collect();
         assert_eq!(entries.len(), 1);
     }
