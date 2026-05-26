@@ -203,19 +203,10 @@ pub fn aggregate_tokens_for_range(
                 continue;
             }
 
-            // Extract token usage (handle both formats)
-            let usage = event
-                .usage
-                .or_else(|| event.message.as_ref().and_then(|m| m.usage.clone()));
-
-            if let Some(usage) = usage {
+            // Extract token usage (handles both old and new transcript formats)
+            if let Some(usage) = event.usage() {
                 file_matched += 1;
-                total_metrics.total_input_tokens += usage.input_tokens;
-                total_metrics.total_output_tokens += usage.output_tokens;
-                total_metrics.total_cache_creation_tokens +=
-                    usage.cache_creation_input_tokens.unwrap_or(0);
-                total_metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
-                total_metrics.assistant_turns += 1;
+                total_metrics.accumulate(usage);
             }
         }
 

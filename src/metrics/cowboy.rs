@@ -34,36 +34,15 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
         session_end_time: Some(group.end_time.to_rfc3339()),
     };
 
-    // Aggregate token metrics from transcript events
-    let mut total_input = 0;
-    let mut total_output = 0;
-    let mut total_cache_creation = 0;
-    let mut total_cache_read = 0;
-    let assistant_turns = group.transcript_events.len();
-
+    // Aggregate token metrics from transcript events (handles both transcript formats)
+    let mut token_metrics = TokenMetrics::default();
     for event in &group.transcript_events {
-        // Extract token usage from either old or new format
-        let usage = event
-            .message
-            .as_ref()
-            .and_then(|m| m.usage.as_ref())
-            .or(event.usage.as_ref());
-
-        if let Some(usage) = usage {
-            total_input += usage.input_tokens;
-            total_output += usage.output_tokens;
-            total_cache_creation += usage.cache_creation_input_tokens.unwrap_or(0);
-            total_cache_read += usage.cache_read_input_tokens.unwrap_or(0);
+        if let Some(usage) = event.usage() {
+            token_metrics.accumulate(usage);
         }
     }
-
-    let token_metrics = TokenMetrics {
-        total_input_tokens: total_input,
-        total_output_tokens: total_output,
-        total_cache_creation_tokens: total_cache_creation,
-        total_cache_read_tokens: total_cache_read,
-        assistant_turns,
-    };
+    // Cowboy turns count every transcript event, even those without usage data.
+    token_metrics.assistant_turns = group.transcript_events.len();
 
     // Create single "ride" phase
     let duration_seconds = (group.end_time - group.start_time).num_seconds() as u64;

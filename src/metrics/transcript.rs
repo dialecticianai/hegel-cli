@@ -1,8 +1,5 @@
-use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs;
-use std::path::Path;
 
 /// Token usage from transcript events
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,6 +47,16 @@ pub struct TranscriptEvent {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+impl TranscriptEvent {
+    /// Extract token usage from either old (`.usage`) or new (`.message.usage`)
+    /// Claude Code transcript format. Old format takes precedence when both exist.
+    pub fn usage(&self) -> Option<&TokenUsage> {
+        self.usage
+            .as_ref()
+            .or_else(|| self.message.as_ref().and_then(|m| m.usage.as_ref()))
+    }
+}
+
 /// Aggregated token metrics from transcript
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TokenMetrics {
@@ -60,200 +67,135 @@ pub struct TokenMetrics {
     pub assistant_turns: usize,
 }
 
-/// Parse transcript file and extract token metrics
-// TODO: Investigate if this function is still needed or can be removed
-#[allow(dead_code)]
-pub fn parse_transcript_file<P: AsRef<Path>>(transcript_path: P) -> Result<TokenMetrics> {
-    let content = fs::read_to_string(transcript_path.as_ref()).with_context(|| {
-        format!(
-            "Failed to read transcript file: {:?}",
-            transcript_path.as_ref()
-        )
-    })?;
-
-    let mut metrics = TokenMetrics::default();
-
-    for (line_num, line) in content.lines().enumerate() {
-        let event: TranscriptEvent = serde_json::from_str(line).with_context(|| {
-            format!("Failed to parse transcript event at line {}", line_num + 1)
-        })?;
-
-        // Only assistant events have token usage
-        if event.event_type == "assistant" {
-            // Try both old format (.usage) and new format (.message.usage)
-            // Claude Code changed schema between versions, handle both for resilience
-            let usage = event
-                .usage
-                .or_else(|| event.message.as_ref().and_then(|m| m.usage.clone()));
-
-            if let Some(usage) = usage {
-                metrics.total_input_tokens += usage.input_tokens;
-                metrics.total_output_tokens += usage.output_tokens;
-                metrics.total_cache_creation_tokens +=
-                    usage.cache_creation_input_tokens.unwrap_or(0);
-                metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
-                metrics.assistant_turns += 1;
-            }
-        }
+impl TokenMetrics {
+    /// Accumulate one usage record, counting it as an assistant turn.
+    pub fn accumulate(&mut self, usage: &TokenUsage) {
+        self.total_input_tokens += usage.input_tokens;
+        self.total_output_tokens += usage.output_tokens;
+        self.total_cache_creation_tokens += usage.cache_creation_input_tokens.unwrap_or(0);
+        self.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
+        self.assistant_turns += 1;
     }
+}
 
-    Ok(metrics)
+impl std::ops::AddAssign<&TokenMetrics> for TokenMetrics {
+    fn add_assign(&mut self, other: &TokenMetrics) {
+        self.total_input_tokens += other.total_input_tokens;
+        self.total_output_tokens += other.total_output_tokens;
+        self.total_cache_creation_tokens += other.total_cache_creation_tokens;
+        self.total_cache_read_tokens += other.total_cache_read_tokens;
+        self.assistant_turns += other.assistant_turns;
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_helpers::*;
+
+    fn parse(line: &str) -> TranscriptEvent {
+        serde_json::from_str(line).unwrap()
+    }
 
     #[test]
-    fn test_parse_transcript_token_usage() {
-        let events = vec![
+    fn test_usage_old_format() {
+        let e = parse(
             r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50,"cache_creation_input_tokens":200,"cache_read_input_tokens":300}}"#,
-            r#"{"type":"user","content":"test message"}"#,
-            r#"{"type":"assistant","usage":{"input_tokens":150,"output_tokens":75}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.total_input_tokens, 250);
-        assert_eq!(metrics.total_output_tokens, 125);
-        assert_eq!(metrics.total_cache_creation_tokens, 200);
-        assert_eq!(metrics.total_cache_read_tokens, 300);
-        assert_eq!(metrics.assistant_turns, 2);
+        );
+        let u = e.usage().expect("old-format usage extracted");
+        assert_eq!(u.input_tokens, 100);
+        assert_eq!(u.output_tokens, 50);
+        assert_eq!(u.cache_creation_input_tokens, Some(200));
+        assert_eq!(u.cache_read_input_tokens, Some(300));
     }
 
     #[test]
-    fn test_parse_transcript_skip_non_assistant() {
-        let events = vec![
-            r#"{"type":"user","content":"hello"}"#,
-            r#"{"type":"system","content":"system message"}"#,
-            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.assistant_turns, 1);
-        assert_eq!(metrics.total_input_tokens, 100);
-    }
-
-    #[test]
-    fn test_parse_transcript_new_format_message_usage() {
+    fn test_usage_new_format_message_usage() {
         // New Claude Code format: token usage nested in message.usage
-        let events = vec![
-            r#"{"type":"assistant","message":{"usage":{"input_tokens":100,"output_tokens":50,"cache_creation_input_tokens":200,"cache_read_input_tokens":300}}}"#,
-            r#"{"type":"user","content":"test message"}"#,
+        let e = parse(
             r#"{"type":"assistant","message":{"usage":{"input_tokens":150,"output_tokens":75}}}"#,
+        );
+        let u = e.usage().expect("new-format usage extracted");
+        assert_eq!(u.input_tokens, 150);
+        assert_eq!(u.output_tokens, 75);
+    }
+
+    #[test]
+    fn test_usage_old_format_takes_precedence() {
+        // Both present: old `.usage` wins over `.message.usage`
+        let e = parse(
+            r#"{"type":"assistant","usage":{"input_tokens":1,"output_tokens":2},"message":{"usage":{"input_tokens":999,"output_tokens":999}}}"#,
+        );
+        let u = e.usage().unwrap();
+        assert_eq!(u.input_tokens, 1);
+        assert_eq!(u.output_tokens, 2);
+    }
+
+    #[test]
+    fn test_usage_absent() {
+        assert!(parse(r#"{"type":"assistant","content":"Hello"}"#)
+            .usage()
+            .is_none());
+        assert!(parse(r#"{"type":"user","content":"hi"}"#).usage().is_none());
+    }
+
+    #[test]
+    fn test_accumulate_old_and_new_formats() {
+        // Mix of old and new formats accumulate identically (resilience test)
+        let events = [
+            parse(r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#),
+            parse(
+                r#"{"type":"assistant","message":{"usage":{"input_tokens":150,"output_tokens":75,"cache_creation_input_tokens":100}}}"#,
+            ),
+            parse(r#"{"type":"assistant","usage":{"input_tokens":200,"output_tokens":100}}"#),
         ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.total_input_tokens, 250);
-        assert_eq!(metrics.total_output_tokens, 125);
-        assert_eq!(metrics.total_cache_creation_tokens, 200);
-        assert_eq!(metrics.total_cache_read_tokens, 300);
-        assert_eq!(metrics.assistant_turns, 2);
+        let mut m = TokenMetrics::default();
+        for e in &events {
+            if let Some(u) = e.usage() {
+                m.accumulate(u);
+            }
+        }
+        assert_eq!(m.total_input_tokens, 450); // 100 + 150 + 200
+        assert_eq!(m.total_output_tokens, 225); // 50 + 75 + 100
+        assert_eq!(m.total_cache_creation_tokens, 100); // absent cache fields count as 0
+        assert_eq!(m.assistant_turns, 3);
     }
 
     #[test]
-    fn test_parse_transcript_mixed_format() {
-        // Mix of old and new formats in same file (resilience test)
-        let events = vec![
-            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
-            r#"{"type":"assistant","message":{"usage":{"input_tokens":150,"output_tokens":75,"cache_creation_input_tokens":100}}}"#,
-            r#"{"type":"user","content":"test"}"#,
-            r#"{"type":"assistant","usage":{"input_tokens":200,"output_tokens":100}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.total_input_tokens, 450); // 100 + 150 + 200
-        assert_eq!(metrics.total_output_tokens, 225); // 50 + 75 + 100
-        assert_eq!(metrics.total_cache_creation_tokens, 100);
-        assert_eq!(metrics.assistant_turns, 3);
+    fn test_accumulate_optional_cache_fields_default_to_zero() {
+        let u = TokenUsage {
+            input_tokens: 10,
+            output_tokens: 5,
+            cache_creation_input_tokens: None,
+            cache_read_input_tokens: None,
+        };
+        let mut m = TokenMetrics::default();
+        m.accumulate(&u);
+        assert_eq!(m.total_cache_creation_tokens, 0);
+        assert_eq!(m.total_cache_read_tokens, 0);
+        assert_eq!(m.assistant_turns, 1);
     }
 
     #[test]
-    fn test_parse_transcript_empty_file() {
-        let events: Vec<&str> = vec![];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.assistant_turns, 0);
-        assert_eq!(metrics.total_input_tokens, 0);
-        assert_eq!(metrics.total_output_tokens, 0);
-    }
-
-    #[test]
-    fn test_parse_transcript_file_not_found() {
-        use std::path::PathBuf;
-        let nonexistent = PathBuf::from("/nonexistent/path/transcript.jsonl");
-        let result = parse_transcript_file(&nonexistent);
-
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("Failed to read transcript file"));
-    }
-
-    #[test]
-    fn test_parse_transcript_malformed_json() {
-        use tempfile::TempDir;
-        let temp_dir = TempDir::new().unwrap();
-        let transcript_path = temp_dir.path().join("transcript.jsonl");
-
-        std::fs::write(&transcript_path, "not valid json\n").unwrap();
-
-        let result = parse_transcript_file(&transcript_path);
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("Failed to parse transcript event"));
-    }
-
-    #[test]
-    fn test_parse_transcript_assistant_without_usage() {
-        // Assistant event without usage field - should be skipped
-        let events = vec![
-            r#"{"type":"assistant","content":"Hello"}"#,
-            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        // Only one assistant turn should be counted (the one with usage)
-        assert_eq!(metrics.assistant_turns, 1);
-        assert_eq!(metrics.total_input_tokens, 100);
-        assert_eq!(metrics.total_output_tokens, 50);
-    }
-
-    #[test]
-    fn test_parse_transcript_with_timestamps() {
-        // Events with timestamps (new field for phase correlation)
-        let events = vec![
-            r#"{"type":"assistant","timestamp":"2025-01-01T10:00:00Z","usage":{"input_tokens":100,"output_tokens":50}}"#,
-            r#"{"type":"assistant","timestamp":"2025-01-01T10:05:00Z","message":{"usage":{"input_tokens":150,"output_tokens":75}}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.assistant_turns, 2);
-        assert_eq!(metrics.total_input_tokens, 250);
-        assert_eq!(metrics.total_output_tokens, 125);
-    }
-
-    #[test]
-    fn test_parse_transcript_other_event_types() {
-        // Test various event types beyond assistant/user/system
-        let events = vec![
-            r#"{"type":"file-history-snapshot","data":"..."}"#,
-            r#"{"type":"assistant","usage":{"input_tokens":100,"output_tokens":50}}"#,
-        ];
-        let (_temp_dir, transcript_path) = create_transcript_file(&events);
-        let metrics = parse_transcript_file(&transcript_path).unwrap();
-
-        assert_eq!(metrics.assistant_turns, 1);
-        assert_eq!(metrics.total_input_tokens, 100);
+    fn test_add_assign_sums_all_fields() {
+        let mut a = TokenMetrics {
+            total_input_tokens: 100,
+            total_output_tokens: 50,
+            total_cache_creation_tokens: 10,
+            total_cache_read_tokens: 5,
+            assistant_turns: 2,
+        };
+        let b = TokenMetrics {
+            total_input_tokens: 200,
+            total_output_tokens: 100,
+            total_cache_creation_tokens: 20,
+            total_cache_read_tokens: 15,
+            assistant_turns: 3,
+        };
+        a += &b;
+        assert_eq!(a.total_input_tokens, 300);
+        assert_eq!(a.total_output_tokens, 150);
+        assert_eq!(a.total_cache_creation_tokens, 30);
+        assert_eq!(a.total_cache_read_tokens, 20);
+        assert_eq!(a.assistant_turns, 5);
     }
 }

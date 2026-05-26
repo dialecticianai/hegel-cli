@@ -232,13 +232,7 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
     // Aggregate token totals from all phases
     if !live_phase_metrics.is_empty() {
         for phase in &live_phase_metrics {
-            unified.token_metrics.total_input_tokens += phase.token_metrics.total_input_tokens;
-            unified.token_metrics.total_output_tokens += phase.token_metrics.total_output_tokens;
-            unified.token_metrics.total_cache_creation_tokens +=
-                phase.token_metrics.total_cache_creation_tokens;
-            unified.token_metrics.total_cache_read_tokens +=
-                phase.token_metrics.total_cache_read_tokens;
-            unified.token_metrics.assistant_turns += phase.token_metrics.assistant_turns;
+            unified.token_metrics += &phase.token_metrics;
         }
     } else if !transcript_files.is_empty() {
         // Fallback: If no phases but we have transcripts, parse them for overall metrics
