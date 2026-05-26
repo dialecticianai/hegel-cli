@@ -90,7 +90,7 @@ pub fn build_phase_metrics(
                         transcript_events_matched: Some(matched_count),
                     });
                 }
-                // Text output already printed in aggregate_tokens_for_phase
+                // Text output already printed in aggregate_tokens_for_range
             }
         }
 
@@ -125,111 +125,6 @@ fn is_in_range(timestamp: &str, start: &str, end: Option<&str>) -> bool {
     } else {
         false
     }
-}
-
-/// Aggregate token usage from transcript for a specific phase
-/// Returns (TokenMetrics, examined_count, matched_count)
-// TODO: Investigate if this function is still needed or can be removed
-#[allow(dead_code)]
-fn aggregate_tokens_for_phase(
-    transcript_path: &str,
-    start_time: &str,
-    end_time: Option<&str>,
-    phase_name: &str,
-    debug_config: Option<&crate::metrics::DebugConfig>,
-) -> Result<(TokenMetrics, usize, usize)> {
-    use crate::metrics::transcript::TranscriptEvent;
-
-    let content = fs::read_to_string(transcript_path)?;
-    let mut metrics = TokenMetrics::default();
-
-    // Debug: Check if we should output for this phase
-    let should_debug = debug_config.map_or(false, |cfg| cfg.overlaps(start_time, end_time));
-
-    let mut examined_count = 0;
-    let mut matched_count = 0;
-
-    if should_debug {
-        eprintln!(
-            "\n[DEBUG LIVE] Phase '{}' ({} to {})",
-            phase_name,
-            start_time,
-            end_time.unwrap_or("active")
-        );
-    }
-
-    for line in content.lines() {
-        if line.trim().is_empty() {
-            continue;
-        }
-
-        let event: TranscriptEvent = serde_json::from_str(line)?;
-
-        // Only process assistant events
-        if event.event_type != "assistant" {
-            continue;
-        }
-
-        examined_count += 1;
-
-        // Check if timestamp is in phase range
-        let event_timestamp = match &event.timestamp {
-            Some(ts) => ts,
-            None => {
-                if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
-                    eprintln!("  - Event #{}: NO TIMESTAMP → SKIPPED", examined_count);
-                }
-                continue;
-            }
-        };
-
-        let in_range = is_in_range(event_timestamp, start_time, end_time);
-
-        // Extract token usage
-        let usage = event
-            .usage
-            .or_else(|| event.message.as_ref().and_then(|m| m.usage.clone()));
-
-        if in_range {
-            if let Some(usage) = usage {
-                matched_count += 1;
-                metrics.total_input_tokens += usage.input_tokens;
-                metrics.total_output_tokens += usage.output_tokens;
-                metrics.total_cache_creation_tokens +=
-                    usage.cache_creation_input_tokens.unwrap_or(0);
-                metrics.total_cache_read_tokens += usage.cache_read_input_tokens.unwrap_or(0);
-                metrics.assistant_turns += 1;
-
-                if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
-                    eprintln!(
-                        "  - Event #{} at {}: {} in + {} out → MATCHED",
-                        examined_count, event_timestamp, usage.input_tokens, usage.output_tokens
-                    );
-                }
-            } else if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
-                eprintln!(
-                    "  - Event #{} at {}: NO USAGE DATA → MATCHED (no tokens)",
-                    examined_count, event_timestamp
-                );
-            }
-        } else if should_debug && debug_config.map_or(false, |cfg| cfg.verbose) {
-            eprintln!(
-                "  - Event #{} at {}: OUT OF RANGE → SKIPPED",
-                examined_count, event_timestamp
-            );
-        }
-    }
-
-    if should_debug && !debug_config.map_or(false, |cfg| cfg.json_output) {
-        // Only print text summary if not in JSON mode
-        let total_tokens = metrics.total_input_tokens + metrics.total_output_tokens;
-        eprintln!(
-            "  Summary: examined {} events, matched {}, attributed {} tokens",
-            examined_count, matched_count, total_tokens
-        );
-    }
-
-    Ok((metrics, examined_count, matched_count))
 }
 
 /// Aggregate token usage from multiple transcript files for a time range

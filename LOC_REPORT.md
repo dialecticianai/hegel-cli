@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-14 12:03
+**Last Updated**: 2026-05-26 15:47
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,647 | 16,017 | 36,664 |
-| **Comments** | 3,036 | - | 3,036 |
-| **Blank Lines** | 3,881 | - | 3,881 |
-| **Total Lines** | 27,564 | 16,017 | 43,581 |
-| **Files** | 123 | 83 | 206 |
+| **Lines** | 20,566 | 16,257 | 36,823 |
+| **Comments** | 3,028 | - | 3,028 |
+| **Blank Lines** | 3,865 | - | 3,865 |
+| **Total Lines** | 27,459 | 16,257 | 43,716 |
+| **Files** | 123 | 84 | 207 |
 
-**Documentation Ratio**: 0.78 lines of docs per line of code
+**Documentation Ratio**: 0.79 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           123           3881           3036          20647
+Rust                           123           3865           3028          20566
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           139           4038           3036          21149
+SUM:                           139           4022           3028          21068
 -------------------------------------------------------------------------------
 ```
 
@@ -116,7 +116,7 @@ SUM:                           139           4038           3036          21149
 | `lib.rs` | 15 | 13 | 2 | 13.3% | ✅ |
 | `main.rs` | 589 | 16 | 573 | 97.3% | ✅ |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
-| `metrics/aggregation.rs` | 408 | 348 | 60 | 14.7% | ✅ |
+| `metrics/aggregation.rs` | 303 | 243 | 60 | 19.8% | ✅ |
 | `metrics/cowboy.rs` | 199 | 116 | 83 | 41.7% | ✅ |
 | `metrics/git.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
@@ -199,6 +199,7 @@ SUM:                           139           4038           3036          21149
 | `.ddd/refactor/20251106-1-gap-detection-test-coverage.md` | 210 |
 | `.ddd/refactor/20251106-2-multi-session-token-attribution.md` | 370 |
 | `.ddd/refactor/20251110-test-extraction.md` | 193 |
+| `.ddd/refactor/20260526-dry-and-idiomatic-cleanup.md` | 240 |
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
@@ -259,7 +260,7 @@ SUM:                           139           4038           3036          21149
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.78 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.79 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

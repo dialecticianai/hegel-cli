@@ -1,20 +1,20 @@
 # Test Coverage Report
 
-**Last Updated**: 2025-11-14 12:03
+**Last Updated**: 2026-05-26 15:47
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **74.23%** lines | **73.85%** regions | **76.08%** functions
+**Overall Coverage**: **74.66%** lines | **74.16%** regions | **76.36%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19727              5159    73.85%        1091               261    76.08%       12317              3174    74.23%           0                 0         -
+TOTAL                                         19630              5073    74.16%        1087               257    76.36%       12238              3101    74.66%           0                 0         -
 ```
 
 ## Coverage by Module
 
 | Module | Line Coverage | Region Coverage | Functions | Status |
 |--------|--------------|-----------------|-----------|--------|
-| `src/adapters/claude_code.rs` | 87.32% | 87.30% | 83.33% | 🟡 Good |
+| `src/adapters/claude_code.rs` | 86.38% | 86.22% | 83.33% | 🟡 Good |
 | `src/adapters/codex.rs` | 94.43% | 94.51% | 91.18% | 🟢 Excellent |
 | `src/adapters/cursor.rs` | 93.84% | 93.41% | 94.74% | 🟢 Excellent |
 | `src/adapters/mod.rs` | 98.91% | 99.35% | 100.00% | 🟢 Excellent |
@@ -34,7 +34,7 @@ TOTAL                                         19727              5159    73.85% 
 | `src/commands/doctor/fix_state.rs` | 32.20% | 25.00% | 100.00% | 🔴 Needs Work |
 | `src/commands/doctor/mod.rs` | 90.00% | 81.82% | 100.00% | 🟢 Excellent |
 | `src/commands/doctor/tests.rs` | 99.44% | 99.25% | 100.00% | 🟢 Excellent |
-| `src/commands/external_bin.rs` | 37.86% | 32.28% | 37.50% | 🔴 Needs Work |
+| `src/commands/external_bin.rs` | 33.98% | 27.85% | 37.50% | 🔴 Needs Work |
 | `src/commands/fork/amp.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/codex.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/cody.rs` | 100.00% | 98.41% | 100.00% | 🟢 Excellent |
@@ -71,7 +71,7 @@ TOTAL                                         19727              5159    73.85% 
 | `src/guardrails/types.rs` | 94.38% | 93.60% | 100.00% | 🟢 Excellent |
 | `src/main.rs` | 42.31% | 35.77% | 100.00% | 🟠 Moderate |
 | `src/metamodes/mod.rs` | 99.29% | 99.56% | 100.00% | 🟢 Excellent |
-| `src/metrics/aggregation.rs` | 57.91% | 60.68% | 75.00% | 🟠 Moderate |
+| `src/metrics/aggregation.rs` | 78.90% | 79.37% | 93.75% | 🟡 Good |
 | `src/metrics/cowboy.rs` | 100.00% | 99.42% | 100.00% | 🟢 Excellent |
 | `src/metrics/git.rs` | 91.89% | 87.59% | 100.00% | 🟢 Excellent |
 | `src/metrics/graph.rs` | 90.06% | 89.20% | 100.00% | 🟢 Excellent |
@@ -158,7 +158,7 @@ TOTAL                                         19727              5159    73.85% 
 - `src/tui/utils.rs` - 97.04%
 
 ### 🟡 Good (70-89% lines)
-- `src/adapters/claude_code.rs` - 87.32%
+- `src/adapters/claude_code.rs` - 86.38%
 - `src/analyze/gap_detection.rs` - 86.03%
 - `src/commands/fork/mod.rs` - 73.68%
 - `src/commands/hooks_setup.rs` - 86.11%
@@ -171,6 +171,7 @@ TOTAL                                         19727              5159    73.85% 
 - `src/doctor/migrations.rs` - 82.98%
 - `src/embedded.rs` - 82.79%
 - `src/engine/mod.rs` - 86.98%
+- `src/metrics/aggregation.rs` - 78.90%
 - `src/storage/log_cleanup.rs` - 75.00%
 - `src/storage/mod.rs` - 80.81%
 - `src/test_helpers/fixtures.rs` - 80.00%
@@ -189,7 +190,6 @@ TOTAL                                         19727              5159    73.85% 
 - `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 60.51%
 - `src/main.rs` - 42.31%
-- `src/metrics/aggregation.rs` - 57.91%
 - `src/metrics/mod.rs` - 58.13%
 
 ### 🔴 Needs Work (<40% lines)
@@ -201,7 +201,7 @@ TOTAL                                         19727              5159    73.85% 
 - `src/commands/astq.rs` - 17.78%
 - `src/commands/doctor/fix_ddd.rs` - 4.47%
 - `src/commands/doctor/fix_state.rs` - 32.20%
-- `src/commands/external_bin.rs` - 37.86%
+- `src/commands/external_bin.rs` - 33.98%
 - `src/commands/markdown.rs` - 30.06%
 - `src/commands/reflect.rs` - 19.55%
 - `src/doctor/rescue.rs` - 0.00%
@@ -211,7 +211,7 @@ TOTAL                                         19727              5159    73.85% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 74.23% | ⏳ In Progress |
+| Overall | ≥80% | 74.66% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
