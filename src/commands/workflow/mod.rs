@@ -7,7 +7,7 @@ use colored::Colorize;
 use std::path::PathBuf;
 
 use crate::engine::{init_state, load_workflow};
-use crate::storage::{FileStorage, State};
+use crate::storage::FileStorage;
 use crate::theme::Theme;
 
 pub use claims::ClaimAlias;
@@ -97,12 +97,7 @@ pub fn start_workflow(
         .with_context(|| format!("Node not found: {}", current_node))?;
 
     // Store state (preserve session_metadata and cumulative_totals from existing state)
-    let state = State {
-        workflow: Some(workflow_state.clone()),
-        session_metadata: existing_state.session_metadata,
-        cumulative_totals: existing_state.cumulative_totals,
-        git_info: existing_state.git_info,
-    };
+    let state = existing_state.with_workflow(Some(workflow_state.clone()));
     storage.save(&state)?;
 
     // Log initial state transition (START -> first node)
@@ -191,12 +186,7 @@ pub fn reset_workflow(storage: &FileStorage) -> Result<()> {
     let state = storage.load()?;
 
     // Clear workflow fields but keep session_metadata and cumulative_totals
-    let cleared_state = State {
-        workflow: None,
-        session_metadata: state.session_metadata,
-        cumulative_totals: state.cumulative_totals,
-        git_info: state.git_info,
-    };
+    let cleared_state = state.with_workflow(None);
 
     storage.save(&cleared_state)?;
     println!("{}", Theme::success("Workflow state cleared"));
@@ -335,12 +325,7 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
         .with_context(|| format!("Node not found: {}", to_node))?;
 
     // Persist state
-    let updated_state = State {
-        workflow: Some(workflow_state.clone()),
-        session_metadata: state.session_metadata,
-        cumulative_totals: state.cumulative_totals,
-        git_info: state.git_info,
-    };
+    let updated_state = state.with_workflow(Some(workflow_state.clone()));
     storage.save(&updated_state)?;
 
     // Log transition (backward)
@@ -463,12 +448,7 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     let stash = storage.load_stash(index)?;
 
     // Restore state
-    let restored = State {
-        workflow: Some(stash.workflow.clone()),
-        session_metadata: state.session_metadata,
-        cumulative_totals: state.cumulative_totals,
-        git_info: state.git_info,
-    };
+    let restored = state.with_workflow(Some(stash.workflow.clone()));
     storage.save(&restored)?;
 
     // Delete stash

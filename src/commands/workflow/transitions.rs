@@ -451,11 +451,12 @@ pub fn execute_transition(
             context.workflow_state.phase_start_time = Some(chrono::Utc::now().to_rfc3339());
 
             // Persist state
+            let loaded = storage.load().ok();
             let state = State {
                 workflow: Some(context.workflow_state.clone()),
                 session_metadata: context.session_metadata.clone(),
-                cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
-                git_info: storage.load().ok().and_then(|s| s.git_info),
+                cumulative_totals: loaded.as_ref().and_then(|s| s.cumulative_totals.clone()),
+                git_info: loaded.as_ref().and_then(|s| s.git_info.clone()),
             };
             storage.save(&state)?;
 
@@ -520,11 +521,12 @@ pub fn execute_transition(
             new_state.meta_mode = context.workflow_state.meta_mode.clone(); // Preserve meta-mode
 
             // Persist new state
+            let loaded = storage.load().ok();
             let state = State {
                 workflow: Some(new_state.clone()),
                 session_metadata: context.session_metadata.clone(),
-                cumulative_totals: storage.load().ok().and_then(|s| s.cumulative_totals),
-                git_info: storage.load().ok().and_then(|s| s.git_info),
+                cumulative_totals: loaded.as_ref().and_then(|s| s.cumulative_totals.clone()),
+                git_info: loaded.as_ref().and_then(|s| s.git_info.clone()),
             };
             storage.save(&state)?;
 

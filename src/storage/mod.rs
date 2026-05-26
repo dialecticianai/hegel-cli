@@ -111,6 +111,14 @@ pub struct State {
     pub git_info: Option<GitInfo>,
 }
 
+impl State {
+    /// Return this state with its workflow replaced, preserving session
+    /// metadata, cumulative totals, and cached git info.
+    pub fn with_workflow(self, workflow: Option<WorkflowState>) -> State {
+        State { workflow, ..self }
+    }
+}
+
 /// Stash entry structure - stored workflow state for later restoration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StashEntry {
