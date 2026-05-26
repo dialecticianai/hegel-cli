@@ -120,12 +120,6 @@ fn create_report(name: &str) -> Result<()> {
     Ok(())
 }
 
-/// Determine the index for a feat artifact on a given date
-/// Returns None if this is the first artifact, Some(N) if there are existing artifacts
-fn determine_index(date: &str) -> Result<Option<usize>> {
-    determine_index_for_artifact(date, "feat")
-}
-
 /// Determine the next index for an artifact of `artifact_type` on `date`.
 /// Returns None if this is the first artifact, Some(N) if there are existing ones.
 fn determine_index_for_artifact(date: &str, artifact_type: &str) -> Result<Option<usize>> {
@@ -245,7 +239,7 @@ mod tests {
     #[test]
     #[serial]
     fn test_determine_index_no_existing() {
-        let result = determine_index("20991231");
+        let result = determine_index_for_artifact("20991231", "feat");
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), None);
     }
@@ -262,7 +256,7 @@ mod tests {
         fs::create_dir_all(format!(".ddd/feat/{}-first", date)).unwrap();
         fs::create_dir_all(format!(".ddd/feat/{}-1-second", date)).unwrap();
 
-        let result = determine_index(date);
+        let result = determine_index_for_artifact(date, "feat");
         assert!(result.is_ok());
         // Should return index 3 (2 existing + 1)
         assert_eq!(result.unwrap(), Some(3));
