@@ -80,7 +80,7 @@ pub fn show_status(storage: &FileStorage) -> Result<()> {
     }
 
     // Show workflow status if active
-    if state.workflow.is_none() || state.workflow.is_none() {
+    if state.workflow.is_none() {
         println!("{}", Theme::secondary("No active workflow"));
         println!(
             "Start a workflow with: {}",
