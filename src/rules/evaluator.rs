@@ -1,8 +1,59 @@
 use anyhow::Result;
-use chrono::DateTime;
+use chrono::{DateTime, FixedOffset};
 use regex::Regex;
 
 use super::types::{RuleConfig, RuleEvaluationContext, RuleViolation};
+
+/// The phase metrics for the context's current phase, if present.
+fn current_phase_metrics<'a>(
+    context: &'a RuleEvaluationContext,
+) -> Option<&'a crate::metrics::PhaseMetrics> {
+    context
+        .all_phase_metrics
+        .iter()
+        .find(|p| p.phase_name == context.current_phase)
+}
+
+/// Compute the `[phase_start, phase_start + window]` bounds and compile the
+/// optional pattern. Falls back to "now" as the start for old state files
+/// missing `phase_start_time`.
+#[allow(clippy::type_complexity)]
+fn phase_window(
+    context: &RuleEvaluationContext,
+    pattern: &Option<String>,
+    window: u64,
+) -> Result<(DateTime<FixedOffset>, DateTime<FixedOffset>, Option<Regex>)> {
+    let phase_start = context
+        .phase_start_time
+        .as_ref()
+        .map(|s| DateTime::parse_from_rfc3339(s))
+        .transpose()?
+        .unwrap_or_else(|| chrono::Utc::now().into());
+    let window_end = phase_start + chrono::Duration::seconds(window as i64);
+    let regex = pattern.as_ref().map(|p| Regex::new(p)).transpose()?;
+    Ok((phase_start, window_end, regex))
+}
+
+/// Items whose timestamp falls within `[phase_start, window_end]` and whose
+/// `text` matches `regex` (or all, when no pattern).
+fn matches_in_window<'a, T>(
+    items: &'a [T],
+    phase_start: DateTime<FixedOffset>,
+    window_end: DateTime<FixedOffset>,
+    regex: &Option<Regex>,
+    timestamp: impl Fn(&T) -> Option<&String>,
+    text: impl Fn(&T) -> &str,
+) -> Vec<&'a T> {
+    items
+        .iter()
+        .filter(|item| {
+            let in_window = timestamp(item)
+                .and_then(|ts| DateTime::parse_from_rfc3339(ts).ok())
+                .is_some_and(|ts| ts >= phase_start && ts <= window_end);
+            in_window && regex.as_ref().is_none_or(|re| re.is_match(text(item)))
+        })
+        .collect()
+}
 
 /// Evaluate all rules and return the first violation (short-circuit)
 pub fn evaluate_rules(
@@ -106,50 +157,17 @@ pub(crate) fn evaluate_repeated_file_edit(
         _ => return Ok(None),
     };
 
-    // Calculate window bounds: [phase_start, phase_start + window]
-    // If phase_start_time is missing, use current time (graceful fallback for old state files)
-    let phase_start = context
-        .phase_start_time
-        .as_ref()
-        .map(|s| DateTime::parse_from_rfc3339(s))
-        .transpose()?
-        .unwrap_or_else(|| chrono::Utc::now().into());
-    let window_end = phase_start + chrono::Duration::seconds(*window as i64);
-
-    // Compile regex if pattern provided
-    let regex = if let Some(pat) = path_pattern {
-        Some(Regex::new(pat)?)
-    } else {
-        None
-    };
+    let (phase_start, window_end, regex) = phase_window(context, path_pattern, *window)?;
 
     // Filter file modifications by time window and pattern
-    let matching_edits: Vec<_> = context
-        .hook_metrics
-        .file_modifications
-        .iter()
-        .filter(|file_mod| {
-            // Filter by timestamp (within window: phase_start <= ts <= window_end)
-            if let Some(ts) = &file_mod.timestamp {
-                if let Ok(timestamp) = DateTime::parse_from_rfc3339(ts) {
-                    if timestamp < phase_start || timestamp > window_end {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            // Filter by pattern (if provided)
-            if let Some(ref re) = regex {
-                re.is_match(&file_mod.file_path)
-            } else {
-                true // No pattern = match all
-            }
-        })
-        .collect();
+    let matching_edits = matches_in_window(
+        &context.hook_metrics.file_modifications,
+        phase_start,
+        window_end,
+        &regex,
+        |f| f.timestamp.as_ref(),
+        |f| &f.file_path,
+    );
 
     let count = matching_edits.len();
 
@@ -193,13 +211,7 @@ pub(crate) fn evaluate_token_budget(
         _ => return Ok(None),
     };
 
-    // Find current phase in all_phase_metrics by name
-    let phase_metrics = context
-        .all_phase_metrics
-        .iter()
-        .find(|p| p.phase_name == context.current_phase);
-
-    let phase_metrics = match phase_metrics {
+    let phase_metrics = match current_phase_metrics(context) {
         Some(pm) => pm,
         None => return Ok(None), // No matching phase metrics available
     };
@@ -246,13 +258,7 @@ pub(crate) fn evaluate_phase_timeout(
         _ => return Ok(None),
     };
 
-    // Find current phase in all_phase_metrics by name
-    let phase_metrics = context
-        .all_phase_metrics
-        .iter()
-        .find(|p| p.phase_name == context.current_phase);
-
-    let phase_metrics = match phase_metrics {
+    let phase_metrics = match current_phase_metrics(context) {
         Some(pm) => pm,
         None => return Ok(None), // No matching phase metrics available
     };
@@ -309,55 +315,17 @@ pub(crate) fn evaluate_repeated_command(
         _ => return Ok(None),
     };
 
-    // Skip evaluation if no phase_start_time available (gracefully handled in fallback below)
-    if context.phase_start_time.is_none() {
-        // Will use current time as fallback
-    }
-
-    // Calculate window bounds: [phase_start, phase_start + window]
-    // If phase_start_time is missing, use current time (graceful fallback for old state files)
-    let phase_start = context
-        .phase_start_time
-        .as_ref()
-        .map(|s| DateTime::parse_from_rfc3339(s))
-        .transpose()?
-        .unwrap_or_else(|| chrono::Utc::now().into());
-    let window_end = phase_start + chrono::Duration::seconds(*window as i64);
-
-    // Compile regex if pattern provided
-    let regex = if let Some(pat) = pattern {
-        Some(Regex::new(pat)?)
-    } else {
-        None
-    };
+    let (phase_start, window_end, regex) = phase_window(context, pattern, *window)?;
 
     // Filter commands by time window and pattern
-    let matching_commands: Vec<_> = context
-        .hook_metrics
-        .bash_commands
-        .iter()
-        .filter(|cmd| {
-            // Filter by timestamp (within window: phase_start <= ts <= window_end)
-            if let Some(ts) = &cmd.timestamp {
-                if let Ok(timestamp) = DateTime::parse_from_rfc3339(ts) {
-                    if timestamp < phase_start || timestamp > window_end {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            // Filter by pattern (if provided)
-            if let Some(ref re) = regex {
-                re.is_match(&cmd.command)
-            } else {
-                true // No pattern = match all
-            }
-        })
-        .collect();
+    let matching_commands = matches_in_window(
+        &context.hook_metrics.bash_commands,
+        phase_start,
+        window_end,
+        &regex,
+        |c| c.timestamp.as_ref(),
+        |c| &c.command,
+    );
 
     let count = matching_commands.len();
 

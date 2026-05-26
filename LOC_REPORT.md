@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 17:42
+**Last Updated**: 2026-05-26 17:46
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,283 | 16,261 | 36,544 |
-| **Comments** | 3,002 | - | 3,002 |
-| **Blank Lines** | 3,817 | - | 3,817 |
-| **Total Lines** | 27,102 | 16,261 | 43,363 |
+| **Lines** | 20,263 | 16,261 | 36,524 |
+| **Comments** | 2,994 | - | 2,994 |
+| **Blank Lines** | 3,813 | - | 3,813 |
+| **Total Lines** | 27,070 | 16,261 | 43,331 |
 | **Files** | 124 | 84 | 208 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           124           3817           3002          20283
+Rust                           124           3813           2994          20263
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           140           3974           3002          20785
+SUM:                           140           3970           2994          20765
 -------------------------------------------------------------------------------
 ```
 
@@ -128,7 +128,7 @@ SUM:                           140           3974           3002          20785
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
 | `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ⚠️ Large |
 | `metrics/transcript.rs` | 201 | 90 | 111 | 55.2% | ✅ |
-| `rules/evaluator.rs` | 389 | 389 | 0 | 0.0% | ✅ |
+| `rules/evaluator.rs` | 357 | 357 | 0 | 0.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 10 | 4 | 6 | 60.0% | ✅ |
 | `rules/tests/evaluator.rs` | 919 | 919 | 0 | 0.0% | ⚠️ Large |
