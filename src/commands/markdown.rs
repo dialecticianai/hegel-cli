@@ -135,10 +135,7 @@ fn scan_markdown_files() -> Result<Vec<MarkdownFile>> {
     Ok(files)
 }
 
-/// Check if a file is a markdown file
-fn is_markdown_file(path: &Path) -> bool {
-    path.extension().and_then(|e| e.to_str()) == Some("md")
-}
+use super::util::is_markdown_file;
 
 /// Classify a file as DDD or regular
 fn classify_file(path: &Path) -> FileCategory {

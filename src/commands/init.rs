@@ -90,10 +90,7 @@ fn detect_project_type(project_dir: &Path) -> Result<ProjectType> {
     Ok(ProjectType::Greenfield)
 }
 
-/// Check if a file is a markdown file
-fn is_markdown_file(path: &Path) -> bool {
-    path.extension().and_then(|s| s.to_str()) == Some("md")
-}
+use super::util::is_markdown_file;
 
 #[cfg(test)]
 mod tests {

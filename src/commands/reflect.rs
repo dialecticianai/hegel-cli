@@ -179,26 +179,7 @@ fn poll_for_reviews(
     }
 }
 
-/// Resolve file path with optional .md extension
-/// Tries path as-is first, then with .md appended
-fn resolve_file_path(file_path: &Path) -> Result<std::path::PathBuf> {
-    // Try the path as-is
-    if file_path.exists() {
-        return Ok(file_path.to_path_buf());
-    }
-
-    // Try with .md extension
-    let with_md = file_path.with_extension("md");
-    if with_md.exists() {
-        return Ok(with_md);
-    }
-
-    // Neither exists
-    anyhow::bail!(
-        "File not found: {} (also tried with .md extension)",
-        file_path.display()
-    )
-}
+use super::util::resolve_file_path;
 
 #[cfg(test)]
 mod tests {

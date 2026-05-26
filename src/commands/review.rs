@@ -43,26 +43,7 @@ pub fn handle_review(file_paths: &[PathBuf], storage: &FileStorage) -> Result<()
     Ok(())
 }
 
-/// Resolve file path with optional .md extension
-/// Tries path as-is first, then with .md appended
-fn resolve_file_path(file_path: &Path) -> Result<std::path::PathBuf> {
-    // Try the path as-is
-    if file_path.exists() {
-        return Ok(file_path.to_path_buf());
-    }
-
-    // Try with .md extension
-    let with_md = file_path.with_extension("md");
-    if with_md.exists() {
-        return Ok(with_md);
-    }
-
-    // Neither exists
-    anyhow::bail!(
-        "File not found: {} (also tried with .md extension)",
-        file_path.display()
-    )
-}
+use super::util::resolve_file_path;
 
 /// Write mode: parse JSONL from stdin and save to reviews.json
 fn write_reviews(file_path: &Path, storage: &FileStorage) -> Result<()> {
