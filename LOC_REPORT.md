@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 18:29
+**Last Updated**: 2026-05-26 18:34
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,235 | 16,261 | 36,496 |
-| **Comments** | 2,991 | - | 2,991 |
-| **Blank Lines** | 3,800 | - | 3,800 |
-| **Total Lines** | 27,026 | 16,261 | 43,287 |
-| **Files** | 124 | 84 | 208 |
+| **Lines** | 20,253 | 16,269 | 36,522 |
+| **Comments** | 3,001 | - | 3,001 |
+| **Blank Lines** | 3,813 | - | 3,813 |
+| **Total Lines** | 27,067 | 16,269 | 43,336 |
+| **Files** | 128 | 84 | 212 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           124           3800           2991          20235
+Rust                           128           3813           3001          20253
 Markdown                        16            157              0            502
 -------------------------------------------------------------------------------
-SUM:                           140           3957           2991          20737
+SUM:                           144           3970           3001          20755
 -------------------------------------------------------------------------------
 ```
 
@@ -73,7 +73,11 @@ SUM:                           140           3957           2991          20737
 | `commands/hooks_setup.rs` | 235 | 118 | 117 | 49.8% | ✅ |
 | `commands/ide.rs` | 27 | 15 | 12 | 44.4% | ✅ |
 | `commands/init.rs` | 220 | 94 | 126 | 57.3% | ✅ |
-| `commands/markdown.rs` | 803 | 670 | 133 | 16.6% | ⚠️ Large |
+| `commands/markdown/json.rs` | 108 | 108 | 0 | 0.0% | ✅ |
+| `commands/markdown/mod.rs` | 82 | 82 | 0 | 0.0% | ✅ |
+| `commands/markdown/render.rs` | 200 | 200 | 0 | 0.0% | ✅ |
+| `commands/markdown/scan.rs` | 200 | 108 | 92 | 46.0% | ✅ |
+| `commands/markdown/tree.rs` | 254 | 209 | 45 | 17.7% | ✅ |
 | `commands/meta.rs` | 255 | 167 | 88 | 34.5% | ✅ |
 | `commands/mod.rs` | 47 | 47 | 0 | 0.0% | ✅ |
 | `commands/new.rs` | 264 | 145 | 119 | 45.1% | ✅ |
@@ -162,7 +166,7 @@ SUM:                           140           3957           2991          20737
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
-**⚠️ Warning:** 6 file(s) over 400 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 5 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
@@ -204,7 +208,7 @@ SUM:                           140           3957           2991          20737
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 240 |
+| `COVERAGE_REPORT.md` | 248 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |

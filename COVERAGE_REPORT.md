@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 18:29
+**Last Updated**: 2026-05-26 18:34
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.63%** lines | **74.85%** regions | **76.74%** functions
+**Overall Coverage**: **75.59%** lines | **74.79%** regions | **76.74%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19149              4816    74.85%        1092               254    76.74%       11931              2907    75.63%           0                 0         -
+TOTAL                                         19149              4828    74.79%        1092               254    76.74%       11931              2912    75.59%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -34,7 +34,7 @@ TOTAL                                         19149              4816    74.85% 
 | `src/commands/doctor/fix_state.rs` | 32.20% | 25.00% | 100.00% | 🔴 Needs Work |
 | `src/commands/doctor/mod.rs` | 90.00% | 81.82% | 100.00% | 🟢 Excellent |
 | `src/commands/doctor/tests.rs` | 99.44% | 99.25% | 100.00% | 🟢 Excellent |
-| `src/commands/external_bin.rs` | 37.86% | 32.28% | 37.50% | 🔴 Needs Work |
+| `src/commands/external_bin.rs` | 33.98% | 27.85% | 37.50% | 🔴 Needs Work |
 | `src/commands/fork/amp.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/codex.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/fork/cody.rs` | 100.00% | 98.41% | 100.00% | 🟢 Excellent |
@@ -47,10 +47,14 @@ TOTAL                                         19149              4816    74.85% 
 | `src/commands/hooks_setup.rs` | 86.11% | 84.94% | 100.00% | 🟡 Good |
 | `src/commands/ide.rs` | 62.50% | 58.33% | 50.00% | 🟠 Moderate |
 | `src/commands/init.rs` | 93.22% | 93.33% | 100.00% | 🟢 Excellent |
-| `src/commands/markdown.rs` | 29.48% | 27.92% | 39.53% | 🔴 Needs Work |
+| `src/commands/markdown/json.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/commands/markdown/mod.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/commands/markdown/render.rs` | 0.00% | 0.00% | 0.00% | 🔴 Needs Work |
+| `src/commands/markdown/scan.rs` | 66.67% | 65.08% | 86.67% | 🟠 Moderate |
+| `src/commands/markdown/tree.rs` | 43.98% | 38.05% | 33.33% | 🟠 Moderate |
 | `src/commands/meta.rs` | 64.88% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/new.rs` | 85.91% | 87.08% | 92.86% | 🟡 Good |
-| `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
+| `src/commands/pm.rs` | 50.00% | 42.11% | 50.00% | 🟠 Moderate |
 | `src/commands/reflect.rs` | 21.49% | 15.18% | 27.27% | 🔴 Needs Work |
 | `src/commands/review.rs` | 88.61% | 90.39% | 80.00% | 🟡 Good |
 | `src/commands/status.rs` | 44.83% | 37.42% | 50.00% | 🟠 Moderate |
@@ -187,8 +191,10 @@ TOTAL                                         19149              4816    74.85% 
 - `src/commands/archive.rs` - 43.35%
 - `src/commands/fork/runtime.rs` - 44.20%
 - `src/commands/ide.rs` - 62.50%
+- `src/commands/markdown/scan.rs` - 66.67%
+- `src/commands/markdown/tree.rs` - 43.98%
 - `src/commands/meta.rs` - 64.88%
-- `src/commands/pm.rs` - 60.00%
+- `src/commands/pm.rs` - 50.00%
 - `src/commands/status.rs` - 44.83%
 - `src/commands/workflow/mod.rs` - 59.04%
 - `src/main.rs` - 42.31%
@@ -203,8 +209,10 @@ TOTAL                                         19149              4816    74.85% 
 - `src/commands/astq.rs` - 17.78%
 - `src/commands/doctor/fix_ddd.rs` - 4.47%
 - `src/commands/doctor/fix_state.rs` - 32.20%
-- `src/commands/external_bin.rs` - 37.86%
-- `src/commands/markdown.rs` - 29.48%
+- `src/commands/external_bin.rs` - 33.98%
+- `src/commands/markdown/json.rs` - 0.00%
+- `src/commands/markdown/mod.rs` - 0.00%
+- `src/commands/markdown/render.rs` - 0.00%
 - `src/commands/reflect.rs` - 21.49%
 - `src/doctor/rescue.rs` - 0.00%
 - `src/tui/mod.rs` - 11.36%
@@ -213,7 +221,7 @@ TOTAL                                         19149              4816    74.85% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.63% | ⏳ In Progress |
+| Overall | ≥80% | 75.59% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
