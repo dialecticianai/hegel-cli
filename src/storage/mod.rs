@@ -195,6 +195,11 @@ impl FileStorage {
         }
     }
 
+    /// Path to a workflow's YAML definition (`<workflows_dir>/<mode>.yaml`).
+    pub fn workflow_path(&self, mode: &str) -> PathBuf {
+        PathBuf::from(self.workflows_dir()).join(format!("{}.yaml", mode))
+    }
+
     /// Get the guides directory (if set), otherwise use env var or default
     pub fn guides_dir(&self) -> String {
         if let Some(ref dir) = self.guides_dir {

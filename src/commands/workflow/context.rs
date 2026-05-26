@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::config::HegelConfig;
 use crate::engine::{render_prompt, Workflow};
@@ -25,8 +25,7 @@ pub fn load_workflow_context(storage: &FileStorage) -> Result<WorkflowContext> {
         .clone();
 
     // Load workflow from YAML file based on mode
-    let workflow_path =
-        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow_path = storage.workflow_path(&workflow_state.mode);
     let workflow = crate::engine::load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 

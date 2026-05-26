@@ -4,7 +4,6 @@ mod transitions;
 
 use anyhow::{Context, Result};
 use colored::Colorize;
-use std::path::PathBuf;
 
 use crate::engine::{init_state, load_workflow};
 use crate::storage::FileStorage;
@@ -19,6 +18,14 @@ pub use transitions::{evaluate_transition, execute_transition};
 #[cfg(test)]
 pub use transitions::{TransitionOption, TransitionOutcome};
 
+/// Format an optional stash message for display: ` "msg"` when present, else empty.
+fn fmt_stash_message(message: &Option<String>) -> String {
+    match message {
+        Some(m) => format!(r#" "{}""#, m),
+        None => String::new(),
+    }
+}
+
 pub fn start_workflow(
     workflow_name: &str,
     start_node: Option<&str>,
@@ -32,8 +39,7 @@ pub fn start_workflow(
     // Check if there's already an active workflow
     if let Some(existing_ws) = &existing_state.workflow {
         // Load existing workflow from YAML file
-        let existing_workflow_path =
-            PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", existing_ws.mode));
+        let existing_workflow_path = storage.workflow_path(&existing_ws.mode);
         if let Ok(existing_workflow) = load_workflow(&existing_workflow_path) {
             // Allow starting new workflow if current is at a terminal node
             if !existing_workflow.is_terminal_node(&existing_ws.current_node) {
@@ -58,8 +64,7 @@ pub fn start_workflow(
     detect_and_archive_cowboy_activity(storage.state_dir(), &now_timestamp)?;
 
     // Load workflow from YAML file
-    let workflows_dir = storage.workflows_dir();
-    let workflow_path = format!("{}/{}.yaml", workflows_dir, workflow_name);
+    let workflow_path = storage.workflow_path(workflow_name);
     let workflow = load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_name))?;
 
@@ -239,8 +244,7 @@ pub fn repeat_prompt(storage: &FileStorage) -> Result<()> {
         .context("No workflow state found. Run 'hegel start <workflow>' first.")?;
 
     // Load workflow from YAML file based on mode
-    let workflow_path =
-        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow_path = storage.workflow_path(&workflow_state.mode);
     let workflow = crate::engine::load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
@@ -288,8 +292,7 @@ pub fn prev_prompt(storage: &FileStorage) -> Result<()> {
         .context("No workflow state found. Run 'hegel start <workflow>' first.")?;
 
     // Load workflow from YAML file based on mode
-    let workflow_path =
-        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow_path = storage.workflow_path(&workflow_state.mode);
     let workflow = crate::engine::load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
@@ -369,10 +372,7 @@ pub fn stash_workflow(message: Option<String>, storage: &FileStorage) -> Result<
     let stashes = storage.list_stashes()?;
     let stash = &stashes[0]; // Newest stash is always at index 0
 
-    let msg_display = match &message {
-        Some(m) => format!(r#" "{}""#, m),
-        None => String::new(),
-    };
+    let msg_display = fmt_stash_message(&message);
 
     println!(
         "Saved working directory to stash@{{0}}: {}/{}{}",
@@ -393,10 +393,7 @@ pub fn list_stashes(storage: &FileStorage) -> Result<()> {
 
     for stash in stashes {
         // Format message
-        let msg_display = match &stash.message {
-            Some(m) => format!(r#" "{}""#, m),
-            None => String::new(),
-        };
+        let msg_display = fmt_stash_message(&stash.message);
 
         // Format relative time
         use chrono::{DateTime, Utc};
@@ -455,10 +452,7 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     storage.delete_stash(index)?;
 
     // Display restored workflow prompt
-    let msg_display = match &stash.message {
-        Some(m) => format!(r#" "{}""#, m),
-        None => String::new(),
-    };
+    let msg_display = fmt_stash_message(&stash.message);
 
     println!(
         "Restored stash@{{{}}}: {}/{}{}",
@@ -468,8 +462,7 @@ pub fn pop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
 
     // Get workflow to display prompt
     let workflow_state = restored.workflow.context("No workflow in restored state")?;
-    let workflow_path =
-        PathBuf::from(storage.workflows_dir()).join(format!("{}.yaml", workflow_state.mode));
+    let workflow_path = storage.workflow_path(&workflow_state.mode);
     let workflow = load_workflow(&workflow_path)
         .with_context(|| format!("Failed to load workflow: {}", workflow_state.mode))?;
 
@@ -498,10 +491,7 @@ pub fn drop_stash(index: Option<usize>, storage: &FileStorage) -> Result<()> {
     // Load stash to show what's being dropped
     let stash = storage.load_stash(index)?;
 
-    let msg_display = match &stash.message {
-        Some(m) => format!(r#" "{}""#, m),
-        None => String::new(),
-    };
+    let msg_display = fmt_stash_message(&stash.message);
 
     // Delete stash (skip confirmation in non-interactive mode)
     storage.delete_stash(index)?;
@@ -551,7 +541,7 @@ pub fn list_workflows(storage: &FileStorage) -> Result<()> {
     if !local_only.is_empty() {
         println!("Local-only:\n");
         for workflow in &local_only {
-            let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
+            let workflow_path = storage.workflow_path(workflow);
             let flow = match load_workflow(&workflow_path) {
                 Ok(wf) => extract_node_flow(&wf),
                 Err(_) => "".to_string(),
@@ -571,7 +561,7 @@ pub fn list_workflows(storage: &FileStorage) -> Result<()> {
         println!("Embedded:\n");
         for workflow in &embedded_workflows {
             // Load workflow to extract node flow
-            let workflow_path = format!("{}/{}.yaml", storage.workflows_dir(), workflow);
+            let workflow_path = storage.workflow_path(workflow);
             let flow = match load_workflow(&workflow_path) {
                 Ok(wf) => extract_node_flow(&wf),
                 Err(_) => "".to_string(),

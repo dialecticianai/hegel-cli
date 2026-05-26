@@ -510,8 +510,7 @@ pub fn execute_transition(
             println!();
 
             // Load new workflow
-            let workflows_dir = storage.workflows_dir();
-            let workflow_path = format!("{}/{}.yaml", workflows_dir, to_workflow);
+            let workflow_path = storage.workflow_path(&to_workflow);
             let new_workflow = load_workflow(&workflow_path)
                 .with_context(|| format!("Failed to load workflow: {}", to_workflow))?;
 
