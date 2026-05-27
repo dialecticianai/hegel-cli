@@ -2,6 +2,7 @@
 mod tests;
 
 mod fix_ddd;
+mod fix_phases;
 mod fix_state;
 
 use anyhow::Result;
@@ -36,6 +37,9 @@ pub fn doctor_command(args: DoctorArgs, storage: &FileStorage) -> Result<()> {
 
     // Check and fix DDD artifacts
     fix_ddd::check_and_fix_ddd(args.apply, args.json)?;
+
+    // Check and fix archived phase metrics (dedup + prune empty phases)
+    fix_phases::check_and_fix_phases(storage, args.apply, args.json)?;
 
     Ok(())
 }

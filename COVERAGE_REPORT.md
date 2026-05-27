@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 22:44
+**Last Updated**: 2026-05-26 22:49
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.93%** lines | **75.18%** regions | **77.26%** functions
+**Overall Coverage**: **75.68%** lines | **74.95%** regions | **77.28%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19427              4821    75.18%        1117               254    77.26%       12086              2909    75.93%           0                 0         -
+TOTAL                                         19519              4890    74.95%        1118               254    77.28%       12141              2953    75.68%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -31,8 +31,9 @@ TOTAL                                         19427              4821    75.18% 
 | `src/commands/astq.rs` | 17.78% | 9.78% | 66.67% | 🔴 Needs Work |
 | `src/commands/config.rs` | 91.95% | 90.30% | 63.64% | 🟢 Excellent |
 | `src/commands/doctor/fix_ddd.rs` | 4.47% | 3.98% | 7.69% | 🔴 Needs Work |
+| `src/commands/doctor/fix_phases.rs` | 18.52% | 21.84% | 100.00% | 🔴 Needs Work |
 | `src/commands/doctor/fix_state.rs` | 32.20% | 25.00% | 100.00% | 🔴 Needs Work |
-| `src/commands/doctor/mod.rs` | 90.00% | 81.82% | 100.00% | 🟢 Excellent |
+| `src/commands/doctor/mod.rs` | 90.91% | 81.48% | 100.00% | 🟢 Excellent |
 | `src/commands/doctor/tests.rs` | 99.44% | 99.25% | 100.00% | 🟢 Excellent |
 | `src/commands/external_bin.rs` | 33.98% | 27.85% | 37.50% | 🔴 Needs Work |
 | `src/commands/fork/amp.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -127,7 +128,7 @@ TOTAL                                         19427              4821    75.18% 
 - `src/analyze/cleanup/aborted.rs` - 97.22%
 - `src/commands/analyze/mod.rs` - 93.50%
 - `src/commands/config.rs` - 91.95%
-- `src/commands/doctor/mod.rs` - 90.00%
+- `src/commands/doctor/mod.rs` - 90.91%
 - `src/commands/doctor/tests.rs` - 99.44%
 - `src/commands/fork/amp.rs` - 100.00%
 - `src/commands/fork/codex.rs` - 100.00%
@@ -221,6 +222,7 @@ TOTAL                                         19427              4821    75.18% 
 - `src/analyze/totals.rs` - 0.00%
 - `src/commands/astq.rs` - 17.78%
 - `src/commands/doctor/fix_ddd.rs` - 4.47%
+- `src/commands/doctor/fix_phases.rs` - 18.52%
 - `src/commands/doctor/fix_state.rs` - 32.20%
 - `src/commands/external_bin.rs` - 33.98%
 - `src/commands/markdown/json.rs` - 0.00%
@@ -235,7 +237,7 @@ TOTAL                                         19427              4821    75.18% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.93% | ⏳ In Progress |
+| Overall | ≥80% | 75.68% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 

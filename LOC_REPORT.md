@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 22:44
+**Last Updated**: 2026-05-26 22:49
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,476 | 16,344 | 36,820 |
-| **Comments** | 3,038 | - | 3,038 |
-| **Blank Lines** | 3,848 | - | 3,848 |
-| **Total Lines** | 27,362 | 16,344 | 43,706 |
-| **Files** | 135 | 86 | 221 |
+| **Lines** | 20,540 | 16,346 | 36,886 |
+| **Comments** | 3,045 | - | 3,045 |
+| **Blank Lines** | 3,857 | - | 3,857 |
+| **Total Lines** | 27,442 | 16,346 | 43,788 |
+| **Files** | 136 | 86 | 222 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           135           3848           3038          20476
+Rust                           136           3857           3045          20540
 Markdown                        18            171              0            538
 -------------------------------------------------------------------------------
-SUM:                           153           4019           3038          21014
+SUM:                           154           4028           3045          21078
 -------------------------------------------------------------------------------
 ```
 
@@ -57,8 +57,9 @@ SUM:                           153           4019           3038          21014
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/doctor/fix_ddd.rs` | 273 | 273 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_phases.rs` | 76 | 76 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
-| `commands/doctor/mod.rs` | 41 | 41 | 0 | 0.0% | ✅ |
+| `commands/doctor/mod.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
 | `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
@@ -213,7 +214,7 @@ SUM:                           153           4019           3038          21014
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 262 |
+| `COVERAGE_REPORT.md` | 264 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
