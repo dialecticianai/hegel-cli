@@ -10,8 +10,9 @@ Implements the workflow command surface (start, next, prev, repeat, restart, abo
 
 ```
 workflow/
-├── mod.rs               Command handlers (start, next with force_bypass, prev, repeat, restart, abort, status, reset, stash)
-│                        Stash operations: stash_workflow, list_stashes, pop_stash, drop_stash
+├── mod.rs               Lifecycle command handlers (start, next with force_bypass, done, prev, repeat, restart, abort, reset)
+├── stash.rs             Stash operations (stash_workflow, list_stashes, pop_stash, drop_stash)
+├── listing.rs           Workflow + guide listing (list_workflows, list_guides, node-flow extraction)
 ├── claims.rs            ClaimAlias type (Next/Repeat/Restart/Custom claim transformations)
 ├── context.rs           WorkflowContext (loading), render_node_prompt (dual-engine routing), display_workflow_prompt
 ├── transitions.rs       Transition evaluation and execution with force_bypass support (Stay/IntraWorkflow/InterWorkflow/Ambiguous)
