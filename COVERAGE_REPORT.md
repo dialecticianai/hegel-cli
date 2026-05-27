@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 22:52
+**Last Updated**: 2026-05-26 22:57
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.68%** lines | **74.95%** regions | **77.28%** functions
+**Overall Coverage**: **75.71%** lines | **75.00%** regions | **77.30%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19519              4890    74.95%        1118               254    77.28%       12141              2953    75.68%           0                 0         -
+TOTAL                                         19559              4890    75.00%        1119               254    77.30%       12159              2953    75.71%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -115,7 +115,7 @@ TOTAL                                         19519              4890    74.95% 
 | `src/tui/tabs/events.rs` | 90.24% | 87.10% | 100.00% | 🟢 Excellent |
 | `src/tui/tabs/files.rs` | 83.93% | 80.37% | 100.00% | 🟡 Good |
 | `src/tui/tabs/overview.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
-| `src/tui/tabs/phases.rs` | 96.90% | 96.85% | 100.00% | 🟢 Excellent |
+| `src/tui/tabs/phases.rs` | 97.28% | 97.33% | 100.00% | 🟢 Excellent |
 | `src/tui/ui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/tui/utils.rs` | 97.04% | 93.61% | 100.00% | 🟢 Excellent |
 
@@ -170,7 +170,7 @@ TOTAL                                         19519              4890    74.95% 
 - `src/test_helpers/tui.rs` - 100.00%
 - `src/tui/tabs/events.rs` - 90.24%
 - `src/tui/tabs/overview.rs` - 100.00%
-- `src/tui/tabs/phases.rs` - 96.90%
+- `src/tui/tabs/phases.rs` - 97.28%
 - `src/tui/ui.rs` - 100.00%
 - `src/tui/utils.rs` - 97.04%
 
@@ -237,7 +237,7 @@ TOTAL                                         19519              4890    74.95% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.68% | ⏳ In Progress |
+| Overall | ≥80% | 75.71% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
