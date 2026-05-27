@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 19:03
+**Last Updated**: 2026-05-26 21:41
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **75.60%** lines | **74.82%** regions | **76.76%** functions
 
@@ -61,7 +61,9 @@ TOTAL                                         19154              4823    74.82% 
 | `src/commands/util.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/claims.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/commands/workflow/context.rs` | 97.87% | 93.06% | 75.00% | 🟢 Excellent |
-| `src/commands/workflow/mod.rs` | 59.04% | 57.65% | 48.65% | 🟠 Moderate |
+| `src/commands/workflow/listing.rs` | 20.16% | 23.72% | 25.00% | 🔴 Needs Work |
+| `src/commands/workflow/mod.rs` | 76.82% | 77.56% | 58.82% | 🟡 Good |
+| `src/commands/workflow/stash.rs` | 71.59% | 65.54% | 62.50% | 🟡 Good |
 | `src/commands/workflow/transitions.rs` | 71.78% | 68.21% | 42.42% | 🟡 Good |
 | `src/commands/wrapped.rs` | 71.79% | 72.44% | 80.00% | 🟡 Good |
 | `src/config.rs` | 76.47% | 75.54% | 57.89% | 🟡 Good |
@@ -178,6 +180,8 @@ TOTAL                                         19154              4823    74.82% 
 - `src/commands/hooks_setup.rs` - 86.11%
 - `src/commands/new.rs` - 85.91%
 - `src/commands/review.rs` - 88.61%
+- `src/commands/workflow/mod.rs` - 76.82%
+- `src/commands/workflow/stash.rs` - 71.59%
 - `src/commands/workflow/transitions.rs` - 71.78%
 - `src/commands/wrapped.rs` - 71.79%
 - `src/config.rs` - 76.47%
@@ -205,7 +209,6 @@ TOTAL                                         19154              4823    74.82% 
 - `src/commands/meta.rs` - 64.88%
 - `src/commands/pm.rs` - 60.00%
 - `src/commands/status.rs` - 44.83%
-- `src/commands/workflow/mod.rs` - 59.04%
 - `src/ddd/parse.rs` - 62.07%
 - `src/main.rs` - 42.31%
 - `src/metrics/mod.rs` - 54.55%
@@ -224,6 +227,7 @@ TOTAL                                         19154              4823    74.82% 
 - `src/commands/markdown/mod.rs` - 0.00%
 - `src/commands/markdown/render.rs` - 0.00%
 - `src/commands/reflect.rs` - 21.49%
+- `src/commands/workflow/listing.rs` - 20.16%
 - `src/doctor/rescue.rs` - 0.00%
 - `src/tui/mod.rs` - 11.36%
 

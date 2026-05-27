@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 19:03
+**Last Updated**: 2026-05-26 21:42
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,284 | 16,310 | 36,594 |
-| **Comments** | 3,013 | - | 3,013 |
-| **Blank Lines** | 3,822 | - | 3,822 |
-| **Total Lines** | 27,119 | 16,310 | 43,429 |
-| **Files** | 133 | 85 | 218 |
+| **Lines** | 20,298 | 16,319 | 36,617 |
+| **Comments** | 3,014 | - | 3,014 |
+| **Blank Lines** | 3,829 | - | 3,829 |
+| **Total Lines** | 27,141 | 16,319 | 43,460 |
+| **Files** | 135 | 85 | 220 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           133           3822           3013          20284
+Rust                           135           3829           3014          20298
 Markdown                        17            164              0            521
 -------------------------------------------------------------------------------
-SUM:                           150           3986           3013          20805
+SUM:                           152           3993           3014          20819
 -------------------------------------------------------------------------------
 ```
 
@@ -88,7 +88,9 @@ SUM:                           150           3986           3013          20805
 | `commands/util.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `commands/workflow/claims.rs` | 24 | 24 | 0 | 0.0% | ✅ |
 | `commands/workflow/context.rs` | 78 | 78 | 0 | 0.0% | ✅ |
-| `commands/workflow/mod.rs` | 697 | 697 | 0 | 0.0% | ⚠️ Large |
+| `commands/workflow/listing.rs` | 196 | 196 | 0 | 0.0% | ✅ |
+| `commands/workflow/mod.rs` | 367 | 367 | 0 | 0.0% | ✅ |
+| `commands/workflow/stash.rs` | 156 | 156 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/archiving_bug_repro.rs` | 210 | 210 | 0 | 0.0% | ✅ |
 | `commands/workflow/tests/commands.rs` | 434 | 434 | 0 | 0.0% | ✅ (infra) |
 | `commands/workflow/tests/integration.rs` | 60 | 60 | 0 | 0.0% | ✅ |
@@ -171,7 +173,7 @@ SUM:                           150           3986           3013          20805
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
-**⚠️ Warning:** 6 file(s) over 400 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 5 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
@@ -213,7 +215,7 @@ SUM:                           150           3986           3013          20805
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 258 |
+| `COVERAGE_REPORT.md` | 262 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
@@ -240,7 +242,7 @@ SUM:                           150           3986           3013          20805
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 285 |
+| `LOC_REPORT.md` | 290 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |
