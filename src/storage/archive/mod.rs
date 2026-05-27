@@ -256,6 +256,84 @@ impl WorkflowArchive {
     }
 }
 
+/// Outcome of [`dedup_across_archives`].
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct CrossArchiveDedup {
+    /// Phase records removed because the same `(phase_name, start_time)` lived
+    /// in another archive.
+    pub phases_removed: usize,
+    /// Transition records removed because the same `(from, to, timestamp)`
+    /// lived in another archive.
+    pub transitions_removed: usize,
+    /// `workflow_id`s whose phases or transitions were modified.
+    pub affected: Vec<String>,
+}
+
+/// Remove phases and transitions that are duplicated *across* archives.
+///
+/// The pre-Nov-3 re-archiving bug wrote nested cumulative snapshots: each
+/// re-archive captured every prior phase/transition plus the new ones, so the
+/// same record ends up in many archive files (inflating phase lists, token
+/// totals, and the workflow graph). This keeps a single canonical copy of each
+/// record and strips the rest:
+/// - phases: canonical = the highest-token copy (ties → earliest archive)
+/// - transitions: canonical = the earliest archive containing it
+///
+/// `archives` is assumed sorted by `workflow_id` (as [`read_archives`] returns
+/// it), so "earliest" means lowest index. Per-archive token/git totals are
+/// **not** recomputed here — call [`WorkflowArchive::compact_phases`] on each
+/// archive afterward to rebuild those from the survivors.
+pub fn dedup_across_archives(archives: &mut [WorkflowArchive]) -> CrossArchiveDedup {
+    use std::collections::{HashMap, HashSet};
+
+    // Pass 1 (immutable): pick the canonical archive index for each phase key.
+    let mut phase_owner: HashMap<(String, String), (usize, u64)> = HashMap::new();
+    for (idx, archive) in archives.iter().enumerate() {
+        for phase in &archive.phases {
+            let key = (phase.phase_name.clone(), phase.start_time.clone());
+            let tokens = phase.tokens.input + phase.tokens.output;
+            phase_owner
+                .entry(key)
+                .and_modify(|(best_idx, best_tokens)| {
+                    // Strictly greater so the earliest archive wins ties.
+                    if tokens > *best_tokens {
+                        *best_idx = idx;
+                        *best_tokens = tokens;
+                    }
+                })
+                .or_insert((idx, tokens));
+        }
+    }
+
+    // Pass 2 (mutable): retain only canonically-owned phases; dedup transitions
+    // by keeping the first archive (lowest index) that contains each.
+    let mut seen_transitions: HashSet<(String, String, String)> = HashSet::new();
+    let mut result = CrossArchiveDedup::default();
+    for (idx, archive) in archives.iter_mut().enumerate() {
+        let phases_before = archive.phases.len();
+        archive.phases.retain(|p| {
+            let key = (p.phase_name.clone(), p.start_time.clone());
+            phase_owner.get(&key).map(|&(owner, _)| owner) == Some(idx)
+        });
+        let phases_dropped = phases_before - archive.phases.len();
+
+        let transitions_before = archive.transitions.len();
+        archive.transitions.retain(|t| {
+            let key = (t.from_node.clone(), t.to_node.clone(), t.timestamp.clone());
+            seen_transitions.insert(key)
+        });
+        let transitions_dropped = transitions_before - archive.transitions.len();
+
+        if phases_dropped > 0 || transitions_dropped > 0 {
+            result.phases_removed += phases_dropped;
+            result.transitions_removed += transitions_dropped;
+            result.affected.push(archive.workflow_id.clone());
+        }
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -338,6 +416,112 @@ mod tests {
         let r = a.compact_phases();
         assert!(!r.changed());
         assert_eq!(a.phases.len(), 2);
+    }
+
+    /// Build a named archive with phases + transitions for cross-archive tests.
+    fn archive_named(
+        id: &str,
+        phases: Vec<PhaseArchive>,
+        transitions: Vec<TransitionArchive>,
+    ) -> WorkflowArchive {
+        WorkflowArchive {
+            workflow_id: id.to_string(),
+            mode: "discovery".to_string(),
+            completed_at: id.to_string(),
+            phases,
+            transitions,
+            totals: WorkflowTotals::default(),
+            session_id: None,
+            is_synthetic: false,
+        }
+    }
+
+    fn transition(from: &str, to: &str, ts: &str) -> TransitionArchive {
+        TransitionArchive {
+            from_node: from.to_string(),
+            to_node: to.to_string(),
+            timestamp: ts.to_string(),
+        }
+    }
+
+    #[test]
+    fn test_dedup_across_archives_keeps_max_token_phase_in_one_archive() {
+        // Nested-snapshot shape: "spec@T1" appears in all three archives; the
+        // later snapshot carries more tokens, so it owns the canonical copy.
+        let mut archives = vec![
+            archive_named("A", vec![phase("spec", "T1", 10, 0)], vec![]),
+            archive_named(
+                "B",
+                vec![phase("spec", "T1", 50, 0), phase("code", "T2", 5, 0)],
+                vec![],
+            ),
+            archive_named("C", vec![phase("spec", "T1", 30, 0)], vec![]),
+        ];
+        let r = dedup_across_archives(&mut archives);
+
+        assert_eq!(r.phases_removed, 2); // spec dropped from A and C
+        assert_eq!(r.transitions_removed, 0);
+        // "spec" survives only in B (max tokens), "code" only in B.
+        assert!(archives[0].phases.is_empty());
+        assert_eq!(archives[1].phases.len(), 2);
+        assert!(archives[2].phases.is_empty());
+        let spec = archives[1]
+            .phases
+            .iter()
+            .find(|p| p.phase_name == "spec")
+            .unwrap();
+        assert_eq!(spec.tokens.input, 50);
+        assert_eq!(r.affected, vec!["A".to_string(), "C".to_string()]);
+    }
+
+    #[test]
+    fn test_dedup_across_archives_ties_go_to_earliest() {
+        // Equal tokens → the earliest archive (lowest index) keeps it.
+        let mut archives = vec![
+            archive_named("A", vec![phase("spec", "T1", 10, 0)], vec![]),
+            archive_named("B", vec![phase("spec", "T1", 10, 0)], vec![]),
+        ];
+        let r = dedup_across_archives(&mut archives);
+        assert_eq!(r.phases_removed, 1);
+        assert_eq!(archives[0].phases.len(), 1);
+        assert!(archives[1].phases.is_empty());
+        assert_eq!(r.affected, vec!["B".to_string()]);
+    }
+
+    #[test]
+    fn test_dedup_across_archives_dedups_transitions_keeping_earliest() {
+        let t = || transition("spec", "code", "T1");
+        let mut archives = vec![
+            archive_named("A", vec![], vec![t(), transition("code", "done", "T2")]),
+            archive_named("B", vec![], vec![t()]), // duplicate of A's first transition
+        ];
+        let r = dedup_across_archives(&mut archives);
+        assert_eq!(r.transitions_removed, 1);
+        assert_eq!(archives[0].transitions.len(), 2); // earliest keeps both
+        assert!(archives[1].transitions.is_empty());
+        assert_eq!(r.affected, vec!["B".to_string()]);
+    }
+
+    #[test]
+    fn test_dedup_across_archives_noop_on_clean_set() {
+        let mut archives = vec![
+            archive_named(
+                "A",
+                vec![phase("spec", "T1", 10, 0)],
+                vec![transition("START", "spec", "T1")],
+            ),
+            archive_named(
+                "B",
+                vec![phase("code", "T2", 20, 0)],
+                vec![transition("spec", "code", "T2")],
+            ),
+        ];
+        let r = dedup_across_archives(&mut archives);
+        assert_eq!(r.phases_removed, 0);
+        assert_eq!(r.transitions_removed, 0);
+        assert!(r.affected.is_empty());
+        assert_eq!(archives[0].phases.len(), 1);
+        assert_eq!(archives[1].phases.len(), 1);
     }
 
     /// Helper to create test archive with default values

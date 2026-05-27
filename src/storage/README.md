@@ -18,7 +18,7 @@ storage/
 ├── reviews.rs           Reviews management for .hegel/reviews.json (types, I/O, project detection)
 │
 ├── archive/             Workflow archive storage with pre-computed aggregates
-│   ├── mod.rs           Core types (WorkflowArchive, PhaseArchive, TokenTotals) + I/O (read/write_archive)
+│   ├── mod.rs           Core types (WorkflowArchive, PhaseArchive, TokenTotals) + I/O (read/write_archive) + compaction (compact_phases, dedup_across_archives)
 │   ├── builder.rs       Archive construction (WorkflowArchive::from_metrics)
 │   ├── aggregation.rs   Aggregation utilities with DRY helpers (aggregate_bash_commands, aggregate_file_modifications, compute_totals)
 │   └── validation.rs    Input validation (validate_workflow_id for path safety)

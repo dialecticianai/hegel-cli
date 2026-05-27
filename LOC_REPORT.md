@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 23:33
+**Last Updated**: 2026-05-26 23:55
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,599 | 16,350 | 36,949 |
-| **Comments** | 3,061 | - | 3,061 |
-| **Blank Lines** | 3,863 | - | 3,863 |
-| **Total Lines** | 27,523 | 16,350 | 43,873 |
+| **Lines** | 20,802 | 16,350 | 37,152 |
+| **Comments** | 3,103 | - | 3,103 |
+| **Blank Lines** | 3,887 | - | 3,887 |
+| **Total Lines** | 27,792 | 16,350 | 44,142 |
 | **Files** | 136 | 86 | 222 |
 
 **Documentation Ratio**: 0.79 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           136           3863           3061          20599
+Rust                           136           3887           3103          20802
 Markdown                        18            171              0            541
 -------------------------------------------------------------------------------
-SUM:                           154           4034           3061          21140
+SUM:                           154           4058           3103          21343
 -------------------------------------------------------------------------------
 ```
 
@@ -57,7 +57,7 @@ SUM:                           154           4034           3061          21140
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
 | `commands/doctor/fix_ddd.rs` | 273 | 273 | 0 | 0.0% | ✅ |
-| `commands/doctor/fix_phases.rs` | 76 | 76 | 0 | 0.0% | ✅ |
+| `commands/doctor/fix_phases.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
 | `commands/doctor/mod.rs` | 45 | 45 | 0 | 0.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
@@ -134,11 +134,11 @@ SUM:                           154           4034           3061          21140
 | `metrics/git.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ |
-| `metrics/mod.rs` | 361 | 356 | 5 | 1.4% | ✅ |
+| `metrics/mod.rs` | 368 | 363 | 5 | 1.4% | ✅ |
 | `metrics/states.rs` | 128 | 24 | 104 | 81.2% | ✅ |
 | `metrics/tests/git.rs` | 337 | 337 | 0 | 0.0% | ✅ |
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
-| `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ✅ (infra) |
+| `metrics/tests/unified.rs` | 602 | 602 | 0 | 0.0% | ✅ (infra) |
 | `metrics/transcript.rs` | 201 | 90 | 111 | 55.2% | ✅ |
 | `rules/evaluator.rs` | 361 | 361 | 0 | 0.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
@@ -148,7 +148,7 @@ SUM:                           154           4034           3061          21140
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 525 | 258 | 267 | 50.9% | ✅ |
+| `storage/archive/mod.rs` | 709 | 336 | 373 | 52.6% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 686 | 682 | 4 | 0.6% | ✅ (infra) |

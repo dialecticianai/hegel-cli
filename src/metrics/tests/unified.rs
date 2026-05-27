@@ -291,6 +291,70 @@ fn test_parse_metrics_with_archives() {
 }
 
 #[test]
+fn test_phase_metrics_sorted_by_start_time_across_archives() {
+    // Archives are read in workflow_id order, so a wide-spanning earlier
+    // archive can interleave with a later one. phase_metrics must still come
+    // out in chronological start_time order.
+    use crate::storage::archive::{
+        write_archive, PhaseArchive, TokenTotals, WorkflowArchive, WorkflowTotals,
+    };
+
+    let temp_dir = TempDir::new().unwrap();
+
+    let mk_phase = |name: &str, start: &str| PhaseArchive {
+        phase_name: name.to_string(),
+        start_time: start.to_string(),
+        end_time: None,
+        duration_seconds: 0,
+        tokens: TokenTotals::default(),
+        bash_commands: vec![],
+        file_modifications: vec![],
+        git_commits: vec![],
+    };
+    let mk_archive = |id: &str, phases: Vec<PhaseArchive>| WorkflowArchive {
+        workflow_id: id.to_string(),
+        mode: "discovery".to_string(),
+        completed_at: id.to_string(),
+        session_id: None,
+        is_synthetic: false,
+        phases,
+        transitions: vec![],
+        totals: WorkflowTotals::default(),
+    };
+
+    // Archive A sorts first by workflow_id but its second phase (10:30) is
+    // later than archive B's phase (10:15) -> raw concatenation is out of order.
+    write_archive(
+        &mk_archive(
+            "2025-10-24T10:00:00Z",
+            vec![
+                mk_phase("spec", "2025-10-24T10:00:00Z"),
+                mk_phase("code", "2025-10-24T10:30:00Z"),
+            ],
+        ),
+        temp_dir.path(),
+    )
+    .unwrap();
+    write_archive(
+        &mk_archive(
+            "2025-10-24T11:00:00Z",
+            vec![mk_phase("review", "2025-10-24T10:15:00Z")],
+        ),
+        temp_dir.path(),
+    )
+    .unwrap();
+
+    let metrics = parse_unified_metrics(temp_dir.path(), true, None).unwrap();
+
+    let order: Vec<&str> = metrics
+        .phase_metrics
+        .iter()
+        .map(|p| p.phase_name.as_str())
+        .collect();
+    assert_eq!(order, vec!["spec", "review", "code"]);
+}
+
+#[test]
 fn test_parse_metrics_with_multiple_archives() {
     use crate::storage::archive::{
         write_archive, PhaseArchive, TokenTotals, TransitionArchive, WorkflowArchive,

@@ -349,6 +349,13 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
         unified.git_commits = git_commits;
     }
 
+    // Defensive invariant: phases render chronologically even when archives
+    // span overlapping windows (e.g. legacy re-archiving snapshots). Stable so
+    // phases sharing a start_time keep archive/insertion order. Unparseable
+    // timestamps (None) sort first, before any real timestamp.
+    all_phase_metrics
+        .sort_by_cached_key(|p| chrono::DateTime::parse_from_rfc3339(&p.start_time).ok());
+
     unified.phase_metrics = all_phase_metrics;
 
     Ok(unified)
