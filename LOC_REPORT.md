@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 21:42
+**Last Updated**: 2026-05-26 21:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,298 | 16,321 | 36,619 |
+| **Lines** | 20,298 | 16,343 | 36,641 |
 | **Comments** | 3,014 | - | 3,014 |
 | **Blank Lines** | 3,829 | - | 3,829 |
-| **Total Lines** | 27,141 | 16,321 | 43,462 |
-| **Files** | 135 | 85 | 220 |
+| **Total Lines** | 27,141 | 16,343 | 43,484 |
+| **Files** | 135 | 86 | 221 |
 
-**Documentation Ratio**: 0.80 lines of docs per line of code
+**Documentation Ratio**: 0.81 lines of docs per line of code
 
 ---
 
@@ -25,9 +25,9 @@
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 Rust                           135           3829           3014          20298
-Markdown                        17            164              0            521
+Markdown                        18            171              0            538
 -------------------------------------------------------------------------------
-SUM:                           152           3993           3014          20819
+SUM:                           153           4000           3014          20836
 -------------------------------------------------------------------------------
 ```
 
@@ -240,7 +240,7 @@ SUM:                           152           3993           3014          20819
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 292 |
+| `LOC_REPORT.md` | 290 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |
@@ -253,7 +253,8 @@ SUM:                           152           3993           3014          20819
 | `src/commands/fork/README.md` | 30 |
 | `src/commands/markdown/README.md` | 25 |
 | `src/commands/README.md` | 49 |
-| `src/commands/workflow/README.md` | 34 |
+| `src/commands/workflow/README.md` | 35 |
+| `src/ddd/README.md` | 23 |
 | `src/engine/README.md` | 49 |
 | `src/guardrails/README.md` | 34 |
 | `src/metamodes/README.md` | 25 |
@@ -271,7 +272,7 @@ SUM:                           152           3993           3014          20819
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.80 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.81 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 
