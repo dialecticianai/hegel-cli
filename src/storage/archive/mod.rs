@@ -176,10 +176,169 @@ pub fn read_archives(state_dir: &Path) -> Result<Vec<WorkflowArchive>> {
     Ok(archives)
 }
 
+/// Whether a phase name is a terminal node (kept even when empty).
+fn is_terminal_phase(name: &str) -> bool {
+    name == "done" || name == "aborted"
+}
+
+/// Whether a phase recorded any activity (tokens, commands, files, or commits).
+fn phase_has_activity(p: &PhaseArchive) -> bool {
+    p.tokens.input > 0
+        || p.tokens.output > 0
+        || p.tokens.cache_creation > 0
+        || p.tokens.cache_read > 0
+        || !p.bash_commands.is_empty()
+        || !p.file_modifications.is_empty()
+        || !p.git_commits.is_empty()
+}
+
+/// Outcome of [`WorkflowArchive::compact_phases`].
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct PhaseCompaction {
+    /// Duplicate phase records removed (same name + start_time).
+    pub deduped: usize,
+    /// Non-terminal, activity-free phases pruned.
+    pub pruned: usize,
+}
+
+impl PhaseCompaction {
+    /// Whether anything was removed.
+    pub fn changed(&self) -> bool {
+        self.deduped > 0 || self.pruned > 0
+    }
+}
+
+impl WorkflowArchive {
+    /// Compact phases in place: drop exact duplicates (same `phase_name` +
+    /// `start_time`, keeping the highest-token copy) and prune non-terminal
+    /// phases that recorded no activity at all. Terminal (`done`/`aborted`)
+    /// phases are always kept. Token and git-commit totals are recomputed from
+    /// the surviving phases (other session-derived totals are left untouched).
+    pub fn compact_phases(&mut self) -> PhaseCompaction {
+        use std::collections::HashMap;
+
+        // 1. Dedup by (phase_name, start_time), keeping the max-token copy.
+        let original = self.phases.len();
+        let mut index: HashMap<(String, String), usize> = HashMap::new();
+        let mut kept: Vec<PhaseArchive> = Vec::with_capacity(original);
+        for phase in std::mem::take(&mut self.phases) {
+            let key = (phase.phase_name.clone(), phase.start_time.clone());
+            if let Some(&i) = index.get(&key) {
+                let existing = &kept[i];
+                if phase.tokens.input + phase.tokens.output
+                    > existing.tokens.input + existing.tokens.output
+                {
+                    kept[i] = phase;
+                }
+            } else {
+                index.insert(key, kept.len());
+                kept.push(phase);
+            }
+        }
+        let deduped = original - kept.len();
+
+        // 2. Prune non-terminal phases with no activity at all.
+        let before_prune = kept.len();
+        kept.retain(|p| is_terminal_phase(&p.phase_name) || phase_has_activity(p));
+        let pruned = before_prune - kept.len();
+
+        self.phases = kept;
+
+        // 3. Recompute phase-derived totals (tokens + git-commit count).
+        let mut tokens = TokenTotals::default();
+        for p in &self.phases {
+            tokens += &p.tokens;
+        }
+        self.totals.tokens = tokens;
+        self.totals.git_commits = self.phases.iter().map(|p| p.git_commits.len()).sum();
+
+        PhaseCompaction { deduped, pruned }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use tempfile::TempDir;
+
+    /// Build a phase with the given name/start, input tokens, and bash-command count.
+    fn phase(name: &str, start: &str, input: u64, bash: usize) -> PhaseArchive {
+        PhaseArchive {
+            phase_name: name.to_string(),
+            start_time: start.to_string(),
+            end_time: Some(start.to_string()),
+            duration_seconds: 0,
+            tokens: TokenTotals {
+                input,
+                output: 0,
+                cache_creation: 0,
+                cache_read: 0,
+                assistant_turns: if input > 0 { 1 } else { 0 },
+            },
+            bash_commands: (0..bash)
+                .map(|i| BashCommandSummary {
+                    command: format!("cmd{i}"),
+                    count: 1,
+                    timestamps: vec![],
+                })
+                .collect(),
+            file_modifications: vec![],
+            git_commits: vec![],
+        }
+    }
+
+    fn archive_with(phases: Vec<PhaseArchive>) -> WorkflowArchive {
+        WorkflowArchive {
+            workflow_id: "wf".to_string(),
+            mode: "discovery".to_string(),
+            completed_at: "2025-01-01T00:00:00Z".to_string(),
+            phases,
+            transitions: vec![],
+            totals: WorkflowTotals::default(),
+            session_id: None,
+            is_synthetic: false,
+        }
+    }
+
+    #[test]
+    fn test_compact_dedups_keeping_max_tokens_and_recomputes_totals() {
+        let mut a = archive_with(vec![
+            phase("plan", "T1", 0, 0),   // duplicate, zero tokens
+            phase("plan", "T1", 100, 0), // duplicate, has tokens -> kept
+            phase("code", "T2", 50, 0),
+        ]);
+        let r = a.compact_phases();
+        assert_eq!(r.deduped, 1);
+        assert_eq!(r.pruned, 0);
+        assert_eq!(a.phases.len(), 2);
+        let plan = a.phases.iter().find(|p| p.phase_name == "plan").unwrap();
+        assert_eq!(plan.tokens.input, 100); // kept the higher-token copy
+        assert_eq!(a.totals.tokens.input, 150); // totals recomputed (100 + 50)
+    }
+
+    #[test]
+    fn test_compact_prunes_empty_nonterminal_keeps_terminal_and_active() {
+        let mut a = archive_with(vec![
+            phase("spec", "T1", 0, 0), // empty non-terminal -> pruned
+            phase("code", "T2", 0, 2), // has bash activity -> kept
+            phase("done", "T3", 0, 0), // terminal empty -> kept
+        ]);
+        let r = a.compact_phases();
+        assert_eq!(r.pruned, 1);
+        assert_eq!(r.deduped, 0);
+        assert_eq!(a.phases.len(), 2);
+        assert!(a.phases.iter().any(|p| p.phase_name == "code"));
+        assert!(a.phases.iter().any(|p| p.phase_name == "done"));
+        assert!(!a.phases.iter().any(|p| p.phase_name == "spec"));
+    }
+
+    #[test]
+    fn test_compact_is_noop_on_clean_archive() {
+        let mut a = archive_with(vec![phase("spec", "T1", 10, 0), phase("done", "T2", 0, 0)]);
+        let r = a.compact_phases();
+        assert!(!r.changed());
+        assert_eq!(a.phases.len(), 2);
+    }
 
     /// Helper to create test archive with default values
     fn test_archive() -> WorkflowArchive {

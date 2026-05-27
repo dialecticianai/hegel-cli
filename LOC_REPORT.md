@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 22:41
+**Last Updated**: 2026-05-26 22:44
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,347 | 16,344 | 36,691 |
-| **Comments** | 3,023 | - | 3,023 |
-| **Blank Lines** | 3,833 | - | 3,833 |
-| **Total Lines** | 27,203 | 16,344 | 43,547 |
+| **Lines** | 20,476 | 16,344 | 36,820 |
+| **Comments** | 3,038 | - | 3,038 |
+| **Blank Lines** | 3,848 | - | 3,848 |
+| **Total Lines** | 27,362 | 16,344 | 43,706 |
 | **Files** | 135 | 86 | 221 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           135           3833           3023          20347
+Rust                           135           3848           3038          20476
 Markdown                        18            171              0            538
 -------------------------------------------------------------------------------
-SUM:                           153           4004           3023          20885
+SUM:                           153           4019           3038          21014
 -------------------------------------------------------------------------------
 ```
 
@@ -147,7 +147,7 @@ SUM:                           153           4004           3023          20885
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 366 | 178 | 188 | 51.4% | ✅ |
+| `storage/archive/mod.rs` | 525 | 258 | 267 | 50.9% | ✅ |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 686 | 682 | 4 | 0.6% | ✅ (infra) |
