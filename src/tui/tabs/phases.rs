@@ -1,126 +1,102 @@
 use crate::metrics::{PhaseMetrics, UnifiedMetrics};
 use crate::tui::utils::scroll_indicators;
+use ratatui::layout::Constraint;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
     text::{Line, Span},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Cell, Row, Table},
 };
 
-/// Phases tab: per-phase breakdown with token counts
+/// Column widths for the phases table.
+/// PHASE (icon+name), WINDOW (widest — multi-day spans), DURATION, TOKENS, BASH, FILES.
+const PHASE_COLUMNS: [Constraint; 6] = [
+    Constraint::Length(10),
+    Constraint::Length(41),
+    Constraint::Length(10),
+    Constraint::Length(8),
+    Constraint::Length(5),
+    Constraint::Length(6),
+];
+
+/// Phases tab: one row per phase with aligned columns.
 pub fn render_phases_tab(
     metrics: &UnifiedMetrics,
     scroll: usize,
     max_scroll: usize,
-) -> Paragraph<'static> {
-    let mut lines = vec![];
+) -> Table<'static> {
+    let header = Row::new([
+        Cell::from("PHASE"),
+        Cell::from("WINDOW"),
+        Cell::from(Line::from("DURATION").right_aligned()),
+        Cell::from(Line::from("TOKENS").right_aligned()),
+        Cell::from(Line::from("BASH").right_aligned()),
+        Cell::from(Line::from("FILES").right_aligned()),
+    ])
+    .style(
+        Style::default()
+            .fg(Color::DarkGray)
+            .add_modifier(Modifier::BOLD),
+    );
 
-    // Apply scroll to the displayable phase list (zero-duration terminal
-    // phases are hidden — see is_displayed_phase)
-    let visible_phases = metrics
+    let mut rows: Vec<Row> = metrics
         .phase_metrics
         .iter()
         .filter(|p| is_displayed_phase(p))
-        .skip(scroll);
+        .skip(scroll)
+        .map(|phase| {
+            let icon = if phase.end_time.is_none() {
+                "🔵"
+            } else {
+                "✅"
+            };
+            let total_tokens =
+                phase.token_metrics.total_input_tokens + phase.token_metrics.total_output_tokens;
 
-    for phase in visible_phases {
-        // Phase header with status indicator
-        let (status_icon, status_color) = if phase.end_time.is_none() {
-            ("🔵", Color::Green)
-        } else {
-            ("✅", Color::Gray)
-        };
+            Row::new(vec![
+                Cell::from(Line::from(vec![
+                    Span::raw(format!("{} ", icon)),
+                    Span::styled(
+                        phase.phase_name.to_uppercase(),
+                        Style::default()
+                            .fg(Color::Yellow)
+                            .add_modifier(Modifier::BOLD),
+                    ),
+                ])),
+                Cell::from(Span::styled(
+                    fmt_phase_window(&phase.start_time, phase.end_time.as_deref()),
+                    Style::default().fg(Color::Gray),
+                )),
+                Cell::from(Line::from(fmt_duration(phase.duration_seconds)).right_aligned())
+                    .style(Style::default().fg(Color::Cyan)),
+                Cell::from(Line::from(total_tokens.to_string()).right_aligned())
+                    .style(Style::default().fg(Color::Magenta)),
+                Cell::from(Line::from(phase.bash_commands.len().to_string()).right_aligned())
+                    .style(Style::default().fg(Color::Green)),
+                Cell::from(Line::from(phase.file_modifications.len().to_string()).right_aligned())
+                    .style(Style::default().fg(Color::Blue)),
+            ])
+        })
+        .collect();
 
-        lines.push(Line::from(vec![
-            Span::raw("  "),
-            Span::raw(status_icon),
-            Span::raw(" "),
-            Span::styled(
-                phase.phase_name.to_uppercase(),
-                Style::default()
-                    .fg(Color::Yellow)
-                    .add_modifier(Modifier::BOLD),
-            ),
-            Span::styled(
-                if phase.end_time.is_none() {
-                    " (active)"
-                } else {
-                    ""
-                },
-                Style::default().fg(status_color),
-            ),
-        ]));
-
-        // Timestamps (start → end, or → active for an in-progress phase)
-        lines.push(Line::from(vec![
-            Span::raw("    🕐 Time:     "),
-            Span::styled(
-                fmt_phase_window(&phase.start_time, phase.end_time.as_deref()),
-                Style::default().fg(Color::Gray),
-            ),
-        ]));
-
-        // Duration
-        if phase.duration_seconds > 0 {
-            let mins = phase.duration_seconds / 60;
-            let secs = phase.duration_seconds % 60;
-            lines.push(Line::from(vec![
-                Span::raw("    ⏱  Duration: "),
-                Span::styled(
-                    format!("{}m {:02}s", mins, secs),
-                    Style::default().fg(Color::Cyan),
-                ),
-            ]));
-        }
-
-        // Token usage
-        let total_tokens =
-            phase.token_metrics.total_input_tokens + phase.token_metrics.total_output_tokens;
-
-        if total_tokens > 0 {
-            lines.push(Line::from(vec![
-                Span::raw("    📊 Tokens:   "),
-                Span::styled(
-                    format!("{}", total_tokens),
-                    Style::default()
-                        .fg(Color::Magenta)
-                        .add_modifier(Modifier::BOLD),
-                ),
-            ]));
-        }
-
-        // Activity counts
-        lines.push(Line::from(vec![
-            Span::raw("    ⚡ Activity:  Bash: "),
-            Span::styled(
-                format!("{}", phase.bash_commands.len()),
-                Style::default().fg(Color::Green),
-            ),
-            Span::raw("  Files: "),
-            Span::styled(
-                format!("{}", phase.file_modifications.len()),
-                Style::default().fg(Color::Blue),
-            ),
-        ]));
-
-        lines.push(Line::from("")); // Spacing
-    }
-
-    if lines.is_empty() {
-        lines.push(Line::from(Span::styled(
-            "  No phase data available",
+    if rows.is_empty() {
+        rows.push(Row::new(vec![Cell::from(Span::styled(
+            "No phase data available",
             Style::default().fg(Color::Gray),
-        )));
+        ))]));
     }
 
     let (up_indicator, down_indicator) = scroll_indicators(scroll, max_scroll);
     let title = format!(" Phase Metrics {} {} ", up_indicator, down_indicator);
 
-    Paragraph::new(lines).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Cyan))
-            .title(title),
-    )
+    Table::new(rows, PHASE_COLUMNS)
+        .header(header)
+        .column_spacing(2)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Cyan))
+                .title(title),
+        )
 }
 
 /// Whether a phase should appear in the phases pane. Zero-duration terminal
@@ -128,6 +104,11 @@ pub fn render_phases_tab(
 /// are hidden from the metrics view.
 pub(crate) fn is_displayed_phase(phase: &PhaseMetrics) -> bool {
     !(phase.duration_seconds == 0 && crate::engine::is_terminal(&phase.phase_name))
+}
+
+/// Format a duration in seconds as `{m}m {s:02}s`.
+fn fmt_duration(secs: u64) -> String {
+    format!("{}m {:02}s", secs / 60, secs % 60)
 }
 
 /// Format a phase's `[start, end]` window for display.
@@ -178,7 +159,7 @@ mod tests {
         // Verify widget renders, and that phase timestamps (with date) are shown
         // (builder starts the first phase at 2025-01-01 10:00:00).
         let rendered = format!("{:?}", widget);
-        assert!(rendered.contains("Paragraph"));
+        assert!(rendered.contains("Table"));
         assert!(rendered.contains("2025-01-01 10:00:00"));
     }
 
@@ -238,6 +219,6 @@ mod tests {
         let widget = render_phases_tab(&metrics, 5, 10);
 
         // Verify widget renders with scroll applied
-        assert!(format!("{:?}", widget).contains("Paragraph"));
+        assert!(format!("{:?}", widget).contains("Table"));
     }
 }
