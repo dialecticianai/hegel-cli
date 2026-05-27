@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 21:59
+**Last Updated**: 2026-05-26 22:03
 **Tool**: cargo-llvm-cov
 **Overall Coverage**: **75.60%** lines | **74.82%** regions | **76.76%** functions
 
