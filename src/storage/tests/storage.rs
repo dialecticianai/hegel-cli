@@ -370,8 +370,8 @@ fn test_log_state_transition_with_none_workflow_id() {
 
 // ========== Stash Helper Functions ==========
 
-fn minimal_workflow() -> serde_yaml::Value {
-    serde_yaml::to_value(serde_yaml::Mapping::new()).unwrap()
+fn minimal_workflow() -> serde_norway::Value {
+    serde_norway::to_value(serde_norway::Mapping::new()).unwrap()
 }
 
 fn stash_count(storage: &FileStorage) -> usize {

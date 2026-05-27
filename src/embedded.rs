@@ -134,7 +134,7 @@ mod tests {
             let yaml_content = get_workflow(workflow_name)
                 .unwrap_or_else(|| panic!("Workflow '{}' not found", workflow_name));
 
-            let workflow: crate::engine::Workflow = serde_yaml::from_str(yaml_content)
+            let workflow: crate::engine::Workflow = serde_norway::from_str(yaml_content)
                 .unwrap_or_else(|e| panic!("Failed to parse workflow '{}': {}", workflow_name, e));
 
             workflow.validate().unwrap_or_else(|e| {

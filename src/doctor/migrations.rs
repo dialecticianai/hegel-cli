@@ -31,7 +31,7 @@ pub trait StateMigration {
 
 /// Migration: Remove workflow definition from state.json
 ///
-/// Old format had both `workflow: Option<serde_yaml::Value>` (full YAML definition)
+/// Old format had both `workflow: Option<serde_norway::Value>` (full YAML definition)
 /// and `workflow_state: Option<WorkflowState>` (current state).
 ///
 /// New format has only `workflow: Option<WorkflowState>` (current state).

@@ -111,7 +111,7 @@ pattern: "cargo (build|test)"
 threshold: 5
 window: 120
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RepeatedCommand {
@@ -134,7 +134,7 @@ type: repeated_command
 threshold: 3
 window: 60
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RepeatedCommand {
@@ -158,7 +158,7 @@ path_pattern: "src/.*\\.rs"
 threshold: 8
 window: 180
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RepeatedFileEdit {
@@ -181,7 +181,7 @@ type: repeated_file_edit
 threshold: 6
 window: 120
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RepeatedFileEdit {
@@ -203,7 +203,7 @@ window: 120
 type: phase_timeout
 max_duration: 600
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::PhaseTimeout { max_duration } => {
@@ -219,7 +219,7 @@ max_duration: 600
 type: token_budget
 max_tokens: 5000
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::TokenBudget { max_tokens } => {
@@ -235,7 +235,7 @@ max_tokens: 5000
 type: nonexistent_rule
 threshold: 5
 "#;
-        let result: Result<RuleConfig, serde_yaml::Error> = serde_yaml::from_str(yaml);
+        let result: Result<RuleConfig, serde_norway::Error> = serde_norway::from_str(yaml);
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
         assert!(err.contains("unknown variant") || err.contains("nonexistent_rule"));
@@ -248,7 +248,7 @@ threshold: 5
 type: repeated_command
 window: 60
 "#;
-        let result: Result<RuleConfig, serde_yaml::Error> = serde_yaml::from_str(yaml);
+        let result: Result<RuleConfig, serde_norway::Error> = serde_norway::from_str(yaml);
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
         assert!(err.contains("missing field") || err.contains("threshold"));
@@ -330,7 +330,7 @@ window: 60
 type: require_commits
 lookback_phases: 2
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RequireCommits { lookback_phases } => {
@@ -346,7 +346,7 @@ lookback_phases: 2
 type: require_commits
 lookback_phases: 999
 "#;
-        let rule: RuleConfig = serde_yaml::from_str(yaml).unwrap();
+        let rule: RuleConfig = serde_norway::from_str(yaml).unwrap();
 
         match rule {
             RuleConfig::RequireCommits { lookback_phases } => {
@@ -379,8 +379,8 @@ lookback_phases: 999
     #[test]
     fn test_serialize_require_commits_roundtrip() {
         let rule = RuleConfig::RequireCommits { lookback_phases: 5 };
-        let yaml = serde_yaml::to_string(&rule).unwrap();
-        let deserialized: RuleConfig = serde_yaml::from_str(&yaml).unwrap();
+        let yaml = serde_norway::to_string(&rule).unwrap();
+        let deserialized: RuleConfig = serde_norway::from_str(&yaml).unwrap();
         assert_eq!(rule, deserialized);
     }
 }

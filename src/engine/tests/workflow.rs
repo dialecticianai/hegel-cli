@@ -30,7 +30,7 @@ fn test_load_workflow_discovery() {
     let workflow_path = create_test_workflow_file(
         &temp_dir,
         "test_discovery",
-        &serde_yaml::to_string(&wf).unwrap(),
+        &serde_norway::to_string(&wf).unwrap(),
     );
     let workflow = load_workflow(&workflow_path).unwrap();
 
@@ -84,7 +84,7 @@ fn test_load_workflow_execution() {
     let workflow_path = create_test_workflow_file(
         &temp_dir,
         "test_execution",
-        &serde_yaml::to_string(&wf).unwrap(),
+        &serde_norway::to_string(&wf).unwrap(),
     );
     let workflow = load_workflow(&workflow_path).unwrap();
 

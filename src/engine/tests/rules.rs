@@ -19,7 +19,7 @@ nodes:
       - type: token_budget
         max_tokens: 5000
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     let node = &workflow.nodes["start"];
     assert_eq!(node.rules.len(), 1);
 }
@@ -34,7 +34,7 @@ nodes:
     prompt: "Test prompt"
     transitions: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     let node = &workflow.nodes["start"];
     assert_eq!(node.rules.len(), 0);
 }
@@ -50,7 +50,7 @@ nodes:
     transitions: []
     rules: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     let node = &workflow.nodes["start"];
     assert_eq!(node.rules.len(), 0);
 }
@@ -74,7 +74,7 @@ nodes:
         threshold: 5
         window: 120
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     let node = &workflow.nodes["start"];
     assert_eq!(node.rules.len(), 3);
 }
@@ -97,7 +97,7 @@ nodes:
     prompt: "Node without rules"
     transitions: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     assert_eq!(workflow.nodes["start"].rules.len(), 1);
     assert_eq!(workflow.nodes["next"].rules.len(), 0);
 }

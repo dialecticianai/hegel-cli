@@ -136,7 +136,7 @@ impl Workflow {
 /// Load workflow definition from YAML string
 pub fn load_workflow_from_str(content: &str) -> Result<Workflow> {
     let mut workflow: Workflow =
-        serde_yaml::from_str(content).with_context(|| "Failed to parse workflow YAML")?;
+        serde_norway::from_str(content).with_context(|| "Failed to parse workflow YAML")?;
 
     // Reject workflows with explicit "done" nodes - these are now implicit
     if workflow.nodes.contains_key("done") {

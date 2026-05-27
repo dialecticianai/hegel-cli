@@ -22,7 +22,7 @@ nodes:
   done:
     transitions: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
 
     // Verify prompt_hbs field is set
     assert!(workflow.nodes["spec"].prompt.is_empty());
@@ -43,7 +43,7 @@ nodes:
       - when: done
         to: done
 "#;
-    let result: Result<Workflow, _> = serde_yaml::from_str(yaml);
+    let result: Result<Workflow, _> = serde_norway::from_str(yaml);
     assert!(result.is_ok()); // YAML parses fine
 
     // But validation should fail
@@ -67,7 +67,7 @@ nodes:
     prompt_hbs: "{{> code_map}}"
     transitions: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
     let state = init_state(&workflow);
 
     // Verify is_handlebars is set to true
@@ -141,7 +141,7 @@ nodes:
   done:
     transitions: []
 "#;
-    let workflow: Workflow = serde_yaml::from_str(yaml).unwrap();
+    let workflow: Workflow = serde_norway::from_str(yaml).unwrap();
 
     // Validate workflow
     assert!(workflow.validate().is_ok());

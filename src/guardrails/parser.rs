@@ -15,7 +15,7 @@ pub fn load_guardrails(state_dir: &Path) -> Result<GuardRailsConfig> {
     let contents = std::fs::read_to_string(&guardrails_path)
         .with_context(|| format!("Failed to read guardrails file: {:?}", guardrails_path))?;
 
-    let config: GuardRailsConfig = serde_yaml::from_str(&contents)
+    let config: GuardRailsConfig = serde_norway::from_str(&contents)
         .with_context(|| format!("Failed to parse guardrails YAML: {:?}", guardrails_path))?;
 
     Ok(config)
