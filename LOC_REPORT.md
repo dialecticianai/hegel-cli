@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,298 | 16,319 | 36,617 |
+| **Lines** | 20,298 | 16,321 | 36,619 |
 | **Comments** | 3,014 | - | 3,014 |
 | **Blank Lines** | 3,829 | - | 3,829 |
-| **Total Lines** | 27,141 | 16,319 | 43,460 |
+| **Total Lines** | 27,141 | 16,321 | 43,462 |
 | **Files** | 135 | 85 | 220 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -120,13 +120,13 @@ SUM:                           152           3993           3014          20819
 | `engine/tests/mod.rs` | 6 | 6 | 0 | 0.0% | ✅ |
 | `engine/tests/navigation.rs` | 204 | 204 | 0 | 0.0% | ✅ |
 | `engine/tests/rules.rs` | 258 | 258 | 0 | 0.0% | ✅ |
-| `engine/tests/template.rs` | 514 | 514 | 0 | 0.0% | ⚠️ Large |
+| `engine/tests/template.rs` | 514 | 514 | 0 | 0.0% | ✅ (infra) |
 | `engine/tests/workflow.rs` | 210 | 210 | 0 | 0.0% | ✅ |
 | `guardrails/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `guardrails/parser.rs` | 71 | 23 | 48 | 67.6% | ✅ |
 | `guardrails/types.rs` | 170 | 97 | 73 | 42.9% | ✅ |
 | `lib.rs` | 15 | 15 | 0 | 0.0% | ✅ |
-| `main.rs` | 589 | 589 | 0 | 0.0% | ⚠️ Large |
+| `main.rs` | 589 | 589 | 0 | 0.0% | ✅ (infra) |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 295 | 235 | 60 | 20.3% | ✅ |
 | `metrics/cowboy.rs` | 178 | 95 | 83 | 46.6% | ✅ |
@@ -137,12 +137,12 @@ SUM:                           152           3993           3014          20819
 | `metrics/states.rs` | 128 | 24 | 104 | 81.2% | ✅ |
 | `metrics/tests/git.rs` | 337 | 337 | 0 | 0.0% | ✅ |
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
-| `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ⚠️ Large |
+| `metrics/tests/unified.rs` | 538 | 538 | 0 | 0.0% | ✅ (infra) |
 | `metrics/transcript.rs` | 201 | 90 | 111 | 55.2% | ✅ |
 | `rules/evaluator.rs` | 361 | 361 | 0 | 0.0% | ✅ |
 | `rules/interrupt.rs` | 175 | 32 | 143 | 81.7% | ✅ |
 | `rules/mod.rs` | 10 | 10 | 0 | 0.0% | ✅ |
-| `rules/tests/evaluator.rs` | 935 | 935 | 0 | 0.0% | ⚠️ Large |
+| `rules/tests/evaluator.rs` | 935 | 935 | 0 | 0.0% | ✅ (infra) |
 | `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
 | `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
@@ -153,7 +153,7 @@ SUM:                           152           3993           3014          20819
 | `storage/mod.rs` | 686 | 682 | 4 | 0.6% | ✅ (infra) |
 | `storage/reviews.rs` | 284 | 137 | 147 | 51.8% | ✅ |
 | `storage/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
-| `storage/tests/storage.rs` | 619 | 619 | 0 | 0.0% | ⚠️ Large |
+| `storage/tests/storage.rs` | 619 | 619 | 0 | 0.0% | ✅ (infra) |
 | `test_helpers/archive.rs` | 137 | 137 | 0 | 0.0% | ✅ |
 | `test_helpers/fixtures.rs` | 29 | 29 | 0 | 0.0% | ✅ |
 | `test_helpers/jsonl.rs` | 125 | 125 | 0 | 0.0% | ✅ |
@@ -172,8 +172,6 @@ SUM:                           152           3993           3014          20819
 | `tui/tabs/phases.rs` | 143 | 111 | 32 | 22.4% | ✅ |
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
-
-**⚠️ Warning:** 5 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
@@ -242,7 +240,7 @@ SUM:                           152           3993           3014          20819
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 290 |
+| `LOC_REPORT.md` | 292 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |

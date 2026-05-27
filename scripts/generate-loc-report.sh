@@ -15,10 +15,16 @@ EXCLUDE_PATHS=(-not -path "./target/*" -not -path "./.git/*" -not -path "./.webc
 
 # Files allowed to exceed ${LARGE_FILE_THRESHOLD} impl lines (infrastructure, shared utilities, etc.)
 ALLOWED_LARGE_FILES=(
-    "commands/workflow/transitions.rs"       # Single concern: state transition logic (606 lines)
-    "commands/workflow/tests/commands.rs"    # Infrastructure: command tests (434 lines)
-    "commands/workflow/tests/transitions.rs" # Infrastructure: transition and state logging tests (518 lines)
-    "storage/mod.rs"                         # Single concern: file-based state persistence (587 lines)
+    "main.rs"                                # Single concern: clap command tree + dispatch (no logic)
+    "commands/workflow/transitions.rs"       # Single concern: state transition logic
+    "storage/mod.rs"                         # Single concern: file-based state persistence
+    # Test files: suites are naturally large; splitting buys little
+    "commands/workflow/tests/commands.rs"    # Infrastructure: command tests
+    "commands/workflow/tests/transitions.rs" # Infrastructure: transition and state logging tests
+    "engine/tests/template.rs"               # Infrastructure: template rendering tests
+    "metrics/tests/unified.rs"               # Infrastructure: unified metrics tests
+    "rules/tests/evaluator.rs"               # Infrastructure: rule evaluator tests
+    "storage/tests/storage.rs"               # Infrastructure: storage persistence tests
 )
 
 # Check if cloc is available
