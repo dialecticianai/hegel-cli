@@ -1,4 +1,4 @@
-use crate::metrics::UnifiedMetrics;
+use crate::metrics::{PhaseMetrics, UnifiedMetrics};
 use crate::tui::utils::scroll_indicators;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::{
@@ -14,8 +14,13 @@ pub fn render_phases_tab(
 ) -> Paragraph<'static> {
     let mut lines = vec![];
 
-    // Apply scroll to phase list
-    let visible_phases = metrics.phase_metrics.iter().skip(scroll);
+    // Apply scroll to the displayable phase list (zero-duration terminal
+    // phases are hidden — see is_displayed_phase)
+    let visible_phases = metrics
+        .phase_metrics
+        .iter()
+        .filter(|p| is_displayed_phase(p))
+        .skip(scroll);
 
     for phase in visible_phases {
         // Phase header with status indicator
@@ -119,6 +124,13 @@ pub fn render_phases_tab(
     )
 }
 
+/// Whether a phase should appear in the phases pane. Zero-duration terminal
+/// (done/aborted) phases are structural transitions with no activity, so they
+/// are hidden from the metrics view.
+pub(crate) fn is_displayed_phase(phase: &PhaseMetrics) -> bool {
+    !(phase.duration_seconds == 0 && crate::engine::is_terminal(&phase.phase_name))
+}
+
 /// Format an RFC3339 timestamp as `HH:MM:SS`, falling back to the raw string
 /// if it can't be parsed (never panics).
 fn fmt_time(rfc3339: &str) -> String {
@@ -146,6 +158,27 @@ mod tests {
         let rendered = format!("{:?}", widget);
         assert!(rendered.contains("Paragraph"));
         assert!(rendered.contains("10:00:00"));
+    }
+
+    #[test]
+    fn test_is_displayed_phase_hides_terminal_zero_duration() {
+        use crate::metrics::TokenMetrics;
+        let mk = |name: &str, dur: u64| PhaseMetrics {
+            phase_name: name.to_string(),
+            start_time: "2025-01-01T10:00:00Z".to_string(),
+            end_time: Some("2025-01-01T10:00:00Z".to_string()),
+            duration_seconds: dur,
+            token_metrics: TokenMetrics::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+            git_commits: vec![],
+            is_synthetic: false,
+            workflow_id: None,
+        };
+        assert!(!is_displayed_phase(&mk("done", 0))); // terminal + zero duration -> hidden
+        assert!(!is_displayed_phase(&mk("aborted", 0))); // hidden
+        assert!(is_displayed_phase(&mk("code", 0))); // non-terminal -> shown
+        assert!(is_displayed_phase(&mk("done", 5))); // terminal but has duration -> shown
     }
 
     #[test]

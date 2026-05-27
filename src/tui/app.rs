@@ -147,7 +147,15 @@ impl AppState {
         // Calculate based on current tab content height
         match self.selected_tab {
             Tab::Overview => 0, // Fits on one screen
-            Tab::Phases => max_scroll(self.metrics.phase_metrics.len(), 10),
+            Tab::Phases => {
+                let visible = self
+                    .metrics
+                    .phase_metrics
+                    .iter()
+                    .filter(|p| crate::tui::tabs::is_displayed_phase(p))
+                    .count();
+                max_scroll(visible, 10)
+            }
             Tab::Events => {
                 let timeline = build_timeline(&self.metrics);
                 max_scroll(timeline.len(), 20)

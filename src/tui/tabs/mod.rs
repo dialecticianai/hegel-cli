@@ -6,4 +6,5 @@ mod phases;
 pub use events::render_events_tab;
 pub use files::render_files_tab;
 pub use overview::render_overview_tab;
+pub(crate) use phases::is_displayed_phase;
 pub use phases::render_phases_tab;
