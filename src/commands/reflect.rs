@@ -89,18 +89,17 @@ fn send_review_request(base_url: &str, files: &[std::path::PathBuf]) -> Result<(
 
     // Make POST request to /review endpoint
     let url = format!("{}/review", base_url.trim_end_matches('/'));
-    let response = ureq::post(&url)
-        .set("Content-Type", "application/json")
-        .send_json(&payload)?;
+    // send_json sets Content-Type: application/json automatically
+    let mut response = ureq::post(&url).send_json(&payload)?;
 
     // Handle response
-    match response.status() {
+    match response.status().as_u16() {
         200 => {
             println!("✓ Review request sent successfully");
             Ok(())
         }
         404 => {
-            let body: serde_json::Value = response.into_json()?;
+            let body: serde_json::Value = response.body_mut().read_json()?;
             if let Some(missing) = body.get("missing").and_then(|m| m.as_array()) {
                 let missing_files: Vec<&str> = missing.iter().filter_map(|v| v.as_str()).collect();
                 anyhow::bail!("Missing files: {}", missing_files.join(", "));

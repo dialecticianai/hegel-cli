@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 22:06
+**Last Updated**: 2026-05-26 22:09
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.60%** lines | **74.82%** regions | **76.76%** functions
+**Overall Coverage**: **75.61%** lines | **74.83%** regions | **76.76%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19154              4823    74.82%        1093               254    76.76%       11931              2911    75.60%           0                 0         -
+TOTAL                                         19151              4820    74.83%        1093               254    76.76%       11929              2909    75.61%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -55,7 +55,7 @@ TOTAL                                         19154              4823    74.82% 
 | `src/commands/meta.rs` | 64.88% | 70.59% | 83.33% | 🟠 Moderate |
 | `src/commands/new.rs` | 85.91% | 87.08% | 92.86% | 🟡 Good |
 | `src/commands/pm.rs` | 60.00% | 68.42% | 50.00% | 🟠 Moderate |
-| `src/commands/reflect.rs` | 21.49% | 15.18% | 27.27% | 🔴 Needs Work |
+| `src/commands/reflect.rs` | 21.85% | 15.38% | 27.27% | 🔴 Needs Work |
 | `src/commands/review.rs` | 88.61% | 90.39% | 80.00% | 🟡 Good |
 | `src/commands/status.rs` | 44.83% | 36.65% | 50.00% | 🟠 Moderate |
 | `src/commands/util.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
@@ -226,7 +226,7 @@ TOTAL                                         19154              4823    74.82% 
 - `src/commands/markdown/json.rs` - 0.00%
 - `src/commands/markdown/mod.rs` - 0.00%
 - `src/commands/markdown/render.rs` - 0.00%
-- `src/commands/reflect.rs` - 21.49%
+- `src/commands/reflect.rs` - 21.85%
 - `src/commands/workflow/listing.rs` - 20.16%
 - `src/doctor/rescue.rs` - 0.00%
 - `src/tui/mod.rs` - 11.36%
@@ -235,7 +235,7 @@ TOTAL                                         19154              4823    74.82% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.60% | ⏳ In Progress |
+| Overall | ≥80% | 75.61% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
