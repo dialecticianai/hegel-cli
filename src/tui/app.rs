@@ -95,6 +95,10 @@ impl AppState {
             KeyCode::Char('g') => self.scroll_to_top(),
             KeyCode::Char('G') => self.scroll_to_bottom(),
 
+            // Page scrolling
+            KeyCode::Char(' ') | KeyCode::PageDown => self.page_down(),
+            KeyCode::PageUp => self.page_up(),
+
             // Reload metrics
             KeyCode::Char('r') => self.needs_reload = true,
 
@@ -141,34 +145,49 @@ impl AppState {
         self.scroll_offset = self.max_scroll();
     }
 
+    /// Visible rows per page for the current tab (drives both max scroll and
+    /// the page jumps). Overview fits on one screen, so it has no page.
+    fn page_size(&self) -> usize {
+        match self.selected_tab {
+            Tab::Overview => 0,
+            Tab::Phases => 10,
+            Tab::Events => 20,
+            Tab::Files => 15,
+        }
+    }
+
+    /// Scroll forward one full page (clamped to the bottom).
+    pub fn page_down(&mut self) {
+        let step = self.page_size().max(1);
+        self.scroll_offset = (self.scroll_offset + step).min(self.max_scroll());
+    }
+
+    /// Scroll back one full page (clamped to the top).
+    pub fn page_up(&mut self) {
+        let step = self.page_size().max(1);
+        self.scroll_offset = self.scroll_offset.saturating_sub(step);
+    }
+
     pub fn max_scroll(&self) -> usize {
         use crate::tui::utils::{build_timeline, max_scroll};
 
-        // Calculate based on current tab content height
-        match self.selected_tab {
-            Tab::Overview => 0, // Fits on one screen
-            Tab::Phases => {
-                let visible = self
-                    .metrics
-                    .phase_metrics
-                    .iter()
-                    .filter(|p| crate::tui::tabs::is_displayed_phase(p))
-                    .count();
-                max_scroll(visible, 10)
-            }
-            Tab::Events => {
-                let timeline = build_timeline(&self.metrics);
-                max_scroll(timeline.len(), 20)
-            }
-            Tab::Files => {
-                let file_count = self
-                    .metrics
-                    .hook_metrics
-                    .file_modification_frequency()
-                    .len();
-                max_scroll(file_count, 15)
-            }
-        }
+        // Content height per tab; the visible page height comes from page_size().
+        let content_len = match self.selected_tab {
+            Tab::Overview => return 0, // Fits on one screen
+            Tab::Phases => self
+                .metrics
+                .phase_metrics
+                .iter()
+                .filter(|p| crate::tui::tabs::is_displayed_phase(p))
+                .count(),
+            Tab::Events => build_timeline(&self.metrics).len(),
+            Tab::Files => self
+                .metrics
+                .hook_metrics
+                .file_modification_frequency()
+                .len(),
+        };
+        max_scroll(content_len, self.page_size())
     }
 }
 
@@ -308,6 +327,34 @@ mod tests {
 
         // Try with vim binding too
         app.handle_key(KeyCode::Char('k'));
+        assert_eq!(app.scroll_offset, 0);
+    }
+
+    #[test]
+    fn test_space_pages_forward_and_back() {
+        use crate::test_helpers::UnifiedMetricsBuilder;
+        let metrics = UnifiedMetricsBuilder::new()
+            .with_session("t")
+            .with_phases(30)
+            .build();
+        let mut app = AppState::new_for_test(metrics);
+        app.selected_tab = Tab::Phases;
+        assert_eq!(app.max_scroll(), 20); // 30 phases - page size 10
+
+        // Space jumps forward a full page.
+        app.handle_key(KeyCode::Char(' '));
+        assert_eq!(app.scroll_offset, 10);
+        // PageDown is equivalent and clamps at the bottom.
+        app.handle_key(KeyCode::PageDown);
+        assert_eq!(app.scroll_offset, 20);
+        app.handle_key(KeyCode::Char(' '));
+        assert_eq!(app.scroll_offset, 20);
+
+        // PageUp jumps back a page and clamps at the top.
+        app.scroll_offset = 15;
+        app.handle_key(KeyCode::PageUp);
+        assert_eq!(app.scroll_offset, 5);
+        app.handle_key(KeyCode::PageUp);
         assert_eq!(app.scroll_offset, 0);
     }
 

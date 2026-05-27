@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 23:18
+**Last Updated**: 2026-05-26 23:25
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,560 | 16,350 | 36,910 |
-| **Comments** | 3,053 | - | 3,053 |
-| **Blank Lines** | 3,856 | - | 3,856 |
-| **Total Lines** | 27,469 | 16,350 | 43,819 |
+| **Lines** | 20,599 | 16,350 | 36,949 |
+| **Comments** | 3,061 | - | 3,061 |
+| **Blank Lines** | 3,863 | - | 3,863 |
+| **Total Lines** | 27,523 | 16,350 | 43,873 |
 | **Files** | 136 | 86 | 222 |
 
-**Documentation Ratio**: 0.80 lines of docs per line of code
+**Documentation Ratio**: 0.79 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           136           3856           3053          20560
+Rust                           136           3863           3061          20599
 Markdown                        18            171              0            541
 -------------------------------------------------------------------------------
-SUM:                           154           4027           3053          21101
+SUM:                           154           4034           3061          21140
 -------------------------------------------------------------------------------
 ```
 
@@ -164,14 +164,14 @@ SUM:                           154           4027           3053          21101
 | `test_helpers/tui.rs` | 81 | 81 | 0 | 0.0% | ✅ |
 | `test_helpers/workflow.rs` | 328 | 328 | 0 | 0.0% | ✅ |
 | `theme.rs` | 96 | 66 | 30 | 31.2% | ✅ |
-| `tui/app.rs` | 411 | 207 | 204 | 49.6% | ✅ |
+| `tui/app.rs` | 458 | 226 | 232 | 50.7% | ✅ |
 | `tui/mod.rs` | 84 | 67 | 17 | 20.2% | ✅ |
 | `tui/tabs/events.rs` | 132 | 113 | 19 | 14.4% | ✅ |
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
 | `tui/tabs/mod.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `tui/tabs/overview.rs` | 88 | 74 | 14 | 15.9% | ✅ |
 | `tui/tabs/phases.rs` | 224 | 144 | 80 | 35.7% | ✅ |
-| `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
+| `tui/ui.rs` | 326 | 167 | 159 | 48.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
 ---
@@ -273,7 +273,7 @@ SUM:                           154           4027           3053          21101
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.80 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.79 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

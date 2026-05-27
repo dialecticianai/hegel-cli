@@ -124,28 +124,35 @@ fn render_footer() -> Paragraph<'static> {
             "[q]",
             Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
         ),
-        Span::styled(" Quit  ", Style::default().fg(Color::Gray)),
+        Span::styled(" Quit ", Style::default().fg(Color::Gray)),
         Span::styled(
             "[Tab]",
             Style::default()
                 .fg(Color::Yellow)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(" Next  ", Style::default().fg(Color::Gray)),
+        Span::styled(" Next ", Style::default().fg(Color::Gray)),
         Span::styled(
             "[↑↓/jk]",
             Style::default()
                 .fg(Color::Green)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(" Scroll  ", Style::default().fg(Color::Gray)),
+        Span::styled(" Scroll ", Style::default().fg(Color::Gray)),
+        Span::styled(
+            "[Space]",
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::styled(" Page ", Style::default().fg(Color::Gray)),
         Span::styled(
             "[g/G]",
             Style::default()
                 .fg(Color::Blue)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(" Top/Bottom  ", Style::default().fg(Color::Gray)),
+        Span::styled(" Top/Bottom ", Style::default().fg(Color::Gray)),
         Span::styled(
             "[r]",
             Style::default()

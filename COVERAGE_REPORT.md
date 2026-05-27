@@ -1,13 +1,13 @@
 # Test Coverage Report
 
-**Last Updated**: 2026-05-26 23:18
+**Last Updated**: 2026-05-26 23:25
 **Tool**: cargo-llvm-cov
-**Overall Coverage**: **75.69%** lines | **74.99%** regions | **77.34%** functions
+**Overall Coverage**: **75.76%** lines | **75.08%** regions | **77.42%** functions
 
 ## Summary
 
 ```
-TOTAL                                         19560              4891    74.99%        1121               254    77.34%       12147              2953    75.69%           0                 0         -
+TOTAL                                         19628              4892    75.08%        1125               254    77.42%       12187              2954    75.76%           0                 0         -
 ```
 
 ## Coverage by Module
@@ -110,7 +110,7 @@ TOTAL                                         19560              4891    74.99% 
 | `src/test_helpers/tui.rs` | 100.00% | 100.00% | 100.00% | 🟢 Excellent |
 | `src/test_helpers/workflow.rs` | 87.29% | 81.77% | 88.89% | 🟡 Good |
 | `src/theme.rs` | 85.71% | 85.94% | 81.82% | 🟡 Good |
-| `src/tui/app.rs` | 88.02% | 87.85% | 88.00% | 🟡 Good |
+| `src/tui/app.rs` | 89.17% | 89.35% | 89.66% | 🟡 Good |
 | `src/tui/mod.rs` | 11.36% | 13.70% | 16.67% | 🔴 Needs Work |
 | `src/tui/tabs/events.rs` | 90.24% | 87.10% | 100.00% | 🟢 Excellent |
 | `src/tui/tabs/files.rs` | 83.93% | 80.37% | 100.00% | 🟡 Good |
@@ -197,7 +197,7 @@ TOTAL                                         19560              4891    74.99% 
 - `src/test_helpers/fixtures.rs` - 80.00%
 - `src/test_helpers/workflow.rs` - 87.29%
 - `src/theme.rs` - 85.71%
-- `src/tui/app.rs` - 88.02%
+- `src/tui/app.rs` - 89.17%
 - `src/tui/tabs/files.rs` - 83.93%
 
 ### 🟠 Moderate (40-69% lines)
@@ -237,7 +237,7 @@ TOTAL                                         19560              4891    74.99% 
 
 | Tier | Target | Current | Status |
 |------|--------|---------|--------|
-| Overall | ≥80% | 75.69% | ⏳ In Progress |
+| Overall | ≥80% | 75.76% | ⏳ In Progress |
 | Critical Paths | ≥95% | Check modules above | Policy |
 | New Modules | ≥80% | - | Policy |
 
