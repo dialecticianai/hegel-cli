@@ -27,8 +27,13 @@ pub fn draw(frame: &mut Frame, app: &AppState) {
 
     frame.render_widget(render_header(app), header_area);
 
+    // Record the live content height so scroll math (page jumps, bounds) tracks
+    // the real terminal size. Must happen before max_scroll/visible_rows below.
+    app.set_content_height(main_area.height);
+
     // Render main content based on selected tab
     let max_scroll = app.max_scroll();
+    let visible_rows = app.visible_rows();
     match app.selected_tab {
         Tab::Overview => frame.render_widget(render_overview_tab(&app.metrics), main_area),
         Tab::Phases => frame.render_widget(
@@ -36,7 +41,7 @@ pub fn draw(frame: &mut Frame, app: &AppState) {
             main_area,
         ),
         Tab::Events => frame.render_widget(
-            render_events_tab(&app.metrics, app.scroll_offset, max_scroll),
+            render_events_tab(&app.metrics, app.scroll_offset, max_scroll, visible_rows),
             main_area,
         ),
         Tab::Files => frame.render_widget(

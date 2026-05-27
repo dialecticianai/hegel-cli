@@ -14,12 +14,13 @@ pub fn render_events_tab(
     metrics: &UnifiedMetrics,
     scroll: usize,
     max_scroll: usize,
+    visible_height: usize,
 ) -> List<'static> {
     // Build unified timeline using helper (merges all sources)
     let timeline = build_timeline(metrics);
 
-    // Apply scroll using helper (20 rows visible)
-    let visible = visible_window(&timeline, scroll, 20);
+    // Apply scroll using helper, sliced to the live pane height.
+    let visible = visible_window(&timeline, scroll, visible_height);
 
     let mut items: Vec<ListItem<'static>> = Vec::new();
     let mut last_day_label: Option<String> = None;
@@ -124,7 +125,7 @@ mod tests {
             .with_events(10, 5)
             .build();
 
-        let widget = render_events_tab(&metrics, 0, 0);
+        let widget = render_events_tab(&metrics, 0, 0, 20);
 
         // Verify widget renders
         assert!(format!("{:?}", widget).contains("List"));

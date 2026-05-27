@@ -1,6 +1,7 @@
 use crate::metrics::{parse_unified_metrics, UnifiedMetrics};
 use crossterm::event::KeyCode;
 use notify::{Event as NotifyEvent, EventKind, RecursiveMode, Watcher};
+use std::cell::Cell;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{channel, Receiver};
 
@@ -18,6 +19,12 @@ pub struct AppState {
     pub scroll_offset: usize,
     pub should_quit: bool,
     pub needs_reload: bool,
+
+    /// Height (rows) of the main content area, captured each frame from
+    /// `frame.area()` during `ui::draw`. `0` until the first draw. Interior
+    /// mutability so `draw(&AppState)` can record it; read back by the scroll
+    /// math so page jumps and bounds track the real terminal size.
+    content_height: Cell<u16>,
 
     // File watching
     state_dir: PathBuf,
@@ -46,6 +53,7 @@ impl AppState {
             scroll_offset: 0,
             should_quit: false,
             needs_reload: false,
+            content_height: Cell::new(0),
             state_dir: state_dir.to_path_buf(),
             file_rx: rx,
             _watcher: watcher,
@@ -145,33 +153,58 @@ impl AppState {
         self.scroll_offset = self.max_scroll();
     }
 
-    /// Visible rows per page for the current tab (drives both max scroll and
-    /// the page jumps). Overview fits on one screen, so it has no page.
-    fn page_size(&self) -> usize {
-        match self.selected_tab {
-            Tab::Overview => 0,
-            Tab::Phases => 10,
-            Tab::Events => 20,
-            Tab::Files => 15,
+    /// Record the main content area height for the current frame. Called from
+    /// `ui::draw` (which holds `&AppState`) via interior mutability.
+    pub(crate) fn set_content_height(&self, height: u16) {
+        self.content_height.set(height);
+    }
+
+    /// Number of data rows the current tab can actually display, derived from
+    /// the last-rendered content height minus the pane's chrome (borders, plus
+    /// a header row for the Phases table). Before the first draw — and in tests
+    /// that never render — `content_height` is 0, so we fall back to sane
+    /// per-tab defaults. Overview fits on one screen, so it never scrolls.
+    pub(crate) fn visible_rows(&self) -> usize {
+        let height = self.content_height.get() as usize;
+        if height == 0 {
+            return match self.selected_tab {
+                Tab::Overview => 0,
+                Tab::Phases => 10,
+                Tab::Events => 20,
+                Tab::Files => 15,
+            };
         }
+        // All scrollable panes draw a full border (top+bottom = 2 rows); the
+        // Phases table also reserves one row for its column header.
+        let chrome = match self.selected_tab {
+            Tab::Overview => return 0,
+            Tab::Phases => 3,
+            Tab::Events | Tab::Files => 2,
+        };
+        height.saturating_sub(chrome).max(1)
     }
 
-    /// Scroll forward one full page (clamped to the bottom).
+    /// Rows to advance per page jump: a full page minus one row of overlap, so
+    /// the last line of the old page becomes the first line of the new one
+    /// (standard pager behavior). Always at least 1.
+    fn page_step(&self) -> usize {
+        self.visible_rows().saturating_sub(1).max(1)
+    }
+
+    /// Scroll forward one page (clamped to the bottom).
     pub fn page_down(&mut self) {
-        let step = self.page_size().max(1);
-        self.scroll_offset = (self.scroll_offset + step).min(self.max_scroll());
+        self.scroll_offset = (self.scroll_offset + self.page_step()).min(self.max_scroll());
     }
 
-    /// Scroll back one full page (clamped to the top).
+    /// Scroll back one page (clamped to the top).
     pub fn page_up(&mut self) {
-        let step = self.page_size().max(1);
-        self.scroll_offset = self.scroll_offset.saturating_sub(step);
+        self.scroll_offset = self.scroll_offset.saturating_sub(self.page_step());
     }
 
     pub fn max_scroll(&self) -> usize {
         use crate::tui::utils::{build_timeline, max_scroll};
 
-        // Content height per tab; the visible page height comes from page_size().
+        // Content height per tab; the visible page height comes from visible_rows().
         let content_len = match self.selected_tab {
             Tab::Overview => return 0, // Fits on one screen
             Tab::Phases => self
@@ -187,7 +220,7 @@ impl AppState {
                 .file_modification_frequency()
                 .len(),
         };
-        max_scroll(content_len, self.page_size())
+        max_scroll(content_len, self.visible_rows())
     }
 }
 
@@ -217,6 +250,7 @@ impl AppState {
             scroll_offset: 0,
             should_quit: false,
             needs_reload: false,
+            content_height: Cell::new(0),
             state_dir,
             file_rx: rx,
             _watcher: watcher,
@@ -339,23 +373,78 @@ mod tests {
             .build();
         let mut app = AppState::new_for_test(metrics);
         app.selected_tab = Tab::Phases;
-        assert_eq!(app.max_scroll(), 20); // 30 phases - page size 10
+        // Simulate a frame: a 13-row content area -> 10 visible rows
+        // (2 borders + 1 header). Page step is one less (9) for the overlap.
+        app.set_content_height(13);
+        assert_eq!(app.visible_rows(), 10);
+        assert_eq!(app.max_scroll(), 20); // 30 phases - 10 visible
 
-        // Space jumps forward a full page.
+        // Space pages forward by a page minus one overlap row (step = 9).
         app.handle_key(KeyCode::Char(' '));
-        assert_eq!(app.scroll_offset, 10);
-        // PageDown is equivalent and clamps at the bottom.
+        assert_eq!(app.scroll_offset, 9);
         app.handle_key(KeyCode::PageDown);
+        assert_eq!(app.scroll_offset, 18);
+        // Clamps at the bottom.
+        app.handle_key(KeyCode::Char(' '));
         assert_eq!(app.scroll_offset, 20);
         app.handle_key(KeyCode::Char(' '));
         assert_eq!(app.scroll_offset, 20);
 
-        // PageUp / 'b' jump back a page and clamp at the top.
+        // PageUp / 'b' jump back a page (step 9) and clamp at the top.
         app.scroll_offset = 15;
         app.handle_key(KeyCode::PageUp);
-        assert_eq!(app.scroll_offset, 5);
+        assert_eq!(app.scroll_offset, 6);
         app.handle_key(KeyCode::Char('b'));
         assert_eq!(app.scroll_offset, 0);
+    }
+
+    #[test]
+    fn test_visible_rows_tracks_content_height_and_chrome() {
+        use crate::test_helpers::UnifiedMetricsBuilder;
+        let metrics = UnifiedMetricsBuilder::new()
+            .with_session("t")
+            .with_phases(5)
+            .build();
+        let mut app = AppState::new_for_test(metrics);
+
+        // Before any draw: per-tab fallback defaults.
+        app.selected_tab = Tab::Phases;
+        assert_eq!(app.visible_rows(), 10);
+        app.selected_tab = Tab::Events;
+        assert_eq!(app.visible_rows(), 20);
+        app.selected_tab = Tab::Files;
+        assert_eq!(app.visible_rows(), 15);
+
+        // After a frame records the area height, rows = height - chrome.
+        app.set_content_height(25);
+        app.selected_tab = Tab::Phases; // 2 borders + 1 header
+        assert_eq!(app.visible_rows(), 22);
+        app.selected_tab = Tab::Events; // 2 borders
+        assert_eq!(app.visible_rows(), 23);
+        app.selected_tab = Tab::Files; // 2 borders
+        assert_eq!(app.visible_rows(), 23);
+
+        // Overview never scrolls.
+        app.selected_tab = Tab::Overview;
+        assert_eq!(app.visible_rows(), 0);
+    }
+
+    #[test]
+    fn test_page_down_puts_previous_bottom_row_on_top() {
+        use crate::test_helpers::UnifiedMetricsBuilder;
+        // With R visible rows, page 1 shows rows [0, R-1]; a page down should
+        // land the bottom row (R-1) at the top (one-row overlap).
+        let metrics = UnifiedMetricsBuilder::new()
+            .with_session("t")
+            .with_phases(50)
+            .build();
+        let mut app = AppState::new_for_test(metrics);
+        app.selected_tab = Tab::Phases;
+        app.set_content_height(17); // 14 visible rows
+        assert_eq!(app.visible_rows(), 14);
+
+        app.handle_key(KeyCode::PageDown);
+        assert_eq!(app.scroll_offset, 13); // previous bottom row is the new top
     }
 
     #[test]

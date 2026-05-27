@@ -10,7 +10,7 @@ use ratatui::{
 /// Column widths for the phases table.
 /// PHASE (icon+name), WINDOW (widest — multi-day spans), DURATION, TOKENS, BASH, FILES.
 const PHASE_COLUMNS: [Constraint; 6] = [
-    Constraint::Length(10),
+    Constraint::Length(20),
     Constraint::Length(41),
     Constraint::Length(10),
     Constraint::Length(8),
