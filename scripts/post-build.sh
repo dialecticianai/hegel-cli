@@ -12,6 +12,10 @@ if [ -f "$RELEASE_BIN" ]; then
     if [ ! -f "$INSTALL_DIR/hegel" ] || [ "$RELEASE_BIN" -nt "$INSTALL_DIR/hegel" ]; then
         echo "📦 Installing hegel to $INSTALL_DIR..."
         mkdir -p "$INSTALL_DIR"
+        # Remove the old binary first so the copy lands on a fresh inode. On macOS,
+        # cp-ing over a running/cached signed binary can invalidate the kernel's
+        # code-signature cache for that path and SIGKILL it on launch ("Killed: 9").
+        rm -f "$INSTALL_DIR/hegel"
         cp "$RELEASE_BIN" "$INSTALL_DIR/hegel"
         chmod +x "$INSTALL_DIR/hegel"
         echo "✅ Installed: $(hegel --version 2>/dev/null || echo 'hegel (version unknown)')"
