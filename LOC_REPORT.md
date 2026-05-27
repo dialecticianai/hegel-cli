@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 22:49
+**Last Updated**: 2026-05-26 22:52
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,540 | 16,346 | 36,886 |
+| **Lines** | 20,540 | 16,350 | 36,890 |
 | **Comments** | 3,045 | - | 3,045 |
 | **Blank Lines** | 3,857 | - | 3,857 |
-| **Total Lines** | 27,442 | 16,346 | 43,788 |
+| **Total Lines** | 27,442 | 16,350 | 43,792 |
 | **Files** | 136 | 86 | 222 |
 
 **Documentation Ratio**: 0.80 lines of docs per line of code
@@ -25,9 +25,9 @@
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 Rust                           136           3857           3045          20540
-Markdown                        18            171              0            538
+Markdown                        18            171              0            541
 -------------------------------------------------------------------------------
-SUM:                           154           4028           3045          21078
+SUM:                           154           4028           3045          21081
 -------------------------------------------------------------------------------
 ```
 
@@ -241,7 +241,7 @@ SUM:                           154           4028           3045          21078
 | `guides/templates/mirror_workflow.md` | 11 |
 | `guides/VISION_WRITING.md` | 176 |
 | `HEGEL_CLAUDE.md` | 350 |
-| `LOC_REPORT.md` | 291 |
+| `LOC_REPORT.md` | 292 |
 | `METRICS.md` | 258 |
 | `README.md` | 438 |
 | `ROADMAP.md` | 450 |
@@ -250,7 +250,7 @@ SUM:                           154           4028           3045          21078
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
-| `src/commands/doctor/README.md` | 39 |
+| `src/commands/doctor/README.md` | 42 |
 | `src/commands/fork/README.md` | 30 |
 | `src/commands/markdown/README.md` | 25 |
 | `src/commands/README.md` | 49 |
