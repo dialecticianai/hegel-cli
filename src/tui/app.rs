@@ -97,7 +97,7 @@ impl AppState {
 
             // Page scrolling
             KeyCode::Char(' ') | KeyCode::PageDown => self.page_down(),
-            KeyCode::PageUp => self.page_up(),
+            KeyCode::Char('b') | KeyCode::PageUp => self.page_up(),
 
             // Reload metrics
             KeyCode::Char('r') => self.needs_reload = true,
@@ -350,11 +350,11 @@ mod tests {
         app.handle_key(KeyCode::Char(' '));
         assert_eq!(app.scroll_offset, 20);
 
-        // PageUp jumps back a page and clamps at the top.
+        // PageUp / 'b' jump back a page and clamp at the top.
         app.scroll_offset = 15;
         app.handle_key(KeyCode::PageUp);
         assert_eq!(app.scroll_offset, 5);
-        app.handle_key(KeyCode::PageUp);
+        app.handle_key(KeyCode::Char('b'));
         assert_eq!(app.scroll_offset, 0);
     }
 

@@ -140,7 +140,7 @@ fn render_footer() -> Paragraph<'static> {
         ),
         Span::styled(" Scroll ", Style::default().fg(Color::Gray)),
         Span::styled(
-            "[Space]",
+            "[Space/b]",
             Style::default()
                 .fg(Color::Green)
                 .add_modifier(Modifier::BOLD),
