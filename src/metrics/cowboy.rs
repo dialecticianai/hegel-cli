@@ -89,8 +89,12 @@ pub fn build_synthetic_cowboy_archive(group: &CowboyActivityGroup) -> Result<Wor
         git_commits: group.git_commits.clone(),
     };
 
-    // Create archive with is_synthetic=true
-    WorkflowArchive::from_metrics(&metrics, &workflow_id, true)
+    // Create archive with is_synthetic=true, then trim its window to the last
+    // captured activity (detection runs at the *next* workflow start, so the
+    // raw gap end would inflate the ride's duration with idle time).
+    let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id, true)?;
+    archive.trim_cowboy_to_activity();
+    Ok(archive)
 }
 
 #[cfg(test)]

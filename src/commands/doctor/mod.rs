@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests;
 
+mod fix_cowboy_durations;
 mod fix_ddd;
 mod fix_phases;
 mod fix_state;
@@ -40,6 +41,9 @@ pub fn doctor_command(args: DoctorArgs, storage: &FileStorage) -> Result<()> {
 
     // Check and fix archived phase metrics (dedup + prune empty phases)
     fix_phases::check_and_fix_phases(storage, args.apply, args.json)?;
+
+    // Trim synthetic cowboy rides to their last captured activity
+    fix_cowboy_durations::check_and_fix_cowboy_durations(storage, args.apply, args.json)?;
 
     Ok(())
 }

@@ -3,13 +3,15 @@ mod builder;
 mod validation;
 
 use anyhow::{bail, Context, Result};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
 use crate::metrics::git::GitCommit;
 
-// Re-export for backwards compatibility
+// Reverse-aggregation helpers (archive summaries -> individual hook records).
+pub use aggregation::{expand_bash_commands, expand_file_modifications};
 
 /// Archived workflow with pre-computed aggregates
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -334,6 +336,95 @@ pub fn dedup_across_archives(archives: &mut [WorkflowArchive]) -> CrossArchiveDe
     result
 }
 
+/// Parse an RFC3339 timestamp to UTC, or `None` if it doesn't parse.
+fn parse_utc(ts: &str) -> Option<DateTime<Utc>> {
+    DateTime::parse_from_rfc3339(ts)
+        .ok()
+        .map(|d| d.with_timezone(&Utc))
+}
+
+/// Latest captured-activity timestamp across the given phases (bash commands,
+/// file modifications, and git commits). `None` if no activity has a timestamp.
+fn phases_last_activity(phases: &[PhaseArchive]) -> Option<DateTime<Utc>> {
+    phases
+        .iter()
+        .flat_map(|p| {
+            let bash = p.bash_commands.iter().flat_map(|b| b.timestamps.iter());
+            let files = p
+                .file_modifications
+                .iter()
+                .flat_map(|f| f.timestamps.iter());
+            let commits = p.git_commits.iter().map(|c| &c.timestamp);
+            bash.chain(files).chain(commits)
+        })
+        .filter_map(|ts| parse_utc(ts))
+        .max()
+}
+
+impl WorkflowArchive {
+    /// Trim a synthetic cowboy ride so it ends at its last *captured activity*
+    /// (the latest bash/file/commit timestamp) rather than the moment detection
+    /// happened to run — which for an overnight gap inflates the duration to
+    /// many idle hours. The anchored start (`workflow_id`) is preserved, so the
+    /// archive's identity and gap-coverage matching are unchanged.
+    ///
+    /// No-op (returns `false`) for non-cowboy archives, when there is no
+    /// timestamped activity to trim to, or when the ride already ends at/before
+    /// its last activity. Transcript-only rides (no bash/file/commit) can't be
+    /// trimmed since transcripts aren't stored in the archive.
+    pub fn trim_cowboy_to_activity(&mut self) -> bool {
+        if !self.is_synthetic || self.mode != "cowboy" {
+            return false;
+        }
+        let Some(last) = phases_last_activity(&self.phases) else {
+            return false;
+        };
+        let Some(start) = parse_utc(&self.workflow_id) else {
+            return false;
+        };
+        if last <= start {
+            return false;
+        }
+        // Already tight enough?
+        if parse_utc(&self.completed_at).is_some_and(|end| last >= end) {
+            return false;
+        }
+
+        let last_rfc = last.to_rfc3339();
+
+        // Drop phases that begin after the last activity (e.g. the trailing
+        // zero-width active-phase placeholder).
+        self.phases
+            .retain(|p| parse_utc(&p.start_time).is_none_or(|s| s < last));
+
+        // Clamp surviving phase ends into the trimmed window and recompute
+        // durations.
+        for p in &mut self.phases {
+            let overruns = match p.end_time.as_deref().and_then(parse_utc) {
+                Some(end) => end > last,
+                None => true, // active phase: close it at the last activity
+            };
+            if overruns {
+                p.end_time = Some(last_rfc.clone());
+            }
+            if let Some(s) = parse_utc(&p.start_time) {
+                let e = p.end_time.as_deref().and_then(parse_utc).unwrap_or(last);
+                p.duration_seconds = (e - s).num_seconds().max(0) as u64;
+            }
+        }
+
+        // Clamp any transition (e.g. ride->done) that fell at the old end.
+        for t in &mut self.transitions {
+            if parse_utc(&t.timestamp).is_some_and(|ts| ts > last) {
+                t.timestamp = last_rfc.clone();
+            }
+        }
+
+        self.completed_at = last_rfc;
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -522,6 +613,126 @@ mod tests {
         assert!(r.affected.is_empty());
         assert_eq!(archives[0].phases.len(), 1);
         assert_eq!(archives[1].phases.len(), 1);
+    }
+
+    /// Build a synthetic cowboy ride spanning [start, end] with optional commit
+    /// and bash timestamps, plus START->ride / ride->done transitions.
+    fn cowboy_ride(
+        start: &str,
+        end: &str,
+        commit_ts: Option<&str>,
+        bash_ts: &[&str],
+    ) -> WorkflowArchive {
+        let git_commits = commit_ts
+            .map(|ts| {
+                vec![GitCommit {
+                    hash: "abc".into(),
+                    author: "a".into(),
+                    timestamp: ts.to_string(),
+                    message: "m".into(),
+                    files_changed: 1,
+                    insertions: 1,
+                    deletions: 0,
+                }]
+            })
+            .unwrap_or_default();
+        let bash_commands = if bash_ts.is_empty() {
+            vec![]
+        } else {
+            vec![BashCommandSummary {
+                command: "echo".into(),
+                count: bash_ts.len(),
+                timestamps: bash_ts.iter().map(|s| s.to_string()).collect(),
+            }]
+        };
+        WorkflowArchive {
+            workflow_id: start.to_string(),
+            mode: "cowboy".to_string(),
+            completed_at: end.to_string(),
+            phases: vec![PhaseArchive {
+                phase_name: "ride".to_string(),
+                start_time: start.to_string(),
+                end_time: Some(end.to_string()),
+                duration_seconds: 999_999,
+                tokens: TokenTotals::default(),
+                bash_commands,
+                file_modifications: vec![],
+                git_commits,
+            }],
+            transitions: vec![
+                transition("START", "ride", start),
+                transition("ride", "done", end),
+            ],
+            totals: WorkflowTotals::default(),
+            session_id: None,
+            is_synthetic: true,
+        }
+    }
+
+    #[test]
+    fn test_trim_cowboy_ends_at_last_activity() {
+        // Overnight gap: detection ran the next morning, but the last activity
+        // was a 10:15 commit.
+        let mut a = cowboy_ride(
+            "2025-01-01T10:00:00Z",
+            "2025-01-02T05:00:00Z",
+            Some("2025-01-01T10:15:00Z"),
+            &["2025-01-01T10:05:00Z", "2025-01-01T10:10:00Z"],
+        );
+        assert!(a.trim_cowboy_to_activity());
+
+        let expect = parse_utc("2025-01-01T10:15:00Z").unwrap();
+        assert_eq!(parse_utc(&a.completed_at), Some(expect));
+        assert_eq!(
+            parse_utc(a.phases[0].end_time.as_deref().unwrap()),
+            Some(expect)
+        );
+        assert_eq!(a.phases[0].duration_seconds, 900); // 10:00 -> 10:15
+                                                       // ride->done transition follows the trimmed end.
+        let done = a.transitions.iter().find(|t| t.to_node == "done").unwrap();
+        assert_eq!(parse_utc(&done.timestamp), Some(expect));
+    }
+
+    #[test]
+    fn test_trim_cowboy_drops_trailing_placeholder_phase() {
+        let mut a = cowboy_ride(
+            "2025-01-01T10:00:00Z",
+            "2025-01-01T12:00:00Z",
+            Some("2025-01-01T10:30:00Z"),
+            &[],
+        );
+        // Append a zero-width active placeholder phase at the old end.
+        a.phases.push(PhaseArchive {
+            phase_name: "ride".to_string(),
+            start_time: "2025-01-01T12:00:00Z".to_string(),
+            end_time: None,
+            duration_seconds: 0,
+            tokens: TokenTotals::default(),
+            bash_commands: vec![],
+            file_modifications: vec![],
+            git_commits: vec![],
+        });
+
+        assert!(a.trim_cowboy_to_activity());
+        assert_eq!(a.phases.len(), 1); // trailing placeholder dropped
+        let expect = parse_utc("2025-01-01T10:30:00Z").unwrap();
+        assert_eq!(parse_utc(&a.completed_at), Some(expect));
+        assert_eq!(a.phases[0].duration_seconds, 1800); // 10:00 -> 10:30
+    }
+
+    #[test]
+    fn test_trim_cowboy_noop_without_timestamped_activity() {
+        // No commits and no bash timestamps -> nothing to trim to.
+        let mut a = cowboy_ride("2025-01-01T10:00:00Z", "2025-01-02T05:00:00Z", None, &[]);
+        assert!(!a.trim_cowboy_to_activity());
+        assert_eq!(a.completed_at, "2025-01-02T05:00:00Z");
+    }
+
+    #[test]
+    fn test_trim_cowboy_noop_for_non_cowboy() {
+        let mut a = archive_with(vec![phase("spec", "2025-01-01T10:00:00Z", 10, 0)]);
+        // archive_with uses mode "discovery"; trim must not touch it.
+        assert!(!a.trim_cowboy_to_activity());
     }
 
     /// Helper to create test archive with default values

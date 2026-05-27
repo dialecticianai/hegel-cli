@@ -8,14 +8,15 @@ use ratatui::{
 };
 
 /// Column widths for the phases table.
-/// PHASE (icon+name), WINDOW (widest — multi-day spans), DURATION, TOKENS, BASH, FILES.
-const PHASE_COLUMNS: [Constraint; 6] = [
+/// PHASE (icon+name), WINDOW (widest — multi-day spans), DURATION, TOKENS, BASH, FILES, COMMITS.
+const PHASE_COLUMNS: [Constraint; 7] = [
     Constraint::Length(20),
     Constraint::Length(41),
     Constraint::Length(10),
     Constraint::Length(8),
     Constraint::Length(5),
     Constraint::Length(6),
+    Constraint::Length(8),
 ];
 
 /// Phases tab: one row per phase with aligned columns.
@@ -31,6 +32,7 @@ pub fn render_phases_tab(
         Cell::from(Line::from("TOKENS").right_aligned()),
         Cell::from(Line::from("BASH").right_aligned()),
         Cell::from(Line::from("FILES").right_aligned()),
+        Cell::from(Line::from("COMMITS").right_aligned()),
     ])
     .style(
         Style::default()
@@ -74,6 +76,8 @@ pub fn render_phases_tab(
                     .style(Style::default().fg(Color::Green)),
                 Cell::from(Line::from(phase.file_modifications.len().to_string()).right_aligned())
                     .style(Style::default().fg(Color::Blue)),
+                Cell::from(Line::from(phase.git_commits.len().to_string()).right_aligned())
+                    .style(Style::default().fg(Color::Red)),
             ])
         })
         .collect();

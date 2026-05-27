@@ -35,6 +35,41 @@ pub fn aggregate_bash_commands(bash_commands: &[BashCommand]) -> Vec<BashCommand
         .collect()
 }
 
+/// Expand archived bash-command summaries back into individual commands.
+///
+/// The reverse of [`aggregate_bash_commands`]: each summary yields `count`
+/// commands so downstream consumers (e.g. the TUI phase table) can count them.
+/// `stdout`/`stderr` are not archived, so they are left empty; timestamps are
+/// restored positionally where present.
+pub fn expand_bash_commands(summaries: &[BashCommandSummary]) -> Vec<BashCommand> {
+    summaries
+        .iter()
+        .flat_map(|s| {
+            (0..s.count).map(move |i| BashCommand {
+                command: s.command.clone(),
+                timestamp: s.timestamps.get(i).filter(|t| !t.is_empty()).cloned(),
+                stdout: None,
+                stderr: None,
+            })
+        })
+        .collect()
+}
+
+/// Expand archived file-modification summaries back into individual
+/// modifications. The reverse of [`aggregate_file_modifications`].
+pub fn expand_file_modifications(summaries: &[FileModificationSummary]) -> Vec<FileModification> {
+    summaries
+        .iter()
+        .flat_map(|s| {
+            (0..s.count).map(move |i| FileModification {
+                file_path: s.file_path.clone(),
+                tool: s.tool.clone(),
+                timestamp: s.timestamps.get(i).filter(|t| !t.is_empty()).cloned(),
+            })
+        })
+        .collect()
+}
+
 /// Aggregate file modifications by (file_path, tool)
 pub fn aggregate_file_modifications(
     file_modifications: &[FileModification],
@@ -91,4 +126,70 @@ pub fn compute_totals(
     totals.git_commits = phases.iter().map(|p| p.git_commits.len()).sum();
 
     totals
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_expand_bash_commands_round_trips_counts() {
+        let cmds = vec![
+            BashCommand {
+                command: "cargo build".into(),
+                timestamp: Some("2025-01-01T10:00:00Z".into()),
+                stdout: None,
+                stderr: None,
+            },
+            BashCommand {
+                command: "cargo build".into(),
+                timestamp: Some("2025-01-01T10:05:00Z".into()),
+                stdout: None,
+                stderr: None,
+            },
+            BashCommand {
+                command: "ls".into(),
+                timestamp: None,
+                stdout: None,
+                stderr: None,
+            },
+        ];
+        let summaries = aggregate_bash_commands(&cmds);
+        let expanded = expand_bash_commands(&summaries);
+        // Total count is preserved through aggregate -> expand.
+        assert_eq!(expanded.len(), 3);
+        assert_eq!(
+            expanded
+                .iter()
+                .filter(|c| c.command == "cargo build")
+                .count(),
+            2
+        );
+        // A present timestamp survives the round trip.
+        assert!(expanded
+            .iter()
+            .any(|c| c.timestamp.as_deref() == Some("2025-01-01T10:00:00Z")));
+    }
+
+    #[test]
+    fn test_expand_file_modifications_round_trips_counts() {
+        let mods = vec![
+            FileModification {
+                file_path: "a.rs".into(),
+                tool: "Edit".into(),
+                timestamp: Some("2025-01-01T10:00:00Z".into()),
+            },
+            FileModification {
+                file_path: "a.rs".into(),
+                tool: "Edit".into(),
+                timestamp: Some("2025-01-01T10:01:00Z".into()),
+            },
+        ];
+        let summaries = aggregate_file_modifications(&mods);
+        let expanded = expand_file_modifications(&summaries);
+        assert_eq!(expanded.len(), 2);
+        assert!(expanded
+            .iter()
+            .all(|m| m.file_path == "a.rs" && m.tool == "Edit"));
+    }
 }

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-27 00:12
+**Last Updated**: 2026-05-27 00:41
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,864 | 16,350 | 37,214 |
-| **Comments** | 3,126 | - | 3,126 |
-| **Blank Lines** | 3,897 | - | 3,897 |
-| **Total Lines** | 27,887 | 16,350 | 44,237 |
-| **Files** | 136 | 86 | 222 |
+| **Lines** | 21,188 | 16,354 | 37,542 |
+| **Comments** | 3,179 | - | 3,179 |
+| **Blank Lines** | 3,925 | - | 3,925 |
+| **Total Lines** | 28,292 | 16,354 | 44,646 |
+| **Files** | 137 | 86 | 223 |
 
-**Documentation Ratio**: 0.78 lines of docs per line of code
+**Documentation Ratio**: 0.77 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           136           3897           3126          20864
-Markdown                        18            171              0            541
+Rust                           137           3925           3179          21188
+Markdown                        18            171              0            543
 -------------------------------------------------------------------------------
-SUM:                           154           4068           3126          21405
+SUM:                           155           4096           3179          21731
 -------------------------------------------------------------------------------
 ```
 
@@ -45,7 +45,7 @@ SUM:                           154           4068           3126          21405
 | `analyze/cleanup/duplicate_cowboy.rs` | 269 | 164 | 105 | 39.0% | ✅ |
 | `analyze/cleanup/git.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `analyze/cleanup/mod.rs` | 75 | 75 | 0 | 0.0% | ✅ |
-| `analyze/gap_detection.rs` | 358 | 358 | 0 | 0.0% | ✅ |
+| `analyze/gap_detection.rs` | 360 | 360 | 0 | 0.0% | ✅ |
 | `analyze/mod.rs` | 8 | 8 | 0 | 0.0% | ✅ |
 | `analyze/repair.rs` | 259 | 259 | 0 | 0.0% | ✅ |
 | `analyze/sections.rs` | 370 | 370 | 0 | 0.0% | ✅ |
@@ -56,10 +56,11 @@ SUM:                           154           4068           3126          21405
 | `commands/archive.rs` | 385 | 296 | 89 | 23.1% | ✅ |
 | `commands/astq.rs` | 83 | 63 | 20 | 24.1% | ✅ |
 | `commands/config.rs` | 134 | 57 | 77 | 57.5% | ✅ |
+| `commands/doctor/fix_cowboy_durations.rs` | 73 | 73 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_ddd.rs` | 273 | 273 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_phases.rs` | 90 | 90 | 0 | 0.0% | ✅ |
 | `commands/doctor/fix_state.rs` | 245 | 245 | 0 | 0.0% | ✅ |
-| `commands/doctor/mod.rs` | 45 | 45 | 0 | 0.0% | ✅ |
+| `commands/doctor/mod.rs` | 49 | 49 | 0 | 0.0% | ✅ |
 | `commands/doctor/tests.rs` | 249 | 249 | 0 | 0.0% | ✅ |
 | `commands/external_bin.rs` | 185 | 154 | 31 | 16.8% | ✅ |
 | `commands/fork/amp.rs` | 43 | 20 | 23 | 53.5% | ✅ |
@@ -130,11 +131,11 @@ SUM:                           154           4068           3126          21405
 | `main.rs` | 589 | 589 | 0 | 0.0% | ✅ (infra) |
 | `metamodes/mod.rs` | 206 | 101 | 105 | 51.0% | ✅ |
 | `metrics/aggregation.rs` | 295 | 235 | 60 | 20.3% | ✅ |
-| `metrics/cowboy.rs` | 178 | 95 | 83 | 46.6% | ✅ |
+| `metrics/cowboy.rs` | 182 | 99 | 83 | 45.6% | ✅ |
 | `metrics/git.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `metrics/graph.rs` | 459 | 287 | 172 | 37.5% | ✅ |
 | `metrics/hooks.rs` | 326 | 216 | 110 | 33.7% | ✅ |
-| `metrics/mod.rs` | 368 | 363 | 5 | 1.4% | ✅ |
+| `metrics/mod.rs` | 374 | 369 | 5 | 1.3% | ✅ |
 | `metrics/states.rs` | 128 | 24 | 104 | 81.2% | ✅ |
 | `metrics/tests/git.rs` | 337 | 337 | 0 | 0.0% | ✅ |
 | `metrics/tests/mod.rs` | 2 | 2 | 0 | 0.0% | ✅ |
@@ -146,9 +147,9 @@ SUM:                           154           4068           3126          21405
 | `rules/tests/evaluator.rs` | 935 | 935 | 0 | 0.0% | ✅ (infra) |
 | `rules/tests/mod.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `rules/types.rs` | 386 | 99 | 287 | 74.4% | ✅ |
-| `storage/archive/aggregation.rs` | 94 | 94 | 0 | 0.0% | ✅ |
+| `storage/archive/aggregation.rs` | 195 | 130 | 65 | 33.3% | ✅ |
 | `storage/archive/builder.rs` | 151 | 87 | 64 | 42.4% | ✅ |
-| `storage/archive/mod.rs` | 709 | 336 | 373 | 52.6% | ✅ |
+| `storage/archive/mod.rs` | 920 | 427 | 493 | 53.6% | ⚠️ Large |
 | `storage/archive/validation.rs` | 41 | 22 | 19 | 46.3% | ✅ |
 | `storage/log_cleanup.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `storage/mod.rs` | 686 | 682 | 4 | 0.6% | ✅ (infra) |
@@ -170,9 +171,11 @@ SUM:                           154           4068           3126          21405
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
 | `tui/tabs/mod.rs` | 10 | 10 | 0 | 0.0% | ✅ |
 | `tui/tabs/overview.rs` | 88 | 74 | 14 | 15.9% | ✅ |
-| `tui/tabs/phases.rs` | 224 | 144 | 80 | 35.7% | ✅ |
+| `tui/tabs/phases.rs` | 228 | 148 | 80 | 35.1% | ✅ |
 | `tui/ui.rs` | 331 | 172 | 159 | 48.0% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
+
+**⚠️ Warning:** 1 file(s) over 400 impl lines - consider splitting for maintainability
 
 ---
 
@@ -214,7 +217,7 @@ SUM:                           154           4068           3126          21405
 | `.ddd/report/20251010-tui-dep-review.md` | 678 |
 | `CLAUDE.md` | 207 |
 | `commands/hegel.md` | 24 |
-| `COVERAGE_REPORT.md` | 264 |
+| `COVERAGE_REPORT.md` | 266 |
 | `docs/ADVANCED_TOOLS.md` | 86 |
 | `docs/astq_patterns/README.md` | 127 |
 | `docs/CUSTOMIZING.md` | 109 |
@@ -250,7 +253,7 @@ SUM:                           154           4068           3126          21405
 | `src/adapters/README.md` | 25 |
 | `src/analyze/cleanup/README.md` | 22 |
 | `src/analyze/README.md` | 28 |
-| `src/commands/doctor/README.md` | 42 |
+| `src/commands/doctor/README.md` | 44 |
 | `src/commands/fork/README.md` | 30 |
 | `src/commands/markdown/README.md` | 25 |
 | `src/commands/README.md` | 49 |
@@ -273,7 +276,7 @@ SUM:                           154           4068           3126          21405
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.78 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.77 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

@@ -202,24 +202,24 @@ pub fn ensure_cowboy_coverage(
             cowboys_in_gap.len()
         );
 
-        // Check if we have a correctly-spanning cowboy
-        let correct_cowboy = cowboys_in_gap.iter().find(|(_, cow)| {
+        // A cowboy is canonical for this gap if it is anchored at the gap start
+        // and ends within the gap. We anchor on start (not end) because rides
+        // are trimmed to their last captured activity, so a correct cowboy ends
+        // at/before the gap end, not exactly at it.
+        let is_canonical = |cow: &WorkflowArchive| {
             let cow_start = parse_timestamp(&cow.workflow_id).ok();
             let cow_end = parse_timestamp(&cow.completed_at).ok();
+            cow_start == Some(gap_start) && cow_end.is_some_and(|e| e <= gap_end)
+        };
 
-            cow_start == Some(gap_start) && cow_end == Some(gap_end)
-        });
+        let correct_cowboy = cowboys_in_gap.iter().find(|(_, cow)| is_canonical(cow));
 
         if correct_cowboy.is_some() {
             eprintln!("DEBUG COWBOY_GAP_FILLER: Correct cowboy exists for gap");
 
-            // Remove all OTHER cowboys in this gap
+            // Remove all OTHER (non-canonical) cowboys in this gap
             for (_idx, cow) in &cowboys_in_gap {
-                let cow_start = parse_timestamp(&cow.workflow_id).ok();
-                let cow_end = parse_timestamp(&cow.completed_at).ok();
-
-                // Remove if not the correct one
-                if cow_start != Some(gap_start) || cow_end != Some(gap_end) {
+                if !is_canonical(cow) {
                     eprintln!(
                         "DEBUG COWBOY_GAP_FILLER: Removing duplicate/incorrect cowboy {}",
                         cow.workflow_id
@@ -351,6 +351,8 @@ fn create_cowboy_for_gap(start: DateTime<Utc>, end: DateTime<Utc>, state_dir: &P
     // Create archive (synthetic cowboy)
     let mut archive = WorkflowArchive::from_metrics(&metrics, &workflow_id, true)?;
     archive.completed_at = end.to_rfc3339();
+    // End the ride at its last captured activity rather than the full gap end.
+    archive.trim_cowboy_to_activity();
 
     write_archive(&archive, state_dir)?;
 

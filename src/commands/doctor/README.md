@@ -4,10 +4,11 @@ Health checks and repairs for workflow state files and DDD artifacts. Detects an
 
 ## Purpose
 
-Validates and repairs three categories of project health:
+Validates and repairs four categories of project health:
 1. **State migrations**: Updates workflow state.json schema for backward compatibility
 2. **DDD artifacts**: Fixes malformed artifact naming (underscores → hyphens)
 3. **Phase metrics**: Repairs archived phases/transitions (dedups records duplicated across archives, compacts each archive, prunes empty phases, rebuilds totals)
+4. **Cowboy durations**: Trims synthetic cowboy rides to end at their last captured activity instead of the moment detection ran (preserving the anchored start), so overnight gaps don't inflate ride durations
 
 ## Structure
 
@@ -16,9 +17,10 @@ doctor/
 ├── mod.rs               Command orchestrator (routes to fix modules, handles --apply flag)
 ├── tests.rs             Integration tests for doctor command
 │
-├── fix_state.rs         State file validation and migration (rescue corrupted files, apply schema migrations)
-├── fix_ddd.rs           DDD artifact naming repairs (git-based date discovery, rename with git mv/fs)
-└── fix_phases.rs        Archive repair (cross-archive dedup of phases+transitions, intra-archive compaction, prune empty phases, rebuild totals)
+├── fix_state.rs            State file validation and migration (rescue corrupted files, apply schema migrations)
+├── fix_ddd.rs              DDD artifact naming repairs (git-based date discovery, rename with git mv/fs)
+├── fix_phases.rs           Archive repair (cross-archive dedup of phases+transitions, intra-archive compaction, prune empty phases, rebuild totals)
+└── fix_cowboy_durations.rs Trim synthetic cowboy rides to last captured activity (WorkflowArchive::trim_cowboy_to_activity)
 ```
 
 ## Workflow

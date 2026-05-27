@@ -255,8 +255,14 @@ pub fn parse_unified_metrics<P: AsRef<Path>>(
                 end_time: phase_archive.end_time.clone(),
                 duration_seconds: phase_archive.duration_seconds,
                 token_metrics: TokenMetrics::from(&phase_archive.tokens),
-                bash_commands: vec![], // Archived as summaries, not individual commands
-                file_modifications: vec![], // Archived as summaries, not individual modifications
+                // Archived as frequency summaries; expand back so counts (e.g.
+                // the TUI BASH/FILES columns) reflect the real activity.
+                bash_commands: crate::storage::archive::expand_bash_commands(
+                    &phase_archive.bash_commands,
+                ),
+                file_modifications: crate::storage::archive::expand_file_modifications(
+                    &phase_archive.file_modifications,
+                ),
                 git_commits: phase_archive.git_commits.clone(),
                 is_synthetic: archive.is_synthetic,
                 workflow_id: Some(archive.workflow_id.clone()),
