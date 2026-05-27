@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2026-05-26 22:20
+**Last Updated**: 2026-05-26 22:26
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 20,296 | 16,344 | 36,640 |
-| **Comments** | 3,015 | - | 3,015 |
-| **Blank Lines** | 3,829 | - | 3,829 |
-| **Total Lines** | 27,140 | 16,344 | 43,484 |
+| **Lines** | 20,311 | 16,344 | 36,655 |
+| **Comments** | 3,019 | - | 3,019 |
+| **Blank Lines** | 3,831 | - | 3,831 |
+| **Total Lines** | 27,161 | 16,344 | 43,505 |
 | **Files** | 135 | 86 | 221 |
 
-**Documentation Ratio**: 0.81 lines of docs per line of code
+**Documentation Ratio**: 0.80 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                           135           3829           3015          20296
+Rust                           135           3831           3019          20311
 Markdown                        18            171              0            538
 -------------------------------------------------------------------------------
-SUM:                           153           4000           3015          20834
+SUM:                           153           4002           3019          20849
 -------------------------------------------------------------------------------
 ```
 
@@ -169,7 +169,7 @@ SUM:                           153           4000           3015          20834
 | `tui/tabs/files.rs` | 90 | 72 | 18 | 20.0% | ✅ |
 | `tui/tabs/mod.rs` | 9 | 9 | 0 | 0.0% | ✅ |
 | `tui/tabs/overview.rs` | 88 | 74 | 14 | 15.9% | ✅ |
-| `tui/tabs/phases.rs` | 143 | 111 | 32 | 22.4% | ✅ |
+| `tui/tabs/phases.rs` | 164 | 129 | 35 | 21.3% | ✅ |
 | `tui/ui.rs` | 319 | 160 | 159 | 49.8% | ✅ |
 | `tui/utils.rs` | 364 | 211 | 153 | 42.0% | ✅ |
 
@@ -272,7 +272,7 @@ SUM:                           153           4000           3015          20834
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 0.81 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 0.80 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ❌ | Optional |
 

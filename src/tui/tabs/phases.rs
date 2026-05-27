@@ -45,6 +45,16 @@ pub fn render_phases_tab(
             ),
         ]));
 
+        // Timestamps (start → end, or → active for an in-progress phase)
+        let time_range = match &phase.end_time {
+            Some(end) => format!("{} → {}", fmt_time(&phase.start_time), fmt_time(end)),
+            None => format!("{} → (active)", fmt_time(&phase.start_time)),
+        };
+        lines.push(Line::from(vec![
+            Span::raw("    🕐 Time:     "),
+            Span::styled(time_range, Style::default().fg(Color::Gray)),
+        ]));
+
         // Duration
         if phase.duration_seconds > 0 {
             let mins = phase.duration_seconds / 60;
@@ -109,6 +119,14 @@ pub fn render_phases_tab(
     )
 }
 
+/// Format an RFC3339 timestamp as `HH:MM:SS`, falling back to the raw string
+/// if it can't be parsed (never panics).
+fn fmt_time(rfc3339: &str) -> String {
+    chrono::DateTime::parse_from_rfc3339(rfc3339)
+        .map(|dt| dt.format("%H:%M:%S").to_string())
+        .unwrap_or_else(|_| rfc3339.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -123,8 +141,11 @@ mod tests {
 
         let widget = render_phases_tab(&metrics, 0, 0);
 
-        // Verify widget renders
-        assert!(format!("{:?}", widget).contains("Paragraph"));
+        // Verify widget renders, and that phase timestamps are shown
+        // (builder starts the first phase at 10:00:00).
+        let rendered = format!("{:?}", widget);
+        assert!(rendered.contains("Paragraph"));
+        assert!(rendered.contains("10:00:00"));
     }
 
     #[test]
